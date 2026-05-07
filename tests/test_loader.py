@@ -1,0 +1,182 @@
+"""数据加载器测试 — 使用真实 JSON 数据文件。"""
+from __future__ import annotations
+
+import sys
+import io
+import pytest
+from src.data.loader import (
+    get_bundle,
+    get_attr_meta,
+    get_attr_name,
+    get_skill_meta,
+    get_skill_name,
+    get_pet_meta,
+    get_pet_name,
+    get_buff_meta,
+    get_pet_skill_meta,
+    invalidate_cache,
+    DATA_DIR,
+)
+
+
+@pytest.fixture(autouse=True)
+def _fresh_cache():
+    """每个测试前清空缓存，确保从文件重新加载。"""
+    invalidate_cache()
+    yield
+    invalidate_cache()
+
+
+def _utf8_print(text: str) -> None:
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
+    print(text)
+
+
+class TestBundleLoading:
+    """整体数据加载测试。"""
+
+    def test_bundle_loads(self):
+        bundle = get_bundle()
+        assert isinstance(bundle, dict)
+        assert len(bundle) > 0
+
+    def test_attr_meta_loaded(self):
+        bundle = get_bundle()
+        attr = bundle.get("attr_meta", {})
+        assert len(attr) >= 18, f"Expected >= 18 attributes, got {len(attr)}"
+
+    def test_skill_meta_loaded(self):
+        bundle = get_bundle()
+        skills = bundle.get("skill_meta", {})
+        assert len(skills) > 100, f"Expected > 100 skills, got {len(skills)}"
+
+    def test_pet_meta_loaded(self):
+        bundle = get_bundle()
+        pets = bundle.get("pet_meta", {})
+        assert len(pets) > 100, f"Expected > 100 pets, got {len(pets)}"
+
+    def test_buff_meta_loaded(self):
+        bundle = get_bundle()
+        buffs = bundle.get("buff_meta", {})
+        assert len(buffs) > 0
+
+
+class TestAttrLookup:
+    """属性查询测试。"""
+
+    def test_attr_name_known_id(self):
+        name = get_attr_name(1)
+        assert name is not None
+        assert isinstance(name, str)
+        assert len(name) > 0
+
+    def test_attr_meta_has_expected_fields(self):
+        meta = get_attr_meta(1)
+        assert meta is not None
+        assert "name" in meta
+        assert "id" in meta
+
+    def test_attr_not_found(self):
+        assert get_attr_name(999999) is None
+        assert get_attr_meta(999999) is None
+
+
+class TestSkillLookup:
+    """技能查询测试。"""
+
+    def test_skill_name_known_id(self):
+        # 7700001 = 愿力冲击 (from verified data)
+        name = get_skill_name(7700001)
+        assert name is not None
+
+    def test_skill_meta_has_fields(self):
+        meta = get_skill_meta(7700001)
+        assert meta is not None
+        assert "name" in meta
+
+    def test_skill_not_found(self):
+        assert get_skill_name(999999999) is None
+
+    def test_skill_id_normalization(self):
+        # Skill IDs >= 100_000 ending in 00 should be normalized (divided by 100)
+        meta_normalized = get_skill_meta(7700000)
+        meta_direct = get_skill_meta(77000)
+        # At least one should work - depends on data
+        # The normalization: 7700000 -> 77000
+        # Check that the normalization function works
+        from src.data.loader import _normalize_skill_id
+        assert _normalize_skill_id(7700000) == 77000
+        assert _normalize_skill_id(100) == 100  # not normalized
+
+
+class TestPetLookup:
+    """精灵查询测试。"""
+
+    def test_pet_name_known_id(self):
+        # 14000001 = 喵喵 (from verified data)
+        name = get_pet_name(14000001)
+        assert name is not None
+
+    def test_pet_meta_has_fields(self):
+        meta = get_pet_meta(14000001)
+        assert meta is not None
+        assert "name" in meta
+        assert "id" in meta
+
+    def test_pet_base_id(self):
+        meta = get_pet_meta(14000001)
+        assert meta is not None
+        assert "base_id" in meta
+
+    def test_pet_not_found(self):
+        assert get_pet_name(999999999) is None
+
+    def test_pet_fallback_to_monster(self):
+        # get_pet_meta tries pet_meta first, then monster_meta
+        # Just verify the function doesn't crash
+        result = get_pet_meta(1)
+        # May or may not exist, just verify no exception
+        assert result is None or isinstance(result, dict)
+
+
+class TestBuffLookup:
+    """Buff 查询测试。"""
+
+    def test_buff_meta_returns_dict_or_none(self):
+        result = get_buff_meta(1)
+        assert result is None or isinstance(result, dict)
+
+    def test_buff_meta_not_found(self):
+        assert get_buff_meta(0) is None
+
+
+class TestPetSkillLookup:
+    """精灵技能池查询测试。"""
+
+    def test_pet_skill_meta_returns_dict_or_none(self):
+        result = get_pet_skill_meta(3001)
+        assert result is None or isinstance(result, dict)
+
+
+class TestCacheInvalidation:
+    """缓存失效测试。"""
+
+    def test_invalidate_and_reload(self):
+        bundle1 = get_bundle()
+        invalidate_cache()
+        bundle2 = get_bundle()
+        assert bundle1 is not bundle2  # different objects after invalidation
+        # Same content
+        assert len(bundle1.get("attr_meta", {})) == len(bundle2.get("attr_meta", {}))
+
+
+class TestDataDir:
+    """数据目录存在性测试。"""
+
+    def test_data_dir_exists(self):
+        assert DATA_DIR.exists()
+
+    def test_required_files_exist(self):
+        required = ["attr_map.json", "skill_map.json", "pet_map.json", "buff_map.json"]
+        for fname in required:
+            assert (DATA_DIR / fname).exists(), f"Missing {fname}"

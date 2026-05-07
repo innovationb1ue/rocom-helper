@@ -1,0 +1,47 @@
+import { useRef, useCallback, useEffect } from 'react';
+import { useBattleStore } from '../stores/battleStore';
+
+export function useBattle() {
+  const wsRef = useRef<WebSocket | null>(null);
+  const { updateState, addSuggestion, setConnected, reset } = useBattleStore();
+
+  const connect = useCallback(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.hostname}:8000/ws/battle`);
+    wsRef.current = ws;
+
+    ws.onopen = () => setConnected(true);
+    ws.onclose = () => setConnected(false);
+    ws.onerror = () => setConnected(false);
+
+    ws.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === 'state_update') {
+          updateState(msg.state);
+        } else if (msg.type === 'suggestions') {
+          msg.suggestions.forEach((s: { type: string; message: string }) => addSuggestion(s));
+        }
+      } catch { /* ignore */ }
+    };
+  }, [updateState, addSuggestion, setConnected]);
+
+  const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
+    wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));
+  }, []);
+
+  const resetBattle = useCallback(() => {
+    wsRef.current?.send(JSON.stringify({ type: 'reset' }));
+    reset();
+  }, [reset]);
+
+  const getState = useCallback(() => {
+    wsRef.current?.send(JSON.stringify({ type: 'get_state' }));
+  }, []);
+
+  useEffect(() => {
+    return () => { wsRef.current?.close(); };
+  }, []);
+
+  return { connect, sendEvent, resetBattle, getState };
+}

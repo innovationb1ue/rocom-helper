@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "mcp__zread__get_repo_structure",
+      "mcp__web-search-prime__web_search_prime",
+      "mcp__web-reader__webReader",
+      "Bash(curl -s \"https://api.github.com/search/repositories?q=洛克王国\")",
+      "Bash(python *)",
+      "Bash(rm -f D:/raco-helper/logs/sniffer.log)",
+      "Bash(rm -rf D:/raco-helper/logs/packets/*)",
+      "Bash(curl -s -X POST http://localhost:8000/api/sniffer/stop)"
+    ]
+  }
+}

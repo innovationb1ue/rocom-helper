@@ -1,0 +1,4912 @@
+[
+  {
+    "wiki_name": "一拳",
+    "name": "一拳",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "三连破",
+    "name": "三连破",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "三鼓作气",
+    "name": "三鼓作气",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "不动如山",
+    "name": "不动如山",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "不可接触",
+    "name": "不可接触",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "丢冰块",
+    "name": "丢冰块",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "丰饶",
+    "name": "丰饶",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "主场优势",
+    "name": "主场优势",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "主轴",
+    "name": "主轴",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "乘胜追击",
+    "name": "乘胜追击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "乘风",
+    "name": "乘风",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "乱打",
+    "name": "乱打",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "二律背反",
+    "name": "二律背反",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "交叉闪电",
+    "name": "交叉闪电",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "仙人掌刺击",
+    "name": "仙人掌刺击",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "以毒攻毒",
+    "name": "以毒攻毒",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "以重制重",
+    "name": "以重制重",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "休息回复",
+    "name": "休息回复",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "传感器",
+    "name": "传感器",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "伪造账单",
+    "name": "伪造账单",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "伺机而动",
+    "name": "伺机而动",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "俯冲猛击",
+    "name": "俯冲猛击",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "借用",
+    "name": "借用",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "倾泻",
+    "name": "倾泻",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "假寐",
+    "name": "假寐",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "偷师",
+    "name": "偷师",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "偷袭",
+    "name": "偷袭",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "充分燃烧",
+    "name": "充分燃烧",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "先发制人",
+    "name": "先发制人",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "光之矛",
+    "name": "光之矛",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "光刃",
+    "name": "光刃",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "光合作用",
+    "name": "光合作用",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "光球",
+    "name": "光球",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "光能聚集",
+    "name": "光能聚集",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冥想",
+    "name": "冥想",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冬至",
+    "name": "冬至",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰冻光线",
+    "name": "冰冻光线",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰刺",
+    "name": "冰刺",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰墙",
+    "name": "冰墙",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰天雪地",
+    "name": "冰天雪地",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰捆缚",
+    "name": "冰捆缚",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰晶坠",
+    "name": "冰晶坠",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰点",
+    "name": "冰点",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰爪",
+    "name": "冰爪",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰荆棘",
+    "name": "冰荆棘",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰蛋壳",
+    "name": "冰蛋壳",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰锋横扫",
+    "name": "冰锋横扫",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰锥",
+    "name": "冰锥",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冰雹",
+    "name": "冰雹",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 105,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冲击",
+    "name": "冲击",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冲撞",
+    "name": "冲撞",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 135,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "冷风",
+    "name": "冷风",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "击鼓传花",
+    "name": "击鼓传花",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "刺盾",
+    "name": "刺盾",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "刺藤",
+    "name": "刺藤",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "剧毒",
+    "name": "剧毒",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "力量吞噬",
+    "name": "力量吞噬",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "力量增效",
+    "name": "力量增效",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "加固",
+    "name": "加固",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "加大功率",
+    "name": "加大功率",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "勾魂",
+    "name": "勾魂",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "化劲",
+    "name": "化劲",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "升龙咆哮",
+    "name": "升龙咆哮",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 200,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "午夜噪音",
+    "name": "午夜噪音",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "压扁",
+    "name": "压扁",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 155,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "双响炮",
+    "name": "双响炮",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "双星",
+    "name": "双星",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "双联脉冲",
+    "name": "双联脉冲",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "反击拳",
+    "name": "反击拳",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "反弹",
+    "name": "反弹",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "取念",
+    "name": "取念",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "叠势",
+    "name": "叠势",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "叶绿光束",
+    "name": "叶绿光束",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "后发制人",
+    "name": "后发制人",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 155,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "吓退",
+    "name": "吓退",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "吞噬",
+    "name": "吞噬",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "吨位压制",
+    "name": "吨位压制",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "听桥",
+    "name": "听桥",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "吹火",
+    "name": "吹火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "吹炎",
+    "name": "吹炎",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 170,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "咆哮",
+    "name": "咆哮",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "啃咬",
+    "name": "啃咬",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "啄击",
+    "name": "啄击",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "啮合传递",
+    "name": "啮合传递",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "嗜痛",
+    "name": "嗜痛",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "嘲弄",
+    "name": "嘲弄",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "噬心",
+    "name": "噬心",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "四维降解",
+    "name": "四维降解",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "回旋踢",
+    "name": "回旋踢",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "回旋风暴",
+    "name": "回旋风暴",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "地刺",
+    "name": "地刺",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "地陷",
+    "name": "地陷",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "地震",
+    "name": "地震",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 190,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "坍缩",
+    "name": "坍缩",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "坟场搏击",
+    "name": "坟场搏击",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 180,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "垂死反击",
+    "name": "垂死反击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "埋伏",
+    "name": "埋伏",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "堆雪人",
+    "name": "堆雪人",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "增程电池",
+    "name": "增程电池",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "壁垒",
+    "name": "壁垒",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "复写",
+    "name": "复写",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "多维击打",
+    "name": "多维击打",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "大爆炸",
+    "name": "大爆炸",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "天光",
+    "name": "天光",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "天旋地转",
+    "name": "天旋地转",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "天洪",
+    "name": "天洪",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "天火",
+    "name": "天火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "孢子",
+    "name": "孢子",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "孢子爆散",
+    "name": "孢子爆散",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "富养化",
+    "name": "富养化",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "寒风吹",
+    "name": "寒风吹",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "寸拳",
+    "name": "寸拳",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "导电撞击",
+    "name": "导电撞击",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "小偷小摸",
+    "name": "小偷小摸",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "尾后针",
+    "name": "尾后针",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "山火",
+    "name": "山火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "岩土暴击",
+    "name": "岩土暴击",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "岩脉崩毁",
+    "name": "岩脉崩毁",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "崩拳",
+    "name": "崩拳",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "幻象",
+    "name": "幻象",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "幼态延续",
+    "name": "幼态延续",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "幽灵爆发",
+    "name": "幽灵爆发",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "应激反应",
+    "name": "应激反应",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "引燃",
+    "name": "引燃",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "引雷",
+    "name": "引雷",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "强制重启",
+    "name": "强制重启",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "当头棒喝",
+    "name": "当头棒喝",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "彗星",
+    "name": "彗星",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 240,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "影袭",
+    "name": "影袭",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "彼岸之手",
+    "name": "彼岸之手",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "徒长",
+    "name": "徒长",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "心灵洞悉",
+    "name": "心灵洞悉",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "快速移动",
+    "name": "快速移动",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "念力膨胀",
+    "name": "念力膨胀",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "怒火",
+    "name": "怒火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "怨力打击",
+    "name": "怨力打击",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 1,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "恐吓",
+    "name": "恐吓",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "恶作剧",
+    "name": "恶作剧",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "恶念交换",
+    "name": "恶念交换",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "恶意逃离",
+    "name": "恶意逃离",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "恶能量",
+    "name": "恶能量",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "惊吓盒子",
+    "name": "惊吓盒子",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "感染病",
+    "name": "感染病",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "感电",
+    "name": "感电",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "截拳",
+    "name": "截拳",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "扇风",
+    "name": "扇风",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "打湿",
+    "name": "打湿",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "打雪仗",
+    "name": "打雪仗",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "打鼾",
+    "name": "打鼾",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 165,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "扫尾",
+    "name": "扫尾",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "扬沙",
+    "name": "扬沙",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "技巧打击",
+    "name": "技巧打击",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "抓挠",
+    "name": "抓挠",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "折射",
+    "name": "折射",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "折线冲击",
+    "name": "折线冲击",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "抛石",
+    "name": "抛石",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "报复",
+    "name": "报复",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "抽枝",
+    "name": "抽枝",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "拆卸",
+    "name": "拆卸",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "拍击",
+    "name": "拍击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "持续高温",
+    "name": "持续高温",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "指指点点",
+    "name": "指指点点",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 5,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "捆缚",
+    "name": "捆缚",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "捧杀",
+    "name": "捧杀",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "掠夺",
+    "name": "掠夺",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "掩护",
+    "name": "掩护",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "提气",
+    "name": "提气",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "摇篮曲",
+    "name": "摇篮曲",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "撒娇",
+    "name": "撒娇",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "撕咬",
+    "name": "撕咬",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "撕裂",
+    "name": "撕裂",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "操控",
+    "name": "操控",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "放晴",
+    "name": "放晴",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "散手",
+    "name": "散手",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "斩断",
+    "name": "斩断",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "旋转突击",
+    "name": "旋转突击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "无影脚",
+    "name": "无影脚",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "无畏之心",
+    "name": "无畏之心",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "易燃物质",
+    "name": "易燃物质",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "星云漩涡",
+    "name": "星云漩涡",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "星星撞击",
+    "name": "星星撞击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "星轨裂变",
+    "name": "星轨裂变",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "星链",
+    "name": "星链",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "晒太阳",
+    "name": "晒太阳",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "暗突袭",
+    "name": "暗突袭",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "暗箱操作",
+    "name": "暗箱操作",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "暴风眼",
+    "name": "暴风眼",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "暴风雪",
+    "name": "暴风雪",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "月光合奏",
+    "name": "月光合奏",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "有效预防",
+    "name": "有效预防",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "杠杆置换",
+    "name": "杠杆置换",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "极寒领域",
+    "name": "极寒领域",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 105,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "极速冷冻",
+    "name": "极速冷冻",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "极限撕裂",
+    "name": "极限撕裂",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 135,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "架势",
+    "name": "架势",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "柔弱",
+    "name": "柔弱",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "根吸收",
+    "name": "根吸收",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "栽赃",
+    "name": "栽赃",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "械斗",
+    "name": "械斗",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "棘刺",
+    "name": "棘刺",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "棘突",
+    "name": "棘突",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "横纵斩",
+    "name": "横纵斩",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "欺诈契约",
+    "name": "欺诈契约",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒囊",
+    "name": "毒囊",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒孢子",
+    "name": "毒孢子",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒沼",
+    "name": "毒沼",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒泡泡",
+    "name": "毒泡泡",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒液渗透",
+    "name": "毒液渗透",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒针",
+    "name": "毒针",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "毒雾",
+    "name": "毒雾",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "气势一击",
+    "name": "气势一击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "气沉丹田",
+    "name": "气沉丹田",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "气泡",
+    "name": "气泡",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "气波",
+    "name": "气波",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "氧输送",
+    "name": "氧输送",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水光冲击",
+    "name": "水光冲击",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水刃",
+    "name": "水刃",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 115,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水幕冲击",
+    "name": "水幕冲击",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水弹",
+    "name": "水弹",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水弹枪",
+    "name": "水弹枪",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水星水",
+    "name": "水星水",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水泡盾",
+    "name": "水泡盾",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水波术",
+    "name": "水波术",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水炮",
+    "name": "水炮",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 110,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水环",
+    "name": "水环",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "水花四溅",
+    "name": "水花四溅",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "求雨",
+    "name": "求雨",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "汲取",
+    "name": "汲取",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "沙涌",
+    "name": "沙涌",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "泡沫",
+    "name": "泡沫",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "泡沫幻影",
+    "name": "泡沫幻影",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "泥巴喷射",
+    "name": "泥巴喷射",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "泥浆",
+    "name": "泥浆",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "泥浆铠甲",
+    "name": "泥浆铠甲",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "洗礼",
+    "name": "洗礼",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "流星火雨",
+    "name": "流星火雨",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "流沙",
+    "name": "流沙",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "流火",
+    "name": "流火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "消毒法",
+    "name": "消毒法",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 115,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "涌泉",
+    "name": "涌泉",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "润泽",
+    "name": "润泽",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "淤泥表皮",
+    "name": "淤泥表皮",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "淬火",
+    "name": "淬火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "湮灭",
+    "name": "湮灭",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 155,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "溃烂触碰",
+    "name": "溃烂触碰",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "滚雪球",
+    "name": "滚雪球",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "漫反射",
+    "name": "漫反射",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "潮汐",
+    "name": "潮汐",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "潮涌",
+    "name": "潮涌",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "激怒",
+    "name": "激怒",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "激流",
+    "name": "激流",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火云车",
+    "name": "火云车",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火焰冲锋",
+    "name": "火焰冲锋",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火焰切割",
+    "name": "火焰切割",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火焰护盾",
+    "name": "火焰护盾",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火焰箭",
+    "name": "火焰箭",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火爪",
+    "name": "火爪",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "火苗",
+    "name": "火苗",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "灵光",
+    "name": "灵光",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "灵媒",
+    "name": "灵媒",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "灼伤",
+    "name": "灼伤",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "灾厄",
+    "name": "灾厄",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 150,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "炎息",
+    "name": "炎息",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "炎打",
+    "name": "炎打",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "炎枪",
+    "name": "炎枪",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "炎爆术",
+    "name": "炎爆术",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "炙热波动",
+    "name": "炙热波动",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "烈焰风暴",
+    "name": "烈焰风暴",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "热气",
+    "name": "热气",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "热砂",
+    "name": "热砂",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "热身",
+    "name": "热身",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "热身运动",
+    "name": "热身运动",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "焚毁",
+    "name": "焚毁",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "焚烧烙印",
+    "name": "焚烧烙印",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "燃尽",
+    "name": "燃尽",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 155,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "爆冲",
+    "name": "爆冲",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "爆米花爆破",
+    "name": "爆米花爆破",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "爆裂飞弹",
+    "name": "爆裂飞弹",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 160,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "牵连",
+    "name": "牵连",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "猛烈撞击",
+    "name": "猛烈撞击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "玩具乐园",
+    "name": "玩具乐园",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "球状闪电",
+    "name": "球状闪电",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "甜心续航",
+    "name": "甜心续航",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "生日蛋糕",
+    "name": "生日蛋糕",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "甩水",
+    "name": "甩水",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "电弧",
+    "name": "电弧",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "电流",
+    "name": "电流",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "电磁偏转",
+    "name": "电磁偏转",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "电离爆破",
+    "name": "电离爆破",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "疫病吐息",
+    "name": "疫病吐息",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "疾风刺",
+    "name": "疾风刺",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "疾风涡轮",
+    "name": "疾风涡轮",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 115,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "疾风连袭",
+    "name": "疾风连袭",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "瘴气喷射",
+    "name": "瘴气喷射",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "盐水浴",
+    "name": "盐水浴",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "盛开",
+    "name": "盛开",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "瞬间零度",
+    "name": "瞬间零度",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "石肤术",
+    "name": "石肤术",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "石锁",
+    "name": "石锁",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "砂石冲撞",
+    "name": "砂石冲撞",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "砂糖弹球",
+    "name": "砂糖弹球",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "破绽",
+    "name": "破绽",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "破罐破摔",
+    "name": "破罐破摔",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "破防",
+    "name": "破防",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "硬化",
+    "name": "硬化",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "硬门",
+    "name": "硬门",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "碎冰冰",
+    "name": "碎冰冰",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "碎冰击",
+    "name": "碎冰击",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "碰爪",
+    "name": "碰爪",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "磁干扰",
+    "name": "磁干扰",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "磁暴",
+    "name": "磁暴",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "示弱",
+    "name": "示弱",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "离子火花",
+    "name": "离子火花",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "离子震荡",
+    "name": "离子震荡",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "种子弹",
+    "name": "种子弹",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "种皮爆裂",
+    "name": "种皮爆裂",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "移花接木",
+    "name": "移花接木",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "空间压迫",
+    "name": "空间压迫",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "穿膛",
+    "name": "穿膛",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "突袭",
+    "name": "突袭",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "等价交换",
+    "name": "等价交换",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "筛管奔流",
+    "name": "筛管奔流",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "粒子对撞",
+    "name": "粒子对撞",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "精神扰乱",
+    "name": "精神扰乱",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "纤维化",
+    "name": "纤维化",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "绵里藏针",
+    "name": "绵里藏针",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "缓冻",
+    "name": "缓冻",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 85,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "缠丝劲",
+    "name": "缠丝劲",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 25,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "网缚",
+    "name": "网缚",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "羽刃",
+    "name": "羽刃",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "羽化加速",
+    "name": "羽化加速",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "羽毛舞",
+    "name": "羽毛舞",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "羽翼庇护",
+    "name": "羽翼庇护",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "翅刃",
+    "name": "翅刃",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "翼击",
+    "name": "翼击",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "耀眼",
+    "name": "耀眼",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "聒噪",
+    "name": "聒噪",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "联动装置",
+    "name": "联动装置",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "聚盐",
+    "name": "聚盐",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "肥皂泡",
+    "name": "肥皂泡",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "背袭",
+    "name": "背袭",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "能量刃",
+    "name": "能量刃",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "能量守恒",
+    "name": "能量守恒",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "能量炮",
+    "name": "能量炮",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 50,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "脉冲光线",
+    "name": "脉冲光线",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "腐化",
+    "name": "腐化",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "腐蚀酸液",
+    "name": "腐蚀酸液",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "花炮",
+    "name": "花炮",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "花香",
+    "name": "花香",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "芳香诱引",
+    "name": "芳香诱引",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "荆棘爪",
+    "name": "荆棘爪",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "草虫冲击",
+    "name": "草虫冲击",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "落井下毒",
+    "name": "落井下毒",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "落星",
+    "name": "落星",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "落石",
+    "name": "落石",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "落雨",
+    "name": "落雨",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "落雷",
+    "name": "落雷",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蓄势待发",
+    "name": "蓄势待发",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蓄水",
+    "name": "蓄水",
+    "type_name": "水",
+    "type_id": 2,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蓄能轰击",
+    "name": "蓄能轰击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 130,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "藤绞",
+    "name": "藤绞",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "藤鞭",
+    "name": "藤鞭",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虚假破产",
+    "name": "虚假破产",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虚化",
+    "name": "虚化",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫击",
+    "name": "虫击",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫刺",
+    "name": "虫刺",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫结阵",
+    "name": "虫结阵",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫网",
+    "name": "虫网",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫群",
+    "name": "虫群",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫群智慧",
+    "name": "虫群智慧",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫群过境",
+    "name": "虫群过境",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫茧",
+    "name": "虫茧",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫蛊",
+    "name": "虫蛊",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虫鸣",
+    "name": "虫鸣",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "虹光冲击",
+    "name": "虹光冲击",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蛰针",
+    "name": "蛰针",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蜡质膜",
+    "name": "蜡质膜",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "蝙蝠",
+    "name": "蝙蝠",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "血气",
+    "name": "血气",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "裂石",
+    "name": "裂石",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "见招拆招",
+    "name": "见招拆招",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "角击",
+    "name": "角击",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "触底强击",
+    "name": "触底强击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "触电",
+    "name": "触电",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "许愿星",
+    "name": "许愿星",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 110,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "诋毁",
+    "name": "诋毁",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "诡刺",
+    "name": "诡刺",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "贪婪",
+    "name": "贪婪",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "贮藏",
+    "name": "贮藏",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "贯手",
+    "name": "贯手",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "赤子之心",
+    "name": "赤子之心",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "趁火打劫",
+    "name": "趁火打劫",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 35,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "超导",
+    "name": "超导",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 95,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "超导加速",
+    "name": "超导加速",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "超新星馈赠",
+    "name": "超新星馈赠",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "超级糖果",
+    "name": "超级糖果",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "超维投射",
+    "name": "超维投射",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "跌落",
+    "name": "跌落",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "践踏",
+    "name": "践踏",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 130,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "跺地",
+    "name": "跺地",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "轴承支撑",
+    "name": "轴承支撑",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "过曝",
+    "name": "过曝",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "过载回路",
+    "name": "过载回路",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "远程访问",
+    "name": "远程访问",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "连续毒针",
+    "name": "连续毒针",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 15,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "连续爪击",
+    "name": "连续爪击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "迫害",
+    "name": "迫害",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "迫近攻击",
+    "name": "迫近攻击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 90,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "追打",
+    "name": "追打",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "退化",
+    "name": "退化",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "逆向演化",
+    "name": "逆向演化",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "逆袭",
+    "name": "逆袭",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "透射",
+    "name": "透射",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "速冻",
+    "name": "速冻",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "遁地",
+    "name": "遁地",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "酶浓度调整",
+    "name": "酶浓度调整",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "重击",
+    "name": "重击",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 110,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "金属噪音",
+    "name": "金属噪音",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "针刺射击",
+    "name": "针刺射击",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "针状物",
+    "name": "针状物",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "钢钻",
+    "name": "钢钻",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "钢铁洪流",
+    "name": "钢铁洪流",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "钧势",
+    "name": "钧势",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "锐利眼神",
+    "name": "锐利眼神",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "错乱",
+    "name": "错乱",
+    "type_name": "幻",
+    "type_id": 11,
+    "power": 65,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "镜像反射",
+    "name": "镜像反射",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "闪光",
+    "name": "闪光",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "闪光冲击",
+    "name": "闪光冲击",
+    "type_name": "光",
+    "type_id": 17,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "闪击",
+    "name": "闪击",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "闪击折返",
+    "name": "闪击折返",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "闪燃",
+    "name": "闪燃",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "防反",
+    "name": "防反",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "防御",
+    "name": "防御",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "防御反击",
+    "name": "防御反击",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "阳火增辉",
+    "name": "阳火增辉",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "阻断",
+    "name": "阻断",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "降灵",
+    "name": "降灵",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "除厄",
+    "name": "除厄",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "陨石",
+    "name": "陨石",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "隐藏条款",
+    "name": "隐藏条款",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "隼鳞",
+    "name": "隼鳞",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 140,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "集中",
+    "name": "集中",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "雪替身",
+    "name": "雪替身",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "雪球",
+    "name": "雪球",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "雷暴",
+    "name": "雷暴",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "雾气环绕",
+    "name": "雾气环绕",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "震击",
+    "name": "震击",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "霜冻",
+    "name": "霜冻",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "霜天",
+    "name": "霜天",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "霜降",
+    "name": "霜降",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鞭打",
+    "name": "鞭打",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "音波弹",
+    "name": "音波弹",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "音爆",
+    "name": "音爆",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 130,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "顶端优势",
+    "name": "顶端优势",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "预备势",
+    "name": "预备势",
+    "type_name": "武",
+    "type_id": 6,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "风吹雪",
+    "name": "风吹雪",
+    "type_name": "冰",
+    "type_id": 5,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "风墙",
+    "name": "风墙",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "风矢",
+    "name": "风矢",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "风起",
+    "name": "风起",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "风隐",
+    "name": "风隐",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "飞叶",
+    "name": "飞叶",
+    "type_name": "草",
+    "type_id": 3,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "飞吻",
+    "name": "飞吻",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "飞断",
+    "name": "飞断",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 20,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "飞羽",
+    "name": "飞羽",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "飞踢",
+    "name": "飞踢",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 110,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "食腐",
+    "name": "食腐",
+    "type_name": "虫",
+    "type_id": 12,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "骗局",
+    "name": "骗局",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 110,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "高温回火",
+    "name": "高温回火",
+    "type_name": "火",
+    "type_id": 1,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鬼火",
+    "name": "鬼火",
+    "type_name": "幽",
+    "type_id": 13,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "魅惑",
+    "name": "魅惑",
+    "type_name": "萌",
+    "type_id": 10,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "魔法增效",
+    "name": "魔法增效",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "魔爪",
+    "name": "魔爪",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 30,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "魔能爆",
+    "name": "魔能爆",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 1,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鸣叫",
+    "name": "鸣叫",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 40,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鸣沙陷阱",
+    "name": "鸣沙陷阱",
+    "type_name": "地",
+    "type_id": 8,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鸩毒",
+    "name": "鸩毒",
+    "type_name": "毒",
+    "type_id": 7,
+    "power": 75,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鹰爪",
+    "name": "鹰爪",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "麻痹",
+    "name": "麻痹",
+    "type_name": "电",
+    "type_id": 4,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "黑手",
+    "name": "黑手",
+    "type_name": "恶",
+    "type_id": 16,
+    "power": 45,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "鼓劲",
+    "name": "鼓劲",
+    "type_name": "普通",
+    "type_id": 0,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "齿轮切开",
+    "name": "齿轮切开",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 130,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "齿轮扭矩",
+    "name": "齿轮扭矩",
+    "type_name": "机械",
+    "type_id": 14,
+    "power": 80,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙之利爪",
+    "name": "龙之利爪",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 130,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙卷风",
+    "name": "龙卷风",
+    "type_name": "翼",
+    "type_id": 9,
+    "power": 70,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙吟",
+    "name": "龙吟",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙吼",
+    "name": "龙吼",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 60,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙威",
+    "name": "龙威",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙息环爆",
+    "name": "龙息环爆",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 55,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙炮",
+    "name": "龙炮",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 100,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙爪",
+    "name": "龙爪",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 120,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  },
+  {
+    "wiki_name": "龙血",
+    "name": "龙血",
+    "type_name": "龙",
+    "type_id": 15,
+    "power": 0,
+    "skill_type": "",
+    "pp": 0,
+    "desc": ""
+  }
+]
