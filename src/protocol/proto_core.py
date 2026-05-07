@@ -108,7 +108,17 @@ def buff_name(buff_id: Optional[int]) -> Optional[str]:
     return meta.get("name") if isinstance(meta, dict) and isinstance(meta.get("name"), str) else None
 
 def side_name(side_id: Optional[int]) -> Optional[str]:
-    return None if side_id is None else SIDE_NAMES.get(int(side_id))
+    if side_id is None:
+        return None
+    v = int(side_id)
+    if v in SIDE_NAMES:
+        return SIDE_NAMES[v]
+    # Extended IDs: 1-6 = player slots, 401-406 = opponent slots
+    if v >= 401:
+        return "敌方"
+    if 1 <= v <= 6:
+        return "我方"
+    return None
 
 def buff_name(buff_id: Optional[int]) -> Optional[str]:
     meta = get_buff_meta(buff_id)
@@ -348,8 +358,14 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
     return out
 
 def _side_from_path(path: str) -> Optional[int]:
-    """Determine side from wrapper path: field 5 = player(1), field 6 = opponent(401)."""
+    """Determine side from wrapper path.
+
+    0x1316 battle_enter:  ``root.6[N].(5|6)[N].2[*]`` → field 5=player(1), field 6=opponent(401).
+    0x131A round_start:   ``root.3[N].2[N].44[N].8[N].3[N]`` → has ``.8[`` = opponent(401);
+                           ``root.3[N].2[N].44[N].3[N]`` (no .8) = player(1).
+    """
     import re
+    # battle_enter pattern: .6[N].5[N] or .6[N].6[N]
     m = re.search(r"\.6\[\d+\]\.(\d+)\[", path)
     if m:
         f = int(m.group(1))
@@ -357,6 +373,12 @@ def _side_from_path(path: str) -> Optional[int]:
             return 1
         if f == 6:
             return 401
+    # round_start pattern: .8[N] present → opponent
+    if re.search(r"\.8\[\d+\]\.", path):
+        return 401
+    # round_start player pets have .44[N].3[N] without .8
+    if re.search(r"\.44\[\d+\]\.", path):
+        return 1
     return None
 
 

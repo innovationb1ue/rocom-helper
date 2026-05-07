@@ -352,4 +352,13 @@ def summarize(record: Any, inner: Optional[Any] = None) -> Tuple[str, Dict[str, 
         kind, handler = entry
         return kind, handler(record, inner)
 
+    from src.data.loader import get_opcode_pb_meta
+    meta = get_opcode_pb_meta(opcode)
+    if meta is not None:
+        msg = meta.get("message", "")
+        return msg if msg else "unknown", {
+            "opcode": opcode,
+            "pb_type": meta.get("type", ""),
+        }
+
     return "unknown", {"opcode": opcode}

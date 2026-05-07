@@ -25,7 +25,7 @@ class TestOffensiveCoverage:
     def test_single_fire_coverage(self, analyzer):
         cov = analyzer.offensive_coverage([FIRE_PET])
         assert cov["草"] == 2.0
-        assert cov["火"] == 0.5  # resisted
+        assert cov["火"] == 1.0  # neutral (fire doesn't resist itself in this chart)
 
     def test_dual_coverage(self, analyzer):
         cov = analyzer.offensive_coverage([DUAL_PET])
@@ -53,15 +53,15 @@ class TestDefensiveCoverage:
 
     def test_no_shared_weakness(self, analyzer):
         dc = analyzer.defensive_coverage([FIRE_PET, ELECTRIC_PET])
-        # Fire weak to water/ground/rock; Electric weak to ground only
-        # Only ground is shared
+        # Fire weak to 水/地; Electric weak to 地 only
+        # Only 地 is shared
         shared = {k: v for k, v in dc.items() if len(v) >= 2}
-        assert "土" in shared
+        assert "地" in shared
 
     def test_dual_type_weakness(self, analyzer):
         dc = analyzer.defensive_coverage([DUAL_PET])
         # Fire/Flying weak to water, electric, rock
-        assert "水" in dc or "电" in dc or "石" in dc
+        assert "水" in dc or "电" in dc or "地" in dc
 
 
 class TestCoverageScore:
@@ -93,10 +93,10 @@ class TestUncoveredTypes:
 class TestSharedWeaknesses:
     def test_fire_electric_shared_ground(self, analyzer):
         sw = analyzer.shared_weaknesses([FIRE_PET, ELECTRIC_PET])
-        # Both weak to ground (土)
-        assert "土" in sw
+        # Both weak to ground (地)
+        assert "地" in sw
 
     def test_two_fire_pets_shared(self, analyzer):
         sw = analyzer.shared_weaknesses([FIRE_PET, {"id": 8, "name": "火2", "types": [1], "skills": []}])
         # Both fire → shared weakness to water, ground, rock
-        assert "水" in sw or "土" in sw or "石" in sw
+        assert "水" in sw or "地" in sw

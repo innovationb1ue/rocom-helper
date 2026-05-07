@@ -95,8 +95,8 @@ const BattleLive: React.FC = () => {
 
         {/* 实时包流 */}
         {isActive && sniffer.recentRecords.length > 0 && (
-          <div style={{ marginTop: 8, maxHeight: 120, overflow: 'auto', fontSize: 12, fontFamily: 'monospace', background: '#fafafa', padding: 8, borderRadius: 4 }}>
-            {sniffer.recentRecords.slice(-10).map((r, i) => (
+          <div style={{ marginTop: 8, maxHeight: 156, overflow: 'auto', fontSize: 12, fontFamily: 'monospace', background: '#fafafa', padding: 8, borderRadius: 4 }}>
+            {sniffer.recentRecords.slice(-100).map((r, i) => (
               <div key={i} style={{ color: r.direction === 'c2s' ? '#1890ff' : '#52c41a' }}>
                 {r.captured_at ? `[${r.captured_at}] ` : ''}[{r.direction}] {r.tgcp_command_name || r._summary_kind || r.record_type || '?'} {r.opcode_hex || r.cmd_hex || ''}
               </div>

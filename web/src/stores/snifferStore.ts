@@ -44,7 +44,7 @@ export const useSnifferStore = create<SnifferStore>((set) => ({
   updateStatus: (status, message, flowCount, keyHex) =>
     set({ status, message, flowCount, keyHex }),
   addRecord: (record) =>
-    set((s) => ({ recentRecords: [...s.recentRecords.slice(-49), record] })),
+    set((s) => ({ recentRecords: [...s.recentRecords.slice(-99), record] })),
   setWsConnected: (c) => set({ wsConnected: c }),
   reset: () => set(initialState),
 }));

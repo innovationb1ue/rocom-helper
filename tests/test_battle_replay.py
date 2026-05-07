@@ -21,11 +21,7 @@ from tests.packet_reader import (
     BATTLE_OPCODES,
 )
 
-SESSION_DIR = Path(__file__).resolve().parent.parent / "logs" / "packets" / "2026-05-07_21-17-31_monitor"
-pytestmark = pytest.mark.skipif(
-    not SESSION_DIR.is_dir(),
-    reason="Captured battle data not available",
-)
+SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
 
 
 @pytest.fixture(scope="module")
@@ -192,3 +188,47 @@ class TestBattleStateReplay:
             and e["detail"].get("entries")
         ]
         assert len(damage_events) > 0, "No damage events found in replay"
+
+    def test_all_six_opponent_pets_tracked(self, replay_result):
+        _, state = replay_result
+        assert len(state["opp_pets"]) == 6, (
+            f"Expected 6 opponent pets, got {len(state['opp_pets'])}: "
+            f"{[p['name'] for p in state['opp_pets']]}"
+        )
+
+    def test_opponent_pets_have_known_names(self, replay_result):
+        _, state = replay_result
+        expected = {"白发路路", "火神", "翼龙", "利灯鱼", "咔咔鸟"}
+        opp_names = {p["name"] for p in state["opp_pets"]}
+        missing = expected - opp_names
+        assert not missing, f"Missing opponent pets: {missing}, got: {opp_names}"
+
+    def test_opponent_pets_have_valid_hp(self, replay_result):
+        _, state = replay_result
+        for p in state["opp_pets"]:
+            assert p["max_hp"] > 0, f"Opponent pet {p['name']} has no max_hp"
+            assert p["current_hp"] >= 0, f"Opponent pet {p['name']} has negative hp"
+            assert p["current_hp"] <= p["max_hp"], (
+                f"Opponent pet {p['name']} hp={p['current_hp']} > max_hp={p['max_hp']}"
+            )
+
+    def test_player_pets_have_valid_hp(self, replay_result):
+        _, state = replay_result
+        for p in state["my_pets"]:
+            assert p["max_hp"] > 0, f"Player pet {p['name']} has no max_hp"
+            assert p["current_hp"] >= 0, f"Player pet {p['name']} has negative hp"
+            assert p["current_hp"] <= p["max_hp"], (
+                f"Player pet {p['name']} hp={p['current_hp']} > max_hp={p['max_hp']}"
+            )
+
+    def test_round_start_wrappers_have_side(self, battle_packets):
+        from src.protocol.proto_core import extract_state_wrappers_from_record
+        rs = [p for p in battle_packets if p["opcode"] == 0x131A]
+        assert len(rs) > 0, "No round_start packets"
+        for item in rs:
+            wrappers = extract_state_wrappers_from_record(item["record"])
+            for w in wrappers:
+                assert w.get("side") in (1, 401), (
+                    f"Round-start wrapper has invalid side={w.get('side')}: "
+                    f"name={w.get('name')} path={w.get('path')}"
+                )

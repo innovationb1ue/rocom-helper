@@ -6,11 +6,17 @@ import pytest
 from fastapi.testclient import TestClient
 
 from src.api.app import app
+from src.game.type_chart import TypeChart
 
 
 @pytest.fixture(scope="module")
 def client():
     return TestClient(app)
+
+
+@pytest.fixture(scope="module")
+def type_chart():
+    return TypeChart()
 
 
 class TestHealth:
@@ -61,11 +67,11 @@ class TestSkills:
 
 
 class TestTypes:
-    def test_list_types(self, client):
+    def test_list_types(self, client, type_chart):
         resp = client.get("/api/types")
         assert resp.status_code == 200
         data = resp.json()
-        assert len(data["types"]) == 21
+        assert len(data["types"]) == len(type_chart.types)
 
     def test_type_matchups(self, client):
         resp = client.get("/api/types/1/matchups")

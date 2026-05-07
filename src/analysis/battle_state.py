@@ -122,6 +122,16 @@ class BattleStateTracker:
         wrappers = detail.get("wrappers", [])
         self._update_pets_from_wrappers(wrappers)
 
+    @staticmethod
+    def _is_mine(side_value) -> bool:
+        """True if *side_value* represents the player side."""
+        if side_value is None:
+            return False
+        if isinstance(side_value, str):
+            return side_value == "我方"
+        v = int(side_value)
+        return 1 <= v <= 6
+
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         entries = detail.get("entries", [])
         for entry in entries:
@@ -130,9 +140,8 @@ class BattleStateTracker:
                 target_side = entry.get("damage_target_side")
                 damage = entry.get("damage", 0)
                 target_hp = entry.get("target_hp_after")
-
-                pet_list = self.state["opp_pets"] if target_side == "敌方" else self.state["my_pets"]
-                active_key = "opp_active" if target_side == "敌方" else "my_active"
+                is_opp = not self._is_mine(target_side)
+                active_key = "opp_active" if is_opp else "my_active"
                 active = self.state[active_key]
                 if active is not None:
                     active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
@@ -143,7 +152,7 @@ class BattleStateTracker:
                 actor_side = entry.get("actor_side", "")
                 energy_delta = entry.get("energy_delta", 0)
                 energy_after = entry.get("energy_after")
-                active_key = "my_active" if actor_side == "我方" else "opp_active"
+                active_key = "my_active" if self._is_mine(actor_side) else "opp_active"
                 active = self.state[active_key]
                 if active is not None:
                     if energy_after is not None:
@@ -153,8 +162,8 @@ class BattleStateTracker:
 
             elif kind == "defeat":
                 defeated_side = entry.get("actor_side", "")
-                pet_list_key = "my_pets" if defeated_side == "我方" else "opp_pets"
-                active_key = "my_active" if defeated_side == "我方" else "opp_active"
+                is_mine = self._is_mine(defeated_side)
+                active_key = "my_active" if is_mine else "opp_active"
                 active = self.state[active_key]
                 if active is not None:
                     active["current_hp"] = 0
@@ -179,7 +188,7 @@ class BattleStateTracker:
         refresh_kind = detail.get("kind")
         if refresh_kind == "energy_bottle":
             target_side = detail.get("side")
-            active_key = "my_active" if target_side == "我方" else "opp_active"
+            active_key = "my_active" if self._is_mine(target_side) else "opp_active"
             active = self.state[active_key]
             if active is not None:
                 active["energy"] = min(10, active.get("energy", 5) + detail.get("energy_delta", 3))
@@ -190,17 +199,64 @@ class BattleStateTracker:
     def _handle_round_flow(self, detail: Dict[str, Any]) -> None:
         self.state["round"] = detail.get("round", self.state["round"])
 
+    @staticmethod
+    def _pet_matches(pet: Dict[str, Any], w: Dict[str, Any]) -> bool:
+        """Match a wrapper to an existing pet.  Uses pet_id first; for PvP
+        opponents with a generic id (e.g. 20000000), falls back to slot."""
+        w_pid = w.get("pet_id") or w.get("pet_gid")
+        p_pid = pet.get("pet_id")
+        if p_pid is not None and w_pid is not None and p_pid == w_pid:
+            # generic opponent id — need secondary match
+            if p_pid == 20000000:
+                w_slot = w.get("slot")
+                p_slot = pet.get("slot")
+                if w_slot is not None and p_slot is not None:
+                    return w_slot == p_slot
+                return pet.get("name") == w.get("name")
+            return True
+        return False
+
     def _update_pets_from_wrappers(self, wrappers: List[Dict[str, Any]]) -> None:
+        seen_sides: set = set()
         for w in wrappers:
             side = w.get("side")
-            pet_list = self.state["my_pets"] if (side == 1 or side == "我方") else self.state["opp_pets"]
+            is_mine = (side == 1 or side == "我方")
+            pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
             pet_id = w.get("pet_id") or w.get("pet_gid")
+            matched = None
             for pet in pet_list:
-                if pet.get("pet_id") == pet_id:
+                if self._pet_matches(pet, w):
+                    matched = pet
                     if "hp" in w:
                         pet["current_hp"] = w["hp"]
                     if "max_hp" in w:
                         pet["max_hp"] = w["max_hp"]
+                    if w.get("name") and w["name"] != "?":
+                        pet["name"] = w["name"]
+                    if w.get("pet_id") and w["pet_id"] != 20000000:
+                        pet["pet_id"] = w["pet_id"]
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
                     break
+            if matched is None:
+                pet_info = {
+                    "pet_id": pet_id,
+                    "name": w.get("name", "?"),
+                    "types": w.get("types", []),
+                    "current_hp": w.get("hp") or w.get("current_hp", 0),
+                    "max_hp": w.get("max_hp", 0),
+                    "energy": w.get("energy", 5),
+                    "buffs": [],
+                    "slot": w.get("slot"),
+                }
+                if pet_info["max_hp"] > 0:
+                    pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
+                else:
+                    pet_info["hp_pct"] = 1.0
+                pet_list.append(pet_info)
+                matched = pet_list[-1]
+            # Update active pet only for first wrapper per side
+            active_key = "my_active" if is_mine else "opp_active"
+            if side not in seen_sides:
+                seen_sides.add(side)
+                self.state[active_key] = matched
