@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import copy
+import logging
 from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
 class BattleStateTracker:
@@ -119,6 +122,7 @@ class BattleStateTracker:
         my_pets = []
         opp_pets = []
         for w in wrappers:
+            equipped = w.get("equipped_skills") or []
             pet_info = {
                 "pet_id": w.get("pet_id") or w.get("pet_gid"),
                 "name": w.get("pet_name") or w.get("name", "?"),
@@ -132,7 +136,7 @@ class BattleStateTracker:
                 "side": w.get("side"),
                 "stats": w.get("stats", []),
                 "skills": w.get("skills", []),
-                "equipped_skills": w.get("equipped_skills", []),
+                "equipped_skills": equipped,
                 "base_id": w.get("base_id"),
                 "base_skill_pool": w.get("base_skill_pool"),
             }
@@ -141,6 +145,13 @@ class BattleStateTracker:
             else:
                 pet_info["hp_pct"] = 1.0
             side = w.get("side")
+            side_label = "MY" if (side == 1 or side == "我方") else "OPP"
+            logger.info(
+                "[%s] %s: %d equipped skills (source=%s) %s",
+                side_label, pet_info["name"], len(equipped),
+                w.get("skill_source", "?"),
+                [s.get("skill_name", "?") for s in equipped],
+            )
             if side == 1 or side == "我方":
                 my_pets.append(pet_info)
             else:
@@ -407,6 +418,11 @@ class BattleStateTracker:
                         pet["base_id"] = w["base_id"]
                     if w.get("base_skill_pool") is not None:
                         pet["base_skill_pool"] = w["base_skill_pool"]
+                    # 如果之前没有装备技能，用新 wrapper 的补充
+                    w_eq = w.get("equipped_skills") or []
+                    if w_eq and not pet.get("equipped_skills"):
+                        pet["skills"] = w.get("skills", [])
+                        pet["equipped_skills"] = w_eq
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
                     break

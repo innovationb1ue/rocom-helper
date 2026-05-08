@@ -329,6 +329,33 @@ def extract_skills(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     skills.sort(key=lambda it: (it["equipped_slot"] == 0, it["equipped_slot"], it["skill_id"]))
     return skills
 
+
+def extract_skills_from_round_data(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """从 BattleInsidePetInfo.field 8 (PetSkillRoundData) 提取技能。
+
+    比起 PetData.field 12 (PetSkillInfo)，这是 PvP 战斗中技能数据的实际来源。
+    PetSkillRoundData: field 39=skill_id, field 25=pos, field 9=cost_energy。
+    """
+    skills, seen = [], set()
+    for entry in field_groups(msg).get(8, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        sid = pick_first(collect_varints(sub, 39))
+        pos = pick_first(collect_varints(sub, 25))
+        if sid is None or pos is None:
+            continue
+        key = (sid, pos)
+        if key in seen:
+            continue
+        seen.add(key)
+        cost_e = pick_first(collect_varints(sub, 9))
+        item = {"skill_id": sid, "equipped_slot": pos, "pp": None, "cost_energy": cost_e}
+        _attach_skill_meta(item, sid)
+        skills.append(item)
+    skills.sort(key=lambda it: (it["equipped_slot"] == 0, it["equipped_slot"], it["skill_id"]))
+    return skills
+
 def extract_stats(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     best: List[Dict[str, Any]] = []
     for entry in field_groups(msg).get(14, []):
@@ -426,6 +453,24 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
     side_code = _side_from_path(path)
     max_hp = ds[1] if len(ds) >= 2 else None
     current_hp = ds[25] if len(ds) >= 26 else None
+
+    # 技能提取: 先用 PetData.field 12, 若为空则从 BattleInsidePetInfo.field 8 取
+    all_skills = creature.get("skills", [])
+    equipped_skills = creature.get("equipped_skills", [])
+    skill_source = "pet_data_f12"
+    if not equipped_skills:
+        round_skills = extract_skills_from_round_data(dm)
+        round_equipped = [it for it in round_skills if 1 <= it["equipped_slot"] <= 4]
+        if round_equipped:
+            all_skills = round_skills
+            equipped_skills = sorted(round_equipped, key=lambda it: (it["equipped_slot"], it["skill_id"]))
+            skill_source = "inside_info_f8"
+            logger.info(
+                "Skills from InsideInfo.field8 for %s (side=%s): %s",
+                creature["name"], side_code,
+                [f"slot{s['equipped_slot']}:{s.get('skill_name', '?')}" for s in equipped_skills],
+            )
+
     return {
         "name": creature["name"], "level": creature["level"],
         "slot": creature["slot"], "pet_id": creature["pet_id"],
@@ -436,8 +481,9 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "current_hp": current_hp, "hp": current_hp,
         "energy": ds[26] if len(ds) >= 27 else None,
         "stats": creature.get("stats", []),
-        "skills": creature.get("skills", []),
-        "equipped_skills": creature.get("equipped_skills", []),
+        "skills": all_skills,
+        "equipped_skills": equipped_skills,
+        "skill_source": skill_source,
         "base_id": creature.get("base_id"),
         "base_skill_pool": creature.get("base_skill_pool"),
         "source_opcode": record["opcode"], "source_opcode_hex": record.get("opcode_hex", ""),
