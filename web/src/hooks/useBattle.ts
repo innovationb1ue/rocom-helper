@@ -1,9 +1,10 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useBattleStore } from '../stores/battleStore';
+import type { FormattedBattleEvent, BattleSummary } from '../stores/battleStore';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset } = useBattleStore();
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary } = useBattleStore();
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -21,10 +22,18 @@ export function useBattle() {
           updateState(msg.state);
         } else if (msg.type === 'suggestions') {
           msg.suggestions.forEach((s: { type: string; message: string }) => addSuggestion(s));
+        } else if (msg.type === 'battle_event') {
+          addFormattedEvent(msg.event as FormattedBattleEvent);
+        } else if (msg.type === 'battle_events') {
+          addFormattedEvents(msg.events as FormattedBattleEvent[]);
+        } else if (msg.type === 'battle_summary') {
+          setBattleSummary(msg.summary as BattleSummary);
         }
-      } catch { /* ignore */ }
+      } catch (err) {
+        console.error("[useBattle] WebSocket message error:", err);
+      }
     };
-  }, [updateState, addSuggestion, setConnected]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));

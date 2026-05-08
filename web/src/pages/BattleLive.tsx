@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Progress, Button, Space, Tag, Typography, Alert, Badge } from 'antd';
+import { Card, Row, Col, Button, Space, Tag, Alert, Badge } from 'antd';
 import {
   ApiOutlined, CheckCircleOutlined, WarningOutlined,
   CloseCircleOutlined, SearchOutlined, StopOutlined,
@@ -8,7 +8,9 @@ import { useBattle } from '../hooks/useBattle';
 import { useBattleStore } from '../stores/battleStore';
 import { useSnifferMonitor } from '../hooks/useSnifferMonitor';
 import { useSnifferStore } from '../stores/snifferStore';
-import BattleTimeline from '../components/BattleTimeline';
+import TeamRoster from '../components/TeamRoster';
+import BattleEventLog from '../components/BattleEventLog';
+import BattleSummaryPanel from '../components/BattleSummaryPanel';
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
   idle: { color: 'default', icon: <CloseCircleOutlined />, text: '未启动' },
@@ -19,8 +21,12 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; text:
 };
 
 const BattleLive: React.FC = () => {
-  const { connect: connectBattle, sendEvent, resetBattle, getState } = useBattle();
-  const { my_active, opp_active, round, result, events, suggestions, connected } = useBattleStore();
+  const { connect: connectBattle, resetBattle, getState } = useBattle();
+  const {
+    my_pets, opp_pets, my_active, opp_active,
+    round, result, suggestions, connected,
+    formattedEvents, battleSummary,
+  } = useBattleStore();
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
 
@@ -44,17 +50,6 @@ const BattleLive: React.FC = () => {
 
   const isActive = ['listening', 'connected', 'key_captured'].includes(sniffer.status);
   const sc = statusConfig[sniffer.status] || statusConfig.idle;
-
-  const hpBar = (pet: { name: string; hp_pct: number; current_hp: number; max_hp: number; energy: number } | null, label: string) => {
-    if (!pet) return <Card size="small"><em>无精灵</em></Card>;
-    const pct = Math.round(pet.hp_pct * 100);
-    return (
-      <Card size="small" title={`${label}: ${pet.name}`}>
-        <Progress percent={pct} status={pct < 25 ? 'exception' : 'active'} />
-        <div>HP: {pet.current_hp}/{pet.max_hp} | 能量: {pet.energy}</div>
-      </Card>
-    );
-  };
 
   return (
     <div>
@@ -88,15 +83,13 @@ const BattleLive: React.FC = () => {
           {isActive && <Tag>连接: {sniffer.flowCount}</Tag>}
         </Space>
 
-        {/* 错误信息 */}
         {sniffer.status === 'idle' && sniffer.message.includes('失败') && (
           <Alert type="error" message={sniffer.message} style={{ marginTop: 8 }} showIcon closable />
         )}
 
-        {/* 实时包流 */}
         {isActive && sniffer.recentRecords.length > 0 && (
-          <div style={{ marginTop: 8, maxHeight: 156, overflow: 'auto', fontSize: 12, fontFamily: 'monospace', background: '#fafafa', padding: 8, borderRadius: 4 }}>
-            {sniffer.recentRecords.slice(-100).map((r, i) => (
+          <div style={{ marginTop: 8, maxHeight: 120, overflow: 'auto', fontSize: 12, fontFamily: 'monospace', background: '#fafafa', padding: 8, borderRadius: 4 }}>
+            {sniffer.recentRecords.slice(-80).map((r, i) => (
               <div key={i} style={{ color: r.direction === 'c2s' ? '#1890ff' : '#52c41a' }}>
                 {r.captured_at ? `[${r.captured_at}] ` : ''}[{r.direction}] {r.tgcp_command_name || r._summary_kind || r.record_type || '?'} {r.opcode_hex || r.cmd_hex || ''}
               </div>
@@ -108,7 +101,7 @@ const BattleLive: React.FC = () => {
       {/* 战斗 WebSocket 控制 */}
       <Space style={{ marginBottom: 12 }} wrap>
         {!wsStarted ? (
-          <Button type="primary" onClick={startWs} disabled={sniffer.status !== 'key_captured'}>
+          <Button type="primary" onClick={startWs}>
             连接战斗
           </Button>
         ) : (
@@ -118,31 +111,36 @@ const BattleLive: React.FC = () => {
             <Button onClick={getState}>获取状态</Button>
           </>
         )}
+        {round > 0 && <Tag color="blue">回合 {round}</Tag>}
       </Space>
 
       {result && <Alert message={`战斗结束: ${result}`} type={result === 'WIN' ? 'success' : 'error'} style={{ marginBottom: 12 }} />}
 
-      <Row gutter={16}>
+      {/* 双方阵容 */}
+      <Row gutter={16} style={{ marginBottom: 12 }}>
         <Col span={12}>
-          {hpBar(my_active as never, '我方')}
+          <TeamRoster pets={my_pets} activePet={my_active} side="my" label="我方阵容" />
         </Col>
         <Col span={12}>
-          {hpBar(opp_active as never, '敌方')}
+          <TeamRoster pets={opp_pets} activePet={opp_active} side="opp" label="敌方阵容" />
         </Col>
       </Row>
 
-      {round > 0 && <Typography.Text style={{ marginTop: 8, display: 'block' }}>回合 {round}</Typography.Text>}
-
+      {/* 建议 */}
       {suggestions.length > 0 && (
-        <Card title="建议" size="small" style={{ marginTop: 12 }}>
+        <Card title="建议" size="small" style={{ marginBottom: 12 }}>
           {suggestions.slice(-3).map((s, i) => (
             <Alert key={i} message={s.message} type="info" style={{ marginBottom: 4 }} showIcon={false} />
           ))}
         </Card>
       )}
 
-      <Card title="事件时间线" size="small" style={{ marginTop: 12 }}>
-        <BattleTimeline events={events as never} />
+      {/* 战斗总结 */}
+      <BattleSummaryPanel summary={battleSummary} />
+
+      {/* 事件日志 */}
+      <Card title="战斗事件" size="small" style={{ marginTop: 12 }}>
+        <BattleEventLog events={formattedEvents} />
       </Card>
     </div>
   );

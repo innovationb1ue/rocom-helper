@@ -105,7 +105,13 @@ def pet_name_fn(pet_id: Optional[int]) -> Optional[str]:
 
 def buff_name(buff_id: Optional[int]) -> Optional[str]:
     meta = get_buff_meta(buff_id)
-    return meta.get("name") if isinstance(meta, dict) and isinstance(meta.get("name"), str) else None
+    if not isinstance(meta, dict):
+        return None
+    if isinstance(meta.get("name"), str) and meta["name"]:
+        return meta["name"]
+    if isinstance(meta.get("editor_name"), str) and meta["editor_name"]:
+        return meta["editor_name"]
+    return None
 
 def side_name(side_id: Optional[int]) -> Optional[str]:
     if side_id is None:
@@ -119,10 +125,6 @@ def side_name(side_id: Optional[int]) -> Optional[str]:
     if 1 <= v <= 6:
         return "我方"
     return None
-
-def buff_name(buff_id: Optional[int]) -> Optional[str]:
-    meta = get_buff_meta(buff_id)
-    return meta.get("name") if isinstance(meta, dict) and isinstance(meta.get("name"), str) else None
 
 def _attach_buff_meta(out: Dict[str, Any], buff_id: Optional[int]) -> None:
     if buff_id is None:

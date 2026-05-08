@@ -234,6 +234,7 @@ def generate_report(session_dir: Path) -> str:
         if detail is None:
             detail = {}
 
+        prev_state = tracker.get_state()
         state = tracker.handle_event(opcode, detail)
 
         # ── battle enter ──
@@ -312,7 +313,7 @@ def generate_report(session_dir: Path) -> str:
         elif opcode == 0x1324:
             for entry in detail.get("entries", []):
                 if entry.get("kind") == "change_pet":
-                    entry["_state"] = state  # attach state for pet name lookup
+                    entry["_state"] = prev_state  # use pre-event state for rest pet name
                 lines.append(_format_entry(entry))
                 _track_unknown(entry, unknown_types)
 

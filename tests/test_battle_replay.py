@@ -14,6 +14,7 @@ from src.protocol.proto_core import (
 )
 from src.protocol.opcodes import summarize
 from src.analysis.battle_state import BattleStateTracker
+from src.analysis.event_formatter import format_battle_event, compute_battle_summary
 from tests.packet_reader import (
     read_bin_packet,
     load_battle_packets,
@@ -232,3 +233,137 @@ class TestBattleStateReplay:
                     f"Round-start wrapper has invalid side={w.get('side')}: "
                     f"name={w.get('name')} path={w.get('path')}"
                 )
+
+
+# ---------------------------------------------------------------------------
+# TestEventFormatterReplay — replay through EventFormatter with real data
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def formatted_replay(replay_result):
+    """Replay all events through EventFormatter, return (formatted_events, state)."""
+    events, state = replay_result
+    all_formatted = []
+    for e in events:
+        opcode = e["opcode"]
+        detail = e["detail"]
+        current_state = e["state"]
+        round_num = current_state.get("round", 0)
+        formatted = format_battle_event(opcode, detail, current_state, round_num)
+        all_formatted.extend(formatted)
+    return all_formatted, state
+
+
+class TestEventFormatterReplay:
+    def test_all_packets_format_without_error(self, formatted_replay):
+        formatted, _ = formatted_replay
+        assert len(formatted) > 0, "No formatted events produced"
+
+    def test_no_empty_summaries(self, formatted_replay):
+        formatted, _ = formatted_replay
+        empty = [fe for fe in formatted if not fe.summary.strip()]
+        assert not empty, f"{len(empty)} events have empty summaries"
+
+    def test_battle_enter_event(self, formatted_replay):
+        formatted, _ = formatted_replay
+        enter_events = [fe for fe in formatted if fe.kind == "battle_enter"]
+        assert len(enter_events) == 1
+        ev = enter_events[0]
+        assert "battle_id" in ev.detail
+        assert ev.detail["my_team"] or ev.detail["opp_team"]
+        assert ev.color == "green"
+
+    def test_battle_finish_event(self, formatted_replay):
+        formatted, state = formatted_replay
+        finish_events = [fe for fe in formatted if fe.kind == "battle_finish"]
+        assert len(finish_events) == 1
+        ev = finish_events[0]
+        assert ev.detail["result"] is not None
+        assert ev.round == state["round"]
+
+    def test_damage_events_have_values(self, formatted_replay):
+        formatted, _ = formatted_replay
+        damage_events = [fe for fe in formatted if fe.kind == "damage"]
+        assert len(damage_events) > 0, "No damage events in battle"
+        for ev in damage_events:
+            assert isinstance(ev.detail["damage"], int)
+            assert ev.detail["damage"] > 0, f"Damage event has 0 damage: {ev.summary}"
+
+    def test_skill_cast_events(self, formatted_replay):
+        formatted, _ = formatted_replay
+        skill_events = [fe for fe in formatted if fe.kind == "skill_cast"]
+        assert len(skill_events) > 0, "No skill_cast events in battle"
+
+    def test_defeat_events(self, formatted_replay):
+        formatted, _ = formatted_replay
+        defeat_events = [fe for fe in formatted if fe.kind == "defeat"]
+        assert len(defeat_events) > 0, "No defeat events in battle"
+        for ev in defeat_events:
+            assert "我方" in ev.summary or "敌方" in ev.summary
+
+    def test_change_pet_events(self, formatted_replay):
+        formatted, _ = formatted_replay
+        change_events = [fe for fe in formatted if fe.kind == "change_pet"]
+        assert len(change_events) > 0, "No change_pet events in battle"
+        for ev in change_events:
+            assert "→" in ev.summary, f"change_pet missing arrow: {ev.summary}"
+            assert "我方" in ev.summary or "敌方" in ev.summary
+
+    def test_round_start_events(self, formatted_replay):
+        formatted, _ = formatted_replay
+        round_events = [fe for fe in formatted if fe.kind == "round_start"]
+        assert len(round_events) > 0, "No round_start events"
+        rounds_seen = {ev.round for ev in round_events}
+        assert len(rounds_seen) > 1, f"Only {len(rounds_seen)} distinct rounds"
+
+    def test_effect_events_present(self, formatted_replay):
+        formatted, _ = formatted_replay
+        effect_kinds = {"effect_apply", "effect_stage", "effect_link", "effect_trigger"}
+        effect_events = [fe for fe in formatted if fe.kind in effect_kinds]
+        assert len(effect_events) > 0, "No effect events in battle"
+
+    def test_all_kinds_have_valid_color(self, formatted_replay):
+        formatted, _ = formatted_replay
+        valid_colors = {"green", "red", "blue", "gold", "gray", "purple", "cyan", "geekblue"}
+        bad = [fe for fe in formatted if fe.color not in valid_colors]
+        assert not bad, f"Invalid colors: {set(fe.color for fe in bad)}"
+
+    def test_event_kinds_distribution(self, formatted_replay):
+        formatted, _ = formatted_replay
+        kinds = {fe.kind for fe in formatted}
+        expected_kinds = {
+            "battle_enter", "round_start", "skill_cast", "damage",
+            "battle_finish", "skill_select", "skill_declare",
+        }
+        missing = expected_kinds - kinds
+        assert not missing, f"Missing expected event kinds: {missing}"
+
+
+class TestBattleSummaryReplay:
+    def test_summary_computed(self, replay_result):
+        _, state = replay_result
+        summary = compute_battle_summary(state)
+        assert summary["result"] is not None
+        assert summary["rounds"] > 0
+
+    def test_summary_pet_counts(self, replay_result):
+        _, state = replay_result
+        summary = compute_battle_summary(state)
+        assert len(summary["my_pets_final"]) == len(state["my_pets"])
+        assert len(summary["opp_pets_final"]) == len(state["opp_pets"])
+
+    def test_summary_final_hp_valid(self, replay_result):
+        _, state = replay_result
+        summary = compute_battle_summary(state)
+        for p in summary["my_pets_final"] + summary["opp_pets_final"]:
+            assert p["hp"] >= 0
+            assert p["max_hp"] > 0
+            assert p["status"] in ("存活", "战败")
+
+    def test_summary_event_stats(self, replay_result):
+        _, state = replay_result
+        summary = compute_battle_summary(state)
+        assert len(summary["event_stats"]) > 0
+        total = sum(summary["event_stats"].values())
+        assert total == len(state["events"])

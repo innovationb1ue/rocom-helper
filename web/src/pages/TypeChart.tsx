@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Table, Tag } from 'antd';
-import { TYPE_COLORS, TYPE_LIST, TYPE_CHART, multiplierColor } from '../utils/typeColors';
+import { TYPE_COLORS, TYPE_LIST, TYPE_CHART, multiplierColor, textColorFor } from '../utils/typeColors';
 
 const TypeChartPage: React.FC = () => {
   const types = TYPE_LIST;
@@ -8,10 +8,20 @@ const TypeChartPage: React.FC = () => {
 
   const columns = [
     { title: '攻\\防', dataIndex: 'name', fixed: 'left' as const, width: 60,
-      render: (name: string) => (
-        <span style={{ background: TYPE_COLORS[types.find(t => t.name === name)?.id ?? 0] || '#999',
-          color: '#fff', padding: '2px 4px', borderRadius: 4, fontSize: 11 }}>{name}</span>
-      ),
+      render: (name: string) => {
+        const id = types.find(t => t.name === name)?.id ?? 0;
+        const bg = TYPE_COLORS[id] || '#999';
+        return (
+          <span style={{
+            background: bg,
+            color: textColorFor(bg),
+            padding: '2px 4px',
+            borderRadius: 4,
+            fontSize: 11,
+            fontWeight: 600,
+          }}>{name}</span>
+        );
+      },
     },
     ...types.map(t => ({
       title: <span style={{ fontSize: 10 }}>{t.name}</span>,
@@ -19,9 +29,16 @@ const TypeChartPage: React.FC = () => {
       width: 45,
       render: (val: number) => {
         if (val === 1.0 || val === undefined) return <span style={{ color: '#ccc' }}>-</span>;
+        const bg = multiplierColor(val);
         return (
-          <span style={{ background: multiplierColor(val), color: '#fff',
-            padding: '1px 3px', borderRadius: 3, fontSize: 10 }}>
+          <span style={{
+            background: bg,
+            color: textColorFor(bg),
+            padding: '1px 3px',
+            borderRadius: 3,
+            fontSize: 10,
+            fontWeight: 600,
+          }}>
             ×{val}
           </span>
         );

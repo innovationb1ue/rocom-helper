@@ -17,13 +17,16 @@ export const TYPE_COLORS: Record<number, string> = {
   15: '#7038F8', // 龙
   16: '#705848', // 恶
   17: '#FFF68F', // 光
+  18: '#C9A0DC', // 魔法攻击加成
+  19: '#CD853F', // 物理伤害减免
+  20: '#8B7D6B', // 魔法伤害减免
 };
 
 export const TYPE_NAMES: Record<number, string> = {
   0: '普通', 1: '火', 2: '水', 3: '草', 4: '电', 5: '冰',
   6: '武', 7: '毒', 8: '地', 9: '翼', 10: '萌', 11: '幻',
   12: '虫', 13: '幽', 14: '机械', 15: '龙', 16: '恶',
-  17: '光',
+  17: '光', 18: '魔攻', 19: '物减', 20: '魔减',
 };
 
 export interface TypeInfo {
@@ -51,6 +54,9 @@ export const TYPE_LIST: TypeInfo[] = [
   {id: 15, name: "龙", color: "#7038F8"},
   {id: 16, name: "恶", color: "#705848"},
   {id: 17, name: "光", color: "#FFF68F"},
+  {id: 18, name: "魔攻", color: "#C9A0DC"},
+  {id: 19, name: "物减", color: "#CD853F"},
+  {id: 20, name: "魔减", color: "#8B7D6B"},
 ];
 
 export const TYPE_CHART: Record<string, Record<string, number>> = {
@@ -81,4 +87,15 @@ export function multiplierColor(m: number): string {
   if (m === 1.0) return '#888888';
   if (m < 2.0) return '#88CC88';
   return '#44AA44';
+}
+
+/** Return readable text color for a given background hex color. */
+export function textColorFor(bgHex: string): string {
+  const hex = bgHex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  // Relative luminance (simplified)
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return lum > 0.55 ? '#1a1a1a' : '#fff';
 }

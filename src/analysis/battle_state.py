@@ -12,7 +12,8 @@ class BattleStateTracker:
             "battle_mode": None,
             "round": 0,
             "max_round": 0,
-            "weather_id": None,
+            "weather": {"id": None, "name": None, "expire_round": None},
+            "phase": "idle",
             "my_pets": [],
             "opp_pets": [],
             "my_active": None,
@@ -49,9 +50,17 @@ class BattleStateTracker:
     def get_state(self) -> Dict[str, Any]:
         return copy.deepcopy(self.state)
 
+    def pet_name_by_slot(self, slot: Any, is_mine: bool) -> Optional[str]:
+        pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
+        for pet in pet_list:
+            if pet.get("slot") == slot or pet.get("pet_id") == slot:
+                return pet.get("name")
+        return None
+
     def get_suggestions(self) -> List[Dict[str, str]]:
         """基于当前状态给出实时建议。"""
         suggestions: List[Dict[str, str]] = []
+        seen: set = set()
         my_active = self.state["my_active"]
         opp_active = self.state["opp_active"]
 
@@ -76,16 +85,35 @@ class BattleStateTracker:
         if len(negative_buffs) >= 2:
             suggestions.append({"type": "debuffed", "message": "我方精灵有多个负面状态"})
 
-        return suggestions
+        # Deduplicate by (type, message)
+        unique: List[Dict[str, str]] = []
+        for s in suggestions:
+            key = (s["type"], s["message"])
+            if key not in seen:
+                seen.add(key)
+                unique.append(s)
+        return unique
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
         self.state["battle_id"] = detail.get("battle_id")
         self.state["battle_mode"] = detail.get("battle_mode")
         self.state["round"] = detail.get("round", 0)
         self.state["max_round"] = detail.get("max_round", 0)
-        self.state["weather_id"] = detail.get("weather_id")
         self.state["result"] = None
         self.state["events"] = []
+        self.state["phase"] = "selecting"
+
+        # Weather
+        weather_id = detail.get("weather_id")
+        weather_name = None
+        if weather_id is not None:
+            from src.data.loader import get_attr_name
+            weather_name = get_attr_name(weather_id)
+        self.state["weather"] = {
+            "id": weather_id,
+            "name": weather_name,
+            "expire_round": detail.get("weather_expire_round"),
+        }
 
         wrappers = detail.get("wrappers", [])
         my_pets = []
@@ -127,6 +155,7 @@ class BattleStateTracker:
 
     def _handle_round_start(self, detail: Dict[str, Any]) -> None:
         self.state["round"] = detail.get("round", self.state["round"] + 1)
+        self.state["phase"] = "resolving"
         wrappers = detail.get("wrappers", [])
         self._update_pets_from_wrappers(wrappers)
 
@@ -212,6 +241,9 @@ class BattleStateTracker:
                     is_opp = int(battle_pet_id) >= 401
                     pet_list = self.state["opp_pets"] if is_opp else self.state["my_pets"]
                     active_key = "opp_active" if is_opp else "my_active"
+                    active = self.state[active_key]
+                    if active is not None:
+                        entry["_prev_active_name"] = active.get("name", "?")
                     matched = None
                     # Match by real pet_id
                     if new_pet_id is not None:
@@ -247,9 +279,51 @@ class BattleStateTracker:
                         pet_list.append(matched)
                     if matched is not None:
                         self.state[active_key] = matched
+                        matched["buffs"] = []
+
+            elif kind == "effect_apply":
+                target_side = entry.get("target_side")
+                effect_id = entry.get("effect_id")
+                if target_side is not None and effect_id is not None:
+                    is_mine = self._is_mine(target_side)
+                    active_key = "my_active" if is_mine else "opp_active"
+                    active = self.state[active_key]
+                    if active is not None:
+                        buffs = active.setdefault("buffs", [])
+                        stage = entry.get("effect_stage")
+                        ename = entry.get("effect_name")
+                        existing = next((b for b in buffs if b["id"] == effect_id), None)
+                        if existing:
+                            if stage is not None:
+                                existing["stage"] = stage
+                            existing["turns_applied"] = existing.get("turns_applied", 0) + 1
+                        else:
+                            buffs.append({
+                                "id": effect_id,
+                                "name": ename or str(effect_id),
+                                "stage": stage,
+                                "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
+                                "turns_applied": 1,
+                            })
+
+            elif kind == "effect_stage":
+                actor_side = entry.get("actor_side")
+                effect_id = entry.get("effect_id")
+                new_stage = entry.get("effect_stage")
+                if actor_side is not None:
+                    is_mine = self._is_mine(actor_side)
+                    active_key = "my_active" if is_mine else "opp_active"
+                    active = self.state[active_key]
+                    if active is not None:
+                        buffs = active.get("buffs", [])
+                        existing = next((b for b in buffs if b["id"] == effect_id), None)
+                        if existing and new_stage is not None:
+                            existing["stage"] = new_stage
 
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
+        self.state["phase"] = "finished"
+        self.state["phase"] = "finished"
         finish_pets = detail.get("finish_pet_infos", [])
         for fp in finish_pets:
             pet_id = fp.get("pet_gid")
@@ -281,7 +355,7 @@ class BattleStateTracker:
     @staticmethod
     def _pet_matches(pet: Dict[str, Any], w: Dict[str, Any]) -> bool:
         """Match a wrapper to an existing pet.  Uses pet_id first; for PvP
-        opponents with a generic id (e.g. 20000000), falls back to slot."""
+        opponents with a generic id (e.g. 20000000), falls back to slot then name."""
         w_pid = w.get("pet_id") or w.get("pet_gid")
         p_pid = pet.get("pet_id")
         if p_pid is not None and w_pid is not None and p_pid == w_pid:
@@ -289,8 +363,8 @@ class BattleStateTracker:
             if p_pid == 20000000:
                 w_slot = w.get("slot")
                 p_slot = pet.get("slot")
-                if w_slot is not None and p_slot is not None:
-                    return w_slot == p_slot
+                if w_slot is not None and p_slot is not None and w_slot == p_slot:
+                    return True
                 return pet.get("name") == w.get("name")
             return True
         return False
