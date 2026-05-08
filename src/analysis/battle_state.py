@@ -169,13 +169,84 @@ class BattleStateTracker:
                         active["energy"] = max(0, active.get("energy", 5) + energy_delta)
 
             elif kind == "defeat":
-                defeated_side = entry.get("actor_side", "")
+                defeated_side = entry.get("target_side", "")
                 is_mine = self._is_mine(defeated_side)
                 active_key = "my_active" if is_mine else "opp_active"
                 active = self.state[active_key]
                 if active is not None:
                     active["current_hp"] = 0
                     active["hp_pct"] = 0.0
+
+            elif kind == "heal":
+                target_side = entry.get("target_side")
+                hp_after = entry.get("target_hp_after")
+                if target_side is not None and hp_after is not None:
+                    is_mine = self._is_mine(target_side)
+                    active_key = "my_active" if is_mine else "opp_active"
+                    active = self.state[active_key]
+                    if active is not None and active["max_hp"] > 0:
+                        active["current_hp"] = hp_after
+                        active["hp_pct"] = hp_after / active["max_hp"]
+
+            elif kind == "energy":
+                target_side = entry.get("target_side") or entry.get("actor_side")
+                energy_after = entry.get("energy_after")
+                energy_delta = entry.get("energy_delta")
+                if target_side is not None:
+                    is_mine = self._is_mine(target_side)
+                    active_key = "my_active" if is_mine else "opp_active"
+                    active = self.state[active_key]
+                    if active is not None:
+                        if energy_after is not None:
+                            active["energy"] = energy_after
+                        elif energy_delta is not None:
+                            active["energy"] = max(0, active.get("energy", 5) + energy_delta)
+
+            elif kind == "change_pet":
+                battle_pet_id = entry.get("battle_pet_id")
+                new_pet_name = entry.get("new_pet_name")
+                new_pet_id = entry.get("new_pet_id")
+                new_pet_types = entry.get("new_pet_types", [])
+                new_pet_level = entry.get("new_pet_level")
+                if battle_pet_id is not None:
+                    is_opp = int(battle_pet_id) >= 401
+                    pet_list = self.state["opp_pets"] if is_opp else self.state["my_pets"]
+                    active_key = "opp_active" if is_opp else "my_active"
+                    matched = None
+                    # Match by real pet_id
+                    if new_pet_id is not None:
+                        for pet in pet_list:
+                            if pet.get("pet_id") == new_pet_id:
+                                matched = pet
+                                break
+                    # Match by name
+                    if matched is None and new_pet_name:
+                        for pet in pet_list:
+                            if pet.get("name") == new_pet_name:
+                                matched = pet
+                                break
+                    # Match by slot position (player slots 1-6 map to index 0-5)
+                    if matched is None and not is_opp:
+                        idx = int(battle_pet_id) - 1
+                        if 0 <= idx < len(pet_list):
+                            matched = pet_list[idx]
+                    # Not found — create a new pet entry from extracted data
+                    if matched is None and new_pet_name:
+                        matched = {
+                            "pet_id": new_pet_id,
+                            "name": new_pet_name,
+                            "types": new_pet_types,
+                            "current_hp": 0,
+                            "max_hp": 0,
+                            "energy": 5,
+                            "buffs": [],
+                            "slot": battle_pet_id,
+                            "level": new_pet_level,
+                            "side": 401 if is_opp else 1,
+                        }
+                        pet_list.append(matched)
+                    if matched is not None:
+                        self.state[active_key] = matched
 
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")

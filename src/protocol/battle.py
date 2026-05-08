@@ -91,8 +91,16 @@ def _schema_quality(
 
 def _extract_skill_ref(msg: Dict[str, Any], *, skill_field: int = 3) -> Dict[str, Any]:
     """Extract a skill reference from a sub-message (fields 1=actor, 2=target, 3=skill)."""
-    skill_id_x100 = pick_first(collect_varints(msg, skill_field), low=100_000)
+    all_field_values = collect_varints(msg, skill_field)
+    skill_id_x100 = pick_first(all_field_values, low=100_000)
     sid = normalize_skill_id(skill_id_x100)
+
+    skill_slot_index: Optional[int] = None
+    if skill_id_x100 is None:
+        raw_small = [v for v in all_field_values if 1 <= v <= 10]
+        if raw_small:
+            skill_slot_index = raw_small[0]
+
     actor = pick_first(collect_varints(msg, 1))
     target = pick_first(collect_varints(msg, 2))
     out: Dict[str, Any] = {
@@ -103,6 +111,7 @@ def _extract_skill_ref(msg: Dict[str, Any], *, skill_field: int = 3) -> Dict[str
         "skill_id_x100": skill_id_x100,
         "skill_id": sid,
         "skill_name": skill_name(sid),
+        "skill_slot_index": skill_slot_index,
     }
     _attach_skill_meta(out, sid)
     return out
@@ -197,6 +206,23 @@ def _extract_skill_or_special(
             sid3 = pick_first(collect_varints(f3_sub, 3), low=100_000)
             if sid3 is not None:
                 out = _extract_skill_ref(f3_sub)
+
+    # 1b. Fallback: check for slot index (small values 1-10)
+    if out is None:
+        raw_all = collect_varints(payload, 3)
+        raw_small = [v for v in raw_all if 1 <= v <= 10]
+        if raw_small:
+            actor = pick_first(collect_varints(payload, 1))
+            target = pick_first(collect_varints(payload, 2))
+            out = {
+                "actor_side": actor,
+                "actor_side_name": side_name(actor),
+                "target_side": target,
+                "target_side_name": side_name(target),
+                "skill_id": None,
+                "skill_name": None,
+                "skill_slot_index": raw_small[0],
+            }
 
     # 2. Try special action
     if out is None:
@@ -438,6 +464,138 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             _extract_actor_target(lm, out)
             out["effect_id"] = pick_first(collect_varints(lm, 3))
             _attach_buff_meta(out, out.get("effect_id"))
+
+    elif entry_type == 5:
+        # BPT_HEAL — from field 7 sub (BattleHealInfo)
+        out["kind"] = "heal"
+        hm = first_sub(sg.get(7, []))
+        if hm:
+            _extract_actor_target(hm, out)
+            out["heal_type"] = pick_first(collect_varints(hm, 4))
+            out["source_id"] = pick_first(collect_varints(hm, 3))
+        ir = first_sub(sg.get(12, []))
+        if ir:
+            for child in field_groups(ir).get(2, []):
+                cs = child.get("sub")
+                if cs is None:
+                    continue
+                hp = pick_first(collect_varints(cs, 3), low=0, high=99999)
+                if hp is not None:
+                    out["target_hp_after"] = hp
+                    break
+
+    elif entry_type == 6:
+        # BPT_ENERGY — from field 8 sub (BattleEnergyInfo)
+        out["kind"] = "energy"
+        em = first_sub(sg.get(8, []))
+        if em:
+            _extract_actor_target(em, out)
+            out["source_id"] = pick_first(collect_varints(em, 3))
+        ir = first_sub(sg.get(12, []))
+        if ir:
+            for child in field_groups(ir).get(2, []):
+                cs = child.get("sub")
+                if cs is None:
+                    continue
+                rd = pick_first(collect_varints(cs, 25))
+                ea = pick_first(collect_varints(cs, 26), low=0, high=99)
+                if rd is not None or ea is not None:
+                    out["energy_delta"] = maybe_signed64(rd) if rd is not None else None
+                    out["energy_after"] = ea
+                    break
+
+    elif entry_type == 8:
+        # BPT_REVIVE — from field 10 sub (BattleReviveInfo)
+        out["kind"] = "revive"
+        rm = first_sub(sg.get(10, []))
+        if rm:
+            _extract_actor_target(rm, out)
+
+    elif entry_type == 9:
+        # BPT_EFFECT_TRIGGER — from field 13 sub (BattleEffectTrigger)
+        out["kind"] = "effect_trigger"
+        em = first_sub(sg.get(13, []))
+        if em:
+            _extract_actor_target(em, out)
+            out["effect_id"] = pick_first(collect_varints(em, 3))
+            out["trigger_result"] = pick_first(collect_varints(em, 5))
+            out["trigger_params"] = collect_varints(em, 6)
+            _attach_buff_meta(out, out.get("effect_id"))
+
+    elif entry_type == 13:
+        # BPT_CHANGE_PET — from field 18 sub (BattleChangePet)
+        out["kind"] = "change_pet"
+        cm = first_sub(sg.get(18, []))
+        if cm:
+            _extract_actor_target(cm, out)
+            out["rest_pet_id"] = pick_first(collect_varints(cm, 2))
+            out["battle_pet_id"] = pick_first(collect_varints(cm, 3))
+            out["is_cmd"] = pick_first(collect_varints(cm, 5))
+            # BattlePetInfo in field 4 → contains the entering pet's data
+            # field 4 → sub has field 1 (pet state) and field 2 (pet info)
+            # Both describe the NEW (entering) pet, not the rest pet
+            pet_wrapper = first_sub(field_groups(cm).get(4, []))
+            if pet_wrapper:
+                pwg = field_groups(pet_wrapper)
+                # pet_info sub (field 2 of wrapper): pet_id at f2, name at f3
+                info_sub = first_sub(pwg.get(2, []))
+                if info_sub:
+                    out["new_pet_id"] = pick_first(collect_varints(info_sub, 2), low=1)
+                    out["new_pet_name"] = first_text(info_sub, 3)
+                    out["new_pet_types"] = collect_varints(info_sub, 6)
+                    out["new_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
+                # Fallback: pet_state sub (field 1 of wrapper): pet_id at f21, name at f23
+                if not out.get("new_pet_name"):
+                    state_sub = first_sub(pwg.get(1, []))
+                    if state_sub:
+                        out["new_pet_id"] = pick_first(collect_varints(state_sub, 21), low=1)
+                        out["new_pet_name"] = first_text(state_sub, 23)
+
+    elif entry_type == 25:
+        # BPT_AI — from field 33 sub (BattleAIPerform)
+        out["kind"] = "ai_action"
+        am = first_sub(sg.get(33, []))
+        if am:
+            out["pet_id"] = pick_first(collect_varints(am, 1))
+            out["uin"] = pick_first(collect_varints(am, 2))
+            out["ai_type"] = pick_first(collect_varints(am, 3))
+            out["param"] = pick_first(collect_varints(am, 4))
+
+    elif entry_type == 34:
+        # BPT_BATTLER_PVP_PERFORM — from field 43 sub (BattlerPvpPerform)
+        out["kind"] = "pvp_perform_marker"
+        pm = first_sub(sg.get(43, []))
+        if pm:
+            out["uin"] = pick_first(collect_varints(pm, 1))
+            out["pvp_type"] = pick_first(collect_varints(pm, 2))
+
+    elif entry_type == 35:
+        # BPT_DATA_UPDATE — from field 44 sub (BattleDataUpdate)
+        out["kind"] = "data_update"
+        dm = first_sub(sg.get(44, []))
+        if dm:
+            out["uin"] = pick_first(collect_varints(dm, 1))
+            pet_sub = first_sub(field_groups(dm).get(3, []))
+            if pet_sub:
+                out["pet_id"] = pick_first(collect_varints(pet_sub, 1))
+
+    elif entry_type == 37:
+        # BPT_SUPPLY_PET — from field 45 sub (BattleSupplyPetPlayerInfo)
+        out["kind"] = "supply_pet"
+        sm = first_sub(sg.get(45, []))
+        if sm:
+            out["player_id"] = pick_first(collect_varints(sm, 1))
+            pet_infos = []
+            for child in field_groups(sm).get(2, []):
+                cs = child.get("sub")
+                if cs is None:
+                    continue
+                pet_infos.append({
+                    "pet_id": pick_first(collect_varints(cs, 1)),
+                    "pet_pos": pick_first(collect_varints(cs, 2)),
+                })
+            if pet_infos:
+                out["supply_pets"] = pet_infos
 
     else:
         out["kind"] = f"unknown_type_{entry_type}"
