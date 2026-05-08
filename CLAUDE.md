@@ -96,6 +96,33 @@ The `src/data/loader.py` module provides typed access to this data; `src/data/sc
 
 Tests live in `tests/` and mirror the module structure (`test_crypto.py` tests `capture/crypto.py`, etc.). Test fixtures are in `tests/fixtures/`. The test suite covers crypto, protocol parsing, game mechanics (type chart, stats, skill eval), battle state tracking, and API endpoints.
 
+## Reference Repositories
+
+These external repositories are useful references for protocol parsing and game data:
+
+### [yuzeis/Roco-Kingdom-Protocol-Parser (RKPP)](https://github.com/yuzeis/Roco-Kingdom-Protocol-Parser)
+
+洛克王国战斗协议解析器 — the primary reference for battle protocol parsing. Key areas of overlap:
+- **Protocol parsing**: `rkpp_proto_core.py` (proto-tree parsing), `rkpp_proto_battle.py` (battle semantics) — mirrors our `protocol/proto_core.py` and `protocol/battle.py`
+- **Network layer**: `rkpp_network.py` (TCP reassembly, BE21 framing, AES-CBC decryption, key extraction) — mirrors our `capture/` modules
+- **Battle analysis**: `rkpp_analysis.py` (schema-driven field decoding), `rkpp_reporter.py` (battle summaries) — mirrors our `analysis/battle_state.py`
+- **Data**: `Data.py` / `Data/` — runtime data access and offline index data
+- **Server doc**: `Server.md` — server protocol documentation
+
+Use this repo to cross-reference opcode meanings, protobuf field structures, battle state transitions, and any protocol details not yet covered in our implementation.
+
+### [P0pola/Roco-Kingdom-World-Data](https://github.com/P0pola/Roco-Kingdom-World-Data)
+
+洛克王国游戏数据解包与解码工具集 — game data extraction and decoding reference. Key areas:
+- **`Bin/BinData/`** and **`Bin/BinDataCompressed/`** — decoded game config JSON (skills, pets, items, etc.), useful for cross-checking our `data/game/` JSON files
+- **`Bin/BinConf/`** — schema files (.non format) describing binary config structure
+- **`Bin/BinLocalize/`** — localized string data (en_US, etc.)
+- **`Bin/decode_bin.py`** — `.bytes` binary config decoder
+- **`PB/decode_pb.py`** — `.pb` file to `.proto` reconstructor, useful for understanding protobuf message definitions
+- **`BattleCamera/`**, **`BattleFsm/`**, **`BattleRecord/`** — battle-related data (camera, FSM state machine, replay records)
+
+Use this repo to look up game entity IDs, skill/effect definitions, protobuf schemas, and to validate or extend our static game data.
+
 ## Language Notes
 
 The codebase uses Chinese for UI strings, comments, and docstrings. Game data files use Chinese field names. Preserve this convention when modifying UI or data-related code.

@@ -405,6 +405,11 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "battle_max_hp": max_hp, "max_hp": max_hp,
         "current_hp": current_hp, "hp": current_hp,
         "energy": ds[26] if len(ds) >= 27 else None,
+        "stats": creature.get("stats", []),
+        "skills": creature.get("skills", []),
+        "equipped_skills": creature.get("equipped_skills", []),
+        "base_id": creature.get("base_id"),
+        "base_skill_pool": creature.get("base_skill_pool"),
         "source_opcode": record["opcode"], "source_opcode_hex": record.get("opcode_hex", ""),
         "seq": record.get("seq"), "path": path,
     }

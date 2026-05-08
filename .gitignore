@@ -1,1 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Pytest
+.pytest_cache/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sw?
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
 logs/
+*.log
+
+# Session keys and captures
+session_key.txt
+*.pcap
+*.pcapng
+
+# Node.js (frontend)
+node_modules/
+web/dist/
+web/*.local
+
+# Reports and docs output
+reports/
+
+# Claude Code
+.claude/

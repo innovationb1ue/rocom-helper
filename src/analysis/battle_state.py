@@ -99,6 +99,14 @@ class BattleStateTracker:
                 "max_hp": w.get("max_hp", 0),
                 "energy": 5,
                 "buffs": [],
+                "level": w.get("level"),
+                "slot": w.get("slot"),
+                "side": w.get("side"),
+                "stats": w.get("stats", []),
+                "skills": w.get("skills", []),
+                "equipped_skills": w.get("equipped_skills", []),
+                "base_id": w.get("base_id"),
+                "base_skill_pool": w.get("base_skill_pool"),
             }
             if pet_info["max_hp"] > 0:
                 pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
@@ -235,6 +243,14 @@ class BattleStateTracker:
                         pet["name"] = w["name"]
                     if w.get("pet_id") and w["pet_id"] != 20000000:
                         pet["pet_id"] = w["pet_id"]
+                    if w.get("level") is not None:
+                        pet["level"] = w["level"]
+                    if w.get("stats"):
+                        pet["stats"] = w["stats"]
+                    if w.get("base_id") is not None:
+                        pet["base_id"] = w["base_id"]
+                    if w.get("base_skill_pool") is not None:
+                        pet["base_skill_pool"] = w["base_skill_pool"]
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
                     break
@@ -248,6 +264,13 @@ class BattleStateTracker:
                     "energy": w.get("energy", 5),
                     "buffs": [],
                     "slot": w.get("slot"),
+                    "level": w.get("level"),
+                    "side": w.get("side"),
+                    "stats": w.get("stats", []),
+                    "skills": w.get("skills", []),
+                    "equipped_skills": w.get("equipped_skills", []),
+                    "base_id": w.get("base_id"),
+                    "base_skill_pool": w.get("base_skill_pool"),
                 }
                 if pet_info["max_hp"] > 0:
                     pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
