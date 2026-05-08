@@ -1,10 +1,10 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useBattleStore } from '../stores/battleStore';
-import type { FormattedBattleEvent, BattleSummary } from '../stores/battleStore';
+import type { FormattedBattleEvent, BattleSummary, DamagePrediction } from '../stores/battleStore';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary } = useBattleStore();
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setDamagePredictions } = useBattleStore();
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -28,12 +28,14 @@ export function useBattle() {
           addFormattedEvents(msg.events as FormattedBattleEvent[]);
         } else if (msg.type === 'battle_summary') {
           setBattleSummary(msg.summary as BattleSummary);
+        } else if (msg.type === 'damage_predictions') {
+          setDamagePredictions(msg.predictions as DamagePrediction[]);
         }
       } catch (err) {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setDamagePredictions]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));

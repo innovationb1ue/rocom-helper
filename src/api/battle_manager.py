@@ -120,6 +120,10 @@ class BattleManager:
             summary = compute_battle_summary(state)
             await self._push_summary(summary)
 
+        # 伤害预测分析
+        if self.battle_active() and opcode in (0x1316, 0x131A, 0x1324, 0x13F4):
+            await self._push_damage_analysis(state)
+
         return state
 
     # ------------------------------------------------------------------
@@ -170,6 +174,25 @@ class BattleManager:
 
     async def _push_summary(self, summary: Dict[str, Any]) -> None:
         msg = json.dumps({"type": "battle_summary", "summary": summary}, ensure_ascii=False)
+        dead: List[WebSocket] = []
+        for ws in self._ws_clients:
+            try:
+                await ws.send_text(msg)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self._ws_clients.remove(ws)
+
+    async def _push_damage_analysis(self, state: Dict[str, Any]) -> None:
+        from src.analysis.battle_advisor import BattleAdvisor
+        advisor = BattleAdvisor()
+        advice = advisor.analyze(state)
+        if not advice.damage_predictions:
+            return
+        msg = json.dumps(
+            {"type": "damage_predictions", "predictions": [p.to_dict() for p in advice.damage_predictions]},
+            ensure_ascii=False,
+        )
         dead: List[WebSocket] = []
         for ws in self._ws_clients:
             try:

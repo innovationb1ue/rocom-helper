@@ -147,6 +147,8 @@ class BattleStateTracker:
                 opp_pets.append(pet_info)
 
         self.state["my_pets"] = my_pets
+
+        self.state["my_pets"] = my_pets
         self.state["opp_pets"] = opp_pets
         if my_pets:
             self.state["my_active"] = my_pets[0]
@@ -192,6 +194,15 @@ class BattleStateTracker:
                 active_key = "my_active" if self._is_mine(actor_side) else "opp_active"
                 active = self.state[active_key]
                 if active is not None:
+                    # 记录使用过的技能
+                    skill_id = entry.get("skill_id")
+                    if skill_id is not None:
+                        used = active.setdefault("used_skills", [])
+                        if not any(s.get("skill_id") == skill_id for s in used):
+                            item = {"skill_id": skill_id}
+                            if entry.get("skill_name"):
+                                item["skill_name"] = entry["skill_name"]
+                            used.append(item)
                     if energy_after is not None:
                         active["energy"] = energy_after
                     else:

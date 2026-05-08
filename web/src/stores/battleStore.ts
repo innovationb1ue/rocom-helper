@@ -32,6 +32,25 @@ export interface BattleSummary {
   event_stats: Record<string, number>;
 }
 
+export interface DamagePrediction {
+  skill_id: number;
+  skill_name: string;
+  power: number;
+  damage_type: number;
+  skill_element: number;
+  skill_element_name: string;
+  effectiveness: number;
+  effectiveness_label: string;
+  is_stab: boolean;
+  min_damage: number;
+  max_damage: number;
+  pct_hp_range: [number, number];
+  can_ko: boolean;
+  energy_cost: number;
+  confidence: string;
+  warnings: string[];
+}
+
 export interface BattleState {
   battle_id: number | null;
   round: number;
@@ -45,6 +64,7 @@ export interface BattleState {
   connected: boolean;
   formattedEvents: FormattedBattleEvent[];
   battleSummary: BattleSummary | null;
+  damagePredictions: DamagePrediction[];
 }
 
 interface BattleStore extends BattleState {
@@ -55,6 +75,7 @@ interface BattleStore extends BattleState {
   addFormattedEvent: (event: FormattedBattleEvent) => void;
   addFormattedEvents: (events: FormattedBattleEvent[]) => void;
   setBattleSummary: (summary: BattleSummary) => void;
+  setDamagePredictions: (predictions: DamagePrediction[]) => void;
 }
 
 const initialState: BattleState = {
@@ -70,6 +91,7 @@ const initialState: BattleState = {
   connected: false,
   formattedEvents: [],
   battleSummary: null,
+  damagePredictions: [],
 };
 
 export const useBattleStore = create<BattleStore>((set) => ({
@@ -86,4 +108,5 @@ export const useBattleStore = create<BattleStore>((set) => ({
   addFormattedEvents: (events) =>
     set((st) => ({ formattedEvents: [...st.formattedEvents, ...events] })),
   setBattleSummary: (summary) => set({ battleSummary: summary }),
+  setDamagePredictions: (predictions) => set({ damagePredictions: predictions }),
 }));

@@ -5,6 +5,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.protocol.proto_core import (
+    SDT_TO_TYPE,
     collect_varints,
     field_groups,
     first_sub,
@@ -542,7 +543,7 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                 if info_sub:
                     out["new_pet_id"] = pick_first(collect_varints(info_sub, 2), low=1)
                     out["new_pet_name"] = first_text(info_sub, 3)
-                    out["new_pet_types"] = collect_varints(info_sub, 6)
+                    out["new_pet_types"] = [SDT_TO_TYPE.get(v, v) for v in collect_varints(info_sub, 6)]
                     out["new_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
                 # Fallback: pet_state sub (field 1 of wrapper): pet_id at f21, name at f23
                 if not out.get("new_pet_name"):

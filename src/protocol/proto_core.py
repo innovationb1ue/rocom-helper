@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
-from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta
+from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_wiki_pet_types
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +86,30 @@ SPECIAL_ACTION_COMMANDS: Dict[Tuple[int, int], str] = {
 }
 SPECIAL_ACTION_SHAPES: Dict[Tuple[int, int], str] = {
     (8, 8): "愿力强化", (3, 4): "能量瓶", (2, 3): "换人",
+}
+
+# SkillDamType enum values (proto_schema PetData.skill_dam_type) → elemental type ID.
+# The battle protocol sends SkillDamType enum values in field 6, not type IDs directly.
+SDT_TO_TYPE: Dict[int, int] = {
+    2: 0,   # SDT_COMMON → 普通
+    3: 3,   # SDT_GRASS → 草
+    4: 1,   # SDT_FIRE → 火
+    5: 2,   # SDT_WATER → 水
+    6: 17,  # SDT_LIGHT → 光
+    7: 8,   # SDT_EARTH → 地
+    9: 5,   # SDT_ICE → 冰
+    10: 15, # SDT_DRAGON → 龙
+    11: 4,  # SDT_ELECTRIC → 电
+    12: 7,  # SDT_TOXIC → 毒
+    13: 12, # SDT_INSECT → 虫
+    14: 6,  # SDT_FIGHT → 武
+    15: 9,  # SDT_WING → 翼
+    16: 10, # SDT_MOE → 萌
+    17: 13, # SDT_GHOST → 幽
+    18: 16, # SDT_DEMON → 恶
+    19: 14, # SDT_MECHANIC → 机械
+    20: 11, # SDT_PHANTOM → 幻
+    23: 0,  # SDT_GENERAL → 普通
 }
 
 # --- 名称查找 ---
@@ -340,7 +364,7 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
     equipped = [it for it in all_skills if 1 <= it["equipped_slot"] <= 4]
     out: Dict[str, Any] = {
         "name": name, "level": level, "slot": slot, "pet_id": pid,
-        "types": collect_varints(msg, 6),
+        "types": [SDT_TO_TYPE.get(v, v) for v in collect_varints(msg, 6)],
         "stats": stats, "max_hp": stats[0]["total"] if stats else None,
         "skills": all_skills,
         "equipped_skills": sorted(equipped, key=lambda it: (it["equipped_slot"], it["skill_id"])),
@@ -357,6 +381,10 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
         skill_pool = get_pet_skill_meta(out["base_id"])
         if isinstance(skill_pool, dict):
             out["base_skill_pool"] = skill_pool.get("level_skills") or []
+    wiki_types = get_wiki_pet_types(name)
+    if wiki_types and wiki_types != out["types"]:
+        logger.debug("Type mismatch for %s: protocol=%s, wiki=%s",
+                     name, out["types"], wiki_types)
     return out
 
 def _side_from_path(path: str) -> Optional[int]:

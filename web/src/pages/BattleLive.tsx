@@ -11,6 +11,7 @@ import { useSnifferStore } from '../stores/snifferStore';
 import TeamRoster from '../components/TeamRoster';
 import BattleEventLog from '../components/BattleEventLog';
 import BattleSummaryPanel from '../components/BattleSummaryPanel';
+import DamagePredictionPanel from '../components/DamagePredictionPanel';
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
   idle: { color: 'default', icon: <CloseCircleOutlined />, text: '未启动' },
@@ -25,7 +26,7 @@ const BattleLive: React.FC = () => {
   const {
     my_pets, opp_pets, my_active, opp_active,
     round, result, suggestions, connected,
-    formattedEvents, battleSummary,
+    formattedEvents, battleSummary, damagePredictions,
   } = useBattleStore();
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -125,6 +126,9 @@ const BattleLive: React.FC = () => {
           <TeamRoster pets={opp_pets} activePet={opp_active} side="opp" label="敌方阵容" />
         </Col>
       </Row>
+
+      {/* 伤害预测 */}
+      <DamagePredictionPanel predictions={damagePredictions} oppActive={opp_active} />
 
       {/* 建议 */}
       {suggestions.length > 0 && (
