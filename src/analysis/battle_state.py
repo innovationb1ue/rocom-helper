@@ -7,6 +7,8 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+POISON_BUFF_IDS = {20070010}
+
 
 class BattleStateTracker:
     def __init__(self) -> None:
@@ -137,6 +139,8 @@ class BattleStateTracker:
                 "equipped_skills": equipped,
                 "base_id": w.get("base_id"),
                 "base_skill_pool": w.get("base_skill_pool"),
+                "combo_bonus": 0,
+                "poison_stacks": 0,
             }
             if pet_info["max_hp"] > 0:
                 pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
@@ -217,6 +221,15 @@ class BattleStateTracker:
                     else:
                         active["energy"] = max(0, active.get("energy", 5) + energy_delta)
 
+            elif kind == "combo_skill_cast":
+                actor_side = entry.get("actor_side")
+                combo_count = entry.get("combo_count")
+                if actor_side is not None and combo_count is not None:
+                    active_key = "my_active" if self._is_mine(actor_side) else "opp_active"
+                    active = self.state[active_key]
+                    if active is not None:
+                        active["combo_bonus"] = combo_count
+
             elif kind == "defeat":
                 defeated_side = entry.get("target_side", "")
                 is_mine = self._is_mine(defeated_side)
@@ -296,11 +309,14 @@ class BattleStateTracker:
                             "slot": battle_pet_id,
                             "level": new_pet_level,
                             "side": 401 if is_opp else 1,
+                            "combo_bonus": 0,
+                            "poison_stacks": 0,
                         }
                         pet_list.append(matched)
                     if matched is not None:
                         self.state[active_key] = matched
                         matched["buffs"] = []
+                        matched["combo_bonus"] = 0
 
             elif kind == "effect_apply":
                 target_side = entry.get("target_side")
@@ -326,6 +342,9 @@ class BattleStateTracker:
                                 "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
                                 "turns_applied": 1,
                             })
+                        # 追踪中毒层数
+                        if effect_id in POISON_BUFF_IDS:
+                            active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
             elif kind == "effect_stage":
                 actor_side = entry.get("actor_side")
@@ -446,6 +465,8 @@ class BattleStateTracker:
                     "equipped_skills": w.get("equipped_skills", []),
                     "base_id": w.get("base_id"),
                     "base_skill_pool": w.get("base_skill_pool"),
+                    "combo_bonus": 0,
+                    "poison_stacks": 0,
                 }
                 if pet_info["max_hp"] > 0:
                     pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
