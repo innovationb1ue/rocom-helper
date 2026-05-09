@@ -29,6 +29,9 @@ class DamageResult:
     can_ko: bool
     energy_cost: int
     confidence: str  # "high" / "medium" / "low"
+    hit_count: int = 1
+    total_min_damage: int = 0
+    total_max_damage: int = 0
     warnings: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -200,11 +203,16 @@ class DamageCalculator:
         min_dmg = ctx["min_damage"]
         max_dmg = ctx["max_damage"]
 
-        # HP 百分比
+        # 连击信息
+        hit_count = ctx.get("hit_count", 1)
+        total_min = min_dmg * hit_count
+        total_max = max_dmg * hit_count
+
+        # HP 百分比（基于总伤害）
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1
-        pct_min = min_dmg / defender_max_hp
-        pct_max = max_dmg / defender_max_hp
-        can_ko = min_dmg >= (defender.get("current_hp") or 0)
+        pct_min = total_min / defender_max_hp
+        pct_max = total_max / defender_max_hp
+        can_ko = total_min >= (defender.get("current_hp") or 0)
 
         # 能耗
         energy_costs = skill_meta.get("energy_cost", [0])
@@ -230,6 +238,9 @@ class DamageCalculator:
             can_ko=can_ko,
             energy_cost=energy_cost,
             confidence=confidence,
+            hit_count=hit_count,
+            total_min_damage=total_min,
+            total_max_damage=total_max,
             warnings=warnings,
         )
 

@@ -59,8 +59,6 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     total_hits = int(combo_bonus * multiplier + additive_bonus)
     if total_hits > 1:
         ctx["hit_count"] = total_hits
-        ctx["min_damage"] = int(ctx["min_damage"] * total_hits)
-        ctx["max_damage"] = int(ctx["max_damage"] * total_hits)
 
     return ctx
 

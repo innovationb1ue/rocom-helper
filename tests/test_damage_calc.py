@@ -320,6 +320,9 @@ class TestCalculate:
         assert "skill_id" in d
         assert "min_damage" in d
         assert "max_damage" in d
+        assert "hit_count" in d
+        assert "total_min_damage" in d
+        assert "total_max_damage" in d
         assert isinstance(d["pct_hp_range"], (list, tuple))
 
 
@@ -470,3 +473,72 @@ class TestHookSystem:
             _make_skill(power=10),
         )
         assert result.can_ko is True
+
+
+# ---------------------------------------------------------------------------
+# TestComboDamage — hit_count, total damage fields
+# ---------------------------------------------------------------------------
+
+
+class TestComboDamage:
+    def test_default_hit_count_is_one(self):
+        """Without combo hooks, hit_count=1 and total equals per-hit damage."""
+        calc = DamageCalculator(TypeChart())
+        result = calc.calculate(_make_attacker(), _make_defender(), _make_skill())
+        assert result.hit_count == 1
+        assert result.total_min_damage == result.min_damage
+        assert result.total_max_damage == result.max_damage
+
+    def test_combo_hook_sets_hit_count(self):
+        """post_calc hook sets hit_count → total_damage = per_hit × hit_count."""
+        calc = DamageCalculator(TypeChart())
+
+        def combo_hook(ctx):
+            return {**ctx, "hit_count": 3}
+
+        calc.register_hook("post_calc", combo_hook)
+        result = calc.calculate(_make_attacker(), _make_defender(), _make_skill())
+        assert result.hit_count == 3
+        assert result.total_min_damage == result.min_damage * 3
+        assert result.total_max_damage == result.max_damage * 3
+
+    def test_combo_can_ko_uses_total_damage(self):
+        """can_ko should be based on total_min_damage, not per-hit."""
+        calc = DamageCalculator(TypeChart())
+
+        def combo_hook(ctx):
+            return {**ctx, "hit_count": 5}
+
+        calc.register_hook("post_calc", combo_hook)
+        # Defender has 200 HP — single hit won't KO but 5 hits might
+        result = calc.calculate(
+            _make_attacker(atk=100),
+            _make_defender(current_hp=200, max_hp=350),
+            _make_skill(power=40),
+        )
+        # Verify: total_min_damage >= current_hp → can_ko
+        assert result.can_ko == (result.total_min_damage >= 200)
+
+    def test_combo_pct_hp_uses_total_damage(self):
+        """pct_hp_range should be based on total damage."""
+        calc = DamageCalculator(TypeChart())
+
+        def combo_hook(ctx):
+            return {**ctx, "hit_count": 4}
+
+        calc.register_hook("post_calc", combo_hook)
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(max_hp=1000, current_hp=1000),
+            _make_skill(power=80),
+        )
+        assert result.pct_hp_range[0] == result.total_min_damage / 1000
+        assert result.pct_hp_range[1] == result.total_max_damage / 1000
+
+    def test_to_dict_includes_combo_fields(self):
+        calc = DamageCalculator(TypeChart())
+        result = calc.calculate(_make_attacker(), _make_defender(), _make_skill())
+        d = result.to_dict()
+        assert d["hit_count"] == 1
+        assert d["total_min_damage"] == result.min_damage
+        assert d["total_max_damage"] == result.max_damage

@@ -115,8 +115,8 @@ class TestComboModifyHook:
         }
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 4  # 3 base + 1 bonus
-        assert result["min_damage"] == 200  # 50 * 4
-        assert result["max_damage"] == 240  # 60 * 4
+        assert result["min_damage"] == 50  # per-hit damage unchanged
+        assert result["max_damage"] == 60
 
     def test_combo_multiplier(self):
         """连击翻倍 (buff 20450030): multiplier=2"""
@@ -133,8 +133,8 @@ class TestComboModifyHook:
         }
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 6  # 3 * 2
-        assert result["min_damage"] == 300  # 50 * 6
-        assert result["max_damage"] == 360  # 60 * 6
+        assert result["min_damage"] == 50  # per-hit damage unchanged
+        assert result["max_damage"] == 60
 
     def test_combo_poison_stacks(self):
         """毒连击 (buff 29990910): per_poison_stack +1"""
@@ -152,7 +152,7 @@ class TestComboModifyHook:
         }
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 5  # 2 base + 3 poison
-        assert result["min_damage"] == 250  # 50 * 5
+        assert result["min_damage"] == 50  # per-hit damage unchanged
 
     def test_combo_element_trigger(self):
         """翼系连击 (buff 20350300): skill_element_used, element=14"""
@@ -199,7 +199,7 @@ class TestComboModifyHook:
         assert result["hit_count"] == 4  # 2 base + 1 + 1
 
     def test_no_innate_buff_uses_base_combo(self):
-        """Combo bonus but no innate skills → damage multiplied by base count."""
+        """Combo bonus but no innate skills → hit_count = base count."""
         attacker = _make_attacker(combo_bonus=3, buffs=[])
         ctx = {
             "min_damage": 50,
@@ -210,7 +210,7 @@ class TestComboModifyHook:
         }
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 3  # base only, no multiplier
-        assert result["min_damage"] == 150  # 50 * 3
+        assert result["min_damage"] == 50  # per-hit damage unchanged
 
     def test_non_innate_buff_ignored(self):
         """Buffs that are not innate skills should be ignored."""
