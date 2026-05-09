@@ -552,6 +552,23 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                         out["new_pet_id"] = pick_first(collect_varints(state_sub, 21), low=1)
                         out["new_pet_name"] = first_text(state_sub, 23)
 
+    elif entry_type == 30:
+        # BPT_COMBO_SKILL — from field 38 sub (BattleComboSkillCast)
+        out["kind"] = "combo_skill_cast"
+        cm = first_sub(sg.get(38, []))
+        if cm:
+            _extract_actor_target(cm, out)
+            out["caster_id"] = pick_first(collect_varints(cm, 1))
+            out["target_id"] = collect_varints(cm, 2)
+            skill_id_x100 = pick_first(collect_varints(cm, 3), low=100_000)
+            sid = normalize_skill_id(skill_id_x100)
+            out["skill_id_x100"] = skill_id_x100
+            out["skill_id"] = sid
+            out["skill_name"] = skill_name(sid)
+            _attach_skill_meta(out, sid)
+            out["combo_index"] = pick_first(collect_varints(cm, 8))
+            out["combo_count"] = pick_first(collect_varints(cm, 9))
+
     elif entry_type == 25:
         # BPT_AI — from field 33 sub (BattleAIPerform)
         out["kind"] = "ai_action"
