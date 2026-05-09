@@ -49,7 +49,7 @@
       "id": "US-007",
       "title": "连击伤害前端展示",
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "description": "BattleLive 页面显示连击技能的总伤害预测和连击信息"
     },
     {

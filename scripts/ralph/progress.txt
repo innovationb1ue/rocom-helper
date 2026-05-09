@@ -107,3 +107,18 @@ Started: Sat May  9 21:19:21 CST 2026
   - The combo_modify_hook no longer modifies damage values directly — it only sets `hit_count` in the context dict
   - Default `hit_count=1` means non-combo skills have `total_*` equal to `min_damage`/`max_damage` — backward compatible
 ---
+
+## 2026-05-09 - US-007
+- Updated frontend to display combo damage information on BattleLive page
+- Added `hit_count`, `total_min_damage`, `total_max_damage` to DamagePrediction TypeScript interface in battleStore.ts
+- Updated DamagePredictionPanel: when hit_count > 1, shows total damage range with tooltip for per-hit damage, purple "×N 连击" tag
+- HP percentage calculation now uses total damage (total_min/total_max) for combo skills
+- Removed unused `Space` import from DamagePredictionPanel.tsx
+- Files changed: `web/src/stores/battleStore.ts`, `web/src/components/DamagePredictionPanel.tsx`
+- All 513 pytest tests pass; my files have no new TS errors (pre-existing errors in untouched files remain)
+- **Learnings for future iterations:**
+  - Backend `DamageResult.to_dict()` uses `asdict()` — any new fields added to the dataclass are automatically serialized to JSON for WebSocket messages
+  - `pct_hp_range` and `can_ko` in the backend already reflect total combo damage — frontend can use total damage or pct_hp_range directly
+  - Frontend has pre-existing TS errors in 5 files (BattleTimeline, CoverageRadar, Dashboard, PetBrowser, TeamBuilder) — these block `npm run build` but are not related to current work
+  - Defensive defaults in frontend: `(p.hit_count ?? 1)` ensures backward compatibility if backend sends older format without hit_count
+---
