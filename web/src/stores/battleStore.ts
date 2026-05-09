@@ -48,6 +48,9 @@ export interface DamagePrediction {
   can_ko: boolean;
   energy_cost: number;
   confidence: string;
+  hit_count: number;
+  total_min_damage: number;
+  total_max_damage: number;
   warnings: string[];
 }
 
