@@ -484,11 +484,12 @@ class TestSuggestions:
         types = [s["type"] for s in suggestions]
         assert "low_hp" in types
 
-    def test_healthy_suggestion(self, tracker):
+    def test_healthy_suggestion_removed(self, tracker):
+        """HP健康时不再生成无用的 hp_ok 建议。"""
         tracker.handle_event(0x1316, _enter_event())
         suggestions = tracker.get_suggestions()
         types = [s["type"] for s in suggestions]
-        assert "hp_ok" in types
+        assert "hp_ok" not in types
 
     def test_finish_off_suggestion(self, tracker):
         """对手低血量时出现 finish_off 建议。"""

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Roco PvP Helper (洛克王国 PvP 辅助工具) — a passive network-monitoring assistant for Roco Kingdom PvP battles. It captures game traffic on port 8195, decrypts the custom BE21 protocol, and provides real-time battle state tracking, team analysis, and type counter-pick suggestions. The tool is purely passive — it only reads traffic, never sends packets to the game.
+Roco PvP Helper (洛克王国 PvP 辅助工具) — a real-time battle analysis and suggestion tool for Roco Kingdom PvP. It passively monitors game network traffic on port 8195, decrypts the custom BE21 protocol, tracks live battle state, and provides actionable suggestions (type counters, threat assessment, team composition) during PvP battles. The tool is purely passive — it only reads traffic, never sends packets to the game.
 
 ## Tech Stack
 
@@ -28,6 +28,43 @@ npm run dev                     # Vite dev server on :5173
 npm run build                   # TypeScript compile + Vite production build
 npm run lint                    # ESLint
 ```
+
+## Development Workflow
+
+**Mandatory after every development task** — complete all steps in order:
+
+### 1. Run Full Test Suite
+```bash
+pytest
+```
+All tests must pass before proceeding. Fix any failures before moving on.
+
+### 2. Start Backend & Frontend
+```bash
+# Terminal 1 — Backend
+python -m src.main
+
+# Terminal 2 — Frontend
+cd web && npm run dev
+```
+
+### 3. Battle Replay Verification
+1. Open browser at `http://localhost:5173/battle-live`
+2. Click "连接战斗" to establish WebSocket connection
+3. Run the replay script:
+```bash
+python -m scripts.replay_to_frontend --delay 80 --session battle_session_1
+```
+
+### 4. Observe & Verify
+Watch the frontend BattleLive page and backend console output. Verify:
+- Battle state updates correctly (HP, energy, buffs, pet switches)
+- Battle events timeline renders properly
+- Type coverage and counter-pick suggestions appear correctly
+- No errors or exceptions in backend console or browser console
+- Overall behavior matches the development goal of real-time battle analysis
+
+If anything looks wrong, investigate and fix before marking the task complete.
 
 ## Architecture
 

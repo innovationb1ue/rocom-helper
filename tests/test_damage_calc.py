@@ -278,12 +278,12 @@ class TestCalculate:
         )
         assert result.confidence == "high"
 
-    def test_confidence_low_with_no_stats(self, calc):
+    def test_no_stats_returns_none(self, calc):
+        """无攻防数据时不再返回不可靠的估算，而是返回 None。"""
         attacker = {"types": [1], "max_hp": 300, "current_hp": 300, "name": "不存在的宠物名xyz"}
         defender = {"types": [2], "max_hp": 350, "current_hp": 350}
         result = calc.calculate(attacker, defender, _make_skill())
-        assert result is not None
-        assert result.confidence == "low"
+        assert result is None
 
     def test_pct_hp_range(self, calc):
         result = calc.calculate(

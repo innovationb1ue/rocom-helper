@@ -36,8 +36,8 @@ class BattleAdvisor:
         if not my_active or not opp_active:
             return BattleAdvice()
 
-        # 收集技能列表：优先 equipped_skills > skills > base_skill_pool
-        skills = my_active.get("equipped_skills") or my_active.get("skills") or []
+        # 收集技能列表：优先 used_skills > equipped_skills > skills > base_skill_pool
+        skills = my_active.get("used_skills") or my_active.get("equipped_skills") or my_active.get("skills") or []
         if not skills:
             skills = self._skills_from_pool(my_active)
         predictions = self._damage_calc.calculate_all(my_active, opp_active, skills)

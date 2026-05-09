@@ -73,8 +73,6 @@ class BattleStateTracker:
         my_hp_pct = my_active.get("hp_pct", 1.0)
         if my_hp_pct < 0.25:
             suggestions.append({"type": "low_hp", "message": "我方精灵HP过低，考虑换宠"})
-        if my_hp_pct > 0.75:
-            suggestions.append({"type": "hp_ok", "message": "我方精灵HP健康"})
 
         opp_hp_pct = opp_active.get("hp_pct", 1.0)
         if opp_hp_pct < 0.25:
@@ -158,8 +156,6 @@ class BattleStateTracker:
                 opp_pets.append(pet_info)
 
         self.state["my_pets"] = my_pets
-
-        self.state["my_pets"] = my_pets
         self.state["opp_pets"] = opp_pets
         if my_pets:
             self.state["my_active"] = my_pets[0]
@@ -195,8 +191,10 @@ class BattleStateTracker:
                 active = self.state[active_key]
                 if active is not None:
                     active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
-                    if active["max_hp"] > 0:
+                    if active.get("max_hp", 0) > 0:
                         active["hp_pct"] = active["current_hp"] / active["max_hp"]
+                    else:
+                        active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
 
             elif kind == "skill_cast":
                 actor_side = entry.get("actor_side", "")
@@ -292,6 +290,7 @@ class BattleStateTracker:
                             "types": new_pet_types,
                             "current_hp": 0,
                             "max_hp": 0,
+                            "hp_pct": 1.0,
                             "energy": 5,
                             "buffs": [],
                             "slot": battle_pet_id,
@@ -344,7 +343,6 @@ class BattleStateTracker:
 
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
-        self.state["phase"] = "finished"
         self.state["phase"] = "finished"
         finish_pets = detail.get("finish_pet_infos", [])
         for fp in finish_pets:
@@ -425,6 +423,11 @@ class BattleStateTracker:
                         pet["equipped_skills"] = w_eq
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
+                    # Keep active reference pointing to the same dict in pet_list
+                    active_key = "my_active" if is_mine else "opp_active"
+                    cur_active = self.state[active_key]
+                    if cur_active is not None and cur_active.get("pet_id") == pet.get("pet_id"):
+                        self.state[active_key] = pet
                     break
             if matched is None:
                 pet_info = {

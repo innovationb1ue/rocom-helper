@@ -31,6 +31,7 @@ class BattleManager:
         self._tracker: Optional[BattleStateTracker] = None
         self._ws_clients: List[WebSocket] = []
         self._bridge_registered = False
+        self._advisor: Optional[Any] = None
 
     @property
     def tracker(self) -> Optional[BattleStateTracker]:
@@ -44,6 +45,7 @@ class BattleManager:
 
     def reset_tracker(self) -> BattleStateTracker:
         self._tracker = BattleStateTracker()
+        self._advisor = None
         return self._tracker
 
     def get_state(self) -> Dict[str, Any]:
@@ -185,8 +187,9 @@ class BattleManager:
 
     async def _push_damage_analysis(self, state: Dict[str, Any]) -> None:
         from src.analysis.battle_advisor import BattleAdvisor
-        advisor = BattleAdvisor()
-        advice = advisor.analyze(state)
+        if self._advisor is None:
+            self._advisor = BattleAdvisor()
+        advice = self._advisor.analyze(state)
         if not advice.damage_predictions:
             return
         msg = json.dumps(

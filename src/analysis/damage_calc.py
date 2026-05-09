@@ -43,6 +43,14 @@ _RAND_MAX = 1.0
 # STAB 倍率
 _STAB_MULTIPLIER = 1.5
 
+# Buff stage → stat multiplier  (stage -6 ~ +6)
+# 每级约 +50% / -33%，参考宝可梦通用规则
+_BUFF_STAGE_MULTIPLIERS = {
+    -6: 2/8, -5: 2/7, -4: 2/6, -3: 2/5, -2: 2/4, -1: 2/3,
+    0: 1.0,
+    1: 3/2, 2: 4/2, 3: 5/2, 4: 6/2, 5: 7/2, 6: 8/2,
+}
+
 
 class DamageCalculator:
     def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
@@ -87,15 +95,19 @@ class DamageCalculator:
                 confidence = "medium"
                 warnings.append("防御属性来自 wiki 估算")
 
-        # 完全无数据时用保守估计
-        if atk_val is None:
-            atk_val = max(1, int((attacker.get("max_hp") or 300) * 0.5))
-            confidence = "low"
-            warnings.append("攻击属性为粗略估计")
-        if def_val is None:
-            def_val = max(1, int((defender.get("max_hp") or 300) * 0.5))
-            confidence = "low"
-            warnings.append("防御属性为粗略估计")
+        # 完全无数据时无法给出有意义的预测
+        if atk_val is None or def_val is None:
+            return None
+
+        # Buff stage 修正
+        atk_stage = self._get_stat_stage(attacker, atk_name)
+        def_stage = self._get_stat_stage(defender, def_name)
+        atk_val = int(atk_val * _BUFF_STAGE_MULTIPLIERS.get(atk_stage, 1.0))
+        def_val = int(def_val * _BUFF_STAGE_MULTIPLIERS.get(def_stage, 1.0))
+        if atk_stage != 0:
+            warnings.append(f"攻击方 {atk_name} stage {atk_stage:+d}")
+        if def_stage != 0:
+            warnings.append(f"防御方 {def_name} stage {def_stage:+d}")
 
         # 属性克制
         defender_types = defender.get("types", [])
@@ -211,3 +223,14 @@ class DamageCalculator:
         if wiki_stats and stat_name in wiki_stats:
             return int(wiki_stats[stat_name])
         return None
+
+    @staticmethod
+    def _get_stat_stage(pet: Dict[str, Any], stat_name: str) -> int:
+        """从 pet 的 buffs 中提取指定属性的 stage 值，累加所有相关 buff 的 stage。"""
+        total = 0
+        for buff in pet.get("buffs", []):
+            stage = buff.get("stage")
+            if isinstance(stage, int) and stage != 0:
+                # buff 的 name 或 id 关联到属性名（粗粒度：所有非零 stage 都计入）
+                total += stage
+        return max(-6, min(6, total))
