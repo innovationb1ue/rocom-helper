@@ -14,7 +14,7 @@
       "id": "US-002",
       "title": "创建先天技能数据文件",
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "description": "创建 data/game/innate_skills.json，以宠物 base_id 为 key，包含先天技能的 name、description、effect_type、effect_params"
     },
     {

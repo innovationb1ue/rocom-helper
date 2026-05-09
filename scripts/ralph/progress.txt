@@ -22,3 +22,19 @@ Started: Sat May  9 21:19:21 CST 2026
   - BattleComboSkillCast has `target_id` as repeated field (field 2) — use `collect_varints` to get all targets
   - Frontend TS build errors are pre-existing and unrelated to backend changes
 ---
+
+## 2026-05-09 - US-002
+- Created `data/game/innate_skills.json` with innate skill definitions
+- Structure uses `skills` (keyed by buff_id) and `pets` (keyed by base_id, currently empty) sections
+- Includes all 12 innate skills from acceptance criteria: 5 S2 talents, 5 combo mods, 3 conditional combo
+- Each skill entry has: name, description, effect_type, effect_params, hook_stage, category
+- effect_types: special, energy_modify, stat_modify, type_resist_modify, power_modify, combo_modify
+- Files changed: `data/game/innate_skills.json`, `scripts/ralph/prd.json`
+- All 473 pytest tests pass
+- **Learnings for future iterations:**
+  - Pet-to-innate-skill mapping is an open question (PRD section 8, Q1-Q2) — the `pets` section in innate_skills.json is empty for now
+  - S2 talents are player-chosen per battle, not pet-inherent — detected via buff application events, not static data
+  - buff_id is the primary identifier for innate skills at runtime; hook_stage indicates which damage calc stage to apply
+  - effect_params.trigger values: "always", "per_poison_stack", "skill_element_used", "hp_below", "turn_end", "first_strike"
+  - The loader doesn't yet load innate_skills.json — will need a `get_innate_skill(buff_id)` function in US-005
+---
