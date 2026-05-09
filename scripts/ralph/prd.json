@@ -42,7 +42,7 @@
       "id": "US-006",
       "title": "DamageResult 支持连击伤害",
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "description": "DamageResult 新增 hit_count、total_min_damage、total_max_damage 字段，支持连击伤害计算"
     },
     {

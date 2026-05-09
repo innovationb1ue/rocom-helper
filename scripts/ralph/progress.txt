@@ -92,3 +92,18 @@ Started: Sat May  9 21:19:21 CST 2026
   - Innate hooks add metadata to context dict (`hit_count`, `lifesteal_pct`, `lifesteal_heal`) — US-006 can read these for DamageResult fields
   - The `_get_active_innate_skills(pet)` helper scans buffs against `get_innate_skill()` — new innate skills just need entries in `innate_skills.json`
 ---
+
+## 2026-05-09 - US-006
+- Added `hit_count`, `total_min_damage`, `total_max_damage` fields to `DamageResult` dataclass
+- `min_damage`/`max_damage` now represent per-hit damage; `total_*` fields represent total combo damage
+- `can_ko` and `pct_hp_range` now based on total damage (not per-hit)
+- Changed `combo_modify_hook` to only set `hit_count` in context — damage multiplication moved to `calculate()`
+- Added 5 new tests for combo damage behavior: defaults, hit_count propagation, can_ko with combo, pct_hp with combo, to_dict
+- Files changed: `src/analysis/damage_calc.py`, `src/analysis/innate_hooks.py`, `tests/test_damage_calc.py`, `tests/test_innate_hooks.py`
+- All 513 pytest tests pass
+- **Learnings for future iterations:**
+  - `min_damage`/`max_damage` are now ALWAYS per-hit values — consumers needing total damage should use `total_min_damage`/`total_max_damage`
+  - `can_ko` and `pct_hp_range` automatically reflect combo totals — no extra work needed by UI consumers
+  - The combo_modify_hook no longer modifies damage values directly — it only sets `hit_count` in the context dict
+  - Default `hit_count=1` means non-combo skills have `total_*` equal to `min_damage`/`max_damage` — backward compatible
+---
