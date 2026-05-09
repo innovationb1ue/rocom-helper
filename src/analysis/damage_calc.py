@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
 from src.data.loader import get_skill_meta, get_skill_name, get_wiki_pet_stats
 from src.game.type_chart import TypeChart
+
+HookStage = Literal["pre_power", "post_base", "pre_final", "post_calc"]
+DamageHook = Callable[[Dict[str, Any]], Dict[str, Any]]
 
 
 @dataclass
@@ -55,6 +58,29 @@ _BUFF_STAGE_MULTIPLIERS = {
 class DamageCalculator:
     def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
         self.chart = type_chart or TypeChart()
+        self._hooks: Dict[HookStage, List[DamageHook]] = {
+            "pre_power": [],
+            "post_base": [],
+            "pre_final": [],
+            "post_calc": [],
+        }
+
+    def register_hook(self, stage: HookStage, hook: DamageHook) -> None:
+        """注册伤害计算 hook。hook 接收并返回 context dict。"""
+        if stage not in self._hooks:
+            raise ValueError(f"Unknown hook stage: {stage}")
+        self._hooks[stage].append(hook)
+
+    def clear_hooks(self) -> None:
+        """清除所有已注册的 hooks。"""
+        for stage in self._hooks:
+            self._hooks[stage].clear()
+
+    def _run_hooks(self, stage: HookStage, ctx: Dict[str, Any]) -> Dict[str, Any]:
+        """依次执行某阶段的所有 hooks，返回最终 context。"""
+        for hook in self._hooks[stage]:
+            ctx = hook(ctx)
+        return ctx
 
     # ------------------------------------------------------------------
     # 公开接口
@@ -76,6 +102,15 @@ class DamageCalculator:
         level = attacker.get("level") or 100
         confidence = "high"
         warnings: List[str] = []
+
+        # ---- pre_power hook: 可修正威力 ----
+        ctx = self._run_hooks("pre_power", {
+            "power": power,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        power = ctx["power"]
 
         # 获取攻防属性
         atk_name = _ATK_STAT[damage_type]
@@ -117,14 +152,53 @@ class DamageCalculator:
         # STAB
         attacker_types = attacker.get("types", [])
         is_stab = skill_element in attacker_types
+        stab_mult = _STAB_MULTIPLIER if is_stab else 1.0
 
         # 基础伤害
         base = self._base_damage(level, power, atk_val, def_val)
 
+        # ---- post_base hook: 可修正基础伤害 ----
+        ctx = self._run_hooks("post_base", {
+            "base_damage": base,
+            "power": power,
+            "level": level,
+            "atk_val": atk_val,
+            "def_val": def_val,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        base = ctx["base_damage"]
+
+        # ---- pre_final hook: 可修正最终计算前的参数 ----
+        ctx = self._run_hooks("pre_final", {
+            "base_damage": base,
+            "effectiveness": effectiveness,
+            "stab_mult": stab_mult,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        base = ctx["base_damage"]
+        effectiveness = ctx["effectiveness"]
+        stab_mult = ctx["stab_mult"]
+
         # 最终伤害范围
-        stab_mult = _STAB_MULTIPLIER if is_stab else 1.0
         max_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MAX))
         min_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MIN))
+
+        # ---- post_calc hook: 可修正最终伤害 ----
+        ctx = self._run_hooks("post_calc", {
+            "min_damage": min_dmg,
+            "max_damage": max_dmg,
+            "effectiveness": effectiveness,
+            "stab_mult": stab_mult,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        min_dmg = ctx["min_damage"]
+        max_dmg = ctx["max_damage"]
 
         # HP 百分比
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1

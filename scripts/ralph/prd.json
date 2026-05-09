@@ -28,7 +28,7 @@
       "id": "US-004",
       "title": "实现伤害计算 hook 系统",
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "description": "DamageCalculator 类添加 hooks 列表和 register_hook 函数，支持 pre_power、post_base、pre_final、post_calc 四个阶段"
     },
     {

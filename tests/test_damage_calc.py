@@ -344,3 +344,129 @@ class TestDamageRange:
         min_expected = int(base * eff * stab * 217 / 255)
         assert result.max_damage == max(1, max_expected)
         assert result.min_damage == max(1, min_expected)
+
+
+# ---------------------------------------------------------------------------
+# TestHookSystem — hook 注册、执行、清理
+# ---------------------------------------------------------------------------
+
+
+class TestHookSystem:
+    def test_register_hook_stores_hook(self):
+        c = DamageCalculator()
+        assert len(c._hooks["pre_power"]) == 0
+        c.register_hook("pre_power", lambda ctx: ctx)
+        assert len(c._hooks["pre_power"]) == 1
+
+    def test_register_hook_rejects_unknown_stage(self):
+        c = DamageCalculator()
+        with pytest.raises(ValueError, match="Unknown hook stage"):
+            c.register_hook("invalid_stage", lambda ctx: ctx)  # type: ignore[arg-type]
+
+    def test_clear_hooks(self):
+        c = DamageCalculator()
+        c.register_hook("pre_power", lambda ctx: ctx)
+        c.register_hook("post_base", lambda ctx: ctx)
+        c.clear_hooks()
+        for stage in c._hooks:
+            assert len(c._hooks[stage]) == 0
+
+    def test_pre_power_hook_modifies_power(self, calc):
+        calc.register_hook("pre_power", lambda ctx: {**ctx, "power": ctx["power"] * 2})
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(),
+            _make_skill(power=80),
+        )
+        assert result.power == 160
+
+    def test_post_base_hook_modifies_base_damage(self, calc):
+        def double_base(ctx):
+            return {**ctx, "base_damage": ctx["base_damage"] * 2}
+        calc.register_hook("post_base", double_base)
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(),
+            _make_skill(power=80),
+        )
+        assert result is not None
+        # Damage should be roughly double (without the hook)
+        assert result.max_damage > 100  # doubled from ~68
+
+    def test_pre_final_hook_modifies_effectiveness(self, calc):
+        def set_half_eff(ctx):
+            return {**ctx, "effectiveness": 0.5}
+        calc.register_hook("pre_final", set_half_eff)
+        result = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[0]),
+            _make_skill(element=1),
+        )
+        assert result.effectiveness == 0.5
+
+    def test_post_calc_hook_modifies_damage(self, calc):
+        def add_bonus(ctx):
+            return {**ctx, "min_damage": ctx["min_damage"] + 100, "max_damage": ctx["max_damage"] + 100}
+        calc.register_hook("post_calc", add_bonus)
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(),
+            _make_skill(power=80),
+        )
+        assert result.min_damage >= 100
+        assert result.max_damage >= 100
+
+    def test_multiple_hooks_same_stage_execute_in_order(self, calc):
+        call_order = []
+
+        def hook_a(ctx):
+            call_order.append("a")
+            return ctx
+
+        def hook_b(ctx):
+            call_order.append("b")
+            return ctx
+
+        calc.register_hook("pre_power", hook_a)
+        calc.register_hook("pre_power", hook_b)
+        calc.calculate(_make_attacker(), _make_defender(), _make_skill())
+        assert call_order == ["a", "b"]
+
+    def test_hooks_across_stages(self, calc):
+        stages_seen = []
+
+        def record_stage(stage):
+            def hook(ctx):
+                stages_seen.append(stage)
+                return ctx
+            return hook
+
+        calc.register_hook("pre_power", record_stage("pre_power"))
+        calc.register_hook("post_base", record_stage("post_base"))
+        calc.register_hook("pre_final", record_stage("pre_final"))
+        calc.register_hook("post_calc", record_stage("post_calc"))
+        calc.calculate(_make_attacker(), _make_defender(), _make_skill())
+        assert stages_seen == ["pre_power", "post_base", "pre_final", "post_calc"]
+
+    def test_no_hooks_produces_same_result(self):
+        c1 = DamageCalculator()
+        c2 = DamageCalculator()
+        atk = _make_attacker()
+        dfn = _make_defender()
+        skill = _make_skill()
+        r1 = c1.calculate(atk, dfn, skill)
+        r2 = c2.calculate(atk, dfn, skill)
+        assert r1.min_damage == r2.min_damage
+        assert r1.max_damage == r2.max_damage
+
+    def test_can_ko_updated_after_post_calc_hook(self, calc):
+        """post_calc hook increases damage enough to KO."""
+        def force_high_damage(ctx):
+            return {**ctx, "min_damage": 99999, "max_damage": 99999}
+        calc.register_hook("post_calc", force_high_damage)
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(current_hp=100, max_hp=350),
+            _make_skill(power=10),
+        )
+        assert result.can_ko is True
