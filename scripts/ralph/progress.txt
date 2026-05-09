@@ -122,3 +122,22 @@ Started: Sat May  9 21:19:21 CST 2026
   - Frontend has pre-existing TS errors in 5 files (BattleTimeline, CoverageRadar, Dashboard, PetBrowser, TeamBuilder) — these block `npm run build` but are not related to current work
   - Defensive defaults in frontend: `(p.hit_count ?? 1)` ensures backward compatibility if backend sends older format without hit_count
 ---
+
+## 2026-05-09 - US-008
+- Created comprehensive integration test suite `tests/test_innate_integration.py` (17 tests)
+- Verified innate skill system end-to-end with battle_session_1 replay data:
+  - Pet state defaults: combo_bonus and poison_stacks initialized on all pets
+  - Poison stack tracking: 2 opponent pets correctly tracked with poison_stacks > 0
+  - Damage calculator integration: innate hooks work with real replay pet data
+  - DamageResult fields: hit_count, total_min_damage, total_max_damage correctly populated
+  - Replay API: endpoint works correctly, tracker state includes innate skill fields
+  - Combo bonus reset: verified all pets have combo_bonus=0 after change_pet events
+- Files changed: `tests/test_innate_integration.py` (new), `scripts/ralph/prd.json`
+- All 530 pytest tests pass (17 new integration tests)
+- **Learnings for future iterations:**
+  - battle_session_1 does NOT contain combo_skill_cast events — only poison effect_apply events
+  - The test suite has good coverage for the innate skill pipeline even without combo events in the fixture data
+  - `register_innate_hooks()` is not called by default in BattleStateTracker or battle_manager — damage calculation integration is only active when explicitly registered
+  - Integration tests should verify field presence (combo_bonus, poison_stacks) not just values, to catch schema regressions
+  - The replay API creates a fresh tracker via `mgr.reset_tracker()` — tests relying on API state should call replay first
+---

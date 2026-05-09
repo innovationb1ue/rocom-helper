@@ -56,7 +56,7 @@
       "id": "US-008",
       "title": "集成验证 - 战斗回放分析",
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "description": "使用 battle_session_1 回放数据验证先天技能系统的正确性"
     }
   ]
