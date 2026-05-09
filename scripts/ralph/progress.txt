@@ -38,3 +38,18 @@ Started: Sat May  9 21:19:21 CST 2026
   - effect_params.trigger values: "always", "per_poison_stack", "skill_element_used", "hp_below", "turn_end", "first_strike"
   - The loader doesn't yet load innate_skills.json — will need a `get_innate_skill(buff_id)` function in US-005
 ---
+
+## 2026-05-09 - US-003
+- Added `combo_bonus` and `poison_stacks` fields to pet state in BattleStateTracker
+- Handles `combo_skill_cast` events: updates caster's `combo_bonus` with `combo_count` from event
+- Handles `effect_apply` events: when effect_id is a poison buff (POISON_BUFF_IDS = {20070010}), updates target's `poison_stacks`
+- Resets `combo_bonus = 0` on pet switch (change_pet)
+- Added defaults for both fields in all pet creation paths (battle_enter, update_pets_from_wrappers, change_pet fallback)
+- Files changed: `src/analysis/battle_state.py`
+- All 473 pytest tests pass
+- **Learnings for future iterations:**
+  - `combo_skill_cast` event has `actor_side` (from `_extract_actor_target`) and `combo_count` — use actor_side to find the caster's active pet
+  - `effect_stage` in `effect_apply` entries represents the buff stack count (for poison, this IS the number of stacks)
+  - `POISON_BUFF_IDS` is defined as a module-level constant in battle_state.py — currently only {20070010} (中毒印记), may need expansion
+  - Pet state fields need defaults in 3 locations: `_handle_battle_enter`, `_handle_action_resolve` (change_pet fallback), and `_update_pets_from_wrappers`
+---

@@ -21,7 +21,7 @@
       "id": "US-003",
       "title": "在 battle state 中追踪连击数和毒层数",
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "description": "BattleStateTracker 的宠物状态新增 combo_bonus 和 poison_stacks 字段，处理 combo_skill_cast 和 effect_apply 事件"
     },
     {
