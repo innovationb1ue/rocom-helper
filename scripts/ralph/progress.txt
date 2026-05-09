@@ -53,3 +53,19 @@ Started: Sat May  9 21:19:21 CST 2026
   - `POISON_BUFF_IDS` is defined as a module-level constant in battle_state.py — currently only {20070010} (中毒印记), may need expansion
   - Pet state fields need defaults in 3 locations: `_handle_battle_enter`, `_handle_action_resolve` (change_pet fallback), and `_update_pets_from_wrappers`
 ---
+
+## 2026-05-09 - US-004
+- Added hook system to DamageCalculator with 4 stages: pre_power, post_base, pre_final, post_calc
+- Each hook receives and returns a context dict, enabling inline modification of damage parameters
+- Added `register_hook(stage, hook)`, `clear_hooks()`, and `_run_hooks(stage, ctx)` methods
+- Context dicts carry: power/skill_meta/attacker/defender (pre_power), base_damage/atk_val/def_val (post_base), effectiveness/stab_mult (pre_final), min_damage/max_damage (post_calc)
+- Hook execution is sequential within a stage, preserving order of registration
+- Added 11 new tests covering all stages, multi-hook ordering, no-hook baseline, and KO update after post_calc
+- Files changed: `src/analysis/damage_calc.py`, `tests/test_damage_calc.py`, `scripts/ralph/prd.json`
+- All 484 pytest tests pass
+- **Learnings for future iterations:**
+  - Hook context dict always includes `attacker`, `defender`, and `skill_meta` — innate hooks can use these to look up pet innate skills or battle state
+  - `pre_final` is the ideal stage for effectiveness/stab modifiers (e.g., type_resist_modify)
+  - `post_calc` is ideal for flat damage bonuses (e.g., combo_modify adding bonus hits)
+  - `clear_hooks()` is useful for test isolation — existing tests use module-scoped fixture, so hooks registered in one test persist unless cleared
+---
