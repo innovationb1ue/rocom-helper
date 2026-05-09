@@ -1,0 +1,24 @@
+# Ralph Progress Log
+Started: Sat May  9 21:19:21 CST 2026
+---
+
+## Codebase Patterns
+- entry_type to field number mapping in `_extract_1324_entry`: not a simple formula — check `proto_schema.json` for BattlePerformEntry fields to find the correct sub-message field number
+- BattleComboSkillCast sub-message is at field 38 in BattlePerformEntry (entry_type 30)
+- `_extract_actor_target(msg, out)` extracts actor (field 1) and target (field 2) from a sub-message
+- `collect_varints(msg, field_num)` returns a list; use `pick_first()` for single values
+- `_attach_skill_meta(out, skill_id)` enriches output with skill metadata from skill_map
+- Frontend has pre-existing TS errors (unused imports) — don't treat those as blockers for backend-only changes
+
+---
+
+## 2026-05-09 - US-001
+- Implemented BPT_COMBO_SKILL (entry_type=30) parsing in `_extract_1324_entry`
+- Added handler that extracts caster_id, target_id (repeated), skill_id, combo_index, combo_count from BattleComboSkillCast (field 38)
+- Files changed: `src/protocol/battle.py`, `scripts/ralph/prd.json` (created)
+- All 473 pytest tests pass
+- **Learnings for future iterations:**
+  - proto_schema.json contains BattlePerformEntry with field-to-sub-message mapping — use this to find correct field numbers for new entry types
+  - BattleComboSkillCast has `target_id` as repeated field (field 2) — use `collect_varints` to get all targets
+  - Frontend TS build errors are pre-existing and unrelated to backend changes
+---

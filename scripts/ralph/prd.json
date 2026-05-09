@@ -7,7 +7,7 @@
       "id": "US-001",
       "title": "解析 BPT_COMBO_SKILL 协议事件",
       "priority": 1,
-      "passes": false,
+      "passes": true,
       "description": "在 protocol/battle.py 的 _extract_1324_entry 中添加 entry_type == 30 (BPT_COMBO_SKILL) 的处理分支，提取 combo_index、combo_count、skill_id、caster_id、target_id"
     },
     {
