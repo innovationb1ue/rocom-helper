@@ -26,6 +26,7 @@ _JSON_PATHS: Dict[str, Path] = {
     "pb_message_meta": DATA_DIR / "pb_message_index.json",
     "wiki_pets": DATA_DIR / "wiki_pets.json",
     "wiki_skills": DATA_DIR / "wiki_skills.json",
+    "innate_skills": DATA_DIR / "innate_skills.json",
 }
 
 _json_cache: Optional[Dict[str, Any]] = None
@@ -195,10 +196,11 @@ def get_pb_message_meta(name: Optional[str]) -> Optional[Dict[str, Any]]:
 
 def invalidate_cache() -> None:
     """热重载 / 测试时调用，使下次查询重新读取数据文件。"""
-    global _json_cache, _maps_cache
+    global _json_cache, _maps_cache, _innate_skills_cache
     with _lock:
         _json_cache = None
         _maps_cache = None
+        _innate_skills_cache = None
 
 
 # ── Wiki 数据查询 ──────────────────────────────────────────────
@@ -275,3 +277,55 @@ def get_wiki_pet_skills(name: str) -> List[str]:
     if wp and wp.get("skills"):
         return wp["skills"]
     return []
+
+
+# ── 先天技能数据查询 ──────────────────────────────────────────────
+
+_innate_skills_cache: Optional[Dict[str, Any]] = None
+
+
+def _load_innate_skills() -> Dict[int, Dict[str, Any]]:
+    """加载 innate_skills.json，以 buff_id (int) 为 key 返回 skills 字典。"""
+    global _innate_skills_cache
+    if _innate_skills_cache is not None:
+        return _innate_skills_cache
+    path = _JSON_PATHS["innate_skills"]
+    if not path.exists():
+        _innate_skills_cache = {}
+        return _innate_skills_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        _innate_skills_cache = {}
+        return _innate_skills_cache
+    raw_skills = data.get("skills", {}) if isinstance(data, dict) else {}
+    _innate_skills_cache = _int_keyed_meta(raw_skills)
+    return _innate_skills_cache
+
+
+def get_innate_skill(buff_id: int) -> Optional[Dict[str, Any]]:
+    """按 buff_id 查找先天技能效果定义。"""
+    return _load_innate_skills().get(buff_id)
+
+
+def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
+    """按 base_id 查找精灵的先天技能列表。"""
+    path = _JSON_PATHS["innate_skills"]
+    if not path.exists():
+        return []
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return []
+    pets = data.get("pets", {}) if isinstance(data, dict) else {}
+    pet_skills = pets.get(str(base_id), [])
+    if not isinstance(pet_skills, list):
+        return []
+    result = []
+    for buff_id in pet_skills:
+        skill = get_innate_skill(buff_id)
+        if skill is not None:
+            result.append(skill)
+    return result

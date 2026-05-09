@@ -69,3 +69,26 @@ Started: Sat May  9 21:19:21 CST 2026
   - `post_calc` is ideal for flat damage bonuses (e.g., combo_modify adding bonus hits)
   - `clear_hooks()` is useful for test isolation — existing tests use module-scoped fixture, so hooks registered in one test persist unless cleared
 ---
+
+## 2026-05-09 - US-005
+- Created `src/analysis/innate_hooks.py` with four hook functions:
+  - `combo_modify_hook` (post_calc): calculates total combo hits = base_combo × multiplier + additive bonuses; multiplies damage by hit count
+  - `stat_modify_hook` (post_base): checks HP threshold conditions and applies % damage boost
+  - `type_resist_modify_hook` (pre_final): clamps effectiveness to a minimum value (e.g., 1.0 for "无视抵抗")
+  - `power_modify_hook` (post_calc): handles conditional effects like first-strike lifesteal, writes `lifesteal_pct`/`lifesteal_heal` to context
+- Added `register_innate_hooks(calculator)` convenience function to register all four hooks at once
+- Added `get_innate_skill(buff_id)` and `get_innate_skills_for_pet(base_id)` to `src/data/loader.py`
+- Hook functions read pet's `buffs` list at runtime, look up matching innate skills via `get_innate_skill`, then apply effects
+- combo_modify supports triggers: always (additive/multiplier), per_poison_stack, skill_element_used
+- stat_modify supports trigger: hp_below (with threshold_pct and modifier_pct)
+- power_modify supports trigger: first_strike (checks `attacker["first_strike"]` flag)
+- Added 24 new tests covering all hooks, trigger conditions, edge cases, and integration
+- Files changed: `src/analysis/innate_hooks.py` (new), `src/data/loader.py`, `tests/test_innate_hooks.py` (new), `scripts/ralph/prd.json`
+- All 508 pytest tests pass
+- **Learnings for future iterations:**
+  - Innate skill hooks check `attacker["buffs"]` at runtime — the battle_state tracker must populate buffs with innate skill buff_ids for hooks to activate
+  - `combo_modify_hook` only activates when `attacker["combo_bonus"] > 0` — combo_bonus is set by `combo_skill_cast` events in battle_state
+  - `power_modify_hook` requires `attacker["first_strike"]` flag — this needs to be set by battle_state or another upstream module
+  - Innate hooks add metadata to context dict (`hit_count`, `lifesteal_pct`, `lifesteal_heal`) — US-006 can read these for DamageResult fields
+  - The `_get_active_innate_skills(pet)` helper scans buffs against `get_innate_skill()` — new innate skills just need entries in `innate_skills.json`
+---

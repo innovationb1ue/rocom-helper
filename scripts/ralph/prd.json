@@ -35,7 +35,7 @@
       "id": "US-005",
       "title": "实现先天技能 hook 函数",
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "description": "创建 src/analysis/innate_hooks.py，实现 combo_modify、stat_modify、type_resist_modify、power_modify hook 函数"
     },
     {
