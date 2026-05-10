@@ -1,5 +1,22 @@
 import { create } from 'zustand';
 
+export interface EquippedSkill {
+  skill_id: number;
+  equipped_slot: number;
+  pp?: number | null;
+  cost_energy?: number | null;
+  skill_name?: string | null;
+  skill_desc?: string | null;
+  skill_energy_cost?: number[] | null;
+  skill_damage_type?: number | null;
+  skill_element?: number | null;
+  skill_target_type?: number | null;
+  skill_feature?: number | null;
+  skill_cd_round?: number[] | null;
+  skill_priority?: number | null;
+  skill_dam_type?: number | null;
+}
+
 export interface BattlePet {
   pet_id: number;
   name: string;
@@ -11,8 +28,32 @@ export interface BattlePet {
   buffs: unknown[];
   level?: number;
   slot?: number;
-  skills?: unknown[];
-  equipped_skills?: unknown[];
+  skills?: EquippedSkill[];
+  equipped_skills?: EquippedSkill[];
+  base_id?: number;
+  side?: number;
+}
+
+export interface SkillAnalysis {
+  skill_id: number;
+  skill_name: string;
+  equipped_slot: number;
+  skill_element: number;
+  skill_damage_type: number;
+  energy_cost: number;
+  skill_desc?: string | null;
+  power?: number | null;
+  min_damage?: number | null;
+  max_damage?: number | null;
+  total_min_damage?: number | null;
+  total_max_damage?: number | null;
+  effectiveness?: number | null;
+  effectiveness_label?: string | null;
+  is_stab?: boolean | null;
+  can_ko?: boolean | null;
+  hit_count?: number;
+  confidence?: string | null;
+  warnings?: string[];
 }
 
 export interface FormattedBattleEvent {
@@ -32,26 +73,18 @@ export interface BattleSummary {
   event_stats: Record<string, number>;
 }
 
-export interface DamagePrediction {
-  skill_id: number;
-  skill_name: string;
-  power: number;
-  damage_type: number;
-  skill_element: number;
-  skill_element_name: string;
-  effectiveness: number;
-  effectiveness_label: string;
-  is_stab: boolean;
-  min_damage: number;
-  max_damage: number;
-  pct_hp_range: [number, number];
-  can_ko: boolean;
-  energy_cost: number;
-  confidence: string;
-  hit_count: number;
-  total_min_damage: number;
-  total_max_damage: number;
-  warnings: string[];
+export interface PetTrait {
+  name: string;
+  description: string;
+}
+
+export interface HookAdvice {
+  hook_id: string;
+  priority: number;
+  title: string;
+  messages: { type: string; message: string }[];
+  data?: Record<string, unknown> | null;
+  expires_round?: number | null;
 }
 
 export interface BattleState {
@@ -67,7 +100,10 @@ export interface BattleState {
   connected: boolean;
   formattedEvents: FormattedBattleEvent[];
   battleSummary: BattleSummary | null;
-  damagePredictions: DamagePrediction[];
+  skillAnalysis: SkillAnalysis[];
+  traits: PetTrait[];
+  oppTraits: PetTrait[];
+  hookAdvice: HookAdvice[];
 }
 
 interface BattleStore extends BattleState {
@@ -78,7 +114,11 @@ interface BattleStore extends BattleState {
   addFormattedEvent: (event: FormattedBattleEvent) => void;
   addFormattedEvents: (events: FormattedBattleEvent[]) => void;
   setBattleSummary: (summary: BattleSummary) => void;
-  setDamagePredictions: (predictions: DamagePrediction[]) => void;
+  setSkillAnalysis: (skills: SkillAnalysis[]) => void;
+  setTraits: (traits: PetTrait[]) => void;
+  setOppTraits: (traits: PetTrait[]) => void;
+  setHookAdvice: (advice: HookAdvice[]) => void;
+  clearExpiredAdvice: (currentRound: number) => void;
 }
 
 const initialState: BattleState = {
@@ -94,7 +134,10 @@ const initialState: BattleState = {
   connected: false,
   formattedEvents: [],
   battleSummary: null,
-  damagePredictions: [],
+  skillAnalysis: [],
+  traits: [],
+  oppTraits: [],
+  hookAdvice: [],
 };
 
 export const useBattleStore = create<BattleStore>((set) => ({
@@ -111,5 +154,13 @@ export const useBattleStore = create<BattleStore>((set) => ({
   addFormattedEvents: (events) =>
     set((st) => ({ formattedEvents: [...st.formattedEvents, ...events] })),
   setBattleSummary: (summary) => set({ battleSummary: summary }),
-  setDamagePredictions: (predictions) => set({ damagePredictions: predictions }),
+  setSkillAnalysis: (skills) => set({ skillAnalysis: skills }),
+  setTraits: (traits) => set({ traits }),
+  setOppTraits: (traits) => set({ oppTraits: traits }),
+  setHookAdvice: (advice) => set({ hookAdvice: advice }),
+  clearExpiredAdvice: (currentRound) => set((st) => ({
+    hookAdvice: st.hookAdvice.filter(
+      (a) => a.expires_round == null || a.expires_round >= currentRound
+    ),
+  })),
 }));

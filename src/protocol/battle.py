@@ -1,4 +1,27 @@
-"""Battle protocol extraction functions ported from RKPP rkpp_proto_battle."""
+"""战斗协议提取模块。
+
+从解析后的 protobuf 记录中提取战斗语义信息。每个 extract_* 函数对应一个 opcode。
+
+提取策略 — 双轨制:
+  1. Schema-first: 通过 proto_schema.json 定义的 Protobuf 消息结构解码
+  2. Raw fallback: 手动遍历 protobuf 字段树提取数据
+
+两者产生相同的输出结构，_schema_quality() 标记解析质量。
+
+主要 opcode 对应:
+  0x0102 = 精灵名册初始化
+  0x130B = 客户端技能选择
+  0x1322 = 服务端技能声明
+  0x1324 = 行动结算（核心，包含伤害/效果/换宠/击杀等子事件）
+  0x130C = 行动确认
+  0x13F4 = 特殊刷新（技能选项/能量）
+  0x1316 = 进入战斗
+  0x131A = 回合开始
+  0x132C = 战斗结束
+  0x13FC = PVP 演出
+  0x13F3 = 预演出
+  0x1312 = 回合流
+"""
 from __future__ import annotations
 
 import logging
@@ -33,7 +56,11 @@ from src.protocol.proto_core import (
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Schema-first helpers
+# Schema-first 辅助函数
+# 用于从 proto_schema.json 解码的结构化数据中提取值。
+# _schema_payload: 获取已解码的 schema 数据（如果存在）
+# _enum_value/_enum_name: 处理枚举类型值（schema 中的 {value, name} 结构）
+# _schema_quality: 标记解析质量（schema_postprocess vs raw_field_postprocess）
 # ---------------------------------------------------------------------------
 
 def _schema_payload(record: Dict[str, Any], expected_message: str) -> Optional[Dict[str, Any]]:
@@ -353,6 +380,12 @@ def _infer_action_from_wrappers(wrappers: List[Dict[str, Any]]) -> Optional[str]
 # ---------------------------------------------------------------------------
 # 0x1324 - Action / perform entries
 # ---------------------------------------------------------------------------
+# _extract_1324_entry 解析 action resolve 中的单个条目。
+# entry_type (field 1) 决定条目类型:
+#   1=skill_cast, 4=damage, 2=effect_apply, 3=effect_stage,
+#   5=heal, 6=energy, 7=defeat, 8=revive, 9=effect_trigger,
+#   10=effect_link, 13=change_pet, 25=ai_action, 30=combo_skill_cast,
+#   34=pvp_perform_marker, 35=data_update, 37=supply_pet
 
 def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
     """Extract a single action entry from a 0x1324 sub-message."""

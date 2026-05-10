@@ -309,6 +309,48 @@ def get_innate_skill(buff_id: int) -> Optional[Dict[str, Any]]:
     return _load_innate_skills().get(buff_id)
 
 
+# Cache: pet_name → {name, description}
+_pet_trait_cache: Optional[Dict[str, Dict[str, str]]] = None
+
+
+def _load_pet_traits() -> Dict[str, Dict[str, str]]:
+    global _pet_trait_cache
+    if _pet_trait_cache is not None:
+        return _pet_trait_cache
+    _pet_trait_cache = {}
+    path = _JSON_PATHS["wiki_pets"]
+    if not path.exists():
+        return _pet_trait_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return _pet_trait_cache
+    if not isinstance(data, list):
+        return _pet_trait_cache
+    skill_map = get_bundle().get("skill_meta", {})
+    for pet in data:
+        ability = pet.get("ability")
+        if not ability or not isinstance(ability, str):
+            continue
+        name = pet.get("name", "")
+        if not name or name in _pet_trait_cache:
+            continue
+        trait_info: Dict[str, str] = {"name": ability, "description": ""}
+        # Find skill_id and description from skill_map
+        for sid, meta in skill_map.items():
+            if meta.get("name") == ability:
+                trait_info["description"] = meta.get("desc", "")
+                break
+        _pet_trait_cache[name] = trait_info
+    return _pet_trait_cache
+
+
+def get_pet_innate_trait(pet_name: str) -> Optional[Dict[str, str]]:
+    """按精灵名查找先天特性（来自 wiki_pets.json）。"""
+    return _load_pet_traits().get(pet_name)
+
+
 def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
     """按 base_id 查找精灵的先天技能列表。"""
     path = _JSON_PATHS["innate_skills"]

@@ -1,3 +1,15 @@
+"""操作码注册与消息分发模块。
+
+使用装饰器模式构建两个注册表：
+- _OPCODE_REGISTRY: 主操作码 → (kind, handler) 映射
+- _INNER_REGISTRY: 内嵌消息ID → (kind, handler) 映射（仅用于 opcode 0x0414）
+
+summarize() 是公开的分发入口：
+  - opcode 0x0414 + inner payload → 查 _INNER_REGISTRY
+  - 其他 opcode → 查 _OPCODE_REGISTRY
+  - 未命中 → 查 opcode_pb_map.json 元数据
+  - 兜底 → ("unknown", {opcode})
+"""
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Optional, Tuple
@@ -67,6 +79,11 @@ def _register_inner(message_id: int, kind: str) -> Callable:
 # ---------------------------------------------------------------------------
 # Inner-message detail parsers
 # ---------------------------------------------------------------------------
+# 内嵌消息解析器 — 处理 opcode 0x0414 中的内嵌消息。
+# message_id 390 = 配对上下文 (pair_ctx, friendly/enemy 数据)
+# message_id 200 = 提交确认 (commit flag, event_time)
+# message_id 51 = 事件 (token, kind, values)
+# message_id 1 = 效果 (header + effect details)
 
 
 def _parse_inner390_detail(fields) -> Dict[str, Any]:
@@ -333,6 +350,12 @@ def summarize(record: Any, inner: Optional[Any] = None) -> Tuple[str, Dict[str, 
     ``_INNER_REGISTRY``.  Every other opcode is dispatched through
     ``_OPCODE_REGISTRY``.  Unknown opcodes fall back to
     ``("unknown", {"opcode": opcode})``.
+
+    分发逻辑:
+    1. opcode 0x0414 (通用容器) → 用 inner.message_id 查 _INNER_REGISTRY
+    2. 其他 opcode → 直接查 _OPCODE_REGISTRY
+    3. 都没命中 → 查 opcode_pb_map.json 获取消息名称
+    4. 最终兜底 → "unknown"
     """
     opcode: int = record  # Assume record exposes the opcode directly
     if hasattr(record, "opcode"):

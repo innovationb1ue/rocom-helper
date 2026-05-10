@@ -29,8 +29,7 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     defender = ctx.get("defender", {})
     combo_bonus = attacker.get("combo_bonus", 0)
 
-    if combo_bonus <= 0:
-        return ctx
+    base_hits = ctx.get("hit_count", 1)
 
     additive_bonus = 0
     multiplier = 1
@@ -56,8 +55,8 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
             if skill_element == element:
                 additive_bonus += params.get("value", 0)
 
-    total_hits = int(combo_bonus * multiplier + additive_bonus)
-    if total_hits > 1:
+    total_hits = int((base_hits + combo_bonus) * multiplier + additive_bonus)
+    if total_hits >= 1:
         ctx["hit_count"] = total_hits
 
     return ctx

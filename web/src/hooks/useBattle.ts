@@ -1,10 +1,10 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useBattleStore } from '../stores/battleStore';
-import type { FormattedBattleEvent, BattleSummary, DamagePrediction } from '../stores/battleStore';
+import type { FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice } from '../stores/battleStore';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setDamagePredictions } = useBattleStore();
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, clearExpiredAdvice } = useBattleStore();
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -20,6 +20,7 @@ export function useBattle() {
         const msg = JSON.parse(ev.data);
         if (msg.type === 'state_update') {
           updateState(msg.state);
+          clearExpiredAdvice(msg.state?.round ?? 0);
         } else if (msg.type === 'suggestions') {
           msg.suggestions.forEach((s: { type: string; message: string }) => addSuggestion(s));
         } else if (msg.type === 'battle_event') {
@@ -28,14 +29,22 @@ export function useBattle() {
           addFormattedEvents(msg.events as FormattedBattleEvent[]);
         } else if (msg.type === 'battle_summary') {
           setBattleSummary(msg.summary as BattleSummary);
-        } else if (msg.type === 'damage_predictions') {
-          setDamagePredictions(msg.predictions as DamagePrediction[]);
+        } else if (msg.type === 'skill_analysis') {
+          setSkillAnalysis(msg.skills as SkillAnalysis[]);
+          if (msg.traits) {
+            setTraits(msg.traits as PetTrait[]);
+          }
+          if (msg.opp_traits) {
+            setOppTraits(msg.opp_traits as PetTrait[]);
+          }
+        } else if (msg.type === 'hook_advice') {
+          setHookAdvice(msg.advice as HookAdvice[]);
         }
       } catch (err) {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setDamagePredictions]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, clearExpiredAdvice]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));

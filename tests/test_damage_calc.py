@@ -542,3 +542,60 @@ class TestComboDamage:
         assert d["hit_count"] == 1
         assert d["total_min_damage"] == result.min_damage
         assert d["total_max_damage"] == result.max_damage
+
+
+# ---------------------------------------------------------------------------
+# TestBaseHitCount — 基础连击数解析
+# ---------------------------------------------------------------------------
+
+
+class TestBaseHitCount:
+    def test_two_combo_from_desc(self):
+        assert DamageCalculator._get_base_hit_count({"desc": "造成物伤，2连击。"}) == 2
+
+    def test_three_combo_from_desc(self):
+        assert DamageCalculator._get_base_hit_count({"desc": "造成魔伤，3连击。"}) == 3
+
+    def test_ten_combo_from_desc(self):
+        assert DamageCalculator._get_base_hit_count({"desc": "造成物伤，10连击。"}) == 10
+
+    def test_one_combo_from_desc(self):
+        assert DamageCalculator._get_base_hit_count({"desc": "造成魔伤，1连击。"}) == 1
+
+    def test_no_combo_defaults_to_one(self):
+        assert DamageCalculator._get_base_hit_count({"desc": "造成物伤。"}) == 1
+
+    def test_empty_desc_defaults_to_one(self):
+        assert DamageCalculator._get_base_hit_count({"desc": ""}) == 1
+
+    def test_no_desc_defaults_to_one(self):
+        assert DamageCalculator._get_base_hit_count({}) == 1
+
+
+# ---------------------------------------------------------------------------
+# TestInnateHooksRegistration — BattleAdvisor 注册先天 hooks
+# ---------------------------------------------------------------------------
+
+
+class TestInnateHooksRegistration:
+    def test_advisor_registers_innate_hooks(self):
+        from src.analysis.battle_advisor import BattleAdvisor
+        advisor = BattleAdvisor()
+        hooks = advisor._damage_calc._hooks
+        assert len(hooks["post_base"]) >= 1   # stat_modify_hook
+        assert len(hooks["pre_final"]) >= 1   # type_resist_modify_hook
+        assert len(hooks["post_calc"]) >= 2   # combo_modify_hook + power_modify_hook
+
+    def test_base_hit_count_in_calc_result(self):
+        """技能 desc 含 '2连击' 时 hit_count 应为 2。"""
+        from src.analysis.battle_advisor import BattleAdvisor
+        advisor = BattleAdvisor()
+        attacker = _make_attacker()
+        defender = _make_defender()
+        skill = _make_skill(power=25)
+        skill["desc"] = "造成物伤，2连击。"
+        result = advisor._damage_calc.calculate(attacker, defender, skill)
+        assert result is not None
+        assert result.hit_count >= 2
+        assert result.total_min_damage == result.min_damage * result.hit_count
+        assert result.total_max_damage == result.max_damage * result.hit_count

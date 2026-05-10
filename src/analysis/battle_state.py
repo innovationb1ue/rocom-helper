@@ -1,4 +1,16 @@
-"""实时战斗状态追踪器 — 消费协议事件，维护战斗状态。"""
+"""实时战斗状态追踪器 — 消费协议事件，维护战斗状态。
+
+BattleStateTracker 维护一个完整的战斗状态字典，包含：
+- 双方精灵列表 (my_pets / opp_pets) 和当前活跃精灵 (my_active / opp_active)
+- 战斗元信息 (battle_id, round, phase, weather)
+- 完整事件历史 (events)
+
+通过 handle_event(opcode, detail) 接收协议事件，根据 opcode 分发到对应的处理函数。
+支持的 opcode: 0x1316(进入), 0x131A(回合开始), 0x1324(行动结算), 0x132C(结束),
+               0x130B(技能选择), 0x13F4(特殊刷新), 0x1322(技能声明), 0x1312(回合流)
+
+战斗阶段: idle → selecting → resolving → (循环 resolving) → finished
+"""
 from __future__ import annotations
 
 import copy
@@ -28,7 +40,18 @@ class BattleStateTracker:
         }
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
-        """处理协议事件，更新状态，返回最新快照。"""
+        """处理协议事件，更新状态，返回最新快照。
+
+        Opcode 分发表:
+          0x1316 = 进入战斗 → 初始化双方精灵、天气、阶段设为 selecting
+          0x131A = 回合开始 → 更新精灵状态、阶段设为 resolving
+          0x1324 = 行动结算 → 处理伤害/效果/换宠/击杀等子事件
+          0x132C = 战斗结束 → 设置结果、阶段设为 finished
+          0x130B = 技能选择 → 客户端意图（仅记录）
+          0x13F4 = 特殊刷新 → 能量瓶等特殊操作
+          0x1322 = 技能声明 → 服务端确认（仅记录）
+          0x1312 = 回合流 → 更新回合号
+        """
         event = {"opcode": opcode, "round": self.state["round"]}
         event.update(detail)
         self.state["events"].append(event)
@@ -123,6 +146,7 @@ class BattleStateTracker:
         opp_pets = []
         for w in wrappers:
             equipped = w.get("equipped_skills") or []
+            initial_buffs = w.get("initial_buffs", [])
             pet_info = {
                 "pet_id": w.get("pet_id") or w.get("pet_gid"),
                 "name": w.get("pet_name") or w.get("name", "?"),
@@ -130,7 +154,9 @@ class BattleStateTracker:
                 "current_hp": w.get("hp") or w.get("current_hp", 0),
                 "max_hp": w.get("max_hp", 0),
                 "energy": 5,
-                "buffs": [],
+                "buffs": list(initial_buffs),
+                "initial_buff_ids": [b["id"] for b in initial_buffs if "id" in b],
+                "innate_skill_id": w.get("passive_skill_id"),
                 "level": w.get("level"),
                 "slot": w.get("slot"),
                 "side": w.get("side"),
@@ -182,6 +208,17 @@ class BattleStateTracker:
         v = int(side_value)
         return 1 <= v <= 6
 
+    # _handle_action_resolve 是最复杂的状态更新函数。
+    # 遍历 detail["entries"] 列表，按 entry.kind 分派处理:
+    #   damage → 更新目标 HP
+    #   skill_cast → 记录使用技能、更新能量
+    #   combo_skill_cast → 记录连击加成
+    #   defeat → 标记精灵 HP=0
+    #   heal → 恢复 HP
+    #   energy → 更新能量值
+    #   change_pet → 切换活跃精灵（匹配: pet_id → name → slot → 新建）
+    #   effect_apply → 添加/更新 buff
+    #   effect_stage → 更新 buff 阶段
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         entries = detail.get("entries", [])
         for entry in entries:
@@ -408,6 +445,11 @@ class BattleStateTracker:
             return True
         return False
 
+    # _update_pets_from_wrappers 用回合开始时的 wrapper 数据刷新精灵状态。
+    # 匹配逻辑（按优先级）:
+    #   1. pet_id 精确匹配（通用对手ID 20000000 需要二次匹配 slot/name）
+    #   2. 未匹配则创建新条目
+    # 每侧仅第一个 wrapper 更新 active 指针（通过 seen_sides 去重）
     def _update_pets_from_wrappers(self, wrappers: List[Dict[str, Any]]) -> None:
         seen_sides: set = set()
         for w in wrappers:
@@ -435,6 +477,16 @@ class BattleStateTracker:
                         pet["base_id"] = w["base_id"]
                     if w.get("base_skill_pool") is not None:
                         pet["base_skill_pool"] = w["base_skill_pool"]
+                    # 刷新先天特性
+                    if w.get("passive_skill_id") is not None:
+                        pet["innate_skill_id"] = w["passive_skill_id"]
+                    # 合并初始 buff（仅添加尚不存在的 buff）
+                    w_buffs = w.get("initial_buffs", [])
+                    if w_buffs:
+                        existing_ids = {b["id"] for b in pet.get("buffs", []) if "id" in b}
+                        for b in w_buffs:
+                            if b.get("id") not in existing_ids:
+                                pet.setdefault("buffs", []).append(b)
                     # 如果之前没有装备技能，用新 wrapper 的补充
                     w_eq = w.get("equipped_skills") or []
                     if w_eq and not pet.get("equipped_skills"):
@@ -449,6 +501,7 @@ class BattleStateTracker:
                         self.state[active_key] = pet
                     break
             if matched is None:
+                init_buffs = w.get("initial_buffs", [])
                 pet_info = {
                     "pet_id": pet_id,
                     "name": w.get("name", "?"),
@@ -456,7 +509,9 @@ class BattleStateTracker:
                     "current_hp": w.get("hp") or w.get("current_hp", 0),
                     "max_hp": w.get("max_hp", 0),
                     "energy": w.get("energy", 5),
-                    "buffs": [],
+                    "buffs": list(init_buffs),
+                    "initial_buff_ids": [b["id"] for b in init_buffs if "id" in b],
+                    "innate_skill_id": w.get("passive_skill_id"),
                     "slot": w.get("slot"),
                     "level": w.get("level"),
                     "side": w.get("side"),

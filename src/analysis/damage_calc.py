@@ -1,7 +1,22 @@
-"""洛克王国伤害计算器 — 基于属性克制、STAB、攻防属性的伤害预测。"""
+"""洛克王国伤害计算器 — 基于属性克制、STAB、攻防属性的伤害预测。
+
+DamageCalculator 实现了一个带 4 阶段 hook 管线的伤害计算流程：
+
+  pre_power → post_base → pre_final → post_calc
+
+每个阶段的 hook 接收并返回一个 context 字典，可修改对应阶段的参数：
+  - pre_power: 可修正 skill power
+  - post_base: 可修正基础伤害（如 stat_modify_hook 基于 HP 阈值加伤）
+  - pre_final: 可修正属性克制倍率（如 type_resist_modify_hook 无视抵抗）
+  - post_calc: 可修正最终伤害和连击数（如 combo_modify_hook 增加连击）
+
+伤害公式: base = floor((level*0.4 + 2) * power * ATK / DEF / 50 + 2)
+最终范围: [base * effectiveness * STAB * 0.85, base * effectiveness * STAB * 1.0]
+"""
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
@@ -106,7 +121,7 @@ class DamageCalculator:
         confidence = "high"
         warnings: List[str] = []
 
-        # ---- pre_power hook: 可修正威力 ----
+        # === 阶段 1/4: pre_power — 可修正威力 ===
         ctx = self._run_hooks("pre_power", {
             "power": power,
             "skill_meta": skill_meta,
@@ -160,7 +175,7 @@ class DamageCalculator:
         # 基础伤害
         base = self._base_damage(level, power, atk_val, def_val)
 
-        # ---- post_base hook: 可修正基础伤害 ----
+        # === 阶段 2/4: post_base — 可修正基础伤害 ===
         ctx = self._run_hooks("post_base", {
             "base_damage": base,
             "power": power,
@@ -173,7 +188,7 @@ class DamageCalculator:
         })
         base = ctx["base_damage"]
 
-        # ---- pre_final hook: 可修正最终计算前的参数 ----
+        # === 阶段 3/4: pre_final — 可修正属性克制/STAB 倍率 ===
         ctx = self._run_hooks("pre_final", {
             "base_damage": base,
             "effectiveness": effectiveness,
@@ -190,10 +205,12 @@ class DamageCalculator:
         max_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MAX))
         min_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MIN))
 
-        # ---- post_calc hook: 可修正最终伤害 ----
+        # === 阶段 4/4: post_calc — 可修正最终伤害/连击数 ===
+        base_hits = self._get_base_hit_count(skill_meta)
         ctx = self._run_hooks("post_calc", {
             "min_damage": min_dmg,
             "max_damage": max_dmg,
+            "hit_count": base_hits,
             "effectiveness": effectiveness,
             "stab_mult": stab_mult,
             "skill_meta": skill_meta,
@@ -319,3 +336,12 @@ class DamageCalculator:
                 # buff 的 name 或 id 关联到属性名（粗粒度：所有非零 stage 都计入）
                 total += stage
         return max(-6, min(6, total))
+
+    @staticmethod
+    def _get_base_hit_count(skill_meta: Dict[str, Any]) -> int:
+        """从技能 desc 中提取基础连击数（如 '2连击' → 2）。"""
+        desc = skill_meta.get("desc", "")
+        m = re.search(r'(\d+)连击', desc)
+        if m:
+            return int(m.group(1))
+        return 1

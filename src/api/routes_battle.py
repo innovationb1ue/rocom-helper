@@ -89,12 +89,23 @@ async def get_battle_effects():
 # ------------------------------------------------------------------
 
 
+# 回放端点的处理流程:
+# 1. 从 tests/fixtures/packets/{session} 加载预录数据包
+# 2. 对每个包: 解析 protobuf → summarize 提取语义 → process_event 推送
+# 3. 支持 stop_round 参数，在指定回合后停止
+# 4. 每个包之间按 delay_ms 毫秒间隔推送
+# 5. 返回处理统计（包数、格式化事件数、结果等）
 @router.post("/api/battle/replay")
 async def replay_battle_packets(
     delay_ms: int = 80,
     session: str = "battle_session_1",
+    stop_round: Optional[int] = None,
 ):
-    """回放 tests/fixtures 中的战斗包到 WebSocket 客户端。"""
+    """回放 tests/fixtures 中的战斗包到 WebSocket 客户端。
+
+    Args:
+        stop_round: 如果指定，回放在此回合结束后停止（不处理下一回合的 round_start）。
+    """
     from src.protocol.proto_core import extract_inner_message
     from src.protocol.opcodes import summarize
     from tests.packet_reader import load_battle_packets
@@ -112,6 +123,7 @@ async def replay_battle_packets(
 
     processed = 0
     total_formatted = 0
+    stopped_early = False
 
     for item in packets:
         record = item["record"]
@@ -125,6 +137,14 @@ async def replay_battle_packets(
         detail = summary.get("detail", summary) if isinstance(summary, dict) else {}
         if not isinstance(detail, dict):
             detail = {}
+
+        # 如果指定了 stop_round，在处理 round_start 前检查是否超出目标回合
+        if stop_round is not None and opcode == 0x131A:
+            current_round = mgr.get_state().get("round", 0)
+            incoming_round = detail.get("round", current_round + 1)
+            if incoming_round > stop_round:
+                stopped_early = True
+                break
 
         state = await mgr.process_event(opcode, detail)
         processed += 1
@@ -145,6 +165,7 @@ async def replay_battle_packets(
         "total_formatted_events": total_formatted,
         "result": final_state.get("result"),
         "rounds": final_state.get("round"),
+        "stopped_early": stopped_early,
         "my_pets": len(final_state.get("my_pets", [])),
         "opp_pets": len(final_state.get("opp_pets", [])),
     }

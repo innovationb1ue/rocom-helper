@@ -29,11 +29,28 @@ curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=200&session=battl
 
 # 快速回放（无延迟）
 curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=0"
+
+# 回放到指定回合停止（例如回放到 R7）
+curl -X POST "http://localhost:8000/api/battle/replay?stop_round=7"
+```
+
+使用 CLI 脚本:
+
+```bash
+# 默认回放到战斗结束
+python -m scripts.replay_to_frontend --delay 80 --session battle_session_1
+
+# 回放到 R7 停止
+python -m scripts.replay_to_frontend --delay 80 --round 7
+
+# 回放到 R10 停止
+python -m scripts.replay_to_frontend --delay 80 --round 10
 ```
 
 参数:
 - `delay_ms` (int, 默认 80): 每个包之间的延迟毫秒数，0 表示瞬间完成
 - `session` (str, 默认 "battle_session_1"): 回放的 session 名称
+- `stop_round` (int, 可选): 在指定回合结束后停止回放。例如 `stop_round=7` 表示回放到 R7 结束后停止，不处理 R8 的 round_start。不指定则回放到战斗结束
 
 返回值:
 ```json
@@ -43,10 +60,13 @@ curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=0"
   "total_formatted_events": 120,
   "result": "WIN_HP",
   "rounds": 17,
+  "stopped_early": false,
   "my_pets": 4,
   "opp_pets": 6
 }
 ```
+
+`stopped_early` 为 `true` 表示因 `stop_round` 参数提前停止。
 
 ### 3. 观察前端
 

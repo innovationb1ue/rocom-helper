@@ -11,7 +11,8 @@ import { useSnifferStore } from '../stores/snifferStore';
 import TeamRoster from '../components/TeamRoster';
 import BattleEventLog from '../components/BattleEventLog';
 import BattleSummaryPanel from '../components/BattleSummaryPanel';
-import DamagePredictionPanel from '../components/DamagePredictionPanel';
+import SkillPanel from '../components/SkillPanel';
+import HookAdvicePanel from '../components/HookAdvicePanel';
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
   idle: { color: 'default', icon: <CloseCircleOutlined />, text: '未启动' },
@@ -26,7 +27,8 @@ const BattleLive: React.FC = () => {
   const {
     my_pets, opp_pets, my_active, opp_active,
     round, result, suggestions, connected,
-    formattedEvents, battleSummary, damagePredictions,
+    formattedEvents, battleSummary, skillAnalysis, traits, oppTraits,
+    hookAdvice,
   } = useBattleStore();
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -85,7 +87,7 @@ const BattleLive: React.FC = () => {
         </Space>
 
         {sniffer.status === 'idle' && sniffer.message.includes('失败') && (
-          <Alert type="error" message={sniffer.message} style={{ marginTop: 8 }} showIcon closable />
+          <Alert type="error" title={sniffer.message} style={{ marginTop: 8 }} showIcon closable />
         )}
 
         {isActive && sniffer.recentRecords.length > 0 && (
@@ -115,7 +117,7 @@ const BattleLive: React.FC = () => {
         {round > 0 && <Tag color="blue">回合 {round}</Tag>}
       </Space>
 
-      {result && <Alert message={`战斗结束: ${result}`} type={result === 'WIN' ? 'success' : 'error'} style={{ marginBottom: 12 }} />}
+      {result && <Alert title={`战斗结束: ${result}`} type={result === 'WIN' ? 'success' : 'error'} style={{ marginBottom: 12 }} />}
 
       {/* 双方阵容 */}
       <Row gutter={16} style={{ marginBottom: 12 }}>
@@ -127,17 +129,38 @@ const BattleLive: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 伤害预测 */}
-      <DamagePredictionPanel predictions={damagePredictions} oppActive={opp_active} />
+      {/* 技能分析面板 */}
+      <SkillPanel skills={skillAnalysis} oppActive={opp_active} traits={traits} />
+
+      {/* 对手特性 */}
+      {oppTraits && oppTraits.length > 0 && (
+        <Card
+          title={`${opp_active?.name || '对方精灵'} 特性`}
+          size="small"
+          style={{ marginBottom: 12 }}
+          styles={{ body: { padding: '8px 12px' } }}
+        >
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {oppTraits.map((t) => (
+              <Tag key={t.name} color="orange" style={{ fontSize: 11, margin: 0 }}>
+                {t.name}
+              </Tag>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* 建议 */}
       {suggestions.length > 0 && (
         <Card title="建议" size="small" style={{ marginBottom: 12 }}>
           {suggestions.slice(-3).map((s, i) => (
-            <Alert key={i} message={s.message} type="info" style={{ marginBottom: 4 }} showIcon={false} />
+            <Alert key={i} title={s.message} type="info" style={{ marginBottom: 4 }} showIcon={false} />
           ))}
         </Card>
       )}
+
+      {/* 钩子战术分析 */}
+      <HookAdvicePanel advice={hookAdvice} />
 
       {/* 战斗总结 */}
       <BattleSummaryPanel summary={battleSummary} />
