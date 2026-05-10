@@ -43,6 +43,8 @@ export interface SkillAnalysis {
   energy_cost: number;
   skill_desc?: string | null;
   power?: number | null;
+  effective_power?: number | null;
+  expected_damage?: number | null;
   min_damage?: number | null;
   max_damage?: number | null;
   total_min_damage?: number | null;
@@ -53,6 +55,9 @@ export interface SkillAnalysis {
   can_ko?: boolean | null;
   hit_count?: number;
   confidence?: string | null;
+  power_mult?: number | null;
+  weather_mult?: number | null;
+  damage_breakdown?: Record<string, unknown> | null;
   warnings?: string[];
 }
 

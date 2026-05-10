@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.data.loader import get_innate_skill
+from src.data.loader import get_buff_stat_modifiers, get_innate_skill
 
 
 def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:

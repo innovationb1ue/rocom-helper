@@ -1,73 +1,62 @@
-# React + TypeScript + Vite
+# Roco PvP Helper — Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React single-page application for the Roco PvP Helper real-time battle analysis tool.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript
+- Ant Design 6 (UI components)
+- Zustand (state management)
+- React Router 7 (routing)
+- Vite 8 (build tool)
+- Axios (HTTP client)
 
-## React Compiler
+## Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev         # Start dev server on http://localhost:5173
+npm run build       # TypeScript check + production build
+npm run lint        # ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The frontend expects the backend running on `http://localhost:8000`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Pages
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Dashboard | Overview with stats and quick links |
+| `/pets` | PetBrowser | Browse and search pet database |
+| `/teams` | TeamBuilder | Build and analyze team compositions |
+| `/type-chart` | TypeChart | Interactive type effectiveness chart |
+| `/battle-live` | BattleLive | Real-time battle monitor (WebSocket) |
+| `/battle-history` | BattleHistory | Battle replay history |
+
+## Key Components
+
+| Component | Description |
+|-----------|-------------|
+| `DamagePredictionPanel` | Damage predictions for all equipped skills, including combo hit counts and KO calculations |
+| `SkillPanel` | Detailed skill analysis with effectiveness breakdown |
+| `HookAdvicePanel` | Tactical analysis advice from analysis hooks (opponent tracking, energy monitoring, switch recommendations) |
+| `BattleTimeline` | Chronological battle event timeline |
+| `BattleSummaryPanel` | End-of-battle summary statistics |
+| `CoverageRadar` | Team type coverage visualization |
+
+## State Management
+
+Zustand stores in `src/stores/`:
+- **battleStore** — Live battle state (pets, HP, energy, skills, damage predictions, hook advice, traits)
+- **petsStore** — Pet database browsing
+- **snifferStore** — Packet capture session status
+
+## WebSocket Protocol
+
+The `BattleLive` page connects to `ws://localhost:8000/ws/battle` and receives these message types:
+- `state_update` — Full battle state snapshot
+- `battle_event` / `battle_events` — Formatted battle events for timeline
+- `skill_analysis` — Damage predictions for equipped skills (with traits)
+- `hook_advice` — Analysis hook recommendations
+- `suggestions` — Simple rule-based suggestions
+- `battle_summary` — End-of-battle summary

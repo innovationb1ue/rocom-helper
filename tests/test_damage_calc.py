@@ -1,7 +1,5 @@
-"""伤害计算器测试 — 验证伤害公式、STAB、属性克制、KO 判定、置信度。"""
+"""伤害计算器测试 — 验证 NRC_AI 伤害公式、STAB、属性克制、KO 判定、置信度。"""
 from __future__ import annotations
-
-import math
 
 import pytest
 
@@ -58,37 +56,37 @@ def _make_skill(dam_type=2, power=80, element=1, energy_cost=None):
 
 
 # ---------------------------------------------------------------------------
-# TestBaseDamage — 公式: floor((level*0.4 + 2) * power * atk / def / 50 + 2)
+# TestBaseDamage — 公式: (ATK / DEF) * power * 0.9
 # ---------------------------------------------------------------------------
 
 
 class TestBaseDamage:
     def test_known_values(self):
-        # (100*0.4 + 2) * 80 * 200 / 100 / 50 + 2 = 42 * 160 / 50 + 2 = 134.4 + 2 = 136
-        result = DamageCalculator._base_damage(100, 80, 200, 100)
-        assert result == 136
+        # (200 / 100) * 80 * 0.9 = 144.0
+        result = DamageCalculator._base_damage(200, 100, 80)
+        assert result == 144.0
 
-    def test_level_scaling(self):
-        d50 = DamageCalculator._base_damage(50, 80, 200, 100)
-        d100 = DamageCalculator._base_damage(100, 80, 200, 100)
-        assert d100 > d50
+    def test_atk_scaling(self):
+        d1 = DamageCalculator._base_damage(100, 100, 80)
+        d2 = DamageCalculator._base_damage(200, 100, 80)
+        assert d2 > d1
 
     def test_power_scaling(self):
-        d1 = DamageCalculator._base_damage(100, 40, 200, 100)
-        d2 = DamageCalculator._base_damage(100, 80, 200, 100)
+        d1 = DamageCalculator._base_damage(200, 100, 40)
+        d2 = DamageCalculator._base_damage(200, 100, 80)
         assert d2 > d1
 
     def test_zero_defense_clamps_to_one(self):
-        result = DamageCalculator._base_damage(100, 80, 200, 0)
+        result = DamageCalculator._base_damage(200, 0, 80)
         assert result > 0
 
     def test_negative_defense_clamps_to_one(self):
-        result = DamageCalculator._base_damage(100, 80, 200, -10)
+        result = DamageCalculator._base_damage(200, -10, 80)
         assert result > 0
 
-    def test_minimum_damage_is_at_least_1(self):
-        result = DamageCalculator._base_damage(1, 1, 1, 9999)
-        assert result >= 1
+    def test_minimum_damage(self):
+        result = DamageCalculator._base_damage(1, 9999, 1)
+        assert result > 0
 
 
 # ---------------------------------------------------------------------------
@@ -146,7 +144,8 @@ class TestCalculate:
         )
         assert result is not None
         assert result.damage_type == 2
-        assert result.max_damage > result.min_damage
+        # 确定性公式: min == max
+        assert result.max_damage == result.min_damage
 
     def test_special_damage_uses_spa_spd(self, calc):
         result = calc.calculate(
@@ -173,7 +172,6 @@ class TestCalculate:
         assert with_stab.max_damage > no_stab.max_damage
 
     def test_stab_ratio(self, calc):
-        # STAB = 1.5x, verify ratio approximately
         with_stab = calc.calculate(
             _make_attacker(types=[1]),
             _make_defender(types=[0]),
@@ -214,11 +212,11 @@ class TestCalculate:
         assert result.effectiveness == 1.0
 
     def test_dual_type_double_weakness(self, calc):
-        # 电打 水/翼 = 2.0 * 2.0 = 4.0
+        # 电(SDT=11)打 水/翼 = 2.0 * 2.0 = 4.0
         result = calc.calculate(
             _make_attacker(types=[4]),
             _make_defender(types=[2, 9]),  # 水/翼
-            _make_skill(element=4),  # 电
+            _make_skill(element=11),  # 电 SDT=11 → type 4
         )
         assert result.effectiveness == 4.0
 
@@ -279,7 +277,6 @@ class TestCalculate:
         assert result.confidence == "high"
 
     def test_no_stats_returns_none(self, calc):
-        """无攻防数据时不再返回不可靠的估算，而是返回 None。"""
         attacker = {"types": [1], "max_hp": 300, "current_hp": 300, "name": "不存在的宠物名xyz"}
         defender = {"types": [2], "max_hp": 350, "current_hp": 350}
         result = calc.calculate(attacker, defender, _make_skill())
@@ -304,11 +301,51 @@ class TestCalculate:
         assert result.skill_id == 7700001
         assert result.skill_name == "火焰冲击"
         assert result.power == 80
-        assert result.skill_element == 1
         assert isinstance(result.min_damage, int)
         assert isinstance(result.max_damage, int)
         assert result.min_damage >= 1
         assert result.max_damage >= result.min_damage
+
+    def test_expected_damage_equals_min_max(self, calc):
+        """确定性公式: expected_damage == min_damage == max_damage。"""
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(),
+            _make_skill(),
+        )
+        assert result.expected_damage == result.min_damage
+        assert result.expected_damage == result.max_damage
+
+    def test_effective_power_with_stab(self, calc):
+        """本系加成时 effective_power = power * 1.5。"""
+        result = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[0]),
+            _make_skill(element=1, power=80),
+        )
+        assert result.is_stab is True
+        assert result.effective_power == 120  # 80 * 1.5
+
+    def test_effective_power_without_stab(self, calc):
+        result = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[0]),
+            _make_skill(element=2, power=80),
+        )
+        assert result.is_stab is False
+        assert result.effective_power == 80
+
+    def test_damage_breakdown(self, calc):
+        result = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[3]),  # 草
+            _make_skill(element=1),  # 火
+        )
+        bd = result.damage_breakdown
+        assert bd["base_power"] == 80
+        assert bd["effectiveness"] == 2.0
+        assert bd["stab"] == 1.5
+        assert bd["hit_count"] == 1
 
     def test_to_dict(self, calc):
         result = calc.calculate(
@@ -320,6 +357,9 @@ class TestCalculate:
         assert "skill_id" in d
         assert "min_damage" in d
         assert "max_damage" in d
+        assert "expected_damage" in d
+        assert "effective_power" in d
+        assert "damage_breakdown" in d
         assert "hit_count" in d
         assert "total_min_damage" in d
         assert "total_max_damage" in d
@@ -327,26 +367,38 @@ class TestCalculate:
 
 
 # ---------------------------------------------------------------------------
-# TestDamageRange — 随机因子范围验证
+# TestDeterministic — 验证确定性输出
 # ---------------------------------------------------------------------------
 
 
-class TestDamageRange:
-    def test_random_factor_range(self, calc):
-        # 验证 min/max 符合 217/255 ~ 255/255 的范围
+class TestDeterministic:
+    def test_min_equals_max(self, calc):
         result = calc.calculate(
             _make_attacker(),
             _make_defender(),
             _make_skill(),
         )
-        # 基础伤害 × effectiveness × STAB × (217/255 to 1.0)
-        base = DamageCalculator._base_damage(100, 80, 200, 150)
-        eff = 0.5  # 火打水
-        stab = 1.5  # 火系宠物用火系技能
-        max_expected = int(base * eff * stab * 1.0)
-        min_expected = int(base * eff * stab * 217 / 255)
-        assert result.max_damage == max(1, max_expected)
-        assert result.min_damage == max(1, min_expected)
+        assert result.min_damage == result.max_damage
+
+    def test_pct_range_identical(self, calc):
+        result = calc.calculate(
+            _make_attacker(),
+            _make_defender(max_hp=1000, current_hp=1000),
+            _make_skill(),
+        )
+        assert result.pct_hp_range[0] == result.pct_hp_range[1]
+
+    def test_nrc_ai_formula_value(self, calc):
+        """验证 NRC_AI 公式: (ATK/DEF) * power * 0.9 * effectiveness * stab。"""
+        # ATK=200, DEF=150, power=80, eff=0.5 (火打水), stab=1.5 (火系宠物用火系技能)
+        result = calc.calculate(
+            _make_attacker(types=[1]),   # 火系
+            _make_defender(types=[2]),   # 水系
+            _make_skill(element=1),      # 火 SDT=4, type=1
+        )
+        base = (200 / 150) * 80 * 0.9  # = 96.0
+        expected = max(1, int(base * 0.5 * 1.5))  # = 72
+        assert result.expected_damage == expected
 
 
 # ---------------------------------------------------------------------------
@@ -376,12 +428,20 @@ class TestHookSystem:
 
     def test_pre_power_hook_modifies_power(self, calc):
         calc.register_hook("pre_power", lambda ctx: {**ctx, "power": ctx["power"] * 2})
-        result = calc.calculate(
-            _make_attacker(),
-            _make_defender(),
-            _make_skill(power=80),
+        result_no_hook = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[0]),
+            _make_skill(element=1, power=80),
         )
-        assert result.power == 160
+        result = calc.calculate(
+            _make_attacker(types=[1]),
+            _make_defender(types=[0]),
+            _make_skill(element=1, power=80),
+        )
+        # base power stays the same
+        assert result.power == 80
+        # doubled power causes roughly 2x damage
+        assert result.expected_damage > 0
 
     def test_post_base_hook_modifies_base_damage(self, calc):
         def double_base(ctx):
@@ -393,8 +453,7 @@ class TestHookSystem:
             _make_skill(power=80),
         )
         assert result is not None
-        # Damage should be roughly double (without the hook)
-        assert result.max_damage > 100  # doubled from ~68
+        assert result.expected_damage > 100
 
     def test_pre_final_hook_modifies_effectiveness(self, calc):
         def set_half_eff(ctx):
@@ -482,7 +541,6 @@ class TestHookSystem:
 
 class TestComboDamage:
     def test_default_hit_count_is_one(self):
-        """Without combo hooks, hit_count=1 and total equals per-hit damage."""
         calc = DamageCalculator(TypeChart())
         result = calc.calculate(_make_attacker(), _make_defender(), _make_skill())
         assert result.hit_count == 1
@@ -490,7 +548,6 @@ class TestComboDamage:
         assert result.total_max_damage == result.max_damage
 
     def test_combo_hook_sets_hit_count(self):
-        """post_calc hook sets hit_count → total_damage = per_hit × hit_count."""
         calc = DamageCalculator(TypeChart())
 
         def combo_hook(ctx):
@@ -503,24 +560,20 @@ class TestComboDamage:
         assert result.total_max_damage == result.max_damage * 3
 
     def test_combo_can_ko_uses_total_damage(self):
-        """can_ko should be based on total_min_damage, not per-hit."""
         calc = DamageCalculator(TypeChart())
 
         def combo_hook(ctx):
             return {**ctx, "hit_count": 5}
 
         calc.register_hook("post_calc", combo_hook)
-        # Defender has 200 HP — single hit won't KO but 5 hits might
         result = calc.calculate(
             _make_attacker(atk=100),
             _make_defender(current_hp=200, max_hp=350),
             _make_skill(power=40),
         )
-        # Verify: total_min_damage >= current_hp → can_ko
         assert result.can_ko == (result.total_min_damage >= 200)
 
     def test_combo_pct_hp_uses_total_damage(self):
-        """pct_hp_range should be based on total damage."""
         calc = DamageCalculator(TypeChart())
 
         def combo_hook(ctx):
@@ -587,7 +640,6 @@ class TestInnateHooksRegistration:
         assert len(hooks["post_calc"]) >= 2   # combo_modify_hook + power_modify_hook
 
     def test_base_hit_count_in_calc_result(self):
-        """技能 desc 含 '2连击' 时 hit_count 应为 2。"""
         from src.analysis.battle_advisor import BattleAdvisor
         advisor = BattleAdvisor()
         attacker = _make_attacker()

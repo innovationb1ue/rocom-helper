@@ -371,3 +371,87 @@ def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
         if skill is not None:
             result.append(skill)
     return result
+
+
+# ── Buff 属性修正查询 ──────────────────────────────────────────────
+
+# attr_map ID → stat modifier key
+_ATTR_TO_STAT_KEY = {
+    29: "atk_up", 30: "spa_up", 31: "def_up", 32: "spd_up",
+    33: "atk_down", 34: "spa_down", 35: "def_down", 36: "spd_down",
+}
+
+# buff_id → {"atk_up": 0.2, "atk_down": 0.0, ...} cached lookup
+_buff_stat_cache: Optional[Dict[int, Dict[str, float]]] = None
+
+
+def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 属性修正映射。"""
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, float]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        mods: Dict[str, float] = {}
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            if len(params_list) < 3:
+                continue
+            attr_id = None
+            value = None
+            try:
+                attr_id = params_list[0].get("params", [None])[0]
+                value = params_list[2].get("params", [None])[0]
+            except (IndexError, AttributeError):
+                continue
+            if attr_id is None or value is None:
+                continue
+            stat_key = _ATTR_TO_STAT_KEY.get(attr_id)
+            if stat_key:
+                mods[stat_key] = mods.get(stat_key, 0.0) + value / 1000.0
+        if mods:
+            table[buff_id] = mods
+    return table
+
+
+def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """从 buff 列表解析属性修正，返回 {"atk_up": 0.2, "spa_down": 0.1, ...}。"""
+    global _buff_stat_cache
+    if _buff_stat_cache is None:
+        _buff_stat_cache = _build_buff_stat_table()
+
+    result: Dict[str, float] = {}
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        mods = _buff_stat_cache.get(buff_id)
+        if mods:
+            for key, val in mods.items():
+                result[key] = result.get(key, 0.0) + val
+    return result
+
+
+# ── 天气修正查询 ──────────────────────────────────────────────
+
+# NRC_AI: rain → 水系技能 x1.5, sandstorm/snow → 无伤害修正
+# skill_element 使用 type chart ID (water=2), 而非 SDT 值 (water=5)
+_WATER_TYPE_ID = 2  # type_chart.json 中水的 ID
+
+
+def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: int) -> float:
+    """根据天气和技能属性（type chart ID）返回伤害修正倍率。"""
+    if not weather:
+        return 1.0
+    name = weather.get("name") or ""
+    is_rain = "雨" in name
+    if is_rain and skill_element == _WATER_TYPE_ID:
+        return 1.5
+    return 1.0

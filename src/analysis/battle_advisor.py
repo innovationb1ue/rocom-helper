@@ -32,6 +32,8 @@ class SkillAnalysis:
     energy_cost: int
     skill_desc: Optional[str] = None
     power: Optional[int] = None
+    effective_power: Optional[int] = None
+    expected_damage: Optional[int] = None
     min_damage: Optional[int] = None
     max_damage: Optional[int] = None
     total_min_damage: Optional[int] = None
@@ -42,6 +44,9 @@ class SkillAnalysis:
     can_ko: Optional[bool] = None
     hit_count: int = 1
     confidence: Optional[str] = None
+    power_mult: Optional[float] = None
+    weather_mult: Optional[float] = None
+    damage_breakdown: Optional[Dict[str, Any]] = None
     warnings: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -78,7 +83,8 @@ class BattleAdvisor:
         if not equipped:
             equipped = self._skills_from_pool(my_active)
 
-        skill_analysis = self._build_skill_analysis(my_active, opp_active, equipped)
+        weather = state.get("weather")
+        skill_analysis = self._build_skill_analysis(my_active, opp_active, equipped, weather)
         suggestions = self._build_suggestions(my_active, opp_active, skill_analysis)
         traits = self._extract_traits(my_active)
 
@@ -88,16 +94,12 @@ class BattleAdvisor:
             traits=traits,
         )
 
-    # 技能分析管线:
-    # 1. 从装备技能列表获取 skill_id
-    # 2. 查询技能 meta 数据
-    # 3. 如果是攻击技能 (damage_type=2/3)，调用 DamageCalculator.calculate()
-    # 4. 合并基础信息和伤害预测结果
     def _build_skill_analysis(
         self,
         attacker: Dict[str, Any],
         defender: Dict[str, Any],
         equipped: List[Dict[str, Any]],
+        weather: Optional[Dict[str, Any]] = None,
     ) -> List[SkillAnalysis]:
         results: List[SkillAnalysis] = []
         for eq in equipped:
@@ -108,9 +110,11 @@ class BattleAdvisor:
             sa = self._skill_from_equipped(eq, meta)
             damage_type = sa.skill_damage_type
             if meta and damage_type in (2, 3):
-                dr = self._damage_calc.calculate(attacker, defender, meta)
+                dr = self._damage_calc.calculate(attacker, defender, meta, weather=weather)
                 if dr is not None:
                     sa.power = dr.power
+                    sa.effective_power = dr.effective_power
+                    sa.expected_damage = dr.expected_damage
                     sa.min_damage = dr.min_damage
                     sa.max_damage = dr.max_damage
                     sa.total_min_damage = dr.total_min_damage
@@ -121,6 +125,9 @@ class BattleAdvisor:
                     sa.can_ko = dr.can_ko
                     sa.hit_count = dr.hit_count
                     sa.confidence = dr.confidence
+                    sa.power_mult = dr.power_mult
+                    sa.weather_mult = dr.weather_mult
+                    sa.damage_breakdown = dr.damage_breakdown
                     sa.warnings = dr.warnings
             results.append(sa)
         results.sort(key=lambda s: s.equipped_slot)
@@ -166,11 +173,11 @@ class BattleAdvisor:
         skill_analysis: List[SkillAnalysis],
     ) -> List[Dict[str, str]]:
         suggestions: List[Dict[str, str]] = []
-        attack_skills = [s for s in skill_analysis if s.min_damage is not None]
+        attack_skills = [s for s in skill_analysis if s.expected_damage is not None]
         if not attack_skills:
             return suggestions
 
-        best = max(attack_skills, key=lambda s: s.max_damage or 0)
+        best = max(attack_skills, key=lambda s: s.total_max_damage or 0)
         if best.can_ko:
             suggestions.append({
                 "type": "ko_skill",
@@ -179,7 +186,7 @@ class BattleAdvisor:
         elif best.effectiveness is not None and best.effectiveness >= 2.0:
             suggestions.append({
                 "type": "super_effective",
-                "message": f"{best.skill_name} 效果拔群，预计造成 {best.min_damage}~{best.max_damage} 伤害",
+                "message": f"{best.skill_name} 效果拔群，预计造成 {best.expected_damage} 伤害",
             })
         elif best.effectiveness is not None and 0 < best.effectiveness < 1.0:
             suggestions.append({

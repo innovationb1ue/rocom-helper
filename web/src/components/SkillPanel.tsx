@@ -27,6 +27,47 @@ function isAttackSkill(s: SkillAnalysis): boolean {
   return s.skill_damage_type === 2 || s.skill_damage_type === 3;
 }
 
+function formatBreakdown(s: SkillAnalysis, oppHp: number): string {
+  const bd = s.damage_breakdown;
+  if (!bd) return '';
+  const lines: string[] = [];
+  const basePwr = (bd.base_power as number) ?? s.power ?? 0;
+  const effPwr = (bd.effective_power as number) ?? s.effective_power ?? basePwr;
+  if (effPwr !== basePwr) {
+    lines.push(`威力: ${basePwr} → ${effPwr}`);
+  } else {
+    lines.push(`威力: ${basePwr}`);
+  }
+  const al = bd.ability_level as number | undefined;
+  if (al !== undefined && al !== 1.0) {
+    lines.push(`能力等级: ×${al.toFixed(2)}`);
+  }
+  if (s.effectiveness != null && s.effectiveness !== 1.0) {
+    lines.push(`属性克制: ×${s.effectiveness} (${s.effectiveness_label || ''})`);
+  }
+  if (s.is_stab) {
+    lines.push('本系加成: ×1.5');
+  }
+  const wm = bd.weather_mult as number | undefined;
+  if (wm !== undefined && wm !== 1.0) {
+    lines.push(`天气: ×${wm}`);
+  }
+  const pm = bd.power_mult as number | undefined;
+  if (pm !== undefined && pm !== 1.0) {
+    lines.push(`威力修正: ×${pm}`);
+  }
+  const hc = (bd.hit_count as number) ?? s.hit_count ?? 1;
+  if (hc > 1) {
+    lines.push(`连击: ×${hc}`);
+  }
+  const totalDmg = s.total_max_damage ?? s.expected_damage ?? 0;
+  if (oppHp > 0) {
+    lines.push(`─────────`);
+    lines.push(`预期伤害: ${totalDmg} (${Math.round(totalDmg / oppHp * 100)}% HP)`);
+  }
+  return lines.join('\n');
+}
+
 interface SkillPanelProps {
   skills: SkillAnalysis[];
   oppActive?: BattlePet | null;
@@ -64,6 +105,8 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
           const attack = isAttackSkill(s);
           const isCombo = (s.hit_count ?? 1) > 1;
           const hitCount = s.hit_count ?? 1;
+          const totalDmg = s.total_max_damage ?? s.expected_damage ?? 0;
+          const breakdownText = attack ? formatBreakdown(s, oppHp) : '';
 
           return (
             <div
@@ -105,18 +148,22 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                 {s.energy_cost > 0 ? `${s.energy_cost}EP` : '免费'}
               </Text>
 
-              {/* 攻击技能：伤害范围 */}
-              {attack && s.min_damage != null && s.max_damage != null && (
+              {/* 攻击技能：威力 + 预期伤害 */}
+              {attack && s.expected_damage != null && (
                 <>
-                  <Text style={{ fontSize: 13, fontWeight: s.can_ko ? 700 : 400 }}>
-                    {isCombo ? (
-                      <Tooltip title={`单次: ${s.min_damage}~${s.max_damage}`}>
-                        {s.total_min_damage ?? s.min_damage * hitCount}~{s.total_max_damage ?? s.max_damage * hitCount}
-                      </Tooltip>
-                    ) : (
-                      `${s.min_damage}~${s.max_damage}`
-                    )}
-                  </Text>
+                  {/* 预期威力 */}
+                  {s.effective_power != null && (
+                    <Tag style={{ fontSize: 11, margin: 0, background: '#f0f0f0', border: '1px solid #d9d9d9' }}>
+                      威力 {s.effective_power}
+                    </Tag>
+                  )}
+
+                  {/* 预期伤害 */}
+                  <Tooltip title={breakdownText || undefined}>
+                    <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600 }}>
+                      {isCombo ? totalDmg : s.expected_damage}
+                    </Text>
+                  </Tooltip>
 
                   {isCombo && (
                     <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>×{hitCount}</Tag>
@@ -125,7 +172,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                   {/* HP 百分比 */}
                   {oppHp > 0 && (
                     <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>
-                      ({Math.round((s.total_min_damage ?? s.min_damage ?? 0) / oppHp * 100)}%~{Math.round((s.total_max_damage ?? s.max_damage ?? 0) / oppHp * 100)}%)
+                      ({Math.round(totalDmg / oppHp * 100)}%)
                     </Text>
                   )}
 

@@ -73,7 +73,7 @@ python -m scripts.replay_to_frontend --delay 80 --round 10
 回放期间，前端页面会实时更新:
 - 双方阵容和 HP/能量条
 - 战斗事件日志
-- **伤害预测面板**（在双方阵容下方，显示当前精灵技能的伤害预测）
+- **伤害预测面板**（`DamagePredictionPanel`，在双方阵容下方，显示当前精灵技能的伤害预测，含连击显示）
 - 建议卡片
 - 战斗结束后显示总结
 
@@ -108,11 +108,15 @@ tests/fixtures/packets/battle_session_1/
 语义化 summary (kind, detail)
   │
   ▼  BattleManager.process_event()
-  ├── BattleStateTracker.handle_event()  → 状态更新
+  ├── BattleStateTracker.handle_event()  → 状态更新（含 combo_bonus, poison_stacks）
   ├── format_battle_event()              → 格式化事件 → WebSocket push
   ├── _push_state()                      → state_update → WebSocket push
-  ├── BattleAdvisor.analyze()            → damage_predictions → WebSocket push
-  └── _push_damage_analysis()            → damage_predictions → WebSocket push
+  ├── BattleAdvisor.analyze()            → skill_analysis → WebSocket push
+  │     └── DamageCalculator.calculate() → DamageResult（4 阶段 Hook 管线）
+  │           └── innate_hooks            → 先天技能修正（combo/stat/type/power）
+  ├── _run_analysis_hooks()              → hook_advice → WebSocket push
+  │     └── HookRegistry.dispatch()      → OpponentTracker, EnergyMonitor, SwitchAdvisor
+  └── compute_battle_summary()           → battle_summary → WebSocket push (战斗结束时)
 ```
 
 ## WebSocket 消息类型
@@ -126,7 +130,8 @@ tests/fixtures/packets/battle_session_1/
 | `battle_event` | 单个格式化事件 | 有新事件时 |
 | `battle_events` | 多个格式化事件 | 有新事件时 |
 | `suggestions` | 文本建议 | 状态更新后 |
-| `damage_predictions` | 伤害预测 | 进入/回合/动作时 |
+| `skill_analysis` | 技能分析（含伤害预测） | 进入/回合/动作时 |
+| `hook_advice` | 分析 Hook 建议 | 战斗事件触发时 |
 | `battle_summary` | 战斗总结 | 战斗结束时 (opcode 0x132C) |
 
 ## 伤害预测触发时机

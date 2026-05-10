@@ -242,6 +242,17 @@ record 结构核心字段：
             "kind": "effect_link",
             "effect_id": 1001,
         },
+        # entry_type=30: 连击技能施放
+        {
+            "kind": "combo_skill_cast",
+            "skill_id": 7700001,
+            "skill_name": "缠丝劲",
+            "actor_side": 1,
+            "actor_side_name": "我方",
+            "combo_index": 3,         # 当前第几击
+            "combo_count": 7,         # 总连击数
+            "target_ids": [401],      # 目标列表
+        },
     ],
     "primary_skill": {...},         # 主技能 entry
     "energy_event": {...},          # 能量变化 entry
@@ -318,6 +329,8 @@ state = {
     "hp_pct": float,               # 0.0 ~ 1.0
     "energy": int,                  # 当前能量
     "buffs": [],
+    "combo_bonus": int,             # 连击数修正值（combo_skill_cast 事件更新，换宠时重置）
+    "poison_stacks": int,           # 中毒层数（effect_apply 中 POISON_BUFF_IDS 事件更新）
 }
 ```
 
@@ -434,6 +447,56 @@ side 判定逻辑（`_side_from_path`）：
 
 ---
 
+## 8.1 伤害计算管线
+
+伤害计算由 `DamageCalculator` (`src/analysis/damage_calc.py`) 驱动，输出 `DamageResult` 数据结构。
+
+```python
+from src.analysis.damage_calc import DamageCalculator
+from src.analysis.innate_hooks import register_innate_hooks
+
+calc = DamageCalculator()
+register_innate_hooks(calc)  # 注册先天技能 Hook（必须显式调用）
+
+result = calc.calculate(
+    attacker={"types": [1], "current_hp": 200, "max_hp": 300, ...},
+    defender={"types": [2], "max_hp": 250, "current_hp": 250, ...},
+    skill_meta=get_skill_meta(7700001),
+)
+# result: DamageResult 或 None（非攻击技能）
+# result.hit_count — 连击数
+# result.total_min_damage / total_max_damage — 连击总伤害
+# result.can_ko — 是否能击杀
+```
+
+`DamageResult` 关键字段:
+- `min_damage` / `max_damage`: 单次命中伤害
+- `hit_count`: 连击次数（默认 1）
+- `total_min_damage` / `total_max_damage`: 总伤害 = 单次 × 连击
+- `can_ko`: 总伤害是否 >= 目标当前 HP
+- `effectiveness` / `effectiveness_label`: 属性克制倍率
+- `confidence`: "high" (抓包数据) 或 "medium" (wiki 估算)
+
+4 阶段 Hook 管线:
+
+| 阶段 | 上下文字段 | 用途 |
+|------|-----------|------|
+| `pre_power` | power, skill_meta, attacker, defender | 修正技能威力 |
+| `post_base` | base_damage, atk_val, def_val | 修正基础伤害 |
+| `pre_final` | base_damage, effectiveness, stab_mult | 修正属性克制/本系修正 |
+| `post_calc` | min_damage, max_damage, hit_count | 修正最终伤害/连击数 |
+
+先天技能 Hook (`src/analysis/innate_hooks.py`):
+
+| Hook 函数 | 注册阶段 | effect_type | 效果 |
+|-----------|---------|-------------|------|
+| `stat_modify_hook` | post_base | stat_modify | HP 低于阈值时百分比提升伤害 |
+| `type_resist_modify_hook` | pre_final | type_resist_modify | 提升属性克制倍率下限 |
+| `combo_modify_hook` | post_calc | combo_modify | 增加连击次数 |
+| `power_modify_hook` | post_calc | power_modify | 附加效果如先手吸血 |
+
+---
+
 ## 9. 游戏数据查询
 
 通过 `src/data/loader.py` 可查询静态游戏数据：
@@ -441,6 +504,7 @@ side 判定逻辑（`_side_from_path`）：
 ```python
 from src.data.loader import get_pet_name, get_skill_name, get_skill_meta, get_attr_name
 from src.data.loader import get_pet_meta, get_pet_skill_meta, get_buff_meta, get_buffbase_meta
+from src.data.loader import get_innate_skill, get_innate_skills_for_pet
 
 get_pet_name(100)                  # → "火龙"
 get_skill_name(7700001)            # → "愿力冲击"
@@ -450,6 +514,29 @@ get_pet_meta(100)                  # → {"base_id": ..., "pet_info_id": ...}
 get_pet_skill_meta(base_id)        # → {"level_skills": [...]}（技能池）
 get_buff_meta(buff_id)             # → {"name": "灼烧"}
 get_buffbase_meta(base_id)         # → {"name": "灼烧基础"}
+get_innate_skill(buff_id)          # → {"name": "无视抵抗", "effect_type": "type_resist_modify", ...}
+get_innate_skills_for_pet(base_id) # → [{"name": "...", "effect_type": "combo_modify", ...}]
+```
+
+### 游戏逻辑模块 (src/game/)
+
+| 模块 | 说明 |
+|------|------|
+| `src/game/type_chart.py` | `TypeChart` 类 — 加载 type_chart.json，提供倍率查询、弱点分析、覆盖度计算 |
+| `src/game/stats.py` | 种族值/能力值计算 — `calc_hp()`, `calc_stat()`, `calc_all_stats()`, 性格修正 |
+| `src/game/skill_eval.py` | 技能评分 — `score_skill()` (0-100 分), `rank_skills()` 排序 |
+
+```python
+from src.game.type_chart import TypeChart
+from src.game.stats import calc_all_stats
+from src.game.skill_eval import score_skill, rank_skills
+
+chart = TypeChart()
+chart.get_multiplier(1, [2])          # → 2.0 (火→草)
+chart.get_effectiveness_label(2.0)     # → "效果拔群"
+
+calc_all_stats([100,80,70,90,85,95], level=50, nature="固执")
+score_skill({"power": 90, "energy_cost": 3, "accuracy": 100})
 ```
 
 ---
