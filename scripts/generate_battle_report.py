@@ -436,11 +436,144 @@ def _track_unknown(entry: Dict[str, Any], unknown_types: Dict[str, int]) -> None
 
 # ── entry point ──────────────────────────────────────────────────────────────
 
-if __name__ == "__main__":
-    session_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_SESSION
-    report = generate_report(session_dir)
+# ── full report (uses BattleReplayRunner) ────────────────────────────────────
 
-    out_path = _PROJECT_ROOT / "docs" / "battle_session_1_report_new.txt"
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(report, encoding="utf-8")
-    sys.stdout.buffer.write((report + f"\n\nReport saved to: {out_path}\n").encode("utf-8", errors="replace"))
+
+def generate_full_report(session_dir: Path, stop_round: Optional[int] = None) -> str:
+    """Generate a comprehensive report with damage predictions and hook advice."""
+    import json as _json
+
+    from src.analysis.replay_runner import BattleReplayRunner
+    from tests.packet_reader import load_battle_packets
+
+    packets = load_battle_packets(session_dir)
+    if not packets:
+        return "No battle packets found."
+
+    runner = BattleReplayRunner()
+    result = runner.run(packets, stop_round=stop_round)
+
+    lines: List[str] = []
+    lines.append("=" * 72)
+    lines.append("洛克王国 PvP 对战回放报告（完整版）")
+    lines.append("=" * 72)
+    lines.append(f"  数据包: {result.total_packets}")
+    lines.append(f"  回合数: {len(result.rounds)}")
+    lines.append(f"  结果:   {result.battle_summary.get('result', '?')}")
+    if result.stopped_early:
+        lines.append(f"  (提前停止于回合 {result.rounds[-1].round_num})")
+    lines.append("")
+
+    # Per-round damage predictions
+    for rs in result.rounds:
+        if not rs.damage_predictions:
+            continue
+        lines.append("─" * 72)
+        lines.append(f"回合 {rs.round_num}")
+        opp = rs.state_at_end.get("opp_active")
+        if opp:
+            opp_name = opp.get("name", "?")
+            opp_hp = opp.get("current_hp", "?")
+            opp_max = opp.get("max_hp", "?")
+            lines.append(f"  目标: {opp_name}  HP: {opp_hp}/{opp_max}")
+        for pred in rs.damage_predictions:
+            name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
+            exp_dmg = pred.get("expected_damage")
+            ko_mark = " ★KO" if pred.get("can_ko") else ""
+            eff = pred.get("effectiveness_label", "") or ""
+            min_d = pred.get("min_damage", "-")
+            max_d = pred.get("max_damage", "-")
+            lines.append(
+                f"  {name:20s}  dmg: {exp_dmg!s:>5}  "
+                f"range: [{min_d!s}-{max_d!s}]  eff: {eff}{ko_mark}"
+            )
+        lines.append("")
+
+    # Hook advice
+    all_hooks = []
+    for ev in result.events:
+        all_hooks.extend(ev.hook_advice)
+    if all_hooks:
+        lines.append("═" * 72)
+        lines.append("Hook 建议")
+        lines.append("═" * 72)
+        for ha in all_hooks:
+            lines.append(f"  [{ha['hook_id']}] {ha['title']}")
+            for msg in ha.get("messages", []):
+                lines.append(f"    - {msg.get('message', '')}")
+        lines.append("")
+
+    # Final roster
+    fs = result.final_state
+    lines.append("═" * 72)
+    lines.append("最终状态")
+    lines.append("═" * 72)
+    for label, key in [("我方", "my_pets"), ("敌方", "opp_pets")]:
+        lines.append(f"  {label}:")
+        for p in fs.get(key, []):
+            hp = p.get("current_hp", 0)
+            max_hp = p.get("max_hp", 1)
+            status = "战败" if hp <= 0 else f"HP {hp}/{max_hp}"
+            lines.append(f"    {p.get('name', '?'):15s}  {status}")
+
+    return "\n".join(lines)
+
+
+# ── entry point ──────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Battle report generator")
+    parser.add_argument("session_dir", nargs="?", default=None, help="Session directory path")
+    parser.add_argument("--full", action="store_true", help="Full report with damage predictions")
+    parser.add_argument("--round", type=int, default=None, help="Stop at this round")
+    parser.add_argument("--json", action="store_true", help="JSON output (full mode only)")
+    args = parser.parse_args()
+
+    session_dir = Path(args.session_dir) if args.session_dir else DEFAULT_SESSION
+
+    if args.full or args.json:
+        import json as _json
+
+        from src.analysis.replay_runner import BattleReplayRunner
+        from tests.packet_reader import load_battle_packets
+
+        pkts = load_battle_packets(session_dir)
+        runner = BattleReplayRunner()
+        result = runner.run(pkts, stop_round=args.round)
+
+        if args.json:
+            output = {
+                "total_packets": result.total_packets,
+                "stopped_early": result.stopped_early,
+                "rounds": [
+                    {
+                        "round_num": rs.round_num,
+                        "damage_predictions": rs.damage_predictions,
+                        "battle_advice": rs.battle_advice,
+                    }
+                    for rs in result.rounds
+                ],
+                "final_state": result.final_state,
+                "battle_summary": result.battle_summary,
+            }
+            sys.stdout.buffer.write(
+                _json.dumps(output, default=str, ensure_ascii=False, indent=2).encode("utf-8")
+            )
+        else:
+            report = generate_full_report(session_dir, stop_round=args.round)
+            out_path = _PROJECT_ROOT / "docs" / "battle_full_report.txt"
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(report, encoding="utf-8")
+            sys.stdout.buffer.write(
+                (report + f"\n\nReport saved to: {out_path}\n").encode("utf-8", errors="replace")
+            )
+    else:
+        report = generate_report(session_dir)
+        out_path = _PROJECT_ROOT / "docs" / "battle_session_1_report_new.txt"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(report, encoding="utf-8")
+        sys.stdout.buffer.write(
+            (report + f"\n\nReport saved to: {out_path}\n").encode("utf-8", errors="replace")
+        )

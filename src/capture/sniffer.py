@@ -75,7 +75,7 @@ class Sniffer:
             try:
                 self.on_event(event_type, data)
             except Exception:
-                pass
+                logger.debug("on_event callback raised", exc_info=True)
 
     def _get_or_create_flow(self, fk: Tuple[str, int, str, int]) -> FlowState:
         with self._lock:
@@ -258,10 +258,10 @@ class Sniffer:
         """停止抓包。"""
         if not self._running:
             return
-        self._running = False
         if self._sniffer:
             self._sniffer.stop()
             self._sniffer = None
+        self._running = False
         logger.info("Sniffer stopped")
 
     @property

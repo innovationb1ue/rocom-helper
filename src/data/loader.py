@@ -430,7 +430,7 @@ def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
                 continue
             stat_key = _ATTR_TO_STAT_KEY.get(attr_id)
             if stat_key:
-                mods[stat_key] = mods.get(stat_key, 0.0) + value / 1000.0
+                mods[stat_key] = mods.get(stat_key, 0.0) + value / 10000.0
         if mods:
             table[buff_id] = mods
     return table
@@ -449,8 +449,9 @@ def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]
             continue
         mods = _buff_stat_cache.get(buff_id)
         if mods:
+            stage = max(1, int(buff.get("stage", 1)))
             for key, val in mods.items():
-                result[key] = result.get(key, 0.0) + val
+                result[key] = result.get(key, 0.0) + val * stage
     return result
 
 

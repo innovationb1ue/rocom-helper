@@ -46,6 +46,8 @@ from src.protocol.battle import (
     extract_1334_emoji,
     extract_133c_catch_rsp,
     extract_13f6_ai_skill,
+    extract_1313_round_confirm,
+    extract_1314_round_confirm_rsp,
 )
 
 # ---------------------------------------------------------------------------
@@ -54,6 +56,13 @@ from src.protocol.battle import (
 
 _OPCODE_REGISTRY: Dict[int, Tuple[str, Callable]] = {}
 _INNER_REGISTRY: Dict[int, Tuple[str, Callable]] = {}
+
+
+def _make_detail_handler(extractor: Callable) -> Callable:
+    """生成标准 handler: record → {"detail": extractor(record)}"""
+    def _handler(record, inner):
+        return {"detail": extractor(record)}
+    return _handler
 
 
 def _register_opcode(opcode: int, kind: str) -> Callable:
@@ -176,6 +185,7 @@ def _parse_inner1_detail(fields) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+# Special handlers with non-standard return shapes
 @_register_opcode(0x0102, "roster_init")
 def _handle_0102(record, inner) -> Dict[str, Any]:
     return {
@@ -184,132 +194,43 @@ def _handle_0102(record, inner) -> Dict[str, Any]:
     }
 
 
-@_register_opcode(0x130B, "client_skill_select")
-def _handle_130b(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_130b_skill_select(record)}
-
-
-@_register_opcode(0x1322, "server_skill_declare")
-def _handle_1322(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1322_skill_declare(record)}
-
-
-@_register_opcode(0x1324, "action_resolve")
-def _handle_1324(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1324_action(record)}
-
-
-@_register_opcode(0x13F4, "special_refresh")
-def _handle_13f4(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_13f4_refresh(record)}
-
-
-@_register_opcode(0x130C, "server_action_ack")
-def _handle_130c(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_130c_result(record)}
-
-
-@_register_opcode(0x01A9, "client_action")
-def _handle_01a9(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_01a9_action(record)}
-
-
 @_register_opcode(0x0220, "snapshot_handle")
 def _handle_0220(record, inner) -> Dict[str, Any]:
     return {"handle": extract_0220_handle(record)}
 
 
-@_register_opcode(0x1316, "battle_enter")
-def _handle_1316(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1316_enter(record)}
-
-
-@_register_opcode(0x131A, "round_start")
-def _handle_131a(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_131a_round_start(record)}
-
-
-@_register_opcode(0x132C, "battle_finish")
-def _handle_132c(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_132c_finish(record)}
-
-
-@_register_opcode(0x13FC, "pvp_perform")
-def _handle_13fc(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_13fc_pvp_perform(record)}
-
-
-@_register_opcode(0x13F3, "preplay")
-def _handle_13f3(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_13f3_preplay(record)}
-
-
-@_register_opcode(0x1312, "round_flow")
-def _handle_1312(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1312_round_flow(record)}
-
-
-# ---------------------------------------------------------------------------
-# Auxiliary battle opcodes
-# ---------------------------------------------------------------------------
-
-
-@_register_opcode(0x1326, "auto_cmd")
-def _handle_1326(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1326_auto_cmd(record)}
-
-
-@_register_opcode(0x132A, "role_leave")
-def _handle_132a(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_132a_role_leave(record)}
-
-
-@_register_opcode(0x132D, "force_finish")
-def _handle_132d(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_132d_force_finish(record)}
-
-
-@_register_opcode(0x1334, "emoji")
-def _handle_1334(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_1334_emoji(record)}
-
-
-@_register_opcode(0x133C, "catch_rsp")
-def _handle_133c(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_133c_catch_rsp(record)}
-
-
-@_register_opcode(0x13F6, "ai_skill")
-def _handle_13f6(record, inner) -> Dict[str, Any]:
-    return {"detail": extract_13f6_ai_skill(record)}
+# Standard "detail" handlers — auto-generated
+for _opc, _kind, _ext in [
+    (0x130B, "client_skill_select", extract_130b_skill_select),
+    (0x1322, "server_skill_declare", extract_1322_skill_declare),
+    (0x1324, "action_resolve", extract_1324_action),
+    (0x13F4, "special_refresh", extract_13f4_refresh),
+    (0x130C, "server_action_ack", extract_130c_result),
+    (0x01A9, "client_action", extract_01a9_action),
+    (0x1316, "battle_enter", extract_1316_enter),
+    (0x131A, "round_start", extract_131a_round_start),
+    (0x132C, "battle_finish", extract_132c_finish),
+    (0x13FC, "pvp_perform", extract_13fc_pvp_perform),
+    (0x13F3, "preplay", extract_13f3_preplay),
+    (0x1312, "round_flow", extract_1312_round_flow),
+    (0x1326, "auto_cmd", extract_1326_auto_cmd),
+    (0x132A, "role_leave", extract_132a_role_leave),
+    (0x132D, "force_finish", extract_132d_force_finish),
+    (0x1334, "emoji", extract_1334_emoji),
+    (0x133C, "catch_rsp", extract_133c_catch_rsp),
+    (0x13F6, "ai_skill", extract_13f6_ai_skill),
+]:
+    _OPCODE_REGISTRY[_opc] = (_kind, _make_detail_handler(_ext))
 
 
 @_register_opcode(0x1313, "round_confirm")
 def _handle_1313(record, inner) -> Dict[str, Any]:
-    root = record.get("root")
-    detail: Dict[str, Any] = {}
-    if root is not None:
-        for fn, entries in field_groups(root).items():
-            vals = collect_varints(root, fn)
-            if vals:
-                detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return {"detail": detail}
+    return {"detail": extract_1313_round_confirm(record)}
 
 
 @_register_opcode(0x1314, "round_confirm_rsp")
 def _handle_1314(record, inner) -> Dict[str, Any]:
-    root = record.get("root")
-    detail: Dict[str, Any] = {}
-    if root is not None:
-        for fn, entries in field_groups(root).items():
-            vals = collect_varints(root, fn)
-            if vals:
-                detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return {"detail": detail}
+    return {"detail": extract_1314_round_confirm_rsp(record)}
 
 
 # ---------------------------------------------------------------------------

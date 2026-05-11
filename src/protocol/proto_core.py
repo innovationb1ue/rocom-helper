@@ -10,6 +10,7 @@
 """
 from __future__ import annotations
 import logging
+import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_wiki_pet_types
@@ -462,6 +463,10 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
                      name, out["types"], wiki_types)
     return out
 
+_RE_BATTLE_ENTER_SIDE = re.compile(r"\.6\[\d+\]\.(\d+)\[")
+_RE_ROUND_START_OPP = re.compile(r"\.8\[\d+\]\.")
+_RE_ROUND_START_PLAYER = re.compile(r"\.44\[\d+\]\.")
+
 def _side_from_path(path: str) -> Optional[int]:
     """Determine side from wrapper path.
 
@@ -469,11 +474,8 @@ def _side_from_path(path: str) -> Optional[int]:
     0x131A round_start:   ``root.3[N].2[N].44[N].8[N].3[N]`` → has ``.8[`` = opponent(401);
                            ``root.3[N].2[N].44[N].3[N]`` (no .8) = player(1).
     """
-    # 路径启发式：battle_enter 用 .6[N].(5|6)[N] 区分我方/敌方
-    # round_start 用 .8[N] 标记敌方，.44[N].3[N] 无 .8 标记为我方
-    import re
     # battle_enter pattern: .6[N].5[N] or .6[N].6[N]
-    m = re.search(r"\.6\[\d+\]\.(\d+)\[", path)
+    m = _RE_BATTLE_ENTER_SIDE.search(path)
     if m:
         f = int(m.group(1))
         if f == 5:
@@ -481,10 +483,10 @@ def _side_from_path(path: str) -> Optional[int]:
         if f == 6:
             return 401
     # round_start pattern: .8[N] present → opponent
-    if re.search(r"\.8\[\d+\]\.", path):
+    if _RE_ROUND_START_OPP.search(path):
         return 401
     # round_start player pets have .44[N].3[N] without .8
-    if re.search(r"\.44\[\d+\]\.", path):
+    if _RE_ROUND_START_PLAYER.search(path):
         return 1
     return None
 

@@ -1306,59 +1306,58 @@ def _schema_or_raw(record: Dict[str, Any], message_name: str) -> Dict[str, Any]:
     return out
 
 
-def extract_1326_auto_cmd(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
-    decoded = _schema_payload(record, "ChangeAutoCmdNotify")
-    detail = dict(decoded) if decoded else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "ChangeAutoCmdNotify")
-        detail.setdefault("auto_flag", detail.get("field_1"))
+def _make_simple_extractor(message_name: str):
+    """生成标准的 auxiliary extractor: schema_or_raw + opcode 标记。"""
+    def _extractor(record: Dict[str, Any]) -> Dict[str, Any]:
+        detail = _schema_or_raw(record, message_name)
+        detail["opcode"] = record.get("opcode")
+        detail["opcode_hex"] = record.get("opcode_hex", "")
+        return detail
+    return _extractor
+
+
+extract_1326_auto_cmd = _make_simple_extractor("ChangeAutoCmdNotify")
+extract_1326_auto_cmd.__doc__ = """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
+
+extract_132a_role_leave = _make_simple_extractor("RoleLeaveNotify")
+extract_132a_role_leave.__doc__ = """0x132A RoleLeaveNotify — player disconnect."""
+
+extract_132d_force_finish = _make_simple_extractor("BattleForceFinishNotify")
+extract_132d_force_finish.__doc__ = """0x132D BattleForceFinishNotify — forced battle end."""
+
+extract_1334_emoji = _make_simple_extractor("EmojiNotify")
+extract_1334_emoji.__doc__ = """0x1334 EmojiNotify — battle emote."""
+
+extract_133c_catch_rsp = _make_simple_extractor("CatchConfirmRsp")
+extract_133c_catch_rsp.__doc__ = """0x133C CatchConfirmRsp — capture result."""
+
+extract_13f6_ai_skill = _make_simple_extractor("AiSelectSkillNotify")
+extract_13f6_ai_skill.__doc__ = """0x13F6 AiSelectSkillNotify — AI skill hint."""
+
+
+# ---------------------------------------------------------------------------
+# Round confirm opcodes (0x1313, 0x1314)
+# ---------------------------------------------------------------------------
+
+def _raw_field_dump(record: Dict[str, Any]) -> Dict[str, Any]:
+    """通用 raw 字段转储，提取所有 varint 字段。"""
+    root = record.get("root")
+    detail: Dict[str, Any] = {}
+    if root is not None:
+        for fn, entries in field_groups(root).items():
+            vals = collect_varints(root, fn)
+            if vals:
+                detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
     detail["opcode"] = record.get("opcode")
     detail["opcode_hex"] = record.get("opcode_hex", "")
     return detail
 
 
-def extract_132a_role_leave(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x132A RoleLeaveNotify — player disconnect."""
-    detail = _schema_or_raw(record, "RoleLeaveNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
+def extract_1313_round_confirm(record: Dict[str, Any]) -> Dict[str, Any]:
+    """0x1313 BattleRoundConfirmNotify — round confirm."""
+    return _raw_field_dump(record)
 
 
-def extract_132d_force_finish(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x132D BattleForceFinishNotify — forced battle end."""
-    detail = _schema_or_raw(record, "BattleForceFinishNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_1334_emoji(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x1334 EmojiNotify — battle emote."""
-    detail = _schema_or_raw(record, "EmojiNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_133c_catch_rsp(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x133C CatchConfirmRsp — capture result."""
-    decoded = _schema_payload(record, "CatchConfirmRsp")
-    detail = dict(decoded) if isinstance(decoded, dict) else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "CatchConfirmRsp")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_13f6_ai_skill(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x13F6 AiSelectSkillNotify — AI skill hint."""
-    decoded = _schema_payload(record, "AiSelectSkillNotify")
-    detail = dict(decoded) if isinstance(decoded, dict) else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "AiSelectSkillNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
+def extract_1314_round_confirm_rsp(record: Dict[str, Any]) -> Dict[str, Any]:
+    """0x1314 BattleRoundConfirmRsp — round confirm response."""
+    return _raw_field_dump(record)
