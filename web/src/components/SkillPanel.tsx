@@ -190,6 +190,9 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                   <Tooltip title={s.warnings?.length ? s.warnings.join('\n') : undefined}>
                     {confidenceTag(s.confidence)}
                   </Tooltip>
+                  {s.confidence === 'medium' && (
+                    <Text type="secondary" style={{ fontSize: 10 }}>(估算)</Text>
+                  )}
                 </>
               )}
 

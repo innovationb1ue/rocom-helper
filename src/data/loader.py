@@ -135,14 +135,22 @@ def _normalize_lookup_value(value: Optional[int], *, normalizer: Optional[_MetaN
 
 
 def _get_bundle_meta(*bundle_keys: str, value: Optional[int], normalizer: Optional[_MetaNormalizer] = None) -> Optional[Dict[str, Any]]:
-    lookup_key = _normalize_lookup_value(value, normalizer=normalizer)
-    if lookup_key is None:
+    if value is None:
         return None
     bundle = get_bundle()
+    # Try raw value first — avoids false normalization of legitimate IDs
     for bundle_key in bundle_keys:
-        entry = bundle.get(bundle_key, {}).get(lookup_key)
+        entry = bundle.get(bundle_key, {}).get(value)
         if isinstance(entry, dict):
             return entry
+    # Try normalized value as fallback (protocol may send id*100)
+    if normalizer:
+        normalized = normalizer(value)
+        if normalized is not None and normalized != value:
+            for bundle_key in bundle_keys:
+                entry = bundle.get(bundle_key, {}).get(normalized)
+                if isinstance(entry, dict):
+                    return entry
     return None
 
 
@@ -152,10 +160,17 @@ def _get_name_from_meta_or_map(*bundle_keys: str, value: Optional[int], map_name
         return meta["name"]
     if map_name is None:
         return None
-    lookup_key = _normalize_lookup_value(value, normalizer=normalizer)
-    if lookup_key is None:
-        return None
-    return get_maps()[map_name].get(lookup_key)
+    maps = get_maps()
+    # Try raw value first
+    name = maps[map_name].get(value)
+    if name:
+        return name
+    # Try normalized fallback
+    if normalizer:
+        normalized = normalizer(value)
+        if normalized is not None and normalized != value:
+            return maps[map_name].get(normalized)
+    return None
 
 
 def get_attr_meta(attr_id: Optional[int]) -> Optional[Dict[str, Any]]:
