@@ -159,6 +159,43 @@
       },
       "hook_stage": "post_calc",
       "category": "combo"
+    },
+    "21080150": {
+      "name": "仅精灵连击数+1",
+      "description": "连击技能连击次数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20460160": {
+      "name": "击败敌人后连击+2",
+      "description": "击败敌人后，连击数+2",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 2,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20450120": {
+      "name": "特定技能连击+2",
+      "description": "使用趁火打劫时连击+2",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "specific_skill",
+        "skill_id": 7180340,
+        "value": 2,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
     }
   },
   "pets": {}

@@ -26,9 +26,11 @@ pytest -k "test_name"           # Run tests matching a name pattern
 ### Headless Replay (后端自闭环)
 ```bash
 py -m scripts.replay_headless --session battle_session_1       # Text summary with events, predictions, hooks
-py -m scripts.replay_headless --session battle_session_1 --json  # Full JSON output
+py -m scripts.replay_headless --session battle_session_1 --json  # Full JSON output (written to tmp/)
 py -m scripts.replay_headless --round 7                        # Stop at round 7
 py -m scripts.generate_battle_report --json                    # Generate report file (docs/battle_report.txt)
+py -m scripts.replay_to_frontend --delay 80 --session battle_session_1  # Push replay to WebSocket frontend
+py -m scripts.replay_to_frontend --delay 80 --session battle_session_1 --round 7  # Replay to round 7
 ```
 
 ### Frontend (from `web/`)
@@ -132,9 +134,11 @@ protocol/
   │
   ▼
 analysis/
+  ├── constants.py ── Shared opcode constants, OPCODE_LABELS, SDT_TO_TYPE re-export (single source of truth)
+  ├── pet_info.py ── PetInfo construction factory (from_wrapper/from_change_pet → to_dict), unifies pet dict construction
   ├── battle_state.py ── Real-time battle state machine (HP, energy, buffs, turn tracking)
   ├── battle_processor.py ── Pure sync event processor (state + formatting + damage + hooks), shared by BattleManager and ReplayRunner
-  ├── battle_advisor.py ── Battle analysis coordinator (skill analysis + damage prediction)
+  ├── battle_advisor.py ── Battle analysis coordinator (skill analysis + damage prediction + state suggestions)
   ├── damage_calc.py ── Damage calculation engine with 4-stage hook pipeline
   ├── innate_hooks.py ── Innate skill damage hooks (combo/stat/type/power modifications)
   ├── event_formatter.py ── Protocol events → UI-ready formatted events
@@ -215,6 +219,7 @@ The `src/data/loader.py` module provides typed access to this data; `src/data/sc
 - **API client**: `web/src/utils/api.ts` centralizes Axios calls to the backend
 - **Battle manager singleton**: `get_battle_manager()` provides global access to `BattleManager`, which bridges the packet sniffer to WebSocket clients and the analysis pipeline
 - **Opcode dispatch**: `opcodes.py` uses decorator registries (`_OPCODE_REGISTRY` for main opcodes, `_INNER_REGISTRY` for inner-message dispatch on opcode 0x0414). The `summarize()` function falls back to `opcode_pb_map.json` metadata for unknown opcodes.
+- **Opcode constants**: `src/analysis/constants.py` centralizes all opcode constants (`OPCODE_BATTLE_ENTER`, `OPCODE_ACTION_RESOLVE`, etc.), opcode sets (`LIFECYCLE_OPCODES`, `DAMAGE_OPCODES`, `IN_BATTLE_OPCODES`), `OPCODE_LABELS`, and re-exports `SDT_TO_TYPE`. All analysis and API modules import from this file instead of using hex literals.
 
 ### Key Architectural Concepts
 
@@ -270,7 +275,7 @@ The `/ws/battle` endpoint pushes these message types to connected clients:
 
 ## Testing
 
-Tests live in `tests/` and mirror the module structure. The suite contains **530+ tests** across ~28 test files. Key test areas:
+Tests live in `tests/` and mirror the module structure. The suite contains **640+ tests** across ~30 test files. Key test areas:
 
 - **Protocol parsing**: `test_opcodes.py`, `test_frame.py`, `test_crypto.py`, `test_skill_extraction.py`, `test_type_extraction.py`
 - **Game mechanics**: `test_type_chart.py` (50 tests), `test_stats.py` (21 tests), `test_skill_eval.py` (8 tests)
@@ -282,6 +287,128 @@ Tests live in `tests/` and mirror the module structure. The suite contains **530
 - **Data**: `test_loader.py`
 
 Test fixtures are in `tests/fixtures/` (including `packets/battle_session_1/` and `packets/battle_session_2/` for replay testing). All tests use real data, not mocks.
+
+### Headless Testing Data Structures
+
+The `BattleReplayRunner` produces structured output via three dataclasses. Understanding these is essential for writing analysis tests:
+
+**`ReplayResult`** (top-level, from `src/analysis/replay_runner.py`):
+```python
+@dataclass
+class ReplayResult:
+    total_packets: int                           # Events processed
+    events: List[ReplayEventSnapshot]            # Flat per-event snapshots
+    rounds: List[RoundSnapshot]                  # Per-round aggregation
+    final_state: Dict[str, Any]                  # Final BattleStateTracker state
+    battle_summary: Dict[str, Any]               # From compute_battle_summary()
+    stopped_early: bool                          # Whether stop_round triggered
+```
+
+**`RoundSnapshot`** (per-round aggregation):
+- `round_num`, `state_at_start`, `state_at_end`
+- `damage_predictions` — List of per-skill damage prediction dicts
+- `formatted_events` — Aggregated UI-ready event dicts (kind/summary/icon/color)
+- `suggestions` — Aggregated suggestion dicts (type/message)
+
+**`ReplayEventSnapshot`** (per-event, most granular):
+- `opcode`, `kind`, `round_num`
+- `state_before`, `state_after` — Battle state before/after this event
+- `battle_advice` — Dict with `skill_analysis` (damage predictions) and `opp_traits`
+- `hook_advice` — List of dicts (hook_id/title/priority/messages)
+- `suggestions` — List of dicts (type/message)
+
+**`ProcessResult`** (from `BattleProcessor.process_event()`):
+- `state` — Updated battle state dict
+- `formatted_events` — List of FormattedEvent
+- `battle_advice` — Skill analysis dict (or None)
+- `hook_advice` — List of hook advice dicts
+- `suggestions` — List of suggestion dicts
+
+**`battle_advice` dict structure** (when present):
+- `skill_analysis` — List of dicts per skill: `skill_name`, `expected_damage`, `can_ko`, `effectiveness`, `effectiveness_label`, `energy_cost`, `hit_count`, `damage_breakdown`, `warnings`
+- `opp_traits` — List of detected opponent innate traits
+
+**`hook_advice` dict structure** (each entry):
+- `hook_id` — e.g., `"opponent_tracker"`, `"energy_monitor"`, `"switch_advisor"`
+- `priority` — 0=urgent, 1=important, 2=info
+- `title` — Human-readable title
+- `messages` — List of dicts with `message` key
+
+### Analysis Test Patterns
+
+**Pattern 1: Full replay integration test** (tests the entire pipeline with real packets):
+```python
+from tests.packet_reader import load_battle_packets
+from src.analysis.replay_runner import BattleReplayRunner
+
+packets = load_battle_packets("tests/fixtures/packets/battle_session_1")
+runner = BattleReplayRunner()
+result = runner.run(packets)
+
+# Assertions on final state
+assert result.final_state["round"] == 17
+assert result.final_state["result"] == "WIN_HP"
+# Assertions on per-round predictions
+for rs in result.rounds:
+    if rs.damage_predictions:
+        for pred in rs.damage_predictions:
+            assert "expected_damage" in pred
+            assert "can_ko" in pred
+```
+
+**Pattern 2: Single-event processor test** (tests BattleProcessor with constructed events):
+```python
+from src.analysis.battle_processor import BattleProcessor
+
+processor = BattleProcessor()
+pr = processor.process_event(0x1316, battle_enter_detail)
+assert len(pr.state["my_pets"]) == 6
+assert pr.formatted_events  # Should produce at least one event
+```
+
+**Pattern 3: State tracker unit test** (tests state transitions step by step):
+```python
+from src.analysis.battle_state import BattleStateTracker
+
+tracker = BattleStateTracker()
+tracker.handle_event(0x1316, battle_enter_detail)
+state = tracker.get_state()
+assert state["phase"] == "selecting"
+assert state["my_active"] is not None
+```
+
+**Pattern 4: Targeted stop-round test** (tests intermediate battle states):
+```python
+runner = BattleReplayRunner()
+result = runner.run(packets, stop_round=5)
+assert result.stopped_early is True
+# Check state at round 5
+round5 = result.rounds[-1]
+assert round5.round_num == 5
+```
+
+**Pattern 5: Flag-based selective testing** (disable expensive computations):
+```python
+runner = BattleReplayRunner(include_analysis=False, include_hooks=False)
+result = runner.run(packets)  # Only state tracking, no damage/hook computation
+assert result.final_state is not None
+assert all(rs.battle_advice is None for rs in result.rounds)
+```
+
+### Headless Replay CLI Output Guide
+
+`replay_headless` text output structure (one section per round):
+```
+=== Round N ===
+  My: {name} HP {cur}/{max} Energy {n}  |  Opp: {name} HP {cur}/{max}
+  [kind] summary text                    ← formatted events
+  SUGGEST: [type] message                ← suggestions
+  {skill_name}  dmg: {n} range: [{min}-{max}] eff: {label} [KO]  ← damage predictions
+  HOOK: [hook_id] title                  ← hook advice
+    - message text
+```
+
+JSON output (`--json`, written to `tmp/`): structured `ReplayResult` serialization with all fields above.
 
 ## Reference Repositories
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.data.loader import get_buff_stat_modifiers, get_innate_skill
+from src.data.loader import get_buff_damage_reduction, get_buff_stat_modifiers, get_innate_skill
 
 
 def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -53,6 +53,11 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
             element = params.get("element")
             skill_element = ctx.get("skill_meta", {}).get("skill_dam_type", 0)
             if skill_element == element:
+                additive_bonus += params.get("value", 0)
+        elif trigger == "specific_skill":
+            target_skill_id = params.get("skill_id")
+            current_skill_id = ctx.get("skill_meta", {}).get("id", 0)
+            if target_skill_id and current_skill_id == target_skill_id:
                 additive_bonus += params.get("value", 0)
 
     total_hits = int((base_hits + combo_bonus) * multiplier + additive_bonus)
@@ -114,6 +119,28 @@ def type_resist_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# damage_reduction hook  (pre_final stage)
+# ---------------------------------------------------------------------------
+
+
+def damage_reduction_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    """伤害减免 — 根据防守方 buff 的 buffbase 参数降低基础伤害。"""
+    defender = ctx.get("defender", {})
+    skill_meta = ctx.get("skill_meta", {})
+    damage_type = skill_meta.get("damage_type", 0)
+
+    if damage_type not in (2, 3):
+        return ctx
+
+    reduction = get_buff_damage_reduction(defender.get("buffs", []), damage_type)
+    if reduction > 0:
+        ctx["base_damage"] = max(1, int(ctx["base_damage"] * (1.0 - reduction)))
+        ctx["damage_reduction"] = ctx.get("damage_reduction", 0.0) + reduction
+
+    return ctx
+
+
+# ---------------------------------------------------------------------------
 # power_modify hook  (post_calc stage)
 # ---------------------------------------------------------------------------
 
@@ -144,8 +171,9 @@ def power_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def register_innate_hooks(calculator: Any) -> None:
-    """将四个先天技能 hook 注册到 DamageCalculator 实例。"""
+    """将先天技能 hook 注册到 DamageCalculator 实例。"""
     calculator.register_hook("post_base", stat_modify_hook)
     calculator.register_hook("pre_final", type_resist_modify_hook)
+    calculator.register_hook("pre_final", damage_reduction_hook)
     calculator.register_hook("post_calc", combo_modify_hook)
     calculator.register_hook("post_calc", power_modify_hook)

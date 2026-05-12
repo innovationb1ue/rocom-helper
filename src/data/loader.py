@@ -211,11 +211,12 @@ def get_pb_message_meta(name: Optional[str]) -> Optional[Dict[str, Any]]:
 
 def invalidate_cache() -> None:
     """热重载 / 测试时调用，使下次查询重新读取数据文件。"""
-    global _json_cache, _maps_cache, _innate_skills_cache
+    global _json_cache, _maps_cache, _innate_skills_cache, _buff_dmg_reduce_cache
     with _lock:
         _json_cache = None
         _maps_cache = None
         _innate_skills_cache = None
+        _buff_dmg_reduce_cache = None
 
 
 # ── Wiki 数据查询 ──────────────────────────────────────────────
@@ -453,6 +454,80 @@ def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]
             for key, val in mods.items():
                 result[key] = result.get(key, 0.0) + val * stage
     return result
+
+
+# ── Buff 伤害减免查询 ──────────────────────────────────────────────
+
+# buff_id → {"reduction": 0.8, "damage_types": [2, 3]} cached lookup
+_buff_dmg_reduce_cache: Optional[Dict[int, Dict[str, Any]]] = None
+
+
+def _build_buff_damage_reduction_table() -> Dict[int, Dict[str, Any]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 伤害减免映射。
+
+    buffbase param 结构:
+      params[1] = 伤害类型过滤 ([2]=物理, [3]=特殊, [2,3]=全部)
+      params[4] = 减免值 (负数, /10000, 如 -8000 = 80% 减免)
+    """
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, Any]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        total_reduction = 0.0
+        dmg_types: set = set()
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            if len(params_list) < 5:
+                continue
+            try:
+                type_filter = params_list[1].get("params", [])
+                reduce_val = params_list[4].get("params", [0])[0]
+            except (IndexError, AttributeError):
+                continue
+            if reduce_val >= 0:
+                continue
+            total_reduction += abs(reduce_val) / 10000.0
+            dmg_types.update(type_filter)
+        if total_reduction > 0:
+            table[buff_id] = {
+                "reduction": total_reduction,
+                "damage_types": sorted(dmg_types),
+            }
+    return table
+
+
+def get_buff_damage_reduction(
+    buff_list: List[Dict[str, Any]], damage_type: int,
+) -> float:
+    """从 buff 列表计算总伤害减免比例，过滤指定伤害类型 (2=物理, 3=特殊)。
+
+    返回 0.0~0.95 之间的减免比例。
+    """
+    global _buff_dmg_reduce_cache
+    if _buff_dmg_reduce_cache is None:
+        _buff_dmg_reduce_cache = _build_buff_damage_reduction_table()
+
+    total = 0.0
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        info = _buff_dmg_reduce_cache.get(buff_id)
+        if not info:
+            continue
+        if damage_type not in info["damage_types"]:
+            continue
+        stage = max(1, int(buff.get("stage", 1)))
+        total += info["reduction"] * stage
+    return min(0.95, total)
 
 
 # ── 天气修正查询 ──────────────────────────────────────────────

@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
 
 # Add project root to path
@@ -98,7 +99,7 @@ def main():
     parser = argparse.ArgumentParser(description="Headless battle replay (no server needed)")
     parser.add_argument("--session", default="battle_session_1", help="Session directory name")
     parser.add_argument("--round", type=int, default=None, help="Stop at this round")
-    parser.add_argument("--json", action="store_true", help="Output full result as JSON")
+    parser.add_argument("--json", "--no-json", default=True, action=argparse.BooleanOptionalAction, help="Write JSON result to tmp/ (default: --json, use --no-json to skip)")
     args = parser.parse_args()
 
     from tests.packet_reader import load_battle_packets
@@ -115,6 +116,8 @@ def main():
 
     runner = BattleReplayRunner()
     result = runner.run(packets, stop_round=args.round)
+
+    _print_summary(result)
 
     if args.json:
         output = {
@@ -133,9 +136,12 @@ def main():
             "final_state": result.final_state,
             "battle_summary": result.battle_summary,
         }
-        json.dump(output, sys.stdout, default=str, ensure_ascii=False, indent=2)
-    else:
-        _print_summary(result)
+        tmp_dir = Path("tmp")
+        tmp_dir.mkdir(exist_ok=True)
+        ts = datetime.now().strftime("%H%M%S")
+        out_path = tmp_dir / f"replay_{args.session}_{ts}.json"
+        out_path.write_text(json.dumps(output, default=str, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"\nJSON saved to: {out_path}")
 
 
 if __name__ == "__main__":
