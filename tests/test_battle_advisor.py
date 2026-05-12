@@ -291,3 +291,36 @@ class TestToDict:
         assert "skill_analysis" in d
         assert "suggestions" in d
         assert "traits" in d
+        assert "opp_traits" in d
+
+    def test_to_dict_has_opp_traits(self, advisor):
+        my = _make_pet(used_skills=[{"skill_id": 7000170}])
+        opp = _make_pet(name="厉毒修萝", types=[7], buffs=[{"id": 20410080}])
+        result = advisor.analyze(_battle_state(my, opp))
+        d = result.to_dict()
+        assert isinstance(d["opp_traits"], list)
+        opp_names = [t["name"] for t in d["opp_traits"]]
+        assert "侵蚀" in opp_names
+
+
+class TestOppTraits:
+    def test_opp_traits_populated(self, advisor):
+        my = _make_pet(used_skills=[{"skill_id": 7000170}])
+        opp = _make_pet(name="厉毒修萝", types=[7])
+        result = advisor.analyze(_battle_state(my, opp))
+        assert isinstance(result.opp_traits, list)
+        names = [t["name"] for t in result.opp_traits]
+        assert "侵蚀" in names
+
+    def test_opp_traits_from_buffs(self, advisor):
+        my = _make_pet(used_skills=[{"skill_id": 7000170}])
+        opp = _make_pet(types=[0], buffs=[{"id": 20410080}])
+        result = advisor.analyze(_battle_state(my, opp))
+        names = [t["name"] for t in result.opp_traits]
+        assert "临界防御" in names
+
+    def test_opp_traits_empty_when_no_match(self, advisor):
+        my = _make_pet(used_skills=[{"skill_id": 7000170}])
+        opp = _make_pet(types=[0])
+        result = advisor.analyze(_battle_state(my, opp))
+        assert result.opp_traits == []

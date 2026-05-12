@@ -24,7 +24,7 @@ from src.data.loader import (
     get_wiki_pet_stats,
 )
 from src.game.type_chart import TypeChart
-from src.protocol.proto_core import SDT_TO_TYPE
+from src.analysis.constants import SDT_TO_TYPE
 
 HookStage = Literal["pre_power", "post_base", "pre_final", "post_calc"]
 DamageHook = Callable[[Dict[str, Any]], Dict[str, Any]]
@@ -43,22 +43,51 @@ class DamageResult:
     effectiveness_label: str
     is_stab: bool
     expected_damage: int
-    min_damage: int
-    max_damage: int
-    pct_hp_range: Tuple[float, float]
+    pct_hp: float  # 伤害占 defender 最大 HP 的百分比
     can_ko: bool
     energy_cost: int
     confidence: str  # "high" / "medium"
     hit_count: int = 1
-    total_min_damage: int = 0
-    total_max_damage: int = 0
     power_mult: float = 1.0
     weather_mult: float = 1.0
     damage_breakdown: Dict[str, Any] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)
 
+    # Backward-compatible properties — deterministic damage has no range
+    @property
+    def min_damage(self) -> int:
+        return self.expected_damage
+
+    @property
+    def max_damage(self) -> int:
+        return self.expected_damage
+
+    @property
+    def total_damage(self) -> int:
+        return self.expected_damage * self.hit_count
+
+    @property
+    def total_min_damage(self) -> int:
+        return self.total_damage
+
+    @property
+    def total_max_damage(self) -> int:
+        return self.total_damage
+
+    @property
+    def pct_hp_range(self) -> Tuple[float, float]:
+        return (self.pct_hp, self.pct_hp)
+
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        # Add computed properties for backward compatibility
+        d["min_damage"] = self.min_damage
+        d["max_damage"] = self.max_damage
+        d["total_damage"] = self.total_damage
+        d["total_min_damage"] = self.total_min_damage
+        d["total_max_damage"] = self.total_max_damage
+        d["pct_hp_range"] = self.pct_hp_range
+        return d
 
 
 # 属性名到 stat name 的映射
@@ -113,29 +142,61 @@ class DamageCalculator:
         if power <= 0 or damage_type not in (2, 3):
             return None
 
-        # SDT → type chart ID 转换
         raw_dam_type = skill_meta.get("skill_dam_type", 0)
         skill_element = SDT_TO_TYPE.get(raw_dam_type, raw_dam_type)
 
-        confidence = "high"
-        warnings: List[str] = []
+        # Phase 1: Resolve power
+        power, _ = self._resolve_power(power, skill_meta, attacker, defender)
 
-        # === 阶段 1/4: pre_power — 可修正威力 ===
+        # Phase 2: Resolve combat stats
+        stats = self._resolve_combat_stats(attacker, defender, damage_type, power)
+        if stats is None:
+            return None
+        effective_atk, effective_def, ability_level, confidence, warnings = stats
+
+        # Phase 3: Compute base damage
+        base = self._compute_base_damage(power, effective_atk, effective_def, skill_meta, attacker, defender)
+
+        # Phase 4: Apply multipliers (effectiveness, STAB, weather, hooks)
+        mult_result = self._apply_multipliers(base, skill_element, attacker, defender, skill_meta, weather)
+        dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab = mult_result
+
+        # Phase 5: Finalize (post_calc hooks, hit count, HP%, energy, result)
+        return self._finalize_damage(
+            dmg, power, ability_level, effective_atk, effective_def,
+            effectiveness, stab_mult, weather_mult, power_mult,
+            skill_meta, skill_element, attacker, defender,
+            damage_type, eff_label, is_stab, confidence, warnings,
+        )
+
+    # ------------------------------------------------------------------
+    # Calculation phases
+    # ------------------------------------------------------------------
+
+    def _resolve_power(
+        self, power: int, skill_meta: Dict, attacker: Dict, defender: Dict,
+    ) -> Tuple[int, Dict[str, Any]]:
+        """阶段 1: pre_power hook — 可修正威力。"""
         ctx = self._run_hooks("pre_power", {
             "power": power,
             "skill_meta": skill_meta,
             "attacker": attacker,
             "defender": defender,
         })
-        power = ctx["power"]
+        return ctx["power"], ctx
 
-        # 获取基础攻防属性
+    def _resolve_combat_stats(
+        self, attacker: Dict, defender: Dict, damage_type: int, power: int,
+    ) -> Optional[Tuple[float, float, float, str, List[str]]]:
+        """获取有效攻防属性、能力等级和置信度。返回 None 如果无法获取属性。"""
+        confidence = "high"
+        warnings: List[str] = []
+
         atk_name = _ATK_STAT[damage_type]
         def_name = _DEF_STAT[damage_type]
         base_atk = self._get_stat(attacker, atk_name)
         base_def = self._get_stat(defender, def_name)
 
-        # 回退到 wiki 数据
         if base_atk is None:
             base_atk = self._get_wiki_stat(attacker, atk_name)
             if base_atk is not None:
@@ -150,7 +211,6 @@ class DamageCalculator:
         if base_atk is None or base_def is None:
             return None
 
-        # NRC_AI 能力等级计算
         atk_mods = get_buff_stat_modifiers(attacker.get("buffs", []))
         def_mods = get_buff_stat_modifiers(defender.get("buffs", []))
         atk_up = atk_mods.get(f"{atk_name.lower()}_up", 0.0)
@@ -168,38 +228,43 @@ class DamageCalculator:
         if ability_level != 1.0:
             warnings.append(f"能力等级 ×{ability_level:.2f}")
 
-        # 基础伤害: NRC_AI 公式
-        base = self._base_damage(effective_atk, effective_def, power)
+        return effective_atk, effective_def, ability_level, confidence, warnings
 
-        # === 阶段 2/4: post_base — 可修正基础伤害 ===
+    def _compute_base_damage(
+        self, power: int, eff_atk: float, eff_def: float,
+        skill_meta: Dict, attacker: Dict, defender: Dict,
+    ) -> float:
+        """阶段 2: 基础伤害公式 + post_base hook。"""
+        base = self._base_damage(eff_atk, eff_def, power)
         ctx = self._run_hooks("post_base", {
             "base_damage": base,
             "power": power,
-            "atk_val": effective_atk,
-            "def_val": effective_def,
+            "atk_val": eff_atk,
+            "def_val": eff_def,
             "skill_meta": skill_meta,
             "attacker": attacker,
             "defender": defender,
         })
-        base = ctx["base_damage"]
+        return ctx["base_damage"]
 
-        # 属性克制 (使用 type chart ID)
+    def _apply_multipliers(
+        self,
+        base: float, skill_element: int,
+        attacker: Dict, defender: Dict, skill_meta: Dict,
+        weather: Optional[Dict],
+    ) -> Tuple[int, float, float, float, float, str, bool]:
+        """阶段 3: 属性克制、STAB、天气、pre_final hook。"""
         defender_types = defender.get("types", [])
         effectiveness = self.chart.get_multiplier(skill_element, defender_types)
         eff_label = self.chart.get_effectiveness_label(effectiveness)
 
-        # STAB (使用 type chart ID)
         attacker_types = attacker.get("types", [])
         is_stab = skill_element in attacker_types
         stab_mult = _STAB_MULTIPLIER if is_stab else 1.0
 
-        # 天气修正
         weather_mult = get_weather_damage_mult(weather, skill_element)
-
-        # 独立威力乘法层 (默认 1.0, 可由 hook 修改)
         power_mult = 1.0
 
-        # === 阶段 3/4: pre_final — 可修正属性克制/STAB/天气/威力乘法 ===
         ctx = self._run_hooks("pre_final", {
             "base_damage": base,
             "effectiveness": effectiveness,
@@ -216,10 +281,21 @@ class DamageCalculator:
         weather_mult = ctx.get("weather_mult", weather_mult)
         power_mult = ctx.get("power_mult", power_mult)
 
-        # 最终伤害 (确定性, 无随机因子)
         dmg = max(1, int(base * effectiveness * stab_mult * weather_mult * power_mult))
+        return dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab
 
-        # === 阶段 4/4: post_calc — 可修正最终伤害/连击数 ===
+    def _finalize_damage(
+        self,
+        dmg: int, power: int, ability_level: float,
+        effective_atk: float, effective_def: float,
+        effectiveness: float, stab_mult: float,
+        weather_mult: float, power_mult: float,
+        skill_meta: Dict, skill_element: int,
+        attacker: Dict, defender: Dict,
+        damage_type: int, eff_label: str, is_stab: bool,
+        confidence: str, warnings: List[str],
+    ) -> DamageResult:
+        """阶段 4: post_calc hook、连击、HP%、能耗、构造结果。"""
         base_hits = self._get_base_hit_count(skill_meta)
         ctx = self._run_hooks("post_calc", {
             "min_damage": dmg,
@@ -233,17 +309,14 @@ class DamageCalculator:
         })
         dmg = ctx["min_damage"]
 
-        # 连击信息
         hit_count = ctx.get("hit_count", 1)
         total_damage = dmg * hit_count
 
-        # HP 百分比
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1
         defender_cur_hp = defender.get("current_hp") or 0
         pct = total_damage / defender_max_hp
         can_ko = total_damage >= defender_cur_hp
 
-        # 能耗
         energy_costs = skill_meta.get("energy_cost", [0])
         energy_cost = energy_costs[0] if energy_costs else 0
         if energy_cost > 0:
@@ -251,10 +324,7 @@ class DamageCalculator:
             if attacker_energy < energy_cost:
                 warnings.append(f"能量不足 (需要{energy_cost}, 当前{attacker_energy})")
 
-        # 有效威力 = 基础威力 × 本系修正 (游戏中的显示方式)
         effective_power = int(power * stab_mult)
-
-        # 伤害分解
         breakdown = {
             "base_power": self._get_power(skill_meta),
             "effective_power": effective_power,
@@ -280,15 +350,11 @@ class DamageCalculator:
             effectiveness_label=eff_label,
             is_stab=is_stab,
             expected_damage=dmg,
-            min_damage=dmg,
-            max_damage=dmg,
-            pct_hp_range=(round(pct, 3), round(pct, 3)),
+            pct_hp=round(pct, 3),
             can_ko=can_ko,
             energy_cost=energy_cost,
             confidence=confidence,
             hit_count=hit_count,
-            total_min_damage=total_damage,
-            total_max_damage=total_damage,
             power_mult=power_mult,
             weather_mult=weather_mult,
             damage_breakdown=breakdown,

@@ -14,8 +14,17 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from src.analysis.battle_advisor import BattleAdvisor
+from src.analysis.battle_advisor import BattleAdvisor, build_state_suggestions
 from src.analysis.battle_state import BattleStateTracker
+from src.analysis.constants import (
+    DAMAGE_OPCODES,
+    OPCODE_ACTION_RESOLVE,
+    OPCODE_BATTLE_ENTER,
+    OPCODE_BATTLE_FINISH,
+    OPCODE_LABELS,
+    OPCODE_ROUND_START,
+    OPCODE_SPECIAL_REFRESH,
+)
 from src.analysis.event_formatter import format_battle_event, FormattedEvent
 from src.analysis.hook_registry import HookContext, HookRegistry, HookTrigger
 from src.analysis.hooks import create_default_hooks
@@ -37,18 +46,18 @@ class ProcessResult:
 # Opcode → HookTrigger 映射（唯一定义）
 # ---------------------------------------------------------------------------
 _OPCODE_TRIGGER_MAP: Dict[int, List[HookTrigger]] = {
-    0x1316: [HookTrigger.ON_BATTLE_ENTER],
-    0x131A: [HookTrigger.ON_ROUND_START],
-    0x1324: [HookTrigger.ON_ACTION_RESOLVE],
-    0x13F4: [HookTrigger.ON_SPECIAL_REFRESH],
-    0x132C: [HookTrigger.ON_BATTLE_FINISH],
+    OPCODE_BATTLE_ENTER: [HookTrigger.ON_BATTLE_ENTER],
+    OPCODE_ROUND_START: [HookTrigger.ON_ROUND_START],
+    OPCODE_ACTION_RESOLVE: [HookTrigger.ON_ACTION_RESOLVE],
+    OPCODE_SPECIAL_REFRESH: [HookTrigger.ON_SPECIAL_REFRESH],
+    OPCODE_BATTLE_FINISH: [HookTrigger.ON_BATTLE_FINISH],
 }
 
 
 class BattleProcessor:
     """纯同步战斗事件处理器。持有 tracker/advisor/hooks，编排完整计算管线。"""
 
-    _DAMAGE_OPCODES = {0x1316, 0x131A, 0x1324, 0x13F4}
+    _DAMAGE_OPCODES = DAMAGE_OPCODES
 
     def __init__(self) -> None:
         self.tracker = BattleStateTracker()
@@ -78,7 +87,7 @@ class BattleProcessor:
             hook_advice_dicts = self._run_hooks(opcode, detail, state)
 
         # 4. 建议
-        suggestions = self.tracker.get_suggestions()
+        suggestions = build_state_suggestions(state)
 
         return ProcessResult(
             state=state,
@@ -127,7 +136,7 @@ class BattleProcessor:
             entries=detail.get("entries", []),
         )
 
-        if opcode == 0x1316:
+        if opcode == OPCODE_BATTLE_ENTER:
             registry.notify_battle_enter(ctx)
 
         triggers = self.opcode_to_triggers(opcode, detail)
@@ -135,7 +144,7 @@ class BattleProcessor:
         for trigger in triggers:
             all_advice.extend(registry.dispatch(trigger, ctx))
 
-        if opcode == 0x132C:
+        if opcode == OPCODE_BATTLE_FINISH:
             registry.notify_battle_finish(ctx)
 
         return [a.to_dict() for a in all_advice]
@@ -144,7 +153,7 @@ class BattleProcessor:
     def opcode_to_triggers(opcode: int, detail: Dict[str, Any]) -> List[HookTrigger]:
         """opcode → HookTrigger 映射。0x1324 额外检查 entries 中的 kind。"""
         triggers = list(_OPCODE_TRIGGER_MAP.get(opcode, []))
-        if opcode == 0x1324:
+        if opcode == OPCODE_ACTION_RESOLVE:
             for entry in detail.get("entries", []):
                 kind = entry.get("kind")
                 if kind == "change_pet":
@@ -169,3 +178,42 @@ class BattleProcessor:
     def battle_active(self) -> bool:
         state = self.tracker.get_state()
         return state.get("battle_id") is not None and state.get("result") is None
+
+
+# ---------------------------------------------------------------------------
+# Battle summary computation
+# ---------------------------------------------------------------------------
+
+def compute_battle_summary(state: Dict[str, Any]) -> Dict[str, Any]:
+    """根据最终战斗状态生成摘要（双方宠物存活、事件统计）。"""
+    my_pets_final = []
+    for p in state.get("my_pets", []):
+        my_pets_final.append({
+            "name": p.get("name", "?"),
+            "hp": p.get("current_hp", 0),
+            "max_hp": p.get("max_hp", 0),
+            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
+        })
+    opp_pets_final = []
+    for p in state.get("opp_pets", []):
+        opp_pets_final.append({
+            "name": p.get("name", "?"),
+            "hp": p.get("current_hp", 0),
+            "max_hp": p.get("max_hp", 0),
+            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
+        })
+
+    raw_events = state.get("events", [])
+    event_stats: Dict[str, int] = {}
+    for e in raw_events:
+        opc = e.get("opcode", 0)
+        key = OPCODE_LABELS.get(opc, hex(opc))
+        event_stats[key] = event_stats.get(key, 0) + 1
+
+    return {
+        "result": state.get("result"),
+        "rounds": state.get("round"),
+        "my_pets_final": my_pets_final,
+        "opp_pets_final": opp_pets_final,
+        "event_stats": event_stats,
+    }

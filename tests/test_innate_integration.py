@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import pytest
-from pathlib import Path
 
 from src.analysis.battle_state import BattleStateTracker, POISON_BUFF_IDS
 from src.analysis.damage_calc import DamageCalculator
@@ -14,19 +13,6 @@ from src.analysis.innate_hooks import (
     type_resist_modify_hook,
 )
 from src.game.type_chart import TypeChart
-from tests.packet_reader import load_battle_packets, replay_battle
-
-SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
-
-
-@pytest.fixture(scope="module")
-def battle_packets():
-    return load_battle_packets(SESSION_DIR)
-
-
-@pytest.fixture(scope="module")
-def replay_result(battle_packets):
-    return replay_battle(battle_packets)
 
 
 # ---------------------------------------------------------------------------
@@ -37,33 +23,33 @@ def replay_result(battle_packets):
 class TestPetStateDefaults:
     """Verify combo_bonus and poison_stacks are initialized on all pets."""
 
-    def test_my_pets_have_combo_bonus(self, replay_result):
-        _, state = replay_result
+    def test_my_pets_have_combo_bonus(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for pet in state["my_pets"]:
             assert "combo_bonus" in pet, f"Pet {pet['name']} missing combo_bonus"
             assert isinstance(pet["combo_bonus"], int)
 
-    def test_opp_pets_have_combo_bonus(self, replay_result):
-        _, state = replay_result
+    def test_opp_pets_have_combo_bonus(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for pet in state["opp_pets"]:
             assert "combo_bonus" in pet, f"Pet {pet['name']} missing combo_bonus"
             assert isinstance(pet["combo_bonus"], int)
 
-    def test_my_pets_have_poison_stacks(self, replay_result):
-        _, state = replay_result
+    def test_my_pets_have_poison_stacks(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for pet in state["my_pets"]:
             assert "poison_stacks" in pet, f"Pet {pet['name']} missing poison_stacks"
             assert isinstance(pet["poison_stacks"], int)
 
-    def test_opp_pets_have_poison_stacks(self, replay_result):
-        _, state = replay_result
+    def test_opp_pets_have_poison_stacks(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for pet in state["opp_pets"]:
             assert "poison_stacks" in pet, f"Pet {pet['name']} missing poison_stacks"
             assert isinstance(pet["poison_stacks"], int)
 
-    def test_default_combo_bonus_is_zero(self, replay_result):
+    def test_default_combo_bonus_is_zero(self, session1_baseline_result):
         """All pets start with combo_bonus=0 (no combo_skill_cast events in this session)."""
-        _, state = replay_result
+        _, state = session1_baseline_result
         for pet in state["my_pets"] + state["opp_pets"]:
             assert pet["combo_bonus"] == 0, f"Pet {pet['name']} has non-zero combo_bonus"
 
@@ -79,9 +65,9 @@ class TestPoisonStackTracking:
     def test_poison_buff_ids_defined(self):
         assert len(POISON_BUFF_IDS) > 0
 
-    def test_poison_events_in_replay(self, replay_result):
+    def test_poison_events_in_replay(self, session1_baseline_result):
         """battle_session_1 has effect_apply events with poison buff IDs."""
-        events, _ = replay_result
+        events, _ = session1_baseline_result
         poison_events = []
         for e in events:
             detail = e.get("detail", {})
@@ -94,17 +80,17 @@ class TestPoisonStackTracking:
                     poison_events.append(entry)
         assert len(poison_events) > 0, "No poison effect_apply events found"
 
-    def test_opponent_pets_with_poison(self, replay_result):
+    def test_opponent_pets_with_poison(self, session1_baseline_result):
         """Specific opponent pets should have poison_stacks > 0."""
-        _, state = replay_result
+        _, state = session1_baseline_result
         poisoned = [p for p in state["opp_pets"] if p.get("poison_stacks", 0) > 0]
         assert len(poisoned) >= 1, "Expected at least 1 poisoned opponent pet"
         for p in poisoned:
             assert p["poison_stacks"] > 0, f"Pet {p['name']} poison_stacks should be > 0"
 
-    def test_poison_stacks_value_from_stage(self, replay_result):
+    def test_poison_stacks_value_from_stage(self, session1_baseline_result):
         """poison_stacks should match the last effect_stage from poison buff events."""
-        events, state = replay_result
+        events, state = session1_baseline_result
         # Collect poison effect events per side
         poison_by_side = {}
         for e in events:
@@ -144,9 +130,9 @@ class TestInnateHooksWithRealData:
         assert opp is not None, "opp_active is None"
         return my, opp
 
-    def test_calculate_with_innate_hooks(self, replay_result):
+    def test_calculate_with_innate_hooks(self, session1_baseline_result):
         """DamageCalculator with innate hooks produces valid results on replay data."""
-        _, state = replay_result
+        _, state = session1_baseline_result
         my, opp = self._get_active_pair(state)
 
         calc = DamageCalculator(TypeChart())
@@ -164,9 +150,9 @@ class TestInnateHooksWithRealData:
             assert r.total_min_damage >= r.min_damage
             assert r.total_max_damage >= r.max_damage
 
-    def test_damage_result_fields_present(self, replay_result):
+    def test_damage_result_fields_present(self, session1_baseline_result):
         """DamageResult has hit_count, total_min_damage, total_max_damage fields."""
-        _, state = replay_result
+        _, state = session1_baseline_result
         my, opp = self._get_active_pair(state)
 
         calc = DamageCalculator(TypeChart())
@@ -188,9 +174,9 @@ class TestInnateHooksWithRealData:
             assert d["total_min_damage"] == d["min_damage"] * d["hit_count"]
             assert d["total_max_damage"] == d["max_damage"] * d["hit_count"]
 
-    def test_hooks_dont_crash_with_replay_data(self, replay_result):
+    def test_hooks_dont_crash_with_replay_data(self, session1_baseline_result):
         """All four hooks execute without error on replay pet state."""
-        _, state = replay_result
+        _, state = session1_baseline_result
         my = state["my_active"]
         opp = state["opp_active"]
         if my is None or opp is None:
@@ -230,9 +216,9 @@ class TestInnateHooksWithRealData:
 class TestComboBonusReset:
     """Verify combo_bonus resets to 0 when pet switches."""
 
-    def test_combo_bonus_reset_on_change_pet(self, replay_result):
+    def test_combo_bonus_reset_on_change_pet(self, session1_baseline_result):
         """Pets that switched in should have combo_bonus=0 (reset on change_pet)."""
-        events, state = replay_result
+        events, state = session1_baseline_result
         # Find pets that were switched in via change_pet entries
         switched_pet_ids = set()
         for e in events:

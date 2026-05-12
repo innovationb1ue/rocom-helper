@@ -23,6 +23,14 @@ pytest tests/test_crypto.py     # Run a single test file
 pytest -k "test_name"           # Run tests matching a name pattern
 ```
 
+### Headless Replay (后端自闭环)
+```bash
+py -m scripts.replay_headless --session battle_session_1       # Text summary with events, predictions, hooks
+py -m scripts.replay_headless --session battle_session_1 --json  # Full JSON output
+py -m scripts.replay_headless --round 7                        # Stop at round 7
+py -m scripts.generate_battle_report --json                    # Generate report file (docs/battle_report.txt)
+```
+
 ### Frontend (from `web/`)
 ```bash
 npm run dev                     # Vite dev server on :5173
@@ -82,6 +90,25 @@ cd web && npm run dev
 
 **Always delete screenshot files immediately after reviewing them.** When taking screenshots (via MCP `take_screenshot` or any other method), delete the file as soon as you've analyzed it. Never leave `.png`/`.jpg`/`.jpeg` screenshot files lingering in the project directory. This applies to both main agent and subagent usage.
 
+### 5. Headless Replay Verification (后端自闭环回放验证)
+
+当要求进行"后端自闭环验证"时，使用 `BattleReplayRunner` 进行纯后端验证，无需启动服务器或前端。
+
+**步骤：**
+
+1. **运行 headless replay** — 使用 Bash 运行：
+   ```bash
+   py -m scripts.replay_headless --session battle_session_1
+   ```
+2. **检查输出完整性** — 验证输出包含：
+   - 每回合的格式化事件（skill_cast, damage, defeat, effect_apply 等）
+   - 每回合的伤害预测（技能名称、预期伤害、效果标签、KO 标记）
+   - 建议（低血量、低能量、击杀提示等）
+   - Hook 建议（换宠建议、能量监控、对手行为分析）
+   - 最终状态（双方阵容 HP）
+3. **运行 JSON 输出对比** — 使用 `--json` 生成结构化数据进行字段级验证
+4. **运行相关测试** — `pytest tests/test_replay_runner.py -v` 确保所有回放测试通过
+
 ## Architecture
 
 The system is a layered pipeline with clear boundaries between capture, parsing, analysis, and presentation:
@@ -106,10 +133,12 @@ protocol/
   ▼
 analysis/
   ├── battle_state.py ── Real-time battle state machine (HP, energy, buffs, turn tracking)
+  ├── battle_processor.py ── Pure sync event processor (state + formatting + damage + hooks), shared by BattleManager and ReplayRunner
   ├── battle_advisor.py ── Battle analysis coordinator (skill analysis + damage prediction)
   ├── damage_calc.py ── Damage calculation engine with 4-stage hook pipeline
   ├── innate_hooks.py ── Innate skill damage hooks (combo/stat/type/power modifications)
   ├── event_formatter.py ── Protocol events → UI-ready formatted events
+  ├── replay_runner.py ── Headless replay runner (no FastAPI/WebSocket), produces ReplayResult with per-event snapshots
   ├── hook_registry.py ── Extensible analysis hook system (ABC-based, lifecycle-aware)
   ├── hooks/
   │   ├── __init__.py ── Default hook factory

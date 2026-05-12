@@ -29,36 +29,56 @@ def _print_summary(result) -> None:
         print(f"(Stopped early at round {result.rounds[-1].round_num})")
     print()
 
-    # Per-round damage predictions
+    # Per-round detail
     for rs in result.rounds:
-        if not rs.damage_predictions:
+        if rs.round_num == 0:
             continue
-        print(f"--- Round {rs.round_num} ---")
-        opp = rs.state_at_end.get("opp_active")
-        opp_name = opp.get("name", "?") if opp else "?"
-        opp_hp = opp.get("current_hp", "?") if opp else "?"
-        opp_max = opp.get("max_hp", "?") if opp else "?"
-        print(f"  Target: {opp_name}  HP: {opp_hp}/{opp_max}")
-        for pred in rs.damage_predictions:
-            ko_mark = " [KO]" if pred.get("can_ko") else ""
-            eff = pred.get("effectiveness_label", "") or ""
-            name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
-            exp_dmg = pred.get("expected_damage", "?")
-            min_d = pred.get("min_damage", "?")
-            max_d = pred.get("max_damage", "?")
-            print(f"  {name:20s}  dmg: {exp_dmg!s:>5}  range: [{min_d!s}-{max_d!s}]  eff: {eff}{ko_mark}")
-        print()
+        has_content = rs.formatted_events or rs.damage_predictions or rs.suggestions
+        if not has_content:
+            continue
 
-    # Hook advice
-    all_hooks = []
-    for ev in result.events:
-        all_hooks.extend(ev.hook_advice)
-    if all_hooks:
-        print("=== Hook Advice ===")
-        for ha in all_hooks:
-            print(f"  [{ha['hook_id']}] {ha['title']}")
-            for msg in ha.get("messages", []):
-                print(f"    - {msg.get('message', '')}")
+        print(f"--- Round {rs.round_num} ---")
+
+        # Active pets
+        for key, label in [("my_active", "My"), ("opp_active", "Opp")]:
+            pet = rs.state_at_end.get(key) or rs.state_at_start.get(key)
+            if pet:
+                name = pet.get("name", "?")
+                hp = pet.get("current_hp", 0)
+                max_hp = pet.get("max_hp", 0)
+                energy = pet.get("energy", 0)
+                print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}")
+
+        # Formatted events
+        if rs.formatted_events:
+            for fe in rs.formatted_events:
+                kind = fe.get("kind", "?")
+                summary = fe.get("summary", "")
+                print(f"  [{kind:20s}] {summary}")
+
+        # Suggestions
+        if rs.suggestions:
+            for sug in rs.suggestions:
+                print(f"  SUGGEST: [{sug.get('type', '?')}] {sug.get('message', '')}")
+
+        # Damage predictions
+        if rs.damage_predictions:
+            for pred in rs.damage_predictions:
+                ko_mark = " [KO]" if pred.get("can_ko") else ""
+                eff = pred.get("effectiveness_label", "") or ""
+                name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
+                exp_dmg = pred.get("expected_damage", "?")
+                min_d = pred.get("min_damage", "?")
+                max_d = pred.get("max_damage", "?")
+                print(f"  {name:20s}  dmg: {exp_dmg!s:>5}  range: [{min_d!s}-{max_d!s}]  eff: {eff}{ko_mark}")
+
+        # Hook advice for this round
+        for ev in rs.events:
+            for ha in ev.hook_advice:
+                print(f"  HOOK: [{ha.get('hook_id', '?')}] {ha.get('title', '')}")
+                for msg in ha.get("messages", []):
+                    print(f"    - {msg.get('message', '')}")
+
         print()
 
     # Final state
@@ -103,6 +123,8 @@ def main():
             "rounds": [
                 {
                     "round_num": rs.round_num,
+                    "formatted_events": rs.formatted_events,
+                    "suggestions": rs.suggestions,
                     "damage_predictions": rs.damage_predictions,
                     "battle_advice": rs.battle_advice,
                 }

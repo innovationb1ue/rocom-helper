@@ -5,3 +5,5 @@ uvicorn[standard]>=0.27
 httpx>=0.26
 beautifulsoup4>=4.12
 pytest>=7.4
+pytest-xdist>=3.5
+pytest-timeout>=2.2

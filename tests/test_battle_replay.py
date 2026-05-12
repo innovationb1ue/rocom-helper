@@ -14,25 +14,14 @@ from src.protocol.proto_core import (
 )
 from src.protocol.opcodes import summarize
 from src.analysis.battle_state import BattleStateTracker
-from src.analysis.event_formatter import format_battle_event, compute_battle_summary
+from src.analysis.battle_processor import compute_battle_summary
+from src.analysis.event_formatter import format_battle_event
 from tests.packet_reader import (
     read_bin_packet,
-    load_battle_packets,
-    replay_battle,
     BATTLE_OPCODES,
 )
 
 SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
-
-
-@pytest.fixture(scope="module")
-def battle_packets():
-    return load_battle_packets(SESSION_DIR)
-
-
-@pytest.fixture(scope="module")
-def replay_result(battle_packets):
-    return replay_battle(battle_packets)
 
 
 # ---------------------------------------------------------------------------
@@ -67,18 +56,18 @@ class TestPacketReader:
 
 
 class TestBattlePipeline:
-    def test_all_packets_parseable(self, battle_packets):
-        assert len(battle_packets) > 0, "No battle packets found"
-        for item in battle_packets:
+    def test_all_packets_parseable(self, session1_packets):
+        assert len(session1_packets) > 0, "No battle packets found"
+        for item in session1_packets:
             assert item["record"] is not None, f"parse_record returned None for {item['filename']}"
 
-    def test_all_packets_have_known_opcodes(self, battle_packets):
-        unknown = [item for item in battle_packets if item["opcode"] not in BATTLE_OPCODES]
+    def test_all_packets_have_known_opcodes(self, session1_packets):
+        unknown = [item for item in session1_packets if item["opcode"] not in BATTLE_OPCODES]
         assert not unknown, f"Unexpected opcodes: {[(i['filename'], hex(i['opcode'])) for i in unknown]}"
 
-    def test_summarize_not_unknown(self, battle_packets):
+    def test_summarize_not_unknown(self, session1_packets):
         unknown = []
-        for item in battle_packets:
+        for item in session1_packets:
             record = item["record"]
             inner = None
             if record.get("opcode") == 0x0414:
@@ -88,12 +77,12 @@ class TestBattlePipeline:
                 unknown.append((item["filename"], hex(item["opcode"])))
         assert not unknown, f"Unknown opcodes in summarize: {unknown}"
 
-    def test_battle_enter_present(self, battle_packets):
-        enter = [p for p in battle_packets if p["opcode"] == 0x1316]
+    def test_battle_enter_present(self, session1_packets):
+        enter = [p for p in session1_packets if p["opcode"] == 0x1316]
         assert len(enter) == 1, f"Expected 1 battle_enter, got {len(enter)}"
 
-    def test_battle_finish_present(self, battle_packets):
-        finish = [p for p in battle_packets if p["opcode"] == 0x132C]
+    def test_battle_finish_present(self, session1_packets):
+        finish = [p for p in session1_packets if p["opcode"] == 0x132C]
         assert len(finish) == 1, f"Expected 1 battle_finish, got {len(finish)}"
 
 
@@ -103,35 +92,35 @@ class TestBattlePipeline:
 
 
 class TestWrapperExtraction:
-    def test_1316_wrappers_have_pets(self, battle_packets):
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
+    def test_1316_wrappers_have_pets(self, session1_packets):
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
         wrappers = extract_state_wrappers_from_record(enter["record"])
         assert len(wrappers) >= 2, f"Expected >= 2 wrappers, got {len(wrappers)}"
 
-    def test_wrappers_have_side(self, battle_packets):
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
+    def test_wrappers_have_side(self, session1_packets):
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
         wrappers = extract_state_wrappers_from_record(enter["record"])
         for w in wrappers:
             assert "side" in w and w["side"] is not None, (
                 f"Wrapper missing 'side' field: pet={w.get('name')} slot={w.get('slot')}"
             )
 
-    def test_wrappers_have_pet_names(self, battle_packets):
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
+    def test_wrappers_have_pet_names(self, session1_packets):
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
         wrappers = extract_state_wrappers_from_record(enter["record"])
         for w in wrappers:
             assert w.get("name"), f"Wrapper missing name: {w}"
 
-    def test_wrappers_have_hp(self, battle_packets):
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
+    def test_wrappers_have_hp(self, session1_packets):
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
         wrappers = extract_state_wrappers_from_record(enter["record"])
         for w in wrappers:
             assert w.get("max_hp") is not None or w.get("battle_max_hp") is not None, (
                 f"Wrapper missing max_hp: pet={w.get('name')}"
             )
 
-    def test_both_sides_present(self, battle_packets):
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
+    def test_both_sides_present(self, session1_packets):
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
         wrappers = extract_state_wrappers_from_record(enter["record"])
         sides = set(w.get("side") for w in wrappers)
         assert 1 in sides, f"No 我方(side=1) pets found, sides={sides}"
@@ -144,44 +133,44 @@ class TestWrapperExtraction:
 
 
 class TestBattleStateReplay:
-    def test_my_pets_populated(self, replay_result):
-        _, state = replay_result
+    def test_my_pets_populated(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert len(state["my_pets"]) > 0, "my_pets is empty after battle replay"
 
-    def test_opp_pets_populated(self, replay_result):
-        _, state = replay_result
+    def test_opp_pets_populated(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert len(state["opp_pets"]) > 0, "opp_pets is empty after battle replay"
 
-    def test_battle_id_set(self, replay_result):
-        _, state = replay_result
+    def test_battle_id_set(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert state["battle_id"] is not None, "battle_id not set"
 
-    def test_battle_result(self, replay_result):
-        _, state = replay_result
+    def test_battle_result(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert state["result"] in ("WIN", "LOSE", "RUNAWAY", "WIN_DEFEAT", "MONSTER_RUNAWAY", "WIN_HP", "WIN_CATCH", "RUNAWAY_ROLE_MAGIC"), (
             f"Unexpected result: {state['result']}"
         )
 
-    def test_rounds_tracked(self, replay_result):
-        events, state = replay_result
+    def test_rounds_tracked(self, session1_baseline_result):
+        events, state = session1_baseline_result
         round_events = [e for e in events if e["opcode"] == 0x131A]
         assert len(round_events) > 0, "No round_start events processed"
         assert state["round"] > 0, "Round not incremented"
 
-    def test_events_collected(self, replay_result):
-        _, state = replay_result
+    def test_events_collected(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert len(state["events"]) >= 10, f"Too few events: {len(state['events'])}"
 
-    def test_my_active_set(self, replay_result):
-        _, state = replay_result
+    def test_my_active_set(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert state["my_active"] is not None, "my_active not set"
 
-    def test_opp_active_set(self, replay_result):
-        _, state = replay_result
+    def test_opp_active_set(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert state["opp_active"] is not None, "opp_active not set"
 
-    def test_hp_changes_tracked(self, replay_result):
-        events, state = replay_result
+    def test_hp_changes_tracked(self, session1_baseline_result):
+        events, state = session1_baseline_result
         damage_events = [
             e for e in events
             if e["opcode"] == 0x1324
@@ -190,22 +179,22 @@ class TestBattleStateReplay:
         ]
         assert len(damage_events) > 0, "No damage events found in replay"
 
-    def test_all_six_opponent_pets_tracked(self, replay_result):
-        _, state = replay_result
+    def test_all_six_opponent_pets_tracked(self, session1_baseline_result):
+        _, state = session1_baseline_result
         assert len(state["opp_pets"]) == 6, (
             f"Expected 6 opponent pets, got {len(state['opp_pets'])}: "
             f"{[p['name'] for p in state['opp_pets']]}"
         )
 
-    def test_opponent_pets_have_known_names(self, replay_result):
-        _, state = replay_result
+    def test_opponent_pets_have_known_names(self, session1_baseline_result):
+        _, state = session1_baseline_result
         expected = {"白发路路", "火神", "翼龙", "利灯鱼", "咔咔鸟"}
         opp_names = {p["name"] for p in state["opp_pets"]}
         missing = expected - opp_names
         assert not missing, f"Missing opponent pets: {missing}, got: {opp_names}"
 
-    def test_opponent_pets_have_valid_hp(self, replay_result):
-        _, state = replay_result
+    def test_opponent_pets_have_valid_hp(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for p in state["opp_pets"]:
             assert p["max_hp"] > 0, f"Opponent pet {p['name']} has no max_hp"
             assert p["current_hp"] >= 0, f"Opponent pet {p['name']} has negative hp"
@@ -213,8 +202,8 @@ class TestBattleStateReplay:
                 f"Opponent pet {p['name']} hp={p['current_hp']} > max_hp={p['max_hp']}"
             )
 
-    def test_player_pets_have_valid_hp(self, replay_result):
-        _, state = replay_result
+    def test_player_pets_have_valid_hp(self, session1_baseline_result):
+        _, state = session1_baseline_result
         for p in state["my_pets"]:
             assert p["max_hp"] > 0, f"Player pet {p['name']} has no max_hp"
             assert p["current_hp"] >= 0, f"Player pet {p['name']} has negative hp"
@@ -222,9 +211,9 @@ class TestBattleStateReplay:
                 f"Player pet {p['name']} hp={p['current_hp']} > max_hp={p['max_hp']}"
             )
 
-    def test_round_start_wrappers_have_side(self, battle_packets):
+    def test_round_start_wrappers_have_side(self, session1_packets):
         from src.protocol.proto_core import extract_state_wrappers_from_record
-        rs = [p for p in battle_packets if p["opcode"] == 0x131A]
+        rs = [p for p in session1_packets if p["opcode"] == 0x131A]
         assert len(rs) > 0, "No round_start packets"
         for item in rs:
             wrappers = extract_state_wrappers_from_record(item["record"])
@@ -241,9 +230,9 @@ class TestBattleStateReplay:
 
 
 @pytest.fixture(scope="module")
-def formatted_replay(replay_result):
+def formatted_replay(session1_baseline_result):
     """Replay all events through EventFormatter, return (formatted_events, state)."""
-    events, state = replay_result
+    events, state = session1_baseline_result
     all_formatted = []
     for e in events:
         opcode = e["opcode"]
@@ -341,28 +330,28 @@ class TestEventFormatterReplay:
 
 
 class TestBattleSummaryReplay:
-    def test_summary_computed(self, replay_result):
-        _, state = replay_result
+    def test_summary_computed(self, session1_baseline_result):
+        _, state = session1_baseline_result
         summary = compute_battle_summary(state)
         assert summary["result"] is not None
         assert summary["rounds"] > 0
 
-    def test_summary_pet_counts(self, replay_result):
-        _, state = replay_result
+    def test_summary_pet_counts(self, session1_baseline_result):
+        _, state = session1_baseline_result
         summary = compute_battle_summary(state)
         assert len(summary["my_pets_final"]) == len(state["my_pets"])
         assert len(summary["opp_pets_final"]) == len(state["opp_pets"])
 
-    def test_summary_final_hp_valid(self, replay_result):
-        _, state = replay_result
+    def test_summary_final_hp_valid(self, session1_baseline_result):
+        _, state = session1_baseline_result
         summary = compute_battle_summary(state)
         for p in summary["my_pets_final"] + summary["opp_pets_final"]:
             assert p["hp"] >= 0
             assert p["max_hp"] > 0
             assert p["status"] in ("存活", "战败")
 
-    def test_summary_event_stats(self, replay_result):
-        _, state = replay_result
+    def test_summary_event_stats(self, session1_baseline_result):
+        _, state = session1_baseline_result
         summary = compute_battle_summary(state)
         assert len(summary["event_stats"]) > 0
         total = sum(summary["event_stats"].values())

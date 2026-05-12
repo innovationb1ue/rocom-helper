@@ -6,7 +6,8 @@ from pathlib import Path
 
 from src.protocol.proto_core import extract_state_wrappers_from_record, extract_inner_message
 from src.analysis.battle_state import BattleStateTracker
-from src.analysis.event_formatter import format_battle_event, compute_battle_summary
+from src.analysis.battle_processor import compute_battle_summary
+from src.analysis.event_formatter import format_battle_event
 from tests.packet_reader import load_battle_packets, replay_battle, BATTLE_OPCODES
 
 SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_2"

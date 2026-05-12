@@ -21,11 +21,14 @@ from src.data.loader import (
 
 
 @pytest.fixture(autouse=True)
-def _fresh_cache():
-    """每个测试前清空缓存，确保从文件重新加载。"""
-    invalidate_cache()
-    yield
-    invalidate_cache()
+def _fresh_cache(request):
+    """Only invalidate cache for tests that explicitly test caching behavior."""
+    if "TestCacheInvalidation" in request.node.nodeid:
+        invalidate_cache()
+        yield
+        invalidate_cache()
+    else:
+        yield
 
 
 def _utf8_print(text: str) -> None:

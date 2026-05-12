@@ -13,13 +13,12 @@ BattleReplayRunner 将 packets 馈入 BattleProcessor，
 """
 from __future__ import annotations
 
-import copy
 import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from src.analysis.battle_processor import BattleProcessor
-from src.analysis.event_formatter import compute_battle_summary
+from src.analysis.battle_processor import BattleProcessor, compute_battle_summary
+from src.analysis.constants import OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START
 from src.protocol.opcodes import summarize
 from src.protocol.proto_core import extract_inner_message
 
@@ -40,6 +39,7 @@ class ReplayEventSnapshot:
     formatted_events: List[Dict[str, Any]] = field(default_factory=list)
     battle_advice: Optional[Dict[str, Any]] = None
     hook_advice: List[Dict[str, Any]] = field(default_factory=list)
+    suggestions: List[Dict[str, str]] = field(default_factory=list)
 
 
 @dataclass
@@ -50,6 +50,8 @@ class RoundSnapshot:
     state_at_end: Dict[str, Any] = field(default_factory=dict)
     battle_advice: Optional[Dict[str, Any]] = None
     damage_predictions: List[Dict[str, Any]] = field(default_factory=list)
+    formatted_events: List[Dict[str, Any]] = field(default_factory=list)
+    suggestions: List[Dict[str, str]] = field(default_factory=list)
 
 
 @dataclass
@@ -103,7 +105,7 @@ class BattleReplayRunner:
             if detail is None:
                 detail = {}
 
-            state_before = copy.deepcopy(processor.get_state())
+            state_before = processor.get_state()
             result = processor.process_event(opcode, detail)
             state_after = result.state
 
@@ -124,6 +126,9 @@ class BattleReplayRunner:
             if self._include_hooks:
                 hook_advice_dicts = result.hook_advice
 
+            # Suggestions
+            suggestions = result.suggestions
+
             snap = ReplayEventSnapshot(
                 index=idx,
                 opcode=opcode,
@@ -134,6 +139,7 @@ class BattleReplayRunner:
                 formatted_events=formatted_dicts,
                 battle_advice=battle_advice_dict,
                 hook_advice=hook_advice_dicts,
+                suggestions=suggestions,
             )
             event_snapshots.append(snap)
 
@@ -146,12 +152,14 @@ class BattleReplayRunner:
             rs = round_map[current_round]
             rs.events.append(snap)
             rs.state_at_end = state_after
+            rs.formatted_events.extend(formatted_dicts)
+            rs.suggestions.extend(suggestions)
             if battle_advice_dict:
                 rs.battle_advice = battle_advice_dict
                 rs.damage_predictions = battle_advice_dict.get("skill_analysis", [])
 
             # Stop early check
-            if stop_round is not None and current_round >= stop_round and opcode in (0x1324, 0x131A):
+            if stop_round is not None and current_round >= stop_round and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
                 stopped_early = True
                 break
 

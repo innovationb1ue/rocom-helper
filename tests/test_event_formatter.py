@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import pytest
 
+from src.analysis.battle_processor import compute_battle_summary
 from src.analysis.event_formatter import (
     FormattedEvent,
-    compute_battle_summary,
     format_action_entry,
     format_battle_enter,
     format_battle_event,

@@ -5,6 +5,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookTrigger
+from src.analysis.constants import OPCODE_ACTION_RESOLVE
 from src.game.type_chart import TypeChart
 
 logger = logging.getLogger(__name__)
@@ -67,7 +68,7 @@ class SwitchAdvisorHook(AnalysisHook):
 
         # On opponent switch, analyze new matchup
         is_opp_switch = False
-        if ctx.opcode == 0x1324:
+        if ctx.opcode == OPCODE_ACTION_RESOLVE:
             for entry in ctx.entries:
                 if entry.get("kind") == "change_pet":
                     side_val = entry.get("target_side", entry.get("actor_side"))

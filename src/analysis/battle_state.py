@@ -17,6 +17,18 @@ import copy
 import logging
 from typing import Any, Dict, List, Optional
 
+from src.analysis.pet_info import PetInfo
+from src.analysis.constants import (
+    OPCODE_ACTION_RESOLVE,
+    OPCODE_BATTLE_ENTER,
+    OPCODE_BATTLE_FINISH,
+    OPCODE_ROUND_FLOW,
+    OPCODE_ROUND_START,
+    OPCODE_SKILL_DECLARE,
+    OPCODE_SKILL_SELECT,
+    OPCODE_SPECIAL_REFRESH,
+)
+
 logger = logging.getLogger(__name__)
 
 POISON_BUFF_IDS = {20070010}
@@ -56,21 +68,21 @@ class BattleStateTracker:
         event.update(detail)
         self.state["events"].append(event)
 
-        if opcode == 0x1316:
+        if opcode == OPCODE_BATTLE_ENTER:
             self._handle_battle_enter(detail)
-        elif opcode == 0x131A:
+        elif opcode == OPCODE_ROUND_START:
             self._handle_round_start(detail)
-        elif opcode == 0x1324:
+        elif opcode == OPCODE_ACTION_RESOLVE:
             self._handle_action_resolve(detail)
-        elif opcode == 0x132C:
+        elif opcode == OPCODE_BATTLE_FINISH:
             self._handle_battle_finish(detail)
-        elif opcode == 0x130B:
+        elif opcode == OPCODE_SKILL_SELECT:
             self._handle_skill_select(detail)
-        elif opcode == 0x13F4:
+        elif opcode == OPCODE_SPECIAL_REFRESH:
             self._handle_special_refresh(detail)
-        elif opcode == 0x1322:
+        elif opcode == OPCODE_SKILL_DECLARE:
             self._handle_skill_declare(detail)
-        elif opcode == 0x1312:
+        elif opcode == OPCODE_ROUND_FLOW:
             self._handle_round_flow(detail)
 
         return self.get_state()
@@ -86,39 +98,9 @@ class BattleStateTracker:
         return None
 
     def get_suggestions(self) -> List[Dict[str, str]]:
-        """基于当前状态给出实时建议。"""
-        suggestions: List[Dict[str, str]] = []
-        seen: set = set()
-        my_active = self.state["my_active"]
-        opp_active = self.state["opp_active"]
-
-        if my_active is None or opp_active is None:
-            return suggestions
-
-        my_hp_pct = my_active.get("hp_pct", 1.0)
-        if my_hp_pct < 0.25:
-            suggestions.append({"type": "low_hp", "message": "我方精灵HP过低，考虑换宠"})
-
-        opp_hp_pct = opp_active.get("hp_pct", 1.0)
-        if opp_hp_pct < 0.25:
-            suggestions.append({"type": "finish_off", "message": "对手精灵HP极低，可尝试击杀"})
-
-        if my_active.get("energy", 0) < 2:
-            suggestions.append({"type": "low_energy", "message": "能量不足，考虑使用低能耗技能或能量瓶"})
-
-        my_buffs = my_active.get("buffs", [])
-        negative_buffs = [b for b in my_buffs if b.get("stacks", 0) < 0]
-        if len(negative_buffs) >= 2:
-            suggestions.append({"type": "debuffed", "message": "我方精灵有多个负面状态"})
-
-        # Deduplicate by (type, message)
-        unique: List[Dict[str, str]] = []
-        for s in suggestions:
-            key = (s["type"], s["message"])
-            if key not in seen:
-                seen.add(key)
-                unique.append(s)
-        return unique
+        """基于当前状态给出实时建议。委托给 battle_advisor.build_state_suggestions。"""
+        from src.analysis.battle_advisor import build_state_suggestions
+        return build_state_suggestions(self.state)
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
         self.state["battle_id"] = detail.get("battle_id")
@@ -145,33 +127,8 @@ class BattleStateTracker:
         my_pets = []
         opp_pets = []
         for w in wrappers:
+            pet_info = PetInfo.from_wrapper(w, default_energy=5).to_dict()
             equipped = w.get("equipped_skills") or []
-            initial_buffs = w.get("initial_buffs", [])
-            pet_info = {
-                "pet_id": w.get("pet_id") or w.get("pet_gid"),
-                "name": w.get("pet_name") or w.get("name", "?"),
-                "types": w.get("types", []),
-                "current_hp": w.get("hp") or w.get("current_hp", 0),
-                "max_hp": w.get("max_hp", 0),
-                "energy": 5,
-                "buffs": list(initial_buffs),
-                "initial_buff_ids": [b["id"] for b in initial_buffs if "id" in b],
-                "innate_skill_id": w.get("passive_skill_id"),
-                "level": w.get("level"),
-                "slot": w.get("slot"),
-                "side": w.get("side"),
-                "stats": w.get("stats", []),
-                "skills": w.get("skills", []),
-                "equipped_skills": equipped,
-                "base_id": w.get("base_id"),
-                "base_skill_pool": w.get("base_skill_pool"),
-                "combo_bonus": 0,
-                "poison_stacks": 0,
-            }
-            if pet_info["max_hp"] > 0:
-                pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
-            else:
-                pet_info["hp_pct"] = 1.0
             side = w.get("side")
             side_label = "MY" if (side == 1 or side == "我方") else "OPP"
             logger.info(
@@ -219,183 +176,183 @@ class BattleStateTracker:
     #   change_pet → 切换活跃精灵（匹配: pet_id → name → slot → 新建）
     #   effect_apply → 添加/更新 buff
     #   effect_stage → 更新 buff 阶段
+
+    _ENTRY_HANDLERS = {
+        "damage": "_handle_damage_entry",
+        "skill_cast": "_handle_skill_cast_entry",
+        "combo_skill_cast": "_handle_combo_skill_cast_entry",
+        "defeat": "_handle_defeat_entry",
+        "heal": "_handle_heal_entry",
+        "energy": "_handle_energy_entry",
+        "change_pet": "_handle_change_pet_entry",
+        "effect_apply": "_handle_effect_apply_entry",
+        "effect_stage": "_handle_effect_stage_entry",
+    }
+
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
-        entries = detail.get("entries", [])
-        for entry in entries:
-            kind = entry.get("kind")
-            if kind == "damage":
-                target_side = entry.get("damage_target_side")
-                damage = entry.get("damage", 0)
-                target_hp = entry.get("target_hp_after")
-                is_opp = not self._is_mine(target_side)
-                active_key = "opp_active" if is_opp else "my_active"
-                active = self.state[active_key]
-                if active is not None:
-                    active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
-                    if active.get("max_hp", 0) > 0:
-                        active["hp_pct"] = active["current_hp"] / active["max_hp"]
-                    else:
-                        active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
+        for entry in detail.get("entries", []):
+            handler_name = self._ENTRY_HANDLERS.get(entry.get("kind"))
+            if handler_name:
+                getattr(self, handler_name)(entry)
 
-            elif kind == "skill_cast":
-                actor_side = entry.get("actor_side", "")
-                energy_delta = entry.get("energy_delta", 0)
-                energy_after = entry.get("energy_after")
-                active_key = "my_active" if self._is_mine(actor_side) else "opp_active"
-                active = self.state[active_key]
-                if active is not None:
-                    # 记录使用过的技能
-                    skill_id = entry.get("skill_id")
-                    if skill_id is not None:
-                        used = active.setdefault("used_skills", [])
-                        if not any(s.get("skill_id") == skill_id for s in used):
-                            item = {"skill_id": skill_id}
-                            if entry.get("skill_name"):
-                                item["skill_name"] = entry["skill_name"]
-                            used.append(item)
-                    if energy_after is not None:
-                        active["energy"] = energy_after
-                    else:
-                        active["energy"] = max(0, active.get("energy", 5) + energy_delta)
+    def _get_active_for_side(self, side_value: Any) -> Optional[Dict[str, Any]]:
+        """根据 side 值获取对应的活跃宠物字典。"""
+        active_key = "my_active" if self._is_mine(side_value) else "opp_active"
+        return self.state[active_key]
 
-            elif kind == "combo_skill_cast":
-                actor_side = entry.get("actor_side")
-                combo_count = entry.get("combo_count")
-                if actor_side is not None and combo_count is not None:
-                    active_key = "my_active" if self._is_mine(actor_side) else "opp_active"
-                    active = self.state[active_key]
-                    if active is not None:
-                        active["combo_bonus"] = combo_count
+    def _handle_damage_entry(self, entry: Dict[str, Any]) -> None:
+        target_side = entry.get("damage_target_side")
+        damage = entry.get("damage", 0)
+        target_hp = entry.get("target_hp_after")
+        active = self._get_active_for_side(target_side)
+        if active is None:
+            return
+        # target_side 的 is_mine 已在 _get_active_for_side 中处理
+        # 但 damage_target_side 语义是"被攻击方"，需要取反
+        active_key = "opp_active" if not self._is_mine(target_side) else "my_active"
+        active = self.state[active_key]
+        active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
+        if active.get("max_hp", 0) > 0:
+            active["hp_pct"] = active["current_hp"] / active["max_hp"]
+        else:
+            active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
 
-            elif kind == "defeat":
-                defeated_side = entry.get("target_side", "")
-                is_mine = self._is_mine(defeated_side)
-                active_key = "my_active" if is_mine else "opp_active"
-                active = self.state[active_key]
-                if active is not None:
-                    active["current_hp"] = 0
-                    active["hp_pct"] = 0.0
+    def _handle_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
+        actor_side = entry.get("actor_side", "")
+        energy_delta = entry.get("energy_delta", 0)
+        energy_after = entry.get("energy_after")
+        active = self._get_active_for_side(actor_side)
+        if active is None:
+            return
+        skill_id = entry.get("skill_id")
+        if skill_id is not None:
+            used = active.setdefault("used_skills", [])
+            if not any(s.get("skill_id") == skill_id for s in used):
+                item = {"skill_id": skill_id}
+                if entry.get("skill_name"):
+                    item["skill_name"] = entry["skill_name"]
+                used.append(item)
+        if energy_after is not None:
+            active["energy"] = energy_after
+        else:
+            active["energy"] = max(0, active.get("energy", 5) + energy_delta)
 
-            elif kind == "heal":
-                target_side = entry.get("target_side")
-                hp_after = entry.get("target_hp_after")
-                if target_side is not None and hp_after is not None:
-                    is_mine = self._is_mine(target_side)
-                    active_key = "my_active" if is_mine else "opp_active"
-                    active = self.state[active_key]
-                    if active is not None and active["max_hp"] > 0:
-                        active["current_hp"] = hp_after
-                        active["hp_pct"] = hp_after / active["max_hp"]
+    def _handle_combo_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
+        actor_side = entry.get("actor_side")
+        combo_count = entry.get("combo_count")
+        if actor_side is not None and combo_count is not None:
+            active = self._get_active_for_side(actor_side)
+            if active is not None:
+                active["combo_bonus"] = combo_count
 
-            elif kind == "energy":
-                target_side = entry.get("target_side") or entry.get("actor_side")
-                energy_after = entry.get("energy_after")
-                energy_delta = entry.get("energy_delta")
-                if target_side is not None:
-                    is_mine = self._is_mine(target_side)
-                    active_key = "my_active" if is_mine else "opp_active"
-                    active = self.state[active_key]
-                    if active is not None:
-                        if energy_after is not None:
-                            active["energy"] = energy_after
-                        elif energy_delta is not None:
-                            active["energy"] = max(0, active.get("energy", 5) + energy_delta)
+    def _handle_defeat_entry(self, entry: Dict[str, Any]) -> None:
+        defeated_side = entry.get("target_side", "")
+        active = self._get_active_for_side(defeated_side)
+        if active is not None:
+            active["current_hp"] = 0
+            active["hp_pct"] = 0.0
 
-            elif kind == "change_pet":
-                battle_pet_id = entry.get("battle_pet_id")
-                new_pet_name = entry.get("new_pet_name")
-                new_pet_id = entry.get("new_pet_id")
-                new_pet_types = entry.get("new_pet_types", [])
-                new_pet_level = entry.get("new_pet_level")
-                if battle_pet_id is not None:
-                    is_opp = int(battle_pet_id) >= 401
-                    pet_list = self.state["opp_pets"] if is_opp else self.state["my_pets"]
-                    active_key = "opp_active" if is_opp else "my_active"
-                    active = self.state[active_key]
-                    if active is not None:
-                        entry["_prev_active_name"] = active.get("name", "?")
-                    matched = None
-                    # Match by real pet_id
-                    if new_pet_id is not None:
-                        for pet in pet_list:
-                            if pet.get("pet_id") == new_pet_id:
-                                matched = pet
-                                break
-                    # Match by name
-                    if matched is None and new_pet_name:
-                        for pet in pet_list:
-                            if pet.get("name") == new_pet_name:
-                                matched = pet
-                                break
-                    # Match by slot position (player slots 1-6 map to index 0-5)
-                    if matched is None and not is_opp:
-                        idx = int(battle_pet_id) - 1
-                        if 0 <= idx < len(pet_list):
-                            matched = pet_list[idx]
-                    # Not found — create a new pet entry from extracted data
-                    if matched is None and new_pet_name:
-                        matched = {
-                            "pet_id": new_pet_id,
-                            "name": new_pet_name,
-                            "types": new_pet_types,
-                            "current_hp": 0,
-                            "max_hp": 0,
-                            "hp_pct": 1.0,
-                            "energy": 5,
-                            "buffs": [],
-                            "slot": battle_pet_id,
-                            "level": new_pet_level,
-                            "side": 401 if is_opp else 1,
-                            "combo_bonus": 0,
-                            "poison_stacks": 0,
-                        }
-                        pet_list.append(matched)
-                    if matched is not None:
-                        self.state[active_key] = matched
-                        matched["buffs"] = []
-                        matched["combo_bonus"] = 0
+    def _handle_heal_entry(self, entry: Dict[str, Any]) -> None:
+        target_side = entry.get("target_side")
+        hp_after = entry.get("target_hp_after")
+        if target_side is None or hp_after is None:
+            return
+        active = self._get_active_for_side(target_side)
+        if active is not None and active["max_hp"] > 0:
+            active["current_hp"] = hp_after
+            active["hp_pct"] = hp_after / active["max_hp"]
 
-            elif kind == "effect_apply":
-                target_side = entry.get("target_side")
-                effect_id = entry.get("effect_id")
-                if target_side is not None and effect_id is not None:
-                    is_mine = self._is_mine(target_side)
-                    active_key = "my_active" if is_mine else "opp_active"
-                    active = self.state[active_key]
-                    if active is not None:
-                        buffs = active.setdefault("buffs", [])
-                        stage = entry.get("effect_stage")
-                        ename = entry.get("effect_name")
-                        existing = next((b for b in buffs if b["id"] == effect_id), None)
-                        if existing:
-                            if stage is not None:
-                                existing["stage"] = stage
-                            existing["turns_applied"] = existing.get("turns_applied", 0) + 1
-                        else:
-                            buffs.append({
-                                "id": effect_id,
-                                "name": ename or str(effect_id),
-                                "stage": stage,
-                                "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
-                                "turns_applied": 1,
-                            })
-                        # 追踪中毒层数
-                        if effect_id in POISON_BUFF_IDS:
-                            active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
+    def _handle_energy_entry(self, entry: Dict[str, Any]) -> None:
+        target_side = entry.get("target_side") or entry.get("actor_side")
+        energy_after = entry.get("energy_after")
+        energy_delta = entry.get("energy_delta")
+        if target_side is None:
+            return
+        active = self._get_active_for_side(target_side)
+        if active is not None:
+            if energy_after is not None:
+                active["energy"] = energy_after
+            elif energy_delta is not None:
+                active["energy"] = max(0, active.get("energy", 5) + energy_delta)
 
-            elif kind == "effect_stage":
-                actor_side = entry.get("actor_side")
-                effect_id = entry.get("effect_id")
-                new_stage = entry.get("effect_stage")
-                if actor_side is not None:
-                    is_mine = self._is_mine(actor_side)
-                    active_key = "my_active" if is_mine else "opp_active"
-                    active = self.state[active_key]
-                    if active is not None:
-                        buffs = active.get("buffs", [])
-                        existing = next((b for b in buffs if b["id"] == effect_id), None)
-                        if existing and new_stage is not None:
-                            existing["stage"] = new_stage
+    def _handle_change_pet_entry(self, entry: Dict[str, Any]) -> None:
+        battle_pet_id = entry.get("battle_pet_id")
+        new_pet_name = entry.get("new_pet_name")
+        new_pet_id = entry.get("new_pet_id")
+        if battle_pet_id is None:
+            return
+        is_opp = int(battle_pet_id) >= 401
+        pet_list = self.state["opp_pets"] if is_opp else self.state["my_pets"]
+        active_key = "opp_active" if is_opp else "my_active"
+        active = self.state[active_key]
+        if active is not None:
+            entry["_prev_active_name"] = active.get("name", "?")
+        matched = None
+        # Match by real pet_id
+        if new_pet_id is not None:
+            for pet in pet_list:
+                if pet.get("pet_id") == new_pet_id:
+                    matched = pet
+                    break
+        # Match by name
+        if matched is None and new_pet_name:
+            for pet in pet_list:
+                if pet.get("name") == new_pet_name:
+                    matched = pet
+                    break
+        # Match by slot position (player slots 1-6 map to index 0-5)
+        if matched is None and not is_opp:
+            idx = int(battle_pet_id) - 1
+            if 0 <= idx < len(pet_list):
+                matched = pet_list[idx]
+        # Not found — create a new pet entry from extracted data
+        if matched is None and new_pet_name:
+            matched = PetInfo.from_change_pet(entry, battle_pet_id, is_opp).to_dict()
+            pet_list.append(matched)
+        if matched is not None:
+            self.state[active_key] = matched
+            matched["buffs"] = []
+            matched["combo_bonus"] = 0
+
+    def _handle_effect_apply_entry(self, entry: Dict[str, Any]) -> None:
+        target_side = entry.get("target_side")
+        effect_id = entry.get("effect_id")
+        if target_side is None or effect_id is None:
+            return
+        active = self._get_active_for_side(target_side)
+        if active is None:
+            return
+        buffs = active.setdefault("buffs", [])
+        stage = entry.get("effect_stage")
+        ename = entry.get("effect_name")
+        existing = next((b for b in buffs if b["id"] == effect_id), None)
+        if existing:
+            if stage is not None:
+                existing["stage"] = stage
+            existing["turns_applied"] = existing.get("turns_applied", 0) + 1
+        else:
+            buffs.append({
+                "id": effect_id,
+                "name": ename or str(effect_id),
+                "stage": stage,
+                "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
+                "turns_applied": 1,
+            })
+        if effect_id in POISON_BUFF_IDS:
+            active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
+
+    def _handle_effect_stage_entry(self, entry: Dict[str, Any]) -> None:
+        actor_side = entry.get("actor_side")
+        effect_id = entry.get("effect_id")
+        new_stage = entry.get("effect_stage")
+        if actor_side is None:
+            return
+        active = self._get_active_for_side(actor_side)
+        if active is not None:
+            buffs = active.get("buffs", [])
+            existing = next((b for b in buffs if b["id"] == effect_id), None)
+            if existing and new_stage is not None:
+                existing["stage"] = new_stage
 
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
@@ -501,32 +458,7 @@ class BattleStateTracker:
                         self.state[active_key] = pet
                     break
             if matched is None:
-                init_buffs = w.get("initial_buffs", [])
-                pet_info = {
-                    "pet_id": pet_id,
-                    "name": w.get("name", "?"),
-                    "types": w.get("types", []),
-                    "current_hp": w.get("hp") or w.get("current_hp", 0),
-                    "max_hp": w.get("max_hp", 0),
-                    "energy": w.get("energy", 5),
-                    "buffs": list(init_buffs),
-                    "initial_buff_ids": [b["id"] for b in init_buffs if "id" in b],
-                    "innate_skill_id": w.get("passive_skill_id"),
-                    "slot": w.get("slot"),
-                    "level": w.get("level"),
-                    "side": w.get("side"),
-                    "stats": w.get("stats", []),
-                    "skills": w.get("skills", []),
-                    "equipped_skills": w.get("equipped_skills", []),
-                    "base_id": w.get("base_id"),
-                    "base_skill_pool": w.get("base_skill_pool"),
-                    "combo_bonus": 0,
-                    "poison_stacks": 0,
-                }
-                if pet_info["max_hp"] > 0:
-                    pet_info["hp_pct"] = pet_info["current_hp"] / pet_info["max_hp"]
-                else:
-                    pet_info["hp_pct"] = 1.0
+                pet_info = PetInfo.from_wrapper(w).to_dict()
                 pet_list.append(pet_info)
                 matched = pet_list[-1]
             # Update active pet only for first wrapper per side

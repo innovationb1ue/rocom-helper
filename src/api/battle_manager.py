@@ -17,9 +17,13 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import WebSocket
 
-from src.analysis.battle_processor import BattleProcessor
+from src.analysis.battle_processor import BattleProcessor, ProcessResult, compute_battle_summary
+from src.analysis.constants import (
+    IN_BATTLE_OPCODES,
+    LIFECYCLE_OPCODES,
+    OPCODE_BATTLE_FINISH,
+)
 from src.analysis.battle_state import BattleStateTracker
-from src.analysis.event_formatter import compute_battle_summary
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +31,8 @@ logger = logging.getLogger(__name__)
 class BattleManager:
     """管理 WebSocket 连接和事件推送，核心计算委托给 BattleProcessor。"""
 
-    _LIFECYCLE_OPCODES = {0x1316, 0x131A, 0x132C, 0x0102}
-    _IN_BATTLE_OPCODES = {
-        0x130B, 0x1322, 0x1324, 0x13F4, 0x130C,
-        0x01A9, 0x0220, 0x13FC, 0x13F3, 0x1312,
-        0x1326, 0x132A, 0x132D, 0x1334, 0x133C, 0x13F6,
-    }
+    _LIFECYCLE_OPCODES = LIFECYCLE_OPCODES
+    _IN_BATTLE_OPCODES = IN_BATTLE_OPCODES
 
     def __init__(self) -> None:
         self._processor = BattleProcessor()
@@ -103,15 +103,15 @@ class BattleManager:
     # Core processing — delegates to BattleProcessor, then pushes WebSocket
     # ------------------------------------------------------------------
 
-    async def process_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
+    async def process_event(self, opcode: int, detail: Dict[str, Any]) -> ProcessResult:
         result = self._processor.process_event(opcode, detail)
 
         if result.formatted_events:
             await self._push_events(result.formatted_events)
 
-        await self._push_state(result.state)
+        await self._push_state(result.state, result.suggestions)
 
-        if opcode == 0x132C:
+        if opcode == OPCODE_BATTLE_FINISH:
             summary = compute_battle_summary(result.state)
             await self._push_summary(summary)
 
@@ -121,13 +121,15 @@ class BattleManager:
         if result.hook_advice:
             await self._push_hook_advice_dicts(result.hook_advice)
 
-        return result.state
+        return result
 
     # ------------------------------------------------------------------
     # WebSocket push helpers
     # ------------------------------------------------------------------
 
-    async def _push_state(self, state: Dict[str, Any]) -> None:
+    async def _push_state(
+        self, state: Dict[str, Any], suggestions: Optional[List[Dict[str, str]]] = None,
+    ) -> None:
         text = json.dumps({"type": "state_update", "state": state}, ensure_ascii=False)
         dead: List[WebSocket] = []
         for ws in self._ws_clients:
@@ -138,7 +140,6 @@ class BattleManager:
         for ws in dead:
             self._ws_clients.remove(ws)
 
-        suggestions = self._processor.tracker.get_suggestions()
         if suggestions:
             sug_text = json.dumps({"type": "suggestions", "suggestions": suggestions}, ensure_ascii=False)
             for ws in self._ws_clients:
@@ -181,16 +182,12 @@ class BattleManager:
     async def _push_damage_analysis_dict(
         self, advice_dict: Dict[str, Any], state: Dict[str, Any],
     ) -> None:
-        from src.analysis.battle_advisor import BattleAdvisor
-
-        opp_active = state.get("opp_active")
-        opp_traits = BattleAdvisor._extract_traits(opp_active) if opp_active else []
         msg = json.dumps(
             {
                 "type": "skill_analysis",
                 "skills": advice_dict.get("skill_analysis", []),
                 "traits": advice_dict.get("traits", []),
-                "opp_traits": opp_traits,
+                "opp_traits": advice_dict.get("opp_traits", []),
             },
             ensure_ascii=False,
         )
@@ -232,11 +229,10 @@ class BattleManager:
             opcode = data.get("opcode")
             detail = data.get("detail", {})
             if opcode is not None:
-                state = self._processor.tracker.handle_event(opcode, detail)
-                await ws.send_json({"type": "state_update", "state": state})
-                suggestions = self._processor.tracker.get_suggestions()
-                if suggestions:
-                    await ws.send_json({"type": "suggestions", "suggestions": suggestions})
+                result = self._processor.process_event(opcode, detail)
+                await ws.send_json({"type": "state_update", "state": result.state})
+                if result.suggestions:
+                    await ws.send_json({"type": "suggestions", "suggestions": result.suggestions})
 
         elif msg_type == "get_state":
             state = self._processor.get_state()

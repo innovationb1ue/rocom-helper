@@ -9,8 +9,9 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from src.analysis.battle_processor import compute_battle_summary
 from src.analysis.battle_state import BattleStateTracker
-from src.analysis.event_formatter import format_battle_event, compute_battle_summary
+from src.analysis.constants import OPCODE_ROUND_START
 from src.api.battle_manager import get_battle_manager
 
 logger = logging.getLogger(__name__)
@@ -139,25 +140,21 @@ async def replay_battle_packets(
             detail = {}
 
         # 如果指定了 stop_round，在处理 round_start 前检查是否超出目标回合
-        if stop_round is not None and opcode == 0x131A:
+        if stop_round is not None and opcode == OPCODE_ROUND_START:
             current_round = mgr.get_state().get("round", 0)
             incoming_round = detail.get("round", current_round + 1)
             if incoming_round > stop_round:
                 stopped_early = True
                 break
 
-        state = await mgr.process_event(opcode, detail)
+        result = await mgr.process_event(opcode, detail)
         processed += 1
-
-        if state.get("result") is None:
-            round_num = state.get("round", 0)
-            formatted = format_battle_event(opcode, detail, state, round_num)
-            total_formatted += len(formatted)
+        total_formatted += len(result.formatted_events)
 
         if delay_ms > 0:
             await asyncio.sleep(delay_ms / 1000.0)
 
-    final_state = mgr.get_state()
+    final_state = result.state
 
     return {
         "status": "ok",

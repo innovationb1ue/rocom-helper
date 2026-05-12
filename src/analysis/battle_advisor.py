@@ -8,7 +8,8 @@ BattleAdvisor 是伤害分析的入口点，它:
 输出为 BattleAdvice 数据结构:
   - skill_analysis: 所有装备技能的详细分析（含伤害预测）
   - suggestions: 基于分析的建议列表
-  - traits: 检测到的先天技能特征
+  - traits: 检测到的我方先天技能特征
+  - opp_traits: 检测到的对方先天技能特征
 """
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ from typing import Any, Dict, List, Optional
 
 from src.analysis.damage_calc import DamageCalculator, DamageResult
 from src.analysis.innate_hooks import register_innate_hooks
+from src.analysis.constants import SDT_TO_TYPE
 from src.data.loader import get_skill_meta, get_skill_name
 from src.game.type_chart import TypeChart
 
@@ -58,12 +60,14 @@ class BattleAdvice:
     skill_analysis: List[SkillAnalysis] = field(default_factory=list)
     suggestions: List[Dict[str, str]] = field(default_factory=list)
     traits: List[Dict[str, str]] = field(default_factory=list)
+    opp_traits: List[Dict[str, str]] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
             "skill_analysis": [s.to_dict() for s in self.skill_analysis],
             "suggestions": self.suggestions,
             "traits": self.traits,
+            "opp_traits": self.opp_traits,
         }
 
 
@@ -87,11 +91,13 @@ class BattleAdvisor:
         skill_analysis = self._build_skill_analysis(my_active, opp_active, equipped, weather)
         suggestions = self._build_suggestions(my_active, opp_active, skill_analysis)
         traits = self._extract_traits(my_active)
+        opp_traits = self._extract_traits(opp_active)
 
         return BattleAdvice(
             skill_analysis=skill_analysis,
             suggestions=suggestions,
             traits=traits,
+            opp_traits=opp_traits,
         )
 
     def _build_skill_analysis(
@@ -152,7 +158,6 @@ class BattleAdvisor:
         if desc is None and meta:
             desc = meta.get("desc")
         if element == 0 and meta:
-            from src.protocol.proto_core import SDT_TO_TYPE
             dt = meta.get("skill_dam_type")
             if dt is not None:
                 element = SDT_TO_TYPE.get(dt, 0)
@@ -249,3 +254,38 @@ class BattleAdvisor:
                 _add(innate.get("name", "?"), innate.get("description", ""))
 
         return traits
+
+
+def build_state_suggestions(state: Dict[str, Any]) -> List[Dict[str, str]]:
+    """基于当前战斗状态的实时建议（低血量、击杀机会、能量不足、负面状态）。"""
+    suggestions: List[Dict[str, str]] = []
+    seen: set = set()
+    my_active = state.get("my_active")
+    opp_active = state.get("opp_active")
+
+    if my_active is None or opp_active is None:
+        return suggestions
+
+    my_hp_pct = my_active.get("hp_pct", 1.0)
+    if my_hp_pct < 0.25:
+        suggestions.append({"type": "low_hp", "message": "我方精灵HP过低，考虑换宠"})
+
+    opp_hp_pct = opp_active.get("hp_pct", 1.0)
+    if opp_hp_pct < 0.25:
+        suggestions.append({"type": "finish_off", "message": "对手精灵HP极低，可尝试击杀"})
+
+    if my_active.get("energy", 0) < 2:
+        suggestions.append({"type": "low_energy", "message": "能量不足，考虑使用低能耗技能或能量瓶"})
+
+    my_buffs = my_active.get("buffs", [])
+    negative_buffs = [b for b in my_buffs if b.get("stacks", 0) < 0]
+    if len(negative_buffs) >= 2:
+        suggestions.append({"type": "debuffed", "message": "我方精灵有多个负面状态"})
+
+    unique: List[Dict[str, str]] = []
+    for s in suggestions:
+        key = (s["type"], s["message"])
+        if key not in seen:
+            seen.add(key)
+            unique.append(s)
+    return unique

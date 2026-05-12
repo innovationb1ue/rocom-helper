@@ -6,6 +6,7 @@ from collections import Counter
 from typing import Any, Dict, List, Optional
 
 from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookTrigger
+from src.analysis.constants import OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +47,13 @@ class OpponentTrackerHook(AnalysisHook):
     def process(self, ctx: HookContext) -> Optional[HookAdvice]:
         messages: List[Dict[str, str]] = []
 
-        if ctx.opcode == 0x131A:
+        if ctx.opcode == OPCODE_ROUND_START:
             self._total_rounds = ctx.round_num
 
-        if ctx.opcode == 0x1324:
+        if ctx.opcode == OPCODE_ACTION_RESOLVE:
             messages = self._process_action(ctx)
 
-        if ctx.opcode == 0x1324:
+        if ctx.opcode == OPCODE_ACTION_RESOLVE:
             for entry in ctx.entries:
                 if entry.get("kind") == "change_pet":
                     new_name = entry.get("new_pet_name", "?")
