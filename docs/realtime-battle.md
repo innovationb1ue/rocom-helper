@@ -178,6 +178,8 @@ state = {
     "hp_pct": 0.8,           # HP 百分比 (0.0~1.0)
     "energy": 5,              # 能量 (0~10)
     "buffs": [...],           # 增益/减益状态
+    "combo_bonus": 0,         # 连击数修正值（combo_skill_cast 事件更新）
+    "poison_stacks": 0,       # 中毒层数（effect_apply 事件更新）
 }
 ```
 
@@ -199,6 +201,74 @@ state = {
 | 敌方 HP < 25% | "对手精灵HP极低，可尝试击杀" |
 | 能量 < 2 | "能量不足，考虑使用低能耗技能或能量瓶" |
 | 负面状态 ≥ 2 | "我方精灵有多个负面状态" |
+
+除上述简单规则建议外，系统还提供两种高级分析：
+
+1. **伤害预测分析**（消息类型 `skill_analysis`）: 对我方精灵的所有装备技能计算伤害预测，含连击总伤害、击杀判断、属性克制信息。由 `BattleAdvisor` 驱动，在 battle_enter、round_start、action_resolve、special_refresh 时触发。
+
+2. **分析 Hook 建议**（消息类型 `hook_advice`）: 基于战斗生命周期的可插拔分析模块，包括对手模式追踪、能量窗口检测、属性换宠建议等。
+
+### 2.6.1 伤害预测分析
+
+**文件：** `src/analysis/battle_advisor.py`、`src/analysis/damage_calc.py`、`src/analysis/innate_hooks.py`
+
+伤害预测系统在战斗进行中对当前精灵的所有装备技能进行伤害计算，提供击杀判断、属性克制等信息。
+
+#### 伤害计算管线 (4 阶段 Hook)
+
+`DamageCalculator` 实现确定性伤害预测：
+
+```
+base = (ATK / DEF) * power * 0.9
+damage = base * effectiveness * stab * weather * hits * power_mult
+```
+
+管线分为 4 个阶段，每个阶段可注册 Hook 函数修改计算参数：
+
+| 阶段 | 上下文字段 | 用途 |
+|------|-----------|------|
+| `pre_power` | power, skill_meta, attacker, defender | 修正技能威力 |
+| `post_base` | base_damage, atk_val, def_val | 修正基础伤害 |
+| `pre_final` | base_damage, effectiveness, stab_mult | 修正属性克制/本系修正 |
+| `post_calc` | min_damage, max_damage, hit_count | 修正最终伤害/连击数 |
+
+#### 先天技能 Hook
+
+`innate_hooks.py` 提供四个 Hook 函数，由 `register_innate_hooks()` 注册：
+
+| Hook 函数 | 注册阶段 | effect_type | 效果 |
+|-----------|---------|-------------|------|
+| `stat_modify_hook` | post_base | stat_modify | HP 低于阈值时百分比提升伤害 |
+| `type_resist_modify_hook` | pre_final | type_resist_modify | 提升属性克制倍率下限（如无视抵抗） |
+| `combo_modify_hook` | post_calc | combo_modify | 增加连击次数，总伤害 = 单次 × 连击 |
+| `power_modify_hook` | post_calc | power_modify | 附加效果如先手吸血 |
+
+支持触发条件：`always`、`per_poison_stack`、`skill_element_used`、`hp_below`、`first_strike`
+
+#### BattleAdvisor
+
+`BattleAdvisor` 是伤害分析入口：
+1. 创建 `DamageCalculator` 并注册先天技能 Hook
+2. 对我方精灵的所有装备技能计算伤害预测
+3. 生成 `BattleAdvice`（含 `skill_analysis`、`suggestions`、`traits`）
+
+#### 分析 Hook 系统
+
+**文件：** `src/analysis/hook_registry.py`、`src/analysis/hooks/`
+
+独立的 ABC Hook 系统，基于战斗生命周期事件触发：
+
+| 触发器 | 时机 |
+|--------|------|
+| ON_BATTLE_ENTER | 战斗开始 |
+| ON_ROUND_START | 回合开始 |
+| ON_ACTION_RESOLVE | 动作结算 |
+| ON_SPECIAL_REFRESH | 特殊刷新 |
+| ON_BATTLE_FINISH | 战斗结束 |
+| ON_CHANGE_PET | 换宠 |
+| ON_DEFEAT | 击败 |
+
+默认 Hook：`OpponentTrackerHook`、`EnergyMonitorHook`、`SwitchAdvisorHook`
 
 ### 2.7 WebSocket 实时推送
 
@@ -230,11 +300,24 @@ state = {
 // 连接确认
 {"type": "connected", "message": "Battle state tracker ready"}
 
-// 状态更新
+// 状态更新（每次事件后推送）
 {"type": "state_update", "state": {...}}
 
-// 战术建议
-{"type": "suggestions", "suggestions": [...]}
+// 格式化战斗事件
+{"type": "battle_event", "event": {...}}
+{"type": "battle_events", "events": [{...}, ...]}
+
+// 简单规则建议
+{"type": "suggestions", "suggestions": [{"type": "low_hp", "message": "..."}]}
+
+// 伤害预测分析
+{"type": "skill_analysis", "skills": [...], "traits": [...], "opp_traits": [...]}
+
+// 分析 Hook 建议
+{"type": "hook_advice", "advice": [{"hook_id": "...", "priority": 0, "title": "...", "messages": [...]}]}
+
+// 战斗总结
+{"type": "battle_summary", "summary": {...}}
 
 // 克制推荐
 {"type": "counter_pick", "opponent": {...}}
@@ -350,6 +433,16 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 协议 | `src/protocol/opcodes.py` | Opcode 注册表与分发 |
 | 协议 | `src/protocol/battle.py` | 战斗协议各 Opcode 的详细解析 |
 | 分析 | `src/analysis/battle_state.py` | 实时战斗状态追踪与建议生成 |
+| 分析 | `src/analysis/damage_calc.py` | 伤害计算引擎（4 阶段 Hook 管线） |
+| 分析 | `src/analysis/innate_hooks.py` | 先天技能伤害 Hook（combo/stat/type/power 修正） |
+| 分析 | `src/analysis/battle_advisor.py` | 战斗分析协调器（技能分析 + 伤害预测） |
+| 分析 | `src/analysis/hook_registry.py` | 可扩展分析 Hook 系统（ABC 基类，生命周期管理） |
+| 分析 | `src/analysis/hooks/opponent_tracker.py` | 对手技能/换宠模式追踪 |
+| 分析 | `src/analysis/hooks/energy_monitor.py` | 能量监控与攻击窗口检测 |
+| 分析 | `src/analysis/hooks/switch_advisor.py` | 属性克制换宠推荐 |
+| 游戏逻辑 | `src/game/type_chart.py` | 18 属性克制矩阵、弱点/抗性查询 |
+| 游戏逻辑 | `src/game/stats.py` | 种族值/能力值计算（HP + 5 属性公式） |
+| 游戏逻辑 | `src/game/skill_eval.py` | 技能评分引擎 |
 | API | `src/api/routes_battle.py` | WebSocket 战斗端点 |
 | API | `src/api/app.py` | FastAPI 应用入口 |
 | 入口 | `src/main.py` | Uvicorn 启动脚本 |
@@ -357,4 +450,8 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 前端 | `web/src/hooks/useBattle.ts` | WebSocket 连接 Hook |
 | 前端 | `web/src/stores/battleStore.ts` | 战斗状态管理 |
 | 前端 | `web/src/components/BattleTimeline.tsx` | 事件时间线组件 |
+| 前端 | `web/src/components/DamagePredictionPanel.tsx` | 伤害预测面板（含连击显示） |
+| 前端 | `web/src/components/SkillPanel.tsx` | 技能分析面板 |
+| 前端 | `web/src/components/HookAdvicePanel.tsx` | 战术分析建议面板 |
 | 数据 | `data/game/type_chart.json` | 属性克制矩阵 |
+| 数据 | `data/game/innate_skills.json` | 先天技能定义（S2 天赋、连击修正等） |

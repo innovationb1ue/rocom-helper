@@ -4,6 +4,20 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, List, Optional
 
+from src.analysis.constants import (
+    OPCODE_ACTION_ACK,
+    OPCODE_ACTION_RESOLVE,
+    OPCODE_BATTLE_ENTER,
+    OPCODE_BATTLE_FINISH,
+    OPCODE_PREPLAY,
+    OPCODE_PVP_PERFORM,
+    OPCODE_ROUND_FLOW,
+    OPCODE_ROUND_START,
+    OPCODE_SKILL_DECLARE,
+    OPCODE_SKILL_SELECT,
+    OPCODE_SPECIAL_REFRESH,
+)
+
 
 @dataclass
 class FormattedEvent:
@@ -606,44 +620,44 @@ def format_battle_event(
     """Format a single protocol event into one or more FormattedEvents."""
     events: List[FormattedEvent] = []
 
-    if opcode == 0x1316:
+    if opcode == OPCODE_BATTLE_ENTER:
         ev = format_battle_enter(detail, state)
         ev.round = round_num
         events.append(ev)
 
-    elif opcode == 0x131A:
+    elif opcode == OPCODE_ROUND_START:
         ev = format_round_start(detail, state)
         events.append(ev)
 
-    elif opcode == 0x132C:
+    elif opcode == OPCODE_BATTLE_FINISH:
         ev = format_battle_finish(detail, state)
         events.append(ev)
 
-    elif opcode == 0x130B:
+    elif opcode == OPCODE_SKILL_SELECT:
         ev = format_skill_select(detail)
         ev.round = round_num
         events.append(ev)
 
-    elif opcode == 0x1322:
+    elif opcode == OPCODE_SKILL_DECLARE:
         ev = format_skill_declare(detail)
         ev.round = round_num
         events.append(ev)
 
-    elif opcode == 0x130C:
+    elif opcode == OPCODE_ACTION_ACK:
         ev = format_action_ack(detail)
         ev.round = round_num
         events.append(ev)
 
-    elif opcode == 0x13F4:
+    elif opcode == OPCODE_SPECIAL_REFRESH:
         ev = format_special_refresh(detail)
         ev.round = round_num
         events.append(ev)
 
-    elif opcode == 0x1312:
+    elif opcode == OPCODE_ROUND_FLOW:
         ev = format_round_flow(detail)
         events.append(ev)
 
-    elif opcode in (0x1324, 0x13FC, 0x13F3):
+    elif opcode in (OPCODE_ACTION_RESOLVE, OPCODE_PVP_PERFORM, OPCODE_PREPLAY):
         for entry in detail.get("entries", []):
             ev = format_action_entry(entry, state, round_num)
             if ev is not None:
@@ -651,49 +665,3 @@ def format_battle_event(
         events = _merge_damage_events(events)
 
     return events
-
-
-# ---------------------------------------------------------------------------
-# Battle summary computation
-# ---------------------------------------------------------------------------
-
-def compute_battle_summary(state: Dict[str, Any]) -> Dict[str, Any]:
-    my_pets_final = []
-    for p in state.get("my_pets", []):
-        my_pets_final.append({
-            "name": p.get("name", "?"),
-            "hp": p.get("current_hp", 0),
-            "max_hp": p.get("max_hp", 0),
-            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
-        })
-    opp_pets_final = []
-    for p in state.get("opp_pets", []):
-        opp_pets_final.append({
-            "name": p.get("name", "?"),
-            "hp": p.get("current_hp", 0),
-            "max_hp": p.get("max_hp", 0),
-            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
-        })
-
-    raw_events = state.get("events", [])
-    event_stats: Dict[str, int] = {}
-    for e in raw_events:
-        opc = e.get("opcode", 0)
-        key = _OPCODE_LABELS.get(opc, hex(opc))
-        event_stats[key] = event_stats.get(key, 0) + 1
-
-    return {
-        "result": state.get("result"),
-        "rounds": state.get("round"),
-        "my_pets_final": my_pets_final,
-        "opp_pets_final": opp_pets_final,
-        "event_stats": event_stats,
-    }
-
-
-_OPCODE_LABELS = {
-    0x1316: "battle_enter", 0x131A: "round_start", 0x130B: "client_skill_select",
-    0x1322: "server_skill_declare", 0x1324: "action_resolve", 0x130C: "server_action_ack",
-    0x132C: "battle_finish", 0x13F4: "special_refresh", 0x13FC: "pvp_perform",
-    0x13F3: "preplay", 0x1312: "round_flow",
-}

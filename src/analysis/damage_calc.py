@@ -1,12 +1,33 @@
-"""洛克王国伤害计算器 — 基于属性克制、STAB、攻防属性的伤害预测。"""
+"""洛克王国伤害计算器 — 基于 NRC_AI 伤害公式的确定性伤害预测。
+
+核心公式 (参考 NRC_AI):
+  ability_level = (1 + atk_up + def_down) / max(0.1, 1 + atk_down + def_up)
+  ATK = base_atk * ability_level
+  base = (ATK / DEF) * power * 0.9
+  damage = base * effectiveness * stab * weather_mult * hits * power_mult
+
+4 阶段 hook 管线:
+  pre_power → post_base → pre_final → post_calc
+"""
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
-from src.data.loader import get_skill_meta, get_skill_name, get_wiki_pet_stats
+from src.data.loader import (
+    get_buff_stat_modifiers,
+    get_skill_meta,
+    get_skill_name,
+    get_weather_damage_mult,
+    get_wiki_pet_stats,
+)
 from src.game.type_chart import TypeChart
+from src.analysis.constants import SDT_TO_TYPE
+
+HookStage = Literal["pre_power", "post_base", "pre_final", "post_calc"]
+DamageHook = Callable[[Dict[str, Any]], Dict[str, Any]]
 
 
 @dataclass
@@ -14,47 +35,95 @@ class DamageResult:
     skill_id: int
     skill_name: str
     power: int
+    effective_power: int
     damage_type: int  # 2=物理, 3=特殊
     skill_element: int
     skill_element_name: str
     effectiveness: float
     effectiveness_label: str
     is_stab: bool
-    min_damage: int
-    max_damage: int
-    pct_hp_range: Tuple[float, float]
+    expected_damage: int
+    pct_hp: float  # 伤害占 defender 最大 HP 的百分比
     can_ko: bool
     energy_cost: int
-    confidence: str  # "high" / "medium" / "low"
+    confidence: str  # "high" / "medium"
+    hit_count: int = 1
+    power_mult: float = 1.0
+    weather_mult: float = 1.0
+    damage_breakdown: Dict[str, Any] = field(default_factory=dict)
     warnings: List[str] = field(default_factory=list)
 
+    # Backward-compatible properties — deterministic damage has no range
+    @property
+    def min_damage(self) -> int:
+        return self.expected_damage
+
+    @property
+    def max_damage(self) -> int:
+        return self.expected_damage
+
+    @property
+    def total_damage(self) -> int:
+        return self.expected_damage * self.hit_count
+
+    @property
+    def total_min_damage(self) -> int:
+        return self.total_damage
+
+    @property
+    def total_max_damage(self) -> int:
+        return self.total_damage
+
+    @property
+    def pct_hp_range(self) -> Tuple[float, float]:
+        return (self.pct_hp, self.pct_hp)
+
     def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        # Add computed properties for backward compatibility
+        d["min_damage"] = self.min_damage
+        d["max_damage"] = self.max_damage
+        d["total_damage"] = self.total_damage
+        d["total_min_damage"] = self.total_min_damage
+        d["total_max_damage"] = self.total_max_damage
+        d["pct_hp_range"] = self.pct_hp_range
+        return d
 
 
 # 属性名到 stat name 的映射
 _ATK_STAT = {2: "ATK", 3: "SPA"}  # damage_type → 攻击属性
 _DEF_STAT = {2: "DEF", 3: "SPD"}  # damage_type → 防御属性
 
-# 随机因子范围 (217/255 ≈ 0.85, 255/255 = 1.0)
-_RAND_MIN = 217 / 255
-_RAND_MAX = 1.0
-
 # STAB 倍率
 _STAB_MULTIPLIER = 1.5
-
-# Buff stage → stat multiplier  (stage -6 ~ +6)
-# 每级约 +50% / -33%，参考宝可梦通用规则
-_BUFF_STAGE_MULTIPLIERS = {
-    -6: 2/8, -5: 2/7, -4: 2/6, -3: 2/5, -2: 2/4, -1: 2/3,
-    0: 1.0,
-    1: 3/2, 2: 4/2, 3: 5/2, 4: 6/2, 5: 7/2, 6: 8/2,
-}
 
 
 class DamageCalculator:
     def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
         self.chart = type_chart or TypeChart()
+        self._hooks: Dict[HookStage, List[DamageHook]] = {
+            "pre_power": [],
+            "post_base": [],
+            "pre_final": [],
+            "post_calc": [],
+        }
+
+    def register_hook(self, stage: HookStage, hook: DamageHook) -> None:
+        """注册伤害计算 hook。hook 接收并返回 context dict。"""
+        if stage not in self._hooks:
+            raise ValueError(f"Unknown hook stage: {stage}")
+        self._hooks[stage].append(hook)
+
+    def clear_hooks(self) -> None:
+        """清除所有已注册的 hooks。"""
+        for stage in self._hooks:
+            self._hooks[stage].clear()
+
+    def _run_hooks(self, stage: HookStage, ctx: Dict[str, Any]) -> Dict[str, Any]:
+        """依次执行某阶段的所有 hooks，返回最终 context。"""
+        for hook in self._hooks[stage]:
+            ctx = hook(ctx)
+        return ctx
 
     # ------------------------------------------------------------------
     # 公开接口
@@ -65,6 +134,7 @@ class DamageCalculator:
         attacker: Dict[str, Any],
         defender: Dict[str, Any],
         skill_meta: Dict[str, Any],
+        weather: Optional[Dict[str, Any]] = None,
     ) -> Optional[DamageResult]:
         """计算单个技能的伤害预测。返回 None 如果不是攻击技能。"""
         power = self._get_power(skill_meta)
@@ -72,67 +142,181 @@ class DamageCalculator:
         if power <= 0 or damage_type not in (2, 3):
             return None
 
-        skill_element = skill_meta.get("skill_dam_type", 0)
-        level = attacker.get("level") or 100
+        raw_dam_type = skill_meta.get("skill_dam_type", 0)
+        skill_element = SDT_TO_TYPE.get(raw_dam_type, raw_dam_type)
+
+        # Phase 1: Resolve power
+        power, _ = self._resolve_power(power, skill_meta, attacker, defender)
+
+        # Phase 2: Resolve combat stats
+        stats = self._resolve_combat_stats(attacker, defender, damage_type, power)
+        if stats is None:
+            return None
+        effective_atk, effective_def, ability_level, confidence, warnings = stats
+
+        # Phase 3: Compute base damage
+        base = self._compute_base_damage(power, effective_atk, effective_def, skill_meta, attacker, defender)
+
+        # Phase 4: Apply multipliers (effectiveness, STAB, weather, hooks)
+        mult_result = self._apply_multipliers(base, skill_element, attacker, defender, skill_meta, weather)
+        dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab = mult_result
+
+        # Phase 5: Finalize (post_calc hooks, hit count, HP%, energy, result)
+        return self._finalize_damage(
+            dmg, power, ability_level, effective_atk, effective_def,
+            effectiveness, stab_mult, weather_mult, power_mult,
+            skill_meta, skill_element, attacker, defender,
+            damage_type, eff_label, is_stab, confidence, warnings,
+        )
+
+    # ------------------------------------------------------------------
+    # Calculation phases
+    # ------------------------------------------------------------------
+
+    def _resolve_power(
+        self, power: int, skill_meta: Dict, attacker: Dict, defender: Dict,
+    ) -> Tuple[int, Dict[str, Any]]:
+        """阶段 1: pre_power hook — 可修正威力。"""
+        ctx = self._run_hooks("pre_power", {
+            "power": power,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        return ctx["power"], ctx
+
+    def _resolve_combat_stats(
+        self, attacker: Dict, defender: Dict, damage_type: int, power: int,
+    ) -> Optional[Tuple[float, float, float, str, List[str]]]:
+        """获取有效攻防属性、能力等级和置信度。返回 None 如果无法获取属性。"""
         confidence = "high"
         warnings: List[str] = []
 
-        # 获取攻防属性
         atk_name = _ATK_STAT[damage_type]
         def_name = _DEF_STAT[damage_type]
-        atk_val = self._get_stat(attacker, atk_name)
-        def_val = self._get_stat(defender, def_name)
+        base_atk = self._get_stat(attacker, atk_name)
+        base_def = self._get_stat(defender, def_name)
 
-        # 回退到 wiki 数据
-        if atk_val is None:
-            atk_val = self._get_wiki_stat(attacker, atk_name)
-            if atk_val is not None:
+        if base_atk is None:
+            base_atk = self._get_wiki_stat(attacker, atk_name)
+            if base_atk is not None:
                 confidence = "medium"
                 warnings.append("攻击属性来自 wiki 估算")
-        if def_val is None:
-            def_val = self._get_wiki_stat(defender, def_name)
-            if def_val is not None:
+        if base_def is None:
+            base_def = self._get_wiki_stat(defender, def_name)
+            if base_def is not None:
                 confidence = "medium"
                 warnings.append("防御属性来自 wiki 估算")
 
-        # 完全无数据时无法给出有意义的预测
-        if atk_val is None or def_val is None:
+        if base_atk is None or base_def is None:
             return None
 
-        # Buff stage 修正
-        atk_stage = self._get_stat_stage(attacker, atk_name)
-        def_stage = self._get_stat_stage(defender, def_name)
-        atk_val = int(atk_val * _BUFF_STAGE_MULTIPLIERS.get(atk_stage, 1.0))
-        def_val = int(def_val * _BUFF_STAGE_MULTIPLIERS.get(def_stage, 1.0))
-        if atk_stage != 0:
-            warnings.append(f"攻击方 {atk_name} stage {atk_stage:+d}")
-        if def_stage != 0:
-            warnings.append(f"防御方 {def_name} stage {def_stage:+d}")
+        atk_mods = get_buff_stat_modifiers(attacker.get("buffs", []))
+        def_mods = get_buff_stat_modifiers(defender.get("buffs", []))
+        atk_up = atk_mods.get(f"{atk_name.lower()}_up", 0.0)
+        atk_down = atk_mods.get(f"{atk_name.lower()}_down", 0.0)
+        def_key = def_name.lower()
+        def_up = def_mods.get(f"{def_key}_up", 0.0)
+        def_down = def_mods.get(f"{def_key}_down", 0.0)
 
-        # 属性克制
+        ability_level = (1.0 + atk_up + def_down) / max(0.1, 1.0 + atk_down + def_up)
+        ability_level = max(0.1, min(5.0, ability_level))
+
+        effective_atk = base_atk * ability_level
+        effective_def = max(1.0, float(base_def))
+
+        if ability_level != 1.0:
+            warnings.append(f"能力等级 ×{ability_level:.2f}")
+
+        return effective_atk, effective_def, ability_level, confidence, warnings
+
+    def _compute_base_damage(
+        self, power: int, eff_atk: float, eff_def: float,
+        skill_meta: Dict, attacker: Dict, defender: Dict,
+    ) -> float:
+        """阶段 2: 基础伤害公式 + post_base hook。"""
+        base = self._base_damage(eff_atk, eff_def, power)
+        ctx = self._run_hooks("post_base", {
+            "base_damage": base,
+            "power": power,
+            "atk_val": eff_atk,
+            "def_val": eff_def,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        return ctx["base_damage"]
+
+    def _apply_multipliers(
+        self,
+        base: float, skill_element: int,
+        attacker: Dict, defender: Dict, skill_meta: Dict,
+        weather: Optional[Dict],
+    ) -> Tuple[int, float, float, float, float, str, bool]:
+        """阶段 3: 属性克制、STAB、天气、pre_final hook。"""
         defender_types = defender.get("types", [])
         effectiveness = self.chart.get_multiplier(skill_element, defender_types)
         eff_label = self.chart.get_effectiveness_label(effectiveness)
 
-        # STAB
         attacker_types = attacker.get("types", [])
         is_stab = skill_element in attacker_types
-
-        # 基础伤害
-        base = self._base_damage(level, power, atk_val, def_val)
-
-        # 最终伤害范围
         stab_mult = _STAB_MULTIPLIER if is_stab else 1.0
-        max_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MAX))
-        min_dmg = max(1, int(base * effectiveness * stab_mult * _RAND_MIN))
 
-        # HP 百分比
+        weather_mult = get_weather_damage_mult(weather, skill_element)
+        power_mult = 1.0
+
+        ctx = self._run_hooks("pre_final", {
+            "base_damage": base,
+            "effectiveness": effectiveness,
+            "stab_mult": stab_mult,
+            "weather_mult": weather_mult,
+            "power_mult": power_mult,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        base = ctx["base_damage"]
+        effectiveness = ctx["effectiveness"]
+        stab_mult = ctx["stab_mult"]
+        weather_mult = ctx.get("weather_mult", weather_mult)
+        power_mult = ctx.get("power_mult", power_mult)
+
+        dmg = max(1, int(base * effectiveness * stab_mult * weather_mult * power_mult))
+        return dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab
+
+    def _finalize_damage(
+        self,
+        dmg: int, power: int, ability_level: float,
+        effective_atk: float, effective_def: float,
+        effectiveness: float, stab_mult: float,
+        weather_mult: float, power_mult: float,
+        skill_meta: Dict, skill_element: int,
+        attacker: Dict, defender: Dict,
+        damage_type: int, eff_label: str, is_stab: bool,
+        confidence: str, warnings: List[str],
+    ) -> DamageResult:
+        """阶段 4: post_calc hook、连击、HP%、能耗、构造结果。"""
+        base_hits = self._get_base_hit_count(skill_meta)
+        ctx = self._run_hooks("post_calc", {
+            "min_damage": dmg,
+            "max_damage": dmg,
+            "hit_count": base_hits,
+            "effectiveness": effectiveness,
+            "stab_mult": stab_mult,
+            "skill_meta": skill_meta,
+            "attacker": attacker,
+            "defender": defender,
+        })
+        dmg = ctx["min_damage"]
+
+        hit_count = ctx.get("hit_count", 1)
+        total_damage = dmg * hit_count
+
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1
-        pct_min = min_dmg / defender_max_hp
-        pct_max = max_dmg / defender_max_hp
-        can_ko = min_dmg >= (defender.get("current_hp") or 0)
+        defender_cur_hp = defender.get("current_hp") or 0
+        pct = total_damage / defender_max_hp
+        can_ko = total_damage >= defender_cur_hp
 
-        # 能耗
         energy_costs = skill_meta.get("energy_cost", [0])
         energy_cost = energy_costs[0] if energy_costs else 0
         if energy_cost > 0:
@@ -140,22 +324,40 @@ class DamageCalculator:
             if attacker_energy < energy_cost:
                 warnings.append(f"能量不足 (需要{energy_cost}, 当前{attacker_energy})")
 
+        effective_power = int(power * stab_mult)
+        breakdown = {
+            "base_power": self._get_power(skill_meta),
+            "effective_power": effective_power,
+            "ability_level": round(ability_level, 3),
+            "atk": int(effective_atk),
+            "def_": int(effective_def),
+            "effectiveness": effectiveness,
+            "stab": stab_mult,
+            "weather_mult": weather_mult,
+            "power_mult": power_mult,
+            "hit_count": hit_count,
+        }
+
         return DamageResult(
             skill_id=skill_meta.get("id", 0),
             skill_name=skill_meta.get("name", "?"),
-            power=power,
+            power=self._get_power(skill_meta),
+            effective_power=effective_power,
             damage_type=damage_type,
             skill_element=skill_element,
             skill_element_name=self.chart.type_name(skill_element) if skill_element else "无属性",
             effectiveness=effectiveness,
             effectiveness_label=eff_label,
             is_stab=is_stab,
-            min_damage=min_dmg,
-            max_damage=max_dmg,
-            pct_hp_range=(round(pct_min, 3), round(pct_max, 3)),
+            expected_damage=dmg,
+            pct_hp=round(pct, 3),
             can_ko=can_ko,
             energy_cost=energy_cost,
             confidence=confidence,
+            hit_count=hit_count,
+            power_mult=power_mult,
+            weather_mult=weather_mult,
+            damage_breakdown=breakdown,
             warnings=warnings,
         )
 
@@ -164,6 +366,7 @@ class DamageCalculator:
         attacker: Dict[str, Any],
         defender: Dict[str, Any],
         skills: List[Dict[str, Any]],
+        weather: Optional[Dict[str, Any]] = None,
     ) -> List[DamageResult]:
         """计算所有攻击技能的伤害预测，按最大伤害降序排列。"""
         results: List[DamageResult] = []
@@ -174,10 +377,10 @@ class DamageCalculator:
             meta = get_skill_meta(skill_id)
             if meta is None:
                 continue
-            result = self.calculate(attacker, defender, meta)
+            result = self.calculate(attacker, defender, meta, weather=weather)
             if result is not None:
                 results.append(result)
-        results.sort(key=lambda r: r.max_damage, reverse=True)
+        results.sort(key=lambda r: r.total_max_damage, reverse=True)
         return results
 
     # ------------------------------------------------------------------
@@ -185,11 +388,11 @@ class DamageCalculator:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _base_damage(level: int, power: int, attack: int, defense: int) -> int:
-        """基础伤害公式: floor((level*0.4 + 2) * power * A / D / 50 + 2)"""
-        if defense <= 0:
-            defense = 1
-        return int(math.floor((level * 0.4 + 2) * power * attack / defense / 50 + 2))
+    def _base_damage(atk: float, def_: float, power: int) -> float:
+        """NRC_AI 基础伤害公式: (ATK/DEF) * power * 0.9"""
+        if def_ <= 0:
+            def_ = 1.0
+        return (atk / def_) * power * 0.9
 
     @staticmethod
     def _get_power(skill_meta: Dict[str, Any]) -> int:
@@ -214,23 +417,33 @@ class DamageCalculator:
         return None
 
     @staticmethod
+    def _calc_arena_stat(race_value: int, stat_name: str) -> int:
+        """用 NRC_AI 竞技场公式估算平衡后属性值 (IV=0, 性格=坦率).
+
+        公式: HP = 1.7×race + 170, Other = 1.1×race + 60
+        参考: references/NRC_AI/src/pokemon_db.py
+        """
+        if stat_name == "HP":
+            return round(1.7 * race_value + 170)
+        return round(1.1 * race_value + 60)
+
+    @staticmethod
     def _get_wiki_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
-        """从 wiki 数据回退获取属性值。"""
+        """从 wiki 种族值估算竞技场平衡后属性值。"""
         name = pet.get("name")
         if not name:
             return None
         wiki_stats = get_wiki_pet_stats(name)
         if wiki_stats and stat_name in wiki_stats:
-            return int(wiki_stats[stat_name])
+            race = int(wiki_stats[stat_name])
+            return DamageCalculator._calc_arena_stat(race, stat_name)
         return None
 
     @staticmethod
-    def _get_stat_stage(pet: Dict[str, Any], stat_name: str) -> int:
-        """从 pet 的 buffs 中提取指定属性的 stage 值，累加所有相关 buff 的 stage。"""
-        total = 0
-        for buff in pet.get("buffs", []):
-            stage = buff.get("stage")
-            if isinstance(stage, int) and stage != 0:
-                # buff 的 name 或 id 关联到属性名（粗粒度：所有非零 stage 都计入）
-                total += stage
-        return max(-6, min(6, total))
+    def _get_base_hit_count(skill_meta: Dict[str, Any]) -> int:
+        """从技能 desc 中提取基础连击数（如 '2连击' → 2）。"""
+        desc = skill_meta.get("desc", "")
+        m = re.search(r'(\d+)连击', desc)
+        if m:
+            return int(m.group(1))
+        return 1

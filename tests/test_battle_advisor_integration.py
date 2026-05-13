@@ -2,16 +2,12 @@
 from __future__ import annotations
 
 import pytest
-from pathlib import Path
 
 from src.analysis.battle_advisor import BattleAdvisor, BattleAdvice
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.damage_calc import DamageCalculator
 from src.analysis.threat import ThreatAssessor
 from src.game.type_chart import TypeChart
-from tests.packet_reader import load_battle_packets, replay_battle
-
-SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
 
 
 @pytest.fixture(scope="module")
@@ -32,18 +28,6 @@ def damage_calc(chart):
 @pytest.fixture(scope="module")
 def threat_assessor(chart):
     return ThreatAssessor(chart)
-
-
-@pytest.fixture(scope="module")
-def battle_packets():
-    if not SESSION_DIR.exists():
-        pytest.skip("battle_session_1 fixtures not found")
-    return load_battle_packets(SESSION_DIR)
-
-
-@pytest.fixture(scope="module")
-def replay_result(battle_packets):
-    return replay_battle(battle_packets)
 
 
 # ---------------------------------------------------------------------------
@@ -128,15 +112,15 @@ class TestConstructedStateIntegration:
 class TestReplayIntegration:
     """用 session_1 的真实回放数据验证全链路。"""
 
-    def test_advisor_on_replay_state(self, advisor, replay_result):
+    def test_advisor_on_replay_state(self, advisor, session1_baseline_result):
         """advisor 能处理回放状态不崩溃。"""
-        events, final_state = replay_result
+        events, final_state = session1_baseline_result
         advice = advisor.analyze(final_state)
         assert isinstance(advice, BattleAdvice)
 
-    def test_advisor_on_each_round(self, advisor, replay_result):
+    def test_advisor_on_each_round(self, advisor, session1_baseline_result):
         """每一轮结束后 advisor 都能产生有效输出。"""
-        events, _ = replay_result
+        events, _ = session1_baseline_result
         round_events = [e for e in events if e["opcode"] == 0x131A]
         success_count = 0
         for e in round_events:
@@ -147,10 +131,10 @@ class TestReplayIntegration:
                 success_count += 1
         assert success_count > 0, "No valid round states to analyze"
 
-    def test_damage_calc_on_final_state(self, damage_calc, replay_result):
+    def test_damage_calc_on_final_state(self, damage_calc, session1_baseline_result):
         """用最终状态的宠物数据验证伤害计算不崩溃。"""
         from src.data.loader import get_skill_meta
-        _, state = replay_result
+        _, state = session1_baseline_result
         my_active = state.get("my_active")
         opp_active = state.get("opp_active")
         if my_active and opp_active:
@@ -162,9 +146,9 @@ class TestReplayIntegration:
                     # Should not crash; result may be None for non-attack skills
                     assert result is None or hasattr(result, "min_damage")
 
-    def test_threat_assessment_on_replay(self, threat_assessor, replay_result):
+    def test_threat_assessment_on_replay(self, threat_assessor, session1_baseline_result):
         """用回放数据验证威胁评估。需要将 stats 格式适配为 dict。"""
-        _, state = replay_result
+        _, state = session1_baseline_result
         my_pets_raw = state.get("my_pets", [])
         opp_pets_raw = state.get("opp_pets", [])
 

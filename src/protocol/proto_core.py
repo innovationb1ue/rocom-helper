@@ -1,6 +1,16 @@
-"""Protobuf 解析原语、传输层常量、精灵/状态提取。"""
+"""核心协议解析模块。
+
+本模块是协议解析的基础层，包含以下功能区域：
+
+1. Protobuf 解析原语 — read_varint, parse_proto_message 等底层解析函数
+2. TGCP 传输层解析 — 4种记录格式（v14, live_s2c, live_c2s, short_heartbeat）
+3. 游戏常量 — STAT_NAMES, SIDE_NAMES, SDT_TO_TYPE, SPECIAL_ACTION_COMMANDS
+4. 精灵/状态提取 — extract_creature, extract_state_wrapper 等高级提取函数
+5. 辅助工具 — walk_messages, field_groups, collect_varints 等查询函数
+"""
 from __future__ import annotations
 import logging
+import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_wiki_pet_types
@@ -185,6 +195,13 @@ def extract_inner_message(root: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return {"message_id": wrapper["field"], "fields": {"fields": ws["fields"]}}
 
 # --- Protobuf 消息解析 ---
+# parse_proto_message 是核心递归解析器。
+# 按 wire type 分派处理：
+#   wire 0 = varint (直接读取数值)
+#   wire 1 = 64-bit fixed (存为 raw_hex)
+#   wire 2 = length-delimited (尝试 UTF-8 文本 → 递归解析子消息)
+#   wire 5 = 32-bit fixed (存为 raw_hex + u32le)
+# 解析结果为 {"fields": [...], "consumed": N, "clean": bool} 结构。
 def parse_proto_message(data: bytes, *, depth: int = 0, max_depth: int = 10, max_fields: int = 5000) -> Dict[str, Any]:
     fields: List[Dict[str, Any]] = []
     off, clean = 0, True
@@ -286,6 +303,9 @@ def pick_first(values: List[int], *, low: Optional[int] = None, high: Optional[i
     return values[0] if values else None
 
 # --- 精灵/状态提取 ---
+# extract_creature 从单个 protobuf 消息中提取完整的精灵信息。
+# 提取流程: 名称(field 3) → 等级(field 10) → slot/pet_id → 属性值(field 14) → 技能(field 12)
+# 同时附加 pet_meta 数据和 wiki 类型校验。
 def _attach_skill_meta(out: Dict[str, Any], skill_id: Optional[int]) -> None:
     if skill_id is None:
         return
@@ -300,9 +320,13 @@ def _attach_skill_meta(out: Dict[str, Any], skill_id: Optional[int]) -> None:
         ("target_type", "skill_target_type"), ("target_count", "skill_target_count"),
         ("skill_priority", "skill_priority"), ("damage_type", "skill_damage_type"),
         ("skill_feature", "skill_feature"), ("cd_round", "skill_cd_round"),
+        ("skill_dam_type", "skill_dam_type"),
     ):
         if src in meta and dst not in out:
             out[dst] = meta[src]
+    dam_type = meta.get("skill_dam_type")
+    if dam_type is not None and "skill_element" not in out:
+        out["skill_element"] = SDT_TO_TYPE.get(dam_type)
 
 def extract_skills(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     skills, seen = [], set()
@@ -355,6 +379,31 @@ def extract_skills_from_round_data(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
         skills.append(item)
     skills.sort(key=lambda it: (it["equipped_slot"] == 0, it["equipped_slot"], it["skill_id"]))
     return skills
+
+
+def extract_battle_buffs(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """从 BattleInsidePetInfo.field 5 (BattleBuffInfo) 提取初始 buff 列表。
+
+    BattleBuffInfo: field 2=buff_id, field 4=stack。
+    包括先天特性 (innate trait) 所对应的 buff。
+    """
+    buffs: List[Dict[str, Any]] = []
+    seen_ids: set = set()
+    for entry in field_groups(msg).get(5, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        buff_id = pick_first(collect_varints(sub, 2))
+        if buff_id is None:
+            continue
+        if buff_id in seen_ids:
+            continue
+        seen_ids.add(buff_id)
+        stack = pick_first(collect_varints(sub, 4))
+        item: Dict[str, Any] = {"id": buff_id, "name": buff_name(buff_id) or str(buff_id), "stage": stack}
+        buffs.append(item)
+    return buffs
+
 
 def extract_stats(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     best: List[Dict[str, Any]] = []
@@ -414,6 +463,10 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
                      name, out["types"], wiki_types)
     return out
 
+_RE_BATTLE_ENTER_SIDE = re.compile(r"\.6\[\d+\]\.(\d+)\[")
+_RE_ROUND_START_OPP = re.compile(r"\.8\[\d+\]\.")
+_RE_ROUND_START_PLAYER = re.compile(r"\.44\[\d+\]\.")
+
 def _side_from_path(path: str) -> Optional[int]:
     """Determine side from wrapper path.
 
@@ -421,9 +474,8 @@ def _side_from_path(path: str) -> Optional[int]:
     0x131A round_start:   ``root.3[N].2[N].44[N].8[N].3[N]`` → has ``.8[`` = opponent(401);
                            ``root.3[N].2[N].44[N].3[N]`` (no .8) = player(1).
     """
-    import re
     # battle_enter pattern: .6[N].5[N] or .6[N].6[N]
-    m = re.search(r"\.6\[\d+\]\.(\d+)\[", path)
+    m = _RE_BATTLE_ENTER_SIDE.search(path)
     if m:
         f = int(m.group(1))
         if f == 5:
@@ -431,14 +483,18 @@ def _side_from_path(path: str) -> Optional[int]:
         if f == 6:
             return 401
     # round_start pattern: .8[N] present → opponent
-    if re.search(r"\.8\[\d+\]\.", path):
+    if _RE_ROUND_START_OPP.search(path):
         return 401
     # round_start player pets have .44[N].3[N] without .8
-    if re.search(r"\.44\[\d+\]\.", path):
+    if _RE_ROUND_START_PLAYER.search(path):
         return 1
     return None
 
 
+# extract_state_wrapper 从「动态属性 + 精灵信息」二合一消息中提取战斗状态。
+# 结构: field 1 = 动态属性（HP/能量/battle_stats）, field 2 = 精灵基本信息
+# 技能提取采用双策略：先从 PetData.field 12 取，若为空则从 InsideInfo.field 8 取
+# (PvP 战斗中实际技能来源通常是 InsideInfo.field 8)
 def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     groups = field_groups(msg)
     se = next((e for e in groups.get(1, []) if e.get("sub")), None)
@@ -471,6 +527,11 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
                 [f"slot{s['equipped_slot']}:{s.get('skill_name', '?')}" for s in equipped_skills],
             )
 
+    # 初始 buff 列表 (含先天特性) from BattleInsidePetInfo.field 5
+    initial_buffs = extract_battle_buffs(dm)
+    # 先天特性/被动技能 from BattleInsidePetInfo.field 64
+    passive_skill_id = pick_first(collect_varints(dm, 64))
+
     return {
         "name": creature["name"], "level": creature["level"],
         "slot": creature["slot"], "pet_id": creature["pet_id"],
@@ -484,6 +545,8 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "skills": all_skills,
         "equipped_skills": equipped_skills,
         "skill_source": skill_source,
+        "initial_buffs": initial_buffs,
+        "passive_skill_id": passive_skill_id,
         "base_id": creature.get("base_id"),
         "base_skill_pool": creature.get("base_skill_pool"),
         "source_opcode": record["opcode"], "source_opcode_hex": record.get("opcode_hex", ""),
@@ -510,6 +573,12 @@ def _dedupe_state_wrappers(wrappers: List[Dict[str, Any]]) -> List[Dict[str, Any
     return out
 
 # --- 传输层解析 ---
+# TGCP (Tencent Game Communication Protocol) 传输层有 4 种记录格式：
+# 1. v14 — 标准格式，30字节头（magic 0x55AA/0x3963），含 session_id/sub_id/opcode
+# 2. live_s2c — 服务端直推格式，10字节头（magic 0x55AA），opcode 在前4字节
+# 3. live_c2s — 客户端直推格式，14字节头（magic 0x3963），含 raw_opcode 和 req_seq
+# 4. live_c2s_short_heartbeat — 客户端短心跳，16字节，固定 opcode 0x013E
+# parse_record 按优先级依次尝试四种格式，首次匹配即返回。
 def parse_special_payload(opcode: int, payload: bytes) -> Optional[Tuple[str, Dict[str, Any]]]:
     if opcode == 0x013D and len(payload) == 12:
         return "s2c_heartbeat_nty_binary", {
@@ -535,6 +604,17 @@ def _build_payload_root(opcode: int, payload: bytes) -> Tuple[Dict[str, Any], st
 def _empty_root() -> Dict[str, Any]:
     return {"fields": [], "consumed": 0, "clean": True}
 
+# v14 格式布局 (30字节头):
+# [0:4]   transport_seq (big-endian)
+# [4:6]   magic 0x55AA
+# [6:10]  record_len (big-endian)
+# [10:12] reserved (must be 0)
+# [12:16] version (0 or 1)
+# [16:20] session_id → s2c 用作 opcode (取低16位)
+# [20:24] sub_id → c2s 用作 raw_opcode (高16位可能为 0x0001 前缀)
+# [24:26] magic 0x3963
+# [26:30] req_seq
+# [30:]   payload (带 tsf4g padding)
 def _parse_record_v14(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if len(body) < 0x1E or body[4:6] != b"\x55\xaa" or body[24:26] != b"\x39\x63":
         return None
@@ -629,6 +709,9 @@ def _parse_record_live_c2s_short_heartbeat(body: bytes, common: Dict[str, Any]) 
     }
 
 
+# parse_record 是传输层的入口函数。
+# 只处理 TGCP DATA (cmd=0x4013) 包，依次尝试四种记录格式。
+# 返回 None 表示无法识别的格式。
 def parse_record(packet: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if packet.get("cmd") != 0x4013 or not packet.get("decrypted_body_hex"):
         return None

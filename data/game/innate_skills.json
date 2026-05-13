@@ -1,0 +1,202 @@
+{
+  "_meta": {
+    "description": "精灵先天技能/天赋效果定义。运行时通过 buff_id 查找效果参数，供伤害计算 hook 使用。",
+    "version": 1,
+    "source": "游戏解包 BUFF_CONF.json / BUFFBASE_CONF.json"
+  },
+  "skills": {
+    "20030370": {
+      "name": "免疫绝处逢生",
+      "description": "免疫绝处逢生复活机制",
+      "effect_type": "special",
+      "effect_params": {
+        "block_buff_ids": [20380120]
+      },
+      "hook_stage": null,
+      "category": "s2_talent"
+    },
+    "20170160": {
+      "name": "能量充盈",
+      "description": "每回合结束获得1能量",
+      "effect_type": "energy_modify",
+      "effect_params": {
+        "trigger": "turn_end",
+        "value": 1
+      },
+      "hook_stage": "post_calc",
+      "category": "s2_talent"
+    },
+    "20410080": {
+      "name": "临界防御",
+      "description": "生命值低于50%时，双攻+40%",
+      "effect_type": "stat_modify",
+      "effect_params": {
+        "trigger": "hp_below",
+        "threshold_pct": 50,
+        "stat": "ATK",
+        "modifier_pct": 40
+      },
+      "hook_stage": "post_base",
+      "category": "s2_talent"
+    },
+    "20420100": {
+      "name": "无视抵抗",
+      "description": "无视敌方的系别抵抗",
+      "effect_type": "type_resist_modify",
+      "effect_params": {
+        "min_effectiveness": 1.0
+      },
+      "hook_stage": "pre_final",
+      "category": "s2_talent"
+    },
+    "20430060": {
+      "name": "先机虹吸",
+      "description": "先手攻击时，额外吸血30%",
+      "effect_type": "power_modify",
+      "effect_params": {
+        "trigger": "first_strike",
+        "lifesteal_pct": 30
+      },
+      "hook_stage": "post_calc",
+      "category": "s2_talent"
+    },
+    "29990910": {
+      "name": "毒连击",
+      "description": "敌方每有一层中毒，对他的攻击连击数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "per_poison_stack",
+        "value": 1,
+        "poison_buff_ids": [20070010],
+        "scope": "attack_against_target"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20350300": {
+      "name": "翼系连击",
+      "description": "每使用1次翼系技能，连击技能连击数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "skill_element_used",
+        "element": 14,
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20450020": {
+      "name": "连击+1",
+      "description": "连击技能连击次数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20450030": {
+      "name": "连击翻倍",
+      "description": "连击技能连击次数翻倍",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "multiplier": 2,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20450050": {
+      "name": "通用连击+1",
+      "description": "通用连击次数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20170700": {
+      "name": "回合结束连击+1",
+      "description": "回合结束时连击数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "turn_end",
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20170570": {
+      "name": "虫系连击捆绑",
+      "description": "虫系技能连击捆绑效果",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "skill_element_used",
+        "element": 12,
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20172000": {
+      "name": "翼加连击",
+      "description": "翼系技能连击加成",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "skill_element_used",
+        "element": 14,
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "21080150": {
+      "name": "仅精灵连击数+1",
+      "description": "连击技能连击次数+1",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 1,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20460160": {
+      "name": "击败敌人后连击+2",
+      "description": "击败敌人后，连击数+2",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "always",
+        "value": 2,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    },
+    "20450120": {
+      "name": "特定技能连击+2",
+      "description": "使用趁火打劫时连击+2",
+      "effect_type": "combo_modify",
+      "effect_params": {
+        "trigger": "specific_skill",
+        "skill_id": 7180340,
+        "value": 2,
+        "scope": "self"
+      },
+      "hook_stage": "post_calc",
+      "category": "combo"
+    }
+  },
+  "pets": {}
+}

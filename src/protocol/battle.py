@@ -1,4 +1,27 @@
-"""Battle protocol extraction functions ported from RKPP rkpp_proto_battle."""
+"""战斗协议提取模块。
+
+从解析后的 protobuf 记录中提取战斗语义信息。每个 extract_* 函数对应一个 opcode。
+
+提取策略 — 双轨制:
+  1. Schema-first: 通过 proto_schema.json 定义的 Protobuf 消息结构解码
+  2. Raw fallback: 手动遍历 protobuf 字段树提取数据
+
+两者产生相同的输出结构，_schema_quality() 标记解析质量。
+
+主要 opcode 对应:
+  0x0102 = 精灵名册初始化
+  0x130B = 客户端技能选择
+  0x1322 = 服务端技能声明
+  0x1324 = 行动结算（核心，包含伤害/效果/换宠/击杀等子事件）
+  0x130C = 行动确认
+  0x13F4 = 特殊刷新（技能选项/能量）
+  0x1316 = 进入战斗
+  0x131A = 回合开始
+  0x132C = 战斗结束
+  0x13FC = PVP 演出
+  0x13F3 = 预演出
+  0x1312 = 回合流
+"""
 from __future__ import annotations
 
 import logging
@@ -33,7 +56,11 @@ from src.protocol.proto_core import (
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Schema-first helpers
+# Schema-first 辅助函数
+# 用于从 proto_schema.json 解码的结构化数据中提取值。
+# _schema_payload: 获取已解码的 schema 数据（如果存在）
+# _enum_value/_enum_name: 处理枚举类型值（schema 中的 {value, name} 结构）
+# _schema_quality: 标记解析质量（schema_postprocess vs raw_field_postprocess）
 # ---------------------------------------------------------------------------
 
 def _schema_payload(record: Dict[str, Any], expected_message: str) -> Optional[Dict[str, Any]]:
@@ -353,6 +380,12 @@ def _infer_action_from_wrappers(wrappers: List[Dict[str, Any]]) -> Optional[str]
 # ---------------------------------------------------------------------------
 # 0x1324 - Action / perform entries
 # ---------------------------------------------------------------------------
+# _extract_1324_entry 解析 action resolve 中的单个条目。
+# entry_type (field 1) 决定条目类型:
+#   1=skill_cast, 4=damage, 2=effect_apply, 3=effect_stage,
+#   5=heal, 6=energy, 7=defeat, 8=revive, 9=effect_trigger,
+#   10=effect_link, 13=change_pet, 25=ai_action, 30=combo_skill_cast,
+#   34=pvp_perform_marker, 35=data_update, 37=supply_pet
 
 def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
     """Extract a single action entry from a 0x1324 sub-message."""
@@ -379,9 +412,19 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["energy_after"] = pick_first(collect_varints(detail, 26), low=0, high=99)
 
     elif entry_type == 4:
-        # damage — skill from field 6, damage/hp from field 12 IR sub
+        # damage — BattleDamageInfo from field 6, sync_data from field 12
         out["kind"] = "damage"
-        out.update(_extract_skill_ref(first_sub(sg.get(6, [])), skill_field=3))
+        dmg_info = first_sub(sg.get(6, []))
+        if dmg_info:
+            out.update(_extract_skill_ref(dmg_info, skill_field=3))
+            # is_critical (field 5, repeated bool — any nonzero = crit)
+            crit_vals = collect_varints(dmg_info, 5)
+            out["is_critical"] = any(v != 0 for v in crit_vals) if crit_vals else None
+            # restraint_type (field 7): -3..+3 effectiveness indicator
+            rt = pick_first(collect_varints(dmg_info, 7))
+            out["restraint_type"] = maybe_signed64(rt) if rt is not None else None
+            # dam_type (field 9): 1=physical, 2=special
+            out["dam_type"] = pick_first(collect_varints(dmg_info, 9))
         dmg_sub = None
         hp_sub = None
         ir = first_sub(sg.get(12, []))
@@ -545,12 +588,42 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                     out["new_pet_name"] = first_text(info_sub, 3)
                     out["new_pet_types"] = [SDT_TO_TYPE.get(v, v) for v in collect_varints(info_sub, 6)]
                     out["new_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
-                # Fallback: pet_state sub (field 1 of wrapper): pet_id at f21, name at f23
-                if not out.get("new_pet_name"):
-                    state_sub = first_sub(pwg.get(1, []))
-                    if state_sub:
+                # pet_state sub (field 1 of wrapper) = BattleInsidePetInfo
+                state_sub = first_sub(pwg.get(1, []))
+                if state_sub:
+                    # Fallback pet_id/name if not found in info_sub
+                    if not out.get("new_pet_name"):
                         out["new_pet_id"] = pick_first(collect_varints(state_sub, 21), low=1)
                         out["new_pet_name"] = first_text(state_sub, 23)
+                    # Extract battle stats: field 6 = [HP, ATK, DEF, SPA, SPD, SPE]
+                    ds = collect_varints(state_sub, 6)
+                    if len(ds) >= 7:
+                        out["new_pet_battle_stats"] = ds[1:7]
+                    # current_hp from field 25, energy from field 26
+                    if len(ds) >= 26:
+                        out["new_pet_current_hp"] = ds[25]
+                        out["new_pet_max_hp"] = ds[1]
+                    if len(ds) >= 27:
+                        out["new_pet_energy"] = ds[26]
+                    # passive_skill_id from field 64
+                    out["new_pet_passive_skill_id"] = pick_first(collect_varints(state_sub, 64))
+
+    elif entry_type == 30:
+        # BPT_COMBO_SKILL — from field 38 sub (BattleComboSkillCast)
+        out["kind"] = "combo_skill_cast"
+        cm = first_sub(sg.get(38, []))
+        if cm:
+            _extract_actor_target(cm, out)
+            out["caster_id"] = pick_first(collect_varints(cm, 1))
+            out["target_id"] = collect_varints(cm, 2)
+            skill_id_x100 = pick_first(collect_varints(cm, 3), low=100_000)
+            sid = normalize_skill_id(skill_id_x100)
+            out["skill_id_x100"] = skill_id_x100
+            out["skill_id"] = sid
+            out["skill_name"] = skill_name(sid)
+            _attach_skill_meta(out, sid)
+            out["combo_index"] = pick_first(collect_varints(cm, 8))
+            out["combo_count"] = pick_first(collect_varints(cm, 9))
 
     elif entry_type == 25:
         # BPT_AI — from field 33 sub (BattleAIPerform)
@@ -722,6 +795,7 @@ def extract_13f4_refresh(record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     if detail.get("energy_after") == _ENERGY_BOTTLE_MAX and (detail.get("energy_delta") or 0) > 0:
         detail["action_name"] = "能量瓶"
+        detail["kind"] = "energy_bottle"
 
     detail["opcode"] = record.get("opcode")
     detail["opcode_hex"] = record.get("opcode_hex", "")
@@ -1256,59 +1330,58 @@ def _schema_or_raw(record: Dict[str, Any], message_name: str) -> Dict[str, Any]:
     return out
 
 
-def extract_1326_auto_cmd(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
-    decoded = _schema_payload(record, "ChangeAutoCmdNotify")
-    detail = dict(decoded) if decoded else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "ChangeAutoCmdNotify")
-        detail.setdefault("auto_flag", detail.get("field_1"))
+def _make_simple_extractor(message_name: str):
+    """生成标准的 auxiliary extractor: schema_or_raw + opcode 标记。"""
+    def _extractor(record: Dict[str, Any]) -> Dict[str, Any]:
+        detail = _schema_or_raw(record, message_name)
+        detail["opcode"] = record.get("opcode")
+        detail["opcode_hex"] = record.get("opcode_hex", "")
+        return detail
+    return _extractor
+
+
+extract_1326_auto_cmd = _make_simple_extractor("ChangeAutoCmdNotify")
+extract_1326_auto_cmd.__doc__ = """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
+
+extract_132a_role_leave = _make_simple_extractor("RoleLeaveNotify")
+extract_132a_role_leave.__doc__ = """0x132A RoleLeaveNotify — player disconnect."""
+
+extract_132d_force_finish = _make_simple_extractor("BattleForceFinishNotify")
+extract_132d_force_finish.__doc__ = """0x132D BattleForceFinishNotify — forced battle end."""
+
+extract_1334_emoji = _make_simple_extractor("EmojiNotify")
+extract_1334_emoji.__doc__ = """0x1334 EmojiNotify — battle emote."""
+
+extract_133c_catch_rsp = _make_simple_extractor("CatchConfirmRsp")
+extract_133c_catch_rsp.__doc__ = """0x133C CatchConfirmRsp — capture result."""
+
+extract_13f6_ai_skill = _make_simple_extractor("AiSelectSkillNotify")
+extract_13f6_ai_skill.__doc__ = """0x13F6 AiSelectSkillNotify — AI skill hint."""
+
+
+# ---------------------------------------------------------------------------
+# Round confirm opcodes (0x1313, 0x1314)
+# ---------------------------------------------------------------------------
+
+def _raw_field_dump(record: Dict[str, Any]) -> Dict[str, Any]:
+    """通用 raw 字段转储，提取所有 varint 字段。"""
+    root = record.get("root")
+    detail: Dict[str, Any] = {}
+    if root is not None:
+        for fn, entries in field_groups(root).items():
+            vals = collect_varints(root, fn)
+            if vals:
+                detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
     detail["opcode"] = record.get("opcode")
     detail["opcode_hex"] = record.get("opcode_hex", "")
     return detail
 
 
-def extract_132a_role_leave(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x132A RoleLeaveNotify — player disconnect."""
-    detail = _schema_or_raw(record, "RoleLeaveNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
+def extract_1313_round_confirm(record: Dict[str, Any]) -> Dict[str, Any]:
+    """0x1313 BattleRoundConfirmNotify — round confirm."""
+    return _raw_field_dump(record)
 
 
-def extract_132d_force_finish(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x132D BattleForceFinishNotify — forced battle end."""
-    detail = _schema_or_raw(record, "BattleForceFinishNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_1334_emoji(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x1334 EmojiNotify — battle emote."""
-    detail = _schema_or_raw(record, "EmojiNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_133c_catch_rsp(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x133C CatchConfirmRsp — capture result."""
-    decoded = _schema_payload(record, "CatchConfirmRsp")
-    detail = dict(decoded) if isinstance(decoded, dict) else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "CatchConfirmRsp")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
-
-def extract_13f6_ai_skill(record: Dict[str, Any]) -> Dict[str, Any]:
-    """0x13F6 AiSelectSkillNotify — AI skill hint."""
-    decoded = _schema_payload(record, "AiSelectSkillNotify")
-    detail = dict(decoded) if isinstance(decoded, dict) else {}
-    if decoded is None:
-        detail = _schema_or_raw(record, "AiSelectSkillNotify")
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
+def extract_1314_round_confirm_rsp(record: Dict[str, Any]) -> Dict[str, Any]:
+    """0x1314 BattleRoundConfirmRsp — round confirm response."""
+    return _raw_field_dump(record)

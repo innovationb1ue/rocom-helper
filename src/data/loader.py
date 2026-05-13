@@ -26,6 +26,7 @@ _JSON_PATHS: Dict[str, Path] = {
     "pb_message_meta": DATA_DIR / "pb_message_index.json",
     "wiki_pets": DATA_DIR / "wiki_pets.json",
     "wiki_skills": DATA_DIR / "wiki_skills.json",
+    "innate_skills": DATA_DIR / "innate_skills.json",
 }
 
 _json_cache: Optional[Dict[str, Any]] = None
@@ -134,14 +135,22 @@ def _normalize_lookup_value(value: Optional[int], *, normalizer: Optional[_MetaN
 
 
 def _get_bundle_meta(*bundle_keys: str, value: Optional[int], normalizer: Optional[_MetaNormalizer] = None) -> Optional[Dict[str, Any]]:
-    lookup_key = _normalize_lookup_value(value, normalizer=normalizer)
-    if lookup_key is None:
+    if value is None:
         return None
     bundle = get_bundle()
+    # Try raw value first — avoids false normalization of legitimate IDs
     for bundle_key in bundle_keys:
-        entry = bundle.get(bundle_key, {}).get(lookup_key)
+        entry = bundle.get(bundle_key, {}).get(value)
         if isinstance(entry, dict):
             return entry
+    # Try normalized value as fallback (protocol may send id*100)
+    if normalizer:
+        normalized = normalizer(value)
+        if normalized is not None and normalized != value:
+            for bundle_key in bundle_keys:
+                entry = bundle.get(bundle_key, {}).get(normalized)
+                if isinstance(entry, dict):
+                    return entry
     return None
 
 
@@ -151,10 +160,17 @@ def _get_name_from_meta_or_map(*bundle_keys: str, value: Optional[int], map_name
         return meta["name"]
     if map_name is None:
         return None
-    lookup_key = _normalize_lookup_value(value, normalizer=normalizer)
-    if lookup_key is None:
-        return None
-    return get_maps()[map_name].get(lookup_key)
+    maps = get_maps()
+    # Try raw value first
+    name = maps[map_name].get(value)
+    if name:
+        return name
+    # Try normalized fallback
+    if normalizer:
+        normalized = normalizer(value)
+        if normalized is not None and normalized != value:
+            return maps[map_name].get(normalized)
+    return None
 
 
 def get_attr_meta(attr_id: Optional[int]) -> Optional[Dict[str, Any]]:
@@ -195,10 +211,12 @@ def get_pb_message_meta(name: Optional[str]) -> Optional[Dict[str, Any]]:
 
 def invalidate_cache() -> None:
     """热重载 / 测试时调用，使下次查询重新读取数据文件。"""
-    global _json_cache, _maps_cache
+    global _json_cache, _maps_cache, _innate_skills_cache, _buff_dmg_reduce_cache
     with _lock:
         _json_cache = None
         _maps_cache = None
+        _innate_skills_cache = None
+        _buff_dmg_reduce_cache = None
 
 
 # ── Wiki 数据查询 ──────────────────────────────────────────────
@@ -275,3 +293,396 @@ def get_wiki_pet_skills(name: str) -> List[str]:
     if wp and wp.get("skills"):
         return wp["skills"]
     return []
+
+
+# ── 先天技能数据查询 ──────────────────────────────────────────────
+
+_innate_skills_cache: Optional[Dict[str, Any]] = None
+
+
+def _load_innate_skills() -> Dict[int, Dict[str, Any]]:
+    """加载 innate_skills.json，以 buff_id (int) 为 key 返回 skills 字典。"""
+    global _innate_skills_cache
+    if _innate_skills_cache is not None:
+        return _innate_skills_cache
+    path = _JSON_PATHS["innate_skills"]
+    if not path.exists():
+        _innate_skills_cache = {}
+        return _innate_skills_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        _innate_skills_cache = {}
+        return _innate_skills_cache
+    raw_skills = data.get("skills", {}) if isinstance(data, dict) else {}
+    _innate_skills_cache = _int_keyed_meta(raw_skills)
+    return _innate_skills_cache
+
+
+def get_innate_skill(buff_id: int) -> Optional[Dict[str, Any]]:
+    """按 buff_id 查找先天技能效果定义。"""
+    return _load_innate_skills().get(buff_id)
+
+
+# Cache: pet_name → {name, description}
+_pet_trait_cache: Optional[Dict[str, Dict[str, str]]] = None
+
+
+def _load_pet_traits() -> Dict[str, Dict[str, str]]:
+    global _pet_trait_cache
+    if _pet_trait_cache is not None:
+        return _pet_trait_cache
+    _pet_trait_cache = {}
+    path = _JSON_PATHS["wiki_pets"]
+    if not path.exists():
+        return _pet_trait_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return _pet_trait_cache
+    if not isinstance(data, list):
+        return _pet_trait_cache
+    skill_map = get_bundle().get("skill_meta", {})
+    for pet in data:
+        ability = pet.get("ability")
+        if not ability or not isinstance(ability, str):
+            continue
+        name = pet.get("name", "")
+        if not name or name in _pet_trait_cache:
+            continue
+        trait_info: Dict[str, str] = {"name": ability, "description": ""}
+        # Find skill_id and description from skill_map
+        for sid, meta in skill_map.items():
+            if meta.get("name") == ability:
+                trait_info["description"] = meta.get("desc", "")
+                break
+        _pet_trait_cache[name] = trait_info
+    return _pet_trait_cache
+
+
+def get_pet_innate_trait(pet_name: str) -> Optional[Dict[str, str]]:
+    """按精灵名查找先天特性（来自 wiki_pets.json）。"""
+    return _load_pet_traits().get(pet_name)
+
+
+def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
+    """按 base_id 查找精灵的先天技能列表。"""
+    path = _JSON_PATHS["innate_skills"]
+    if not path.exists():
+        return []
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        return []
+    pets = data.get("pets", {}) if isinstance(data, dict) else {}
+    pet_skills = pets.get(str(base_id), [])
+    if not isinstance(pet_skills, list):
+        return []
+    result = []
+    for buff_id in pet_skills:
+        skill = get_innate_skill(buff_id)
+        if skill is not None:
+            result.append(skill)
+    return result
+
+
+# ── Buff 属性修正查询 ──────────────────────────────────────────────
+
+# attr_map ID → stat modifier key
+_ATTR_TO_STAT_KEY = {
+    29: "atk_up", 30: "spa_up", 31: "def_up", 32: "spd_up",
+    33: "atk_down", 34: "spa_down", 35: "def_down", 36: "spd_down",
+}
+
+# buff_id → {"atk_up": 0.2, "atk_down": 0.0, ...} cached lookup
+_buff_stat_cache: Optional[Dict[int, Dict[str, float]]] = None
+
+
+def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 属性修正映射。"""
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, float]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        mods: Dict[str, float] = {}
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            if len(params_list) < 3:
+                continue
+            attr_id = None
+            value = None
+            try:
+                attr_id = params_list[0].get("params", [None])[0]
+                value = params_list[2].get("params", [None])[0]
+            except (IndexError, AttributeError):
+                continue
+            if attr_id is None or value is None:
+                continue
+            stat_key = _ATTR_TO_STAT_KEY.get(attr_id)
+            if stat_key:
+                mods[stat_key] = mods.get(stat_key, 0.0) + value / 10000.0
+        if mods:
+            table[buff_id] = mods
+    return table
+
+
+def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """从 buff 列表解析属性修正，返回 {"atk_up": 0.2, "spa_down": 0.1, ...}。"""
+    global _buff_stat_cache
+    if _buff_stat_cache is None:
+        _buff_stat_cache = _build_buff_stat_table()
+
+    result: Dict[str, float] = {}
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        mods = _buff_stat_cache.get(buff_id)
+        if mods:
+            stage = max(1, int(buff.get("stage", 1)))
+            for key, val in mods.items():
+                result[key] = result.get(key, 0.0) + val * stage
+    return result
+
+
+# ── Buff 速度修正查询 ──────────────────────────────────────────────
+
+_SPEED_STAT_PARAM = 6  # buffbase params[0] = 6 表示速度
+_speed_buff_cache: Optional[Dict[int, Dict[str, float]]] = None
+
+
+def _build_speed_buff_table() -> Dict[int, Dict[str, float]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 速度修正映射。
+
+    buffbase param 结构 (params 按 3 个一组):
+      params[0] = 6 (速度属性标识)
+      params[1] = 0 → 固定值修改, params[2] = ±N
+      params[1] = 1 → 百分比修改, params[2] = N (N/10000)
+    """
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, float]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        flat = 0.0
+        pct = 0.0
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            # params 按 3 个一组解析: [stat_id, mode, value]
+            for i in range(0, len(params_list) - 2, 3):
+                try:
+                    p0 = params_list[i].get("params", [None])[0]
+                    p1 = params_list[i + 1].get("params", [None])[0]
+                    p2 = params_list[i + 2].get("params", [None])[0]
+                except (IndexError, AttributeError):
+                    continue
+                if p0 != _SPEED_STAT_PARAM or p2 is None:
+                    continue
+                if p1 == 0:
+                    flat += p2
+                elif p1 == 1:
+                    pct += p2 / 10000.0
+        if flat != 0 or pct != 0:
+            table[buff_id] = {"flat": flat, "pct": pct}
+    return table
+
+
+def get_speed_buff_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """从 buff 列表计算速度修正，返回 {"flat_total": float, "pct_total": float}。
+
+    stage 表示 buff 层数，效果乘以 stage。
+    """
+    global _speed_buff_cache
+    if _speed_buff_cache is None:
+        _speed_buff_cache = _build_speed_buff_table()
+
+    flat_total = 0.0
+    pct_total = 0.0
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        mods = _speed_buff_cache.get(buff_id)
+        if not mods:
+            continue
+        stage = max(1, int(buff.get("stage", 1)))
+        flat_total += mods.get("flat", 0.0) * stage
+        pct_total += mods.get("pct", 0.0) * stage
+    return {"flat_total": flat_total, "pct_total": pct_total}
+
+
+# ── Buff 伤害减免查询 ──────────────────────────────────────────────
+
+# buff_id → {"reduction": 0.8, "damage_types": [2, 3]} cached lookup
+_buff_dmg_reduce_cache: Optional[Dict[int, Dict[str, Any]]] = None
+
+
+def _build_buff_damage_reduction_table() -> Dict[int, Dict[str, Any]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 伤害减免映射。
+
+    buffbase param 结构:
+      params[1] = 伤害类型过滤 ([2]=物理, [3]=特殊, [2,3]=全部)
+      params[4] = 减免值 (负数, /10000, 如 -8000 = 80% 减免)
+    """
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, Any]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        total_reduction = 0.0
+        dmg_types: set = set()
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            if len(params_list) < 5:
+                continue
+            try:
+                type_filter = params_list[1].get("params", [])
+                reduce_val = params_list[4].get("params", [0])[0]
+            except (IndexError, AttributeError):
+                continue
+            if reduce_val >= 0:
+                continue
+            total_reduction += abs(reduce_val) / 10000.0
+            dmg_types.update(type_filter)
+        if total_reduction > 0:
+            table[buff_id] = {
+                "reduction": total_reduction,
+                "damage_types": sorted(dmg_types),
+            }
+    return table
+
+
+def get_buff_damage_reduction(
+    buff_list: List[Dict[str, Any]], damage_type: int,
+) -> float:
+    """从 buff 列表计算总伤害减免比例，过滤指定伤害类型 (2=物理, 3=特殊)。
+
+    返回 0.0~0.95 之间的减免比例。
+    """
+    global _buff_dmg_reduce_cache
+    if _buff_dmg_reduce_cache is None:
+        _buff_dmg_reduce_cache = _build_buff_damage_reduction_table()
+
+    total = 0.0
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        info = _buff_dmg_reduce_cache.get(buff_id)
+        if not info:
+            continue
+        if damage_type not in info["damage_types"]:
+            continue
+        stage = max(1, int(buff.get("stage", 1)))
+        total += info["reduction"] * stage
+    return min(0.95, total)
+
+
+# ── 天气修正查询 ──────────────────────────────────────────────
+
+# NRC_AI: rain → 水系技能 x1.5, sandstorm/snow → 无伤害修正
+# skill_element 使用 type chart ID (water=2), 而非 SDT 值 (water=5)
+_WATER_TYPE_ID = 2  # type_chart.json 中水的 ID
+
+
+def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: int) -> float:
+    """根据天气和技能属性（type chart ID）返回伤害修正倍率。"""
+    if not weather:
+        return 1.0
+    name = weather.get("name") or ""
+    is_rain = "雨" in name
+    if is_rain and skill_element == _WATER_TYPE_ID:
+        return 1.5
+    return 1.0
+
+
+# ── 热门技能预设 ──────────────────────────────────────────────
+
+CONFIG_DIR = PROJECT_ROOT / "data" / "config"
+_POPULAR_SKILLS_PATH = CONFIG_DIR / "popular_skills.json"
+_popular_skills_cache: Optional[Dict[str, Any]] = None
+
+
+def _load_popular_skills() -> Dict[str, Any]:
+    """加载 popular_skills.json，返回完整配置。"""
+    global _popular_skills_cache
+    if _popular_skills_cache is not None:
+        return _popular_skills_cache
+    path = _POPULAR_SKILLS_PATH
+    if not path.exists():
+        _popular_skills_cache = {"version": 1, "presets": {}}
+        return _popular_skills_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        _popular_skills_cache = {"version": 1, "presets": {}}
+        return _popular_skills_cache
+    _popular_skills_cache = data if isinstance(data, dict) else {"version": 1, "presets": {}}
+    return _popular_skills_cache
+
+
+def get_popular_skills(base_id: int) -> Optional[Dict[str, Any]]:
+    """获取某精灵的热门技能预设。返回 {"name": ..., "skills": [...], "note": ...} 或 None。"""
+    data = _load_popular_skills()
+    presets = data.get("presets", {})
+    return presets.get(str(base_id))
+
+
+def get_all_popular_skills() -> Dict[str, Any]:
+    """获取全部热门技能预设。"""
+    return _load_popular_skills()
+
+
+def save_popular_skills(base_id: int, name: str, skills: List[int], note: str = "") -> None:
+    """保存某精灵的热门技能预设。"""
+    data = _load_popular_skills()
+    presets = data.setdefault("presets", {})
+    presets[str(base_id)] = {"name": name, "skills": skills, "note": note}
+    _save_popular_skills_file(data)
+
+
+def delete_popular_skills(base_id: int) -> bool:
+    """删除某精灵的热门技能预设。返回是否存在。"""
+    data = _load_popular_skills()
+    presets = data.get("presets", {})
+    key = str(base_id)
+    if key in presets:
+        del presets[key]
+        _save_popular_skills_file(data)
+        return True
+    return False
+
+
+def _save_popular_skills_file(data: Dict[str, Any]) -> None:
+    """将热门技能配置写入文件。"""
+    global _popular_skills_cache
+    _POPULAR_SKILLS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with _POPULAR_SKILLS_PATH.open("w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, indent=2)
+    _popular_skills_cache = data

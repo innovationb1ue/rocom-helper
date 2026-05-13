@@ -29,11 +29,28 @@ curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=200&session=battl
 
 # 快速回放（无延迟）
 curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=0"
+
+# 回放到指定回合停止（例如回放到 R7）
+curl -X POST "http://localhost:8000/api/battle/replay?stop_round=7"
+```
+
+使用 CLI 脚本:
+
+```bash
+# 默认回放到战斗结束
+python -m scripts.replay_to_frontend --delay 80 --session battle_session_1
+
+# 回放到 R7 停止
+python -m scripts.replay_to_frontend --delay 80 --round 7
+
+# 回放到 R10 停止
+python -m scripts.replay_to_frontend --delay 80 --round 10
 ```
 
 参数:
 - `delay_ms` (int, 默认 80): 每个包之间的延迟毫秒数，0 表示瞬间完成
 - `session` (str, 默认 "battle_session_1"): 回放的 session 名称
+- `stop_round` (int, 可选): 在指定回合结束后停止回放。例如 `stop_round=7` 表示回放到 R7 结束后停止，不处理 R8 的 round_start。不指定则回放到战斗结束
 
 返回值:
 ```json
@@ -43,17 +60,20 @@ curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=0"
   "total_formatted_events": 120,
   "result": "WIN_HP",
   "rounds": 17,
+  "stopped_early": false,
   "my_pets": 4,
   "opp_pets": 6
 }
 ```
+
+`stopped_early` 为 `true` 表示因 `stop_round` 参数提前停止。
 
 ### 3. 观察前端
 
 回放期间，前端页面会实时更新:
 - 双方阵容和 HP/能量条
 - 战斗事件日志
-- **伤害预测面板**（在双方阵容下方，显示当前精灵技能的伤害预测）
+- **伤害预测面板**（`DamagePredictionPanel`，在双方阵容下方，显示当前精灵技能的伤害预测，含连击显示）
 - 建议卡片
 - 战斗结束后显示总结
 
@@ -88,11 +108,15 @@ tests/fixtures/packets/battle_session_1/
 语义化 summary (kind, detail)
   │
   ▼  BattleManager.process_event()
-  ├── BattleStateTracker.handle_event()  → 状态更新
+  ├── BattleStateTracker.handle_event()  → 状态更新（含 combo_bonus, poison_stacks）
   ├── format_battle_event()              → 格式化事件 → WebSocket push
   ├── _push_state()                      → state_update → WebSocket push
-  ├── BattleAdvisor.analyze()            → damage_predictions → WebSocket push
-  └── _push_damage_analysis()            → damage_predictions → WebSocket push
+  ├── BattleAdvisor.analyze()            → skill_analysis → WebSocket push
+  │     └── DamageCalculator.calculate() → DamageResult（4 阶段 Hook 管线）
+  │           └── innate_hooks            → 先天技能修正（combo/stat/type/power）
+  ├── _run_analysis_hooks()              → hook_advice → WebSocket push
+  │     └── HookRegistry.dispatch()      → OpponentTracker, EnergyMonitor, SwitchAdvisor
+  └── compute_battle_summary()           → battle_summary → WebSocket push (战斗结束时)
 ```
 
 ## WebSocket 消息类型
@@ -106,7 +130,8 @@ tests/fixtures/packets/battle_session_1/
 | `battle_event` | 单个格式化事件 | 有新事件时 |
 | `battle_events` | 多个格式化事件 | 有新事件时 |
 | `suggestions` | 文本建议 | 状态更新后 |
-| `damage_predictions` | 伤害预测 | 进入/回合/动作时 |
+| `skill_analysis` | 技能分析（含伤害预测） | 进入/回合/动作时 |
+| `hook_advice` | 分析 Hook 建议 | 战斗事件触发时 |
 | `battle_summary` | 战斗总结 | 战斗结束时 (opcode 0x132C) |
 
 ## 伤害预测触发时机

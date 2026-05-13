@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 try:
     from Crypto.Cipher import AES
 except ImportError as exc:
-    raise SystemExit("缺少 pycryptodome。先执行: pip install pycryptodome") from exc
+    raise RuntimeError("缺少 pycryptodome。先执行: pip install pycryptodome") from exc
 
 logger = logging.getLogger(__name__)
 
@@ -33,8 +33,7 @@ def parse_key_text(text: str) -> bytes:
 
 def load_key_from_file(path: str) -> Optional[bytes]:
     """从文件加载密钥"""
-    from pathlib import Path as _Path
-    p = _Path(path)
+    p = Path(path)
     if not p.is_file():
         return None
     text = p.read_text(encoding="utf-8", errors="ignore").strip()

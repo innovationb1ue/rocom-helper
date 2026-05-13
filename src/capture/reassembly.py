@@ -4,7 +4,11 @@ import logging
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
-from src.capture.frame import Be21Packet, parse_be21_from_buffer, _MAX_BUFFER_SIZE, _MAX_PENDING_BYTES, _MAX_SEEN_ACKS
+from src.capture.frame import Be21Packet, parse_be21_from_buffer
+
+_MAX_BUFFER_SIZE = 16 * 1024 * 1024
+_MAX_PENDING_BYTES = 8 * 1024 * 1024
+_MAX_SEEN_ACKS = 256
 
 logger = logging.getLogger(__name__)
 

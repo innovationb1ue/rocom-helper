@@ -1,4 +1,4 @@
-import { Card, Tag, Space, Typography, Tooltip } from 'antd';
+import { Card, Tag, Typography, Tooltip } from 'antd';
 import type { DamagePrediction, BattlePet } from '../stores/battleStore';
 import { TYPE_COLORS } from '../utils/typeColors';
 
@@ -43,8 +43,14 @@ export default function DamagePredictionPanel({ predictions, oppActive }: Props)
         {predictions.map((p) => {
           const typeColor = TYPE_COLORS[p.skill_element] || '#999';
           const effColor = effectivenessColor(p.effectiveness_label);
+          const isCombo = (p.hit_count ?? 1) > 1;
+          const hitCount = p.hit_count ?? 1;
+          const totalMin = p.total_min_damage || p.min_damage * hitCount;
+          const totalMax = p.total_max_damage || p.max_damage * hitCount;
+
+          // HP 百分比基于总伤害
           const hpPct = oppHp > 0
-            ? `${Math.round(p.min_damage / oppHp * 100)}%~${Math.round(p.max_damage / oppHp * 100)}%`
+            ? `${Math.round(totalMin / oppHp * 100)}%~${Math.round(totalMax / oppHp * 100)}%`
             : '-';
 
           return (
@@ -72,9 +78,24 @@ export default function DamagePredictionPanel({ predictions, oppActive }: Props)
               </Text>
 
               {/* 伤害范围 */}
-              <Text style={{ fontSize: 13, minWidth: 80, fontWeight: p.can_ko ? 700 : 400 }}>
-                {p.min_damage}~{p.max_damage}
-              </Text>
+              {isCombo ? (
+                <Tooltip title={`单次伤害: ${p.min_damage}~${p.max_damage}`}>
+                  <Text style={{ fontSize: 13, fontWeight: p.can_ko ? 700 : 400 }}>
+                    {totalMin}~{totalMax}
+                  </Text>
+                </Tooltip>
+              ) : (
+                <Text style={{ fontSize: 13, minWidth: 80, fontWeight: p.can_ko ? 700 : 400 }}>
+                  {p.min_damage}~{p.max_damage}
+                </Text>
+              )}
+
+              {/* 连击标记 */}
+              {isCombo && (
+                <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>
+                  ×{hitCount} 连击
+                </Tag>
+              )}
 
               {/* HP 百分比 */}
               <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>

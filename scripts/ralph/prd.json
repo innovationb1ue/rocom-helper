@@ -1,0 +1,63 @@
+{
+  "title": "精灵先天技能系统 (Innate Skill System)",
+  "branchName": "ralph/innate-skill-system",
+  "description": "添加先天技能系统，在伤害计算前后通过 hook 机制注入先天技能修正，使伤害预测准确反映连击总伤害和先天技能效果。",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "解析 BPT_COMBO_SKILL 协议事件",
+      "priority": 1,
+      "passes": true,
+      "description": "在 protocol/battle.py 的 _extract_1324_entry 中添加 entry_type == 30 (BPT_COMBO_SKILL) 的处理分支，提取 combo_index、combo_count、skill_id、caster_id、target_id"
+    },
+    {
+      "id": "US-002",
+      "title": "创建先天技能数据文件",
+      "priority": 2,
+      "passes": true,
+      "description": "创建 data/game/innate_skills.json，以宠物 base_id 为 key，包含先天技能的 name、description、effect_type、effect_params"
+    },
+    {
+      "id": "US-003",
+      "title": "在 battle state 中追踪连击数和毒层数",
+      "priority": 3,
+      "passes": true,
+      "description": "BattleStateTracker 的宠物状态新增 combo_bonus 和 poison_stacks 字段，处理 combo_skill_cast 和 effect_apply 事件"
+    },
+    {
+      "id": "US-004",
+      "title": "实现伤害计算 hook 系统",
+      "priority": 4,
+      "passes": true,
+      "description": "DamageCalculator 类添加 hooks 列表和 register_hook 函数，支持 pre_power、post_base、pre_final、post_calc 四个阶段"
+    },
+    {
+      "id": "US-005",
+      "title": "实现先天技能 hook 函数",
+      "priority": 5,
+      "passes": true,
+      "description": "创建 src/analysis/innate_hooks.py，实现 combo_modify、stat_modify、type_resist_modify、power_modify hook 函数"
+    },
+    {
+      "id": "US-006",
+      "title": "DamageResult 支持连击伤害",
+      "priority": 6,
+      "passes": true,
+      "description": "DamageResult 新增 hit_count、total_min_damage、total_max_damage 字段，支持连击伤害计算"
+    },
+    {
+      "id": "US-007",
+      "title": "连击伤害前端展示",
+      "priority": 7,
+      "passes": true,
+      "description": "BattleLive 页面显示连击技能的总伤害预测和连击信息"
+    },
+    {
+      "id": "US-008",
+      "title": "集成验证 - 战斗回放分析",
+      "priority": 8,
+      "passes": true,
+      "description": "使用 battle_session_1 回放数据验证先天技能系统的正确性"
+    }
+  ]
+}

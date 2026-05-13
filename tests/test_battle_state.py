@@ -385,6 +385,49 @@ class TestSpecialRefresh:
         })
         assert state["my_active"]["energy"] == 10  # min(5+10, 10)
 
+    def test_skill_cast_energy_capped_at_10(self, tracker):
+        """skill_cast 中 energy_after 超过 10 时截断。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "skill_cast", "actor_side": 1, "energy_after": 19},
+        ]))
+        assert state["my_active"]["energy"] == 10
+
+    def test_skill_cast_energy_delta_capped_at_10(self, tracker):
+        """skill_cast 中 energy_delta 导致超过 10 时截断。"""
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.state["my_active"]["energy"] = 8
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "skill_cast", "actor_side": 1, "energy_delta": 5},
+        ]))
+        assert state["my_active"]["energy"] == 10  # min(8+5, 10)
+
+    def test_energy_event_after_capped_at_10(self, tracker):
+        """energy 事件中 energy_after 超过 10 时截断。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "energy", "target_side": 1, "energy_after": 14},
+        ]))
+        assert state["my_active"]["energy"] == 10
+
+    def test_energy_event_delta_capped_at_10(self, tracker):
+        """energy 事件中 energy_delta 导致超过 10 时截断。"""
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.state["my_active"]["energy"] = 9
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "energy", "target_side": 1, "energy_delta": 5},
+        ]))
+        assert state["my_active"]["energy"] == 10  # min(9+5, 10)
+
+    def test_energy_bottle_via_action_name(self, tracker):
+        """能量瓶通过 action_name 匹配（协议实际字段）。"""
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.state["my_active"]["energy"] = 2
+        state = tracker.handle_event(0x13F4, {
+            "action_name": "能量瓶", "side": 1, "energy_delta": 3,
+        })
+        assert state["my_active"]["energy"] == 5  # 2 + 3
+
 
 class TestBattleReset:
     def test_second_battle_resets_state(self, tracker):

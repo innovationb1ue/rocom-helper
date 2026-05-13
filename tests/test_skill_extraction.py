@@ -16,7 +16,6 @@
 from __future__ import annotations
 
 import pytest
-from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
 from src.protocol.proto_core import (
@@ -27,9 +26,7 @@ from src.protocol.proto_core import (
     pick_first,
     skill_name,
 )
-from tests.packet_reader import load_battle_packets, replay_battle
-
-SESSION_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
+from tests.packet_reader import replay_battle
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -144,13 +141,8 @@ def _collect_cast_skills_from_battle(
 # ---------------------------------------------------------------------------
 
 @pytest.fixture(scope="module")
-def battle_packets():
-    return load_battle_packets(SESSION_DIR)
-
-
-@pytest.fixture(scope="module")
-def enter_packet(battle_packets):
-    return next(p for p in battle_packets if p["opcode"] == 0x1316)
+def enter_packet(session1_packets):
+    return next(p for p in session1_packets if p["opcode"] == 0x1316)
 
 
 @pytest.fixture(scope="module")
@@ -159,8 +151,8 @@ def pet_infos(enter_packet):
 
 
 @pytest.fixture(scope="module")
-def cast_skills(battle_packets):
-    return _collect_cast_skills_from_battle(battle_packets)
+def cast_skills(session1_packets):
+    return _collect_cast_skills_from_battle(session1_packets)
 
 
 # ---------------------------------------------------------------------------
@@ -332,9 +324,9 @@ def _find_inside_info_skills_in_record(record) -> List[Dict[str, Any]]:
 class TestRoundStartSkillData:
     """验证 0x131A round_start 中的 skill_round_data。"""
 
-    def test_round_start_has_skill_data(self, battle_packets):
+    def test_round_start_has_skill_data(self, session1_packets):
         """round_start 包中活跃精灵应有 skill_round_data (4 个装备技能)。"""
-        round_starts = [p for p in battle_packets if p["opcode"] == 0x131A]
+        round_starts = [p for p in session1_packets if p["opcode"] == 0x131A]
         assert len(round_starts) > 0
 
         for rs in round_starts:
@@ -344,12 +336,12 @@ class TestRoundStartSkillData:
 
         pytest.fail("round_start 中未找到含 4 个装备技能的精灵")
 
-    def test_round_start_player_skills_match_enter(self, battle_packets):
+    def test_round_start_player_skills_match_enter(self, session1_packets):
         """round_start 中我方精灵的技能应与 battle_enter 一致。"""
         from src.protocol.proto_core import walk_messages
 
-        enter = next(p for p in battle_packets if p["opcode"] == 0x1316)
-        round_starts = [p for p in battle_packets if p["opcode"] == 0x131A]
+        enter = next(p for p in session1_packets if p["opcode"] == 0x1316)
+        round_starts = [p for p in session1_packets if p["opcode"] == 0x131A]
 
         # 从 0x1316 收集我方技能
         enter_pets = _navigate_battle_enter_teams(enter["record"])
@@ -373,3 +365,87 @@ class TestRoundStartSkillData:
             f"round_start 技能集合 {rs_skill_sets} "
             f"未在 enter 技能集合 {enter_skill_sets} 中找到匹配"
         )
+
+
+# ---------------------------------------------------------------------------
+# Tests: 全链路 — replay_battle 后 tracker state 中的 equipped_skills
+# ---------------------------------------------------------------------------
+
+
+class TestEquippedSkillsInTrackerState:
+    """验证 replay_battle 后所有我方精灵的 equipped_skills 完整性。"""
+
+    @pytest.fixture(scope="class")
+    def replay_result(self, session1_baseline_result):
+        return session1_baseline_result
+
+    def test_player_pets_count(self, replay_result):
+        """我方应有6只精灵。"""
+        _, final_state = replay_result
+        my_pets = final_state.get("my_pets", [])
+        assert len(my_pets) == 6, f"我方应有6只精灵, 实际 {len(my_pets)}: {[p.get('name') for p in my_pets]}"
+
+    def test_all_player_pets_have_four_equipped_skills(self, replay_result):
+        """每只我方精灵应有恰好4个装备技能。"""
+        _, final_state = replay_result
+        for pet in final_state.get("my_pets", []):
+            eq = pet.get("equipped_skills", [])
+            assert len(eq) == 4, (
+                f"精灵 {pet.get('name')} 应有4个装备技能, 实际 {len(eq)}: "
+                f"{[s.get('skill_name') for s in eq]}"
+            )
+
+    def test_equipped_skills_sorted_by_slot(self, replay_result):
+        """装备技能应按 slot 1-4 排序。"""
+        _, final_state = replay_result
+        for pet in final_state.get("my_pets", []):
+            slots = [s.get("equipped_slot") for s in pet.get("equipped_skills", [])]
+            assert slots == [1, 2, 3, 4], f"精灵 {pet.get('name')} slots 不连续: {slots}"
+
+    def test_equipped_skills_have_names(self, replay_result):
+        """装备技能应有名称（允许少量因 normalizer 未收录的技能）。"""
+        _, final_state = replay_result
+        unnamed = 0
+        for pet in final_state.get("my_pets", []):
+            for skill in pet.get("equipped_skills", []):
+                if skill.get("skill_name") is None:
+                    unnamed += 1
+        assert unnamed <= 4, f"有 {unnamed} 个装备技能无法解析名称"
+
+    def test_equipped_skills_have_element(self, replay_result):
+        """装备技能应有 skill_element（允许少量因 normalizer 未收录的技能）。"""
+        _, final_state = replay_result
+        no_element = 0
+        for pet in final_state.get("my_pets", []):
+            for skill in pet.get("equipped_skills", []):
+                if skill.get("skill_element") is None:
+                    no_element += 1
+        assert no_element <= 4, f"有 {no_element} 个装备技能无 skill_element"
+
+    def test_equipped_skills_have_damage_type(self, replay_result):
+        """装备技能应有 skill_damage_type (1=状态, 2=物攻, 3=特攻)，允许少量无元数据的技能。"""
+        _, final_state = replay_result
+        no_dt = 0
+        for pet in final_state.get("my_pets", []):
+            for skill in pet.get("equipped_skills", []):
+                dt = skill.get("skill_damage_type")
+                if dt is None:
+                    no_dt += 1
+                    continue
+                assert dt in (1, 2, 3), (
+                    f"精灵 {pet.get('name')}: 技能 {skill.get('skill_name')} damage_type={dt} 不合法"
+                )
+        assert no_dt <= 4, f"有 {no_dt} 个装备技能无 skill_damage_type"
+
+    def test_wrapper_skill_source_tracked(self, session1_packets):
+        """extract_state_wrapper 应返回 skill_source 字段。"""
+        from src.protocol.proto_core import extract_state_wrappers_from_record
+        enter_packet = next(p for p in session1_packets if p["opcode"] == 0x1316)
+        wrappers = extract_state_wrappers_from_record(enter_packet["record"])
+        player_wrappers = [w for w in wrappers if w.get("side") == 1]
+        assert len(player_wrappers) >= 1, "应有我方精灵 wrapper"
+        for w in player_wrappers:
+            assert w.get("skill_source") is not None, f"精灵 {w.get('name')} 无 skill_source"
+            assert len(w.get("equipped_skills", [])) == 4, (
+                f"精灵 {w.get('name')} wrapper equipped_skills 不为4"
+            )

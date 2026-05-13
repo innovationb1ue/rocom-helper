@@ -14,17 +14,21 @@ from src.data.loader import (
     get_pet_name,
     get_buff_meta,
     get_pet_skill_meta,
+    get_buff_stat_modifiers,
     invalidate_cache,
     DATA_DIR,
 )
 
 
 @pytest.fixture(autouse=True)
-def _fresh_cache():
-    """每个测试前清空缓存，确保从文件重新加载。"""
-    invalidate_cache()
-    yield
-    invalidate_cache()
+def _fresh_cache(request):
+    """Only invalidate cache for tests that explicitly test caching behavior."""
+    if "TestCacheInvalidation" in request.node.nodeid:
+        invalidate_cache()
+        yield
+        invalidate_cache()
+    else:
+        yield
 
 
 def _utf8_print(text: str) -> None:
@@ -180,3 +184,68 @@ class TestDataDir:
         required = ["attr_map.json", "skill_map.json", "pet_map.json", "buff_map.json"]
         for fname in required:
             assert (DATA_DIR / fname).exists(), f"Missing {fname}"
+
+
+class TestBuffStatModifiers:
+    """Buff 属性修正查询测试。"""
+
+    def test_empty_buff_list(self):
+        assert get_buff_stat_modifiers([]) == {}
+
+    def test_unknown_buff_id(self):
+        result = get_buff_stat_modifiers([{"id": 999999999}])
+        assert result == {}
+
+    def test_known_buff_modifier_scale(self):
+        """助燃 (buff_id=20011521) has buff_base_ids=[2001001, 2001002].
+        2001001: attr=29 (atk_up), value=1000 → 1000/10000 = 0.1
+        2001002: attr=30 (spa_up), value=1000 → 1000/10000 = 0.1
+        At stage=1: atk_up=0.1, spa_up=0.1"""
+        result = get_buff_stat_modifiers([{"id": 20011521, "stage": 1}])
+        assert abs(result.get("atk_up", 0.0) - 0.1) < 0.001
+        assert abs(result.get("spa_up", 0.0) - 0.1) < 0.001
+
+    def test_stage_multiplies_modifier(self):
+        """Stage=2 should double the modifier."""
+        r1 = get_buff_stat_modifiers([{"id": 20011521, "stage": 1}])
+        r2 = get_buff_stat_modifiers([{"id": 20011521, "stage": 2}])
+        assert abs(r2["atk_up"] - r1["atk_up"] * 2) < 0.001
+        assert abs(r2["spa_up"] - r1["spa_up"] * 2) < 0.001
+
+    def test_missing_stage_defaults_to_1(self):
+        """Buff without stage field should default to stage=1."""
+        r_no_stage = get_buff_stat_modifiers([{"id": 20011521}])
+        r_stage_1 = get_buff_stat_modifiers([{"id": 20011521, "stage": 1}])
+        assert abs(r_no_stage["atk_up"] - r_stage_1["atk_up"]) < 0.001
+
+    def test_zero_stage_clamped_to_1(self):
+        """Stage=0 should be clamped to 1."""
+        r0 = get_buff_stat_modifiers([{"id": 20011521, "stage": 0}])
+        r1 = get_buff_stat_modifiers([{"id": 20011521, "stage": 1}])
+        assert abs(r0["atk_up"] - r1["atk_up"]) < 0.001
+
+    def test_multiple_buffs_accumulate(self):
+        """Multiple buffs should sum their modifiers."""
+        r = get_buff_stat_modifiers([
+            {"id": 20011521, "stage": 1},  # atk_up=0.1, spa_up=0.1
+            {"id": 20011521, "stage": 2},  # atk_up=0.2, spa_up=0.2
+        ])
+        assert abs(r["atk_up"] - 0.3) < 0.001
+        assert abs(r["spa_up"] - 0.3) < 0.001
+
+    def test_defensive_buff_modifier(self):
+        """物防等级提升10 (buffbase 2001005): attr=31 (def_up), value=1000 → 0.1."""
+        # Find a buff that uses buffbase 2001005
+        bundle = get_bundle()
+        buff_meta = bundle.get("buff_meta", {})
+        bb_meta = bundle.get("buffbase_meta", {})
+        target_buff_id = None
+        for bid, bentry in buff_meta.items():
+            base_ids = bentry.get("buff_base_ids", [])
+            if 2001005 in base_ids and len(base_ids) == 1:
+                target_buff_id = bid
+                break
+        if target_buff_id is None:
+            pytest.skip("No single-base buff with buffbase 2001005 found")
+        result = get_buff_stat_modifiers([{"id": target_buff_id, "stage": 1}])
+        assert abs(result.get("def_up", 0.0) - 0.1) < 0.001

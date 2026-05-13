@@ -51,6 +51,13 @@ web/*.local
 
 # Reports and docs output
 reports/
+tmp/
+battle_replay_*.txt
+battle_replay_*.png
+docs/battle_*_report*.txt
+
+# Progress tracking
+scripts/ralph/progress.txt
 
 # Claude Code
 .claude/

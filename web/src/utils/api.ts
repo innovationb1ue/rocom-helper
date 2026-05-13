@@ -76,6 +76,51 @@ export const fetchDataStatus = () =>
 export const refreshData = () =>
   api.post('/data/refresh').then(r => r.data);
 
+// ── 热门技能预设 ──
+
+export interface PopularSkillPreset {
+  name: string;
+  skills: number[];
+  note: string;
+}
+
+export interface PopularSkillsData {
+  version: number;
+  presets: Record<string, PopularSkillPreset>;
+}
+
+export interface PetWithSkills {
+  base_id: number;
+  name: string;
+  skill_count: number;
+}
+
+export interface LearnableSkill {
+  skill_id: number;
+  name: string;
+  element: number;
+  damage_type: number;
+  energy_cost: number;
+  power: number;
+  desc: string;
+  source: number;
+}
+
+export const fetchPopularSkills = () =>
+  api.get<PopularSkillsData>('/config/popular-skills').then(r => r.data);
+
+export const updatePopularSkill = (baseId: number, data: { name?: string; skills: number[]; note?: string }) =>
+  api.put(`/config/popular-skills/${baseId}`, data).then(r => r.data);
+
+export const deletePopularSkill = (baseId: number) =>
+  api.delete(`/config/popular-skills/${baseId}`).then(r => r.data);
+
+export const fetchPetsWithSkills = () =>
+  api.get<{ total: number; pets: PetWithSkills[] }>('/config/pets-with-skills').then(r => r.data);
+
+export const fetchPetLearnableSkills = (baseId: number) =>
+  api.get<{ base_id: number; name: string; skills: LearnableSkill[] }>(`/config/pets-with-skills/${baseId}/skills`).then(r => r.data);
+
 export type SnifferTestResult = {
   status: 'ok' | 'no_traffic' | 'error';
   message: string;

@@ -1,0 +1,33 @@
+"""Shared test fixtures — session-scoped to avoid redundant I/O."""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+from tests.packet_reader import load_battle_packets, replay_battle
+from src.analysis.replay_runner import BattleReplayRunner
+
+SESSION1_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
+SESSION2_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_2"
+
+
+@pytest.fixture(scope="session")
+def session1_packets():
+    """Load battle_session_1 packets once for the entire test session."""
+    if not SESSION1_DIR.exists():
+        pytest.skip("battle_session_1 fixtures not found")
+    return load_battle_packets(SESSION1_DIR)
+
+
+@pytest.fixture(scope="session")
+def session1_baseline_result(session1_packets):
+    """Replay battle_session_1 through BattleStateTracker once."""
+    return replay_battle(session1_packets)
+
+
+@pytest.fixture(scope="session")
+def session1_runner_result(session1_packets):
+    """Replay battle_session_1 through BattleReplayRunner once."""
+    runner = BattleReplayRunner()
+    return runner.run(session1_packets)
