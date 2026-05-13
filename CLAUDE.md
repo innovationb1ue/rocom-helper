@@ -135,7 +135,7 @@ protocol/
   ▼
 analysis/
   ├── constants.py ── Shared opcode constants, OPCODE_LABELS, SDT_TO_TYPE re-export (single source of truth)
-  ├── pet_info.py ── PetInfo construction factory (from_wrapper/from_change_pet → to_dict), unifies pet dict construction
+  ├── pet_info.py ── PetInfo construction factory (from_wrapper/from_change_pet → to_dict), unifies pet dict construction, includes base_speed from battle_stats[5]
   ├── battle_state.py ── Real-time battle state machine (HP, energy, buffs, turn tracking)
   ├── battle_processor.py ── Pure sync event processor (state + formatting + damage + hooks), shared by BattleManager and ReplayRunner
   ├── battle_advisor.py ── Battle analysis coordinator (skill analysis + damage prediction + state suggestions)
@@ -241,6 +241,15 @@ The project has two separate hook systems serving different purposes:
 
 **Note:** `register_innate_hooks()` is called automatically by `BattleAdvisor`, so damage analysis triggered via `BattleManager` has innate hooks active. However, if `DamageCalculator` is instantiated directly (e.g., in tests or standalone scripts), `register_innate_hooks()` must be called explicitly for innate skill effects to apply.
 
+**PvP Data Availability:**
+
+The protocol provides asymmetric data for the two sides. Understanding what is and isn't available is critical for action recommendation:
+
+- **Speed**: Available for both sides via `battle_stats[5]` from the very first packet (`battle_enter` 0x1316). Stored in `pet["base_speed"]` — immutable during battle. `pet["effective_speed"]` is computed on-demand in `get_state()` from `base_speed` + active speed buffs (via `get_speed_buff_modifiers` in `loader.py`).
+- **Equipped skills**: Only available for the player's own pets (`inside_info_f8` source). Opponent `equipped_skills` is always `[]`.
+- **Opponent skills learned**: Accumulated via `used_skills` as the opponent uses skills during battle. The opponent's full skill pool is available from `pet_skill_map.json` keyed by `base_id`.
+- **Stats (ATK/DEF/SPA/SPD)**: Protocol sends `battle_stats[1:5]` but these are typically `0` for the opponent — only HP (`[0]`) and Speed (`[5]`) are populated. The `stats` field from `extract_creature` is also empty for opponents.
+
 **Dual Extraction Strategy (battle.py):**
 
 All major extractors in `battle.py` use a dual approach:
@@ -262,7 +271,7 @@ idle → selecting (0x1316 battle_enter) → resolving (0x131A round_start)
 
 The `/ws/battle` endpoint pushes these message types to connected clients:
 - `connected` — Initial connection confirmation
-- `state_update` — Full battle state snapshot after every event
+- `state_update` — Full battle state snapshot after every event. Each pet dict includes `base_speed` (exact value from `battle_stats[5]`, set once at battle_enter and never modified — speed buffs should compute from this base)
 - `battle_event` / `battle_events` — Formatted battle event(s) for timeline
 - `battle_summary` — End-of-battle summary (computed at 0x132C)
 - `skill_analysis` — Damage prediction for all equipped skills (with optional `traits`)

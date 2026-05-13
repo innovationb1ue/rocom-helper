@@ -4,7 +4,7 @@ import type { FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, Hook
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, clearExpiredAdvice } = useBattleStore();
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice } = useBattleStore();
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -37,6 +37,9 @@ export function useBattle() {
           if (msg.opp_traits) {
             setOppTraits(msg.opp_traits as PetTrait[]);
           }
+          if (msg.opp_skill_analysis) {
+            setOppSkillAnalysis(msg.opp_skill_analysis as SkillAnalysis[], msg.opp_skill_source || '');
+          }
         } else if (msg.type === 'hook_advice') {
           setHookAdvice(msg.advice as HookAdvice[]);
         }
@@ -44,7 +47,7 @@ export function useBattle() {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, clearExpiredAdvice]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));

@@ -34,6 +34,17 @@ logger = logging.getLogger(__name__)
 POISON_BUFF_IDS = {20070010}
 
 
+def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
+    """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正)，最低 1。"""
+    base = pet.get("base_speed")
+    if base is None:
+        return None
+    from src.data.loader import get_speed_buff_modifiers
+    mods = get_speed_buff_modifiers(pet.get("buffs", []))
+    effective = (base + mods.get("flat_total", 0)) * (1.0 + mods.get("pct_total", 0.0))
+    return max(1, int(round(effective)))
+
+
 class BattleStateTracker:
     def __init__(self) -> None:
         self.state: Dict[str, Any] = {
@@ -50,6 +61,9 @@ class BattleStateTracker:
             "events": [],
             "result": None,
         }
+        # battle slot IDs whose ownership has been established
+        self._opponent_slots: set = set()
+        self._player_slots: set = set()
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         """处理协议事件，更新状态，返回最新快照。
@@ -88,7 +102,15 @@ class BattleStateTracker:
         return self.get_state()
 
     def get_state(self) -> Dict[str, Any]:
-        return copy.deepcopy(self.state)
+        state = copy.deepcopy(self.state)
+        # 计算所有精灵的实际速度（基础速度 + buff 修正）
+        for pet in state.get("my_pets", []) + state.get("opp_pets", []):
+            pet["effective_speed"] = _compute_effective_speed(pet)
+        for key in ("my_active", "opp_active"):
+            active = state.get(key)
+            if active:
+                active["effective_speed"] = _compute_effective_speed(active)
+        return state
 
     def pet_name_by_slot(self, slot: Any, is_mine: bool) -> Optional[str]:
         pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
@@ -155,14 +177,18 @@ class BattleStateTracker:
         wrappers = detail.get("wrappers", [])
         self._update_pets_from_wrappers(wrappers)
 
-    @staticmethod
-    def _is_mine(side_value) -> bool:
+    def _is_mine(self, side_value) -> bool:
         """True if *side_value* represents the player side."""
         if side_value is None:
             return False
         if isinstance(side_value, str):
             return side_value == "我方"
         v = int(side_value)
+        if v in self._opponent_slots:
+            return False
+        if v in self._player_slots:
+            return True
+        # Fallback: numeric range when slot mapping is not yet established
         return 1 <= v <= 6
 
     # _handle_action_resolve 是最复杂的状态更新函数。
@@ -204,18 +230,17 @@ class BattleStateTracker:
         target_side = entry.get("damage_target_side")
         damage = entry.get("damage", 0)
         target_hp = entry.get("target_hp_after")
-        active = self._get_active_for_side(target_side)
-        if active is None:
+        if target_side is None:
             return
-        # target_side 的 is_mine 已在 _get_active_for_side 中处理
-        # 但 damage_target_side 语义是"被攻击方"，需要取反
-        active_key = "opp_active" if not self._is_mine(target_side) else "my_active"
+        # damage_target_side is the pet receiving damage — route to its active
+        active_key = "my_active" if self._is_mine(target_side) else "opp_active"
         active = self.state[active_key]
-        active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
-        if active.get("max_hp", 0) > 0:
-            active["hp_pct"] = active["current_hp"] / active["max_hp"]
-        else:
-            active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
+        if active is not None:
+            active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
+            if active.get("max_hp", 0) > 0:
+                active["hp_pct"] = active["current_hp"] / active["max_hp"]
+            else:
+                active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
 
     def _handle_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
         actor_side = entry.get("actor_side", "")
@@ -233,9 +258,9 @@ class BattleStateTracker:
                     item["skill_name"] = entry["skill_name"]
                 used.append(item)
         if energy_after is not None:
-            active["energy"] = energy_after
+            active["energy"] = min(10, energy_after)
         else:
-            active["energy"] = max(0, active.get("energy", 5) + energy_delta)
+            active["energy"] = min(10, max(0, active.get("energy", 5) + energy_delta))
 
     def _handle_combo_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
         actor_side = entry.get("actor_side")
@@ -271,9 +296,9 @@ class BattleStateTracker:
         active = self._get_active_for_side(target_side)
         if active is not None:
             if energy_after is not None:
-                active["energy"] = energy_after
+                active["energy"] = min(10, energy_after)
             elif energy_delta is not None:
-                active["energy"] = max(0, active.get("energy", 5) + energy_delta)
+                active["energy"] = min(10, max(0, active.get("energy", 5) + energy_delta))
 
     def _handle_change_pet_entry(self, entry: Dict[str, Any]) -> None:
         battle_pet_id = entry.get("battle_pet_id")
@@ -281,7 +306,37 @@ class BattleStateTracker:
         new_pet_id = entry.get("new_pet_id")
         if battle_pet_id is None:
             return
-        is_opp = int(battle_pet_id) >= 401
+
+        # Determine side by pet identity, not slot number range.
+        is_opp = None
+        if new_pet_id is not None:
+            in_my = any(p.get("pet_id") == new_pet_id for p in self.state["my_pets"])
+            in_opp = any(p.get("pet_id") == new_pet_id for p in self.state["opp_pets"])
+            if in_my and not in_opp:
+                is_opp = False
+            elif in_opp and not in_my:
+                is_opp = True
+
+        # New pet not in either list: use rest_pet_id (the pet being benched)
+        if is_opp is None:
+            rest_pet_id = entry.get("rest_pet_id")
+            if rest_pet_id in self._opponent_slots:
+                is_opp = True
+            elif rest_pet_id in self._player_slots:
+                is_opp = False
+
+        # Fallback: numeric range
+        if is_opp is None:
+            bpid = int(battle_pet_id)
+            is_opp = bpid >= 401
+
+        # Record slot mapping
+        bpid = int(battle_pet_id)
+        if is_opp:
+            self._opponent_slots.add(bpid)
+        else:
+            self._player_slots.add(bpid)
+
         pet_list = self.state["opp_pets"] if is_opp else self.state["my_pets"]
         active_key = "opp_active" if is_opp else "my_active"
         active = self.state[active_key]
@@ -313,6 +368,20 @@ class BattleStateTracker:
             self.state[active_key] = matched
             matched["buffs"] = []
             matched["combo_bonus"] = 0
+            # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
+            if matched.get("base_speed") is None:
+                bs = entry.get("new_pet_battle_stats") or []
+                if len(bs) >= 6 and bs[5]:
+                    matched["base_speed"] = bs[5]
+            if entry.get("new_pet_current_hp") is not None and entry.get("new_pet_max_hp") is not None:
+                matched["current_hp"] = entry["new_pet_current_hp"]
+                matched["max_hp"] = entry["new_pet_max_hp"]
+                if matched["max_hp"] > 0:
+                    matched["hp_pct"] = matched["current_hp"] / matched["max_hp"]
+            if entry.get("new_pet_energy") is not None:
+                matched["energy"] = entry["new_pet_energy"]
+            if entry.get("new_pet_passive_skill_id") is not None:
+                matched["innate_skill_id"] = entry["new_pet_passive_skill_id"]
 
     def _handle_effect_apply_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side")
@@ -325,6 +394,11 @@ class BattleStateTracker:
         buffs = active.setdefault("buffs", [])
         stage = entry.get("effect_stage")
         ename = entry.get("effect_name")
+        # BuffChangeType: 0=NULL, 1=ADD, 2=CHANGE, 3=REMOVE
+        if stage == 3:
+            # 移除 buff
+            active["buffs"] = [b for b in buffs if b.get("id") != effect_id]
+            return
         existing = next((b for b in buffs if b["id"] == effect_id), None)
         if existing:
             if stage is not None:
@@ -371,8 +445,8 @@ class BattleStateTracker:
         pass  # Client intent, just logged
 
     def _handle_special_refresh(self, detail: Dict[str, Any]) -> None:
-        refresh_kind = detail.get("kind")
-        if refresh_kind == "energy_bottle":
+        refresh_kind = detail.get("kind") or detail.get("action_name")
+        if refresh_kind in ("energy_bottle", "能量瓶"):
             target_side = detail.get("side")
             active_key = "my_active" if self._is_mine(target_side) else "opp_active"
             active = self.state[active_key]
@@ -380,7 +454,19 @@ class BattleStateTracker:
                 active["energy"] = min(10, active.get("energy", 5) + detail.get("energy_delta", 3))
 
     def _handle_skill_declare(self, detail: Dict[str, Any]) -> None:
-        pass  # Server skill declare, just logged
+        skill_id = detail.get("skill_id")
+        actor_side = detail.get("actor_side")
+        if skill_id is None or actor_side is None:
+            return
+        active = self._get_active_for_side(actor_side)
+        if active is None:
+            return
+        used = active.setdefault("used_skills", [])
+        if not any(s.get("skill_id") == skill_id for s in used):
+            item = {"skill_id": skill_id}
+            if detail.get("skill_name"):
+                item["skill_name"] = detail["skill_name"]
+            used.append(item)
 
     def _handle_round_flow(self, detail: Dict[str, Any]) -> None:
         self.state["round"] = detail.get("round", self.state["round"])
@@ -449,6 +535,17 @@ class BattleStateTracker:
                     if w_eq and not pet.get("equipped_skills"):
                         pet["skills"] = w.get("skills", [])
                         pet["equipped_skills"] = w_eq
+                    # 从 battle_stats[5] 设置基础速度（仅首次，战斗中不变）
+                    if pet.get("base_speed") is None:
+                        w_bs = w.get("battle_stats") or []
+                        if len(w_bs) >= 6 and w_bs[5]:
+                            pet["base_speed"] = w_bs[5]
+                    # 能量刷新
+                    if w.get("energy") is not None:
+                        pet["energy"] = w["energy"]
+                    # 属性类型（仅首次为空时填充）
+                    if not pet.get("types") and w.get("types"):
+                        pet["types"] = w["types"]
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
                     # Keep active reference pointing to the same dict in pet_list

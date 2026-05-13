@@ -5,7 +5,7 @@ PetInfo 是一个构造辅助类，不是运行时类型。通过 from_wrapper()
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 class PetInfo:
@@ -16,7 +16,7 @@ class PetInfo:
         "energy", "buffs", "initial_buff_ids", "innate_skill_id",
         "level", "slot", "side", "stats", "skills", "equipped_skills",
         "base_id", "base_skill_pool", "combo_bonus", "poison_stacks",
-        "used_skills",
+        "used_skills", "base_speed",
     )
 
     def __init__(self) -> None:
@@ -41,6 +41,7 @@ class PetInfo:
         self.combo_bonus: int = 0
         self.poison_stacks: int = 0
         self.used_skills: List[Dict[str, Any]] = []
+        self.base_speed: Optional[int] = None
 
     def recalc_hp_pct(self) -> None:
         if self.max_hp > 0:
@@ -71,6 +72,7 @@ class PetInfo:
             "combo_bonus": self.combo_bonus,
             "poison_stacks": self.poison_stacks,
             "used_skills": self.used_skills,
+            "base_speed": self.base_speed,
         }
 
     @classmethod
@@ -84,7 +86,7 @@ class PetInfo:
         pet.types = w.get("types", [])
         pet.current_hp = w.get("hp") or w.get("current_hp", 0)
         pet.max_hp = w.get("max_hp", 0)
-        pet.energy = w.get("energy", default_energy)
+        pet.energy = min(10, w.get("energy", default_energy))
         pet.buffs = list(initial_buffs)
         pet.initial_buff_ids = [b["id"] for b in initial_buffs if "id" in b]
         pet.innate_skill_id = w.get("passive_skill_id")
@@ -96,6 +98,10 @@ class PetInfo:
         pet.equipped_skills = equipped
         pet.base_id = w.get("base_id")
         pet.base_skill_pool = w.get("base_skill_pool")
+        # 从 battle_stats[5] 提取基础速度（含性格/个体/努力值，战斗中不变）
+        battle_stats = w.get("battle_stats") or []
+        if len(battle_stats) >= 6 and battle_stats[5]:
+            pet.base_speed = battle_stats[5]
         pet.recalc_hp_pct()
         return pet
 
@@ -114,5 +120,17 @@ class PetInfo:
         pet.side = 401 if is_opp else 1
         pet.slot = battle_pet_id
         pet.level = entry.get("new_pet_level")
+        # 从 pet_state (BattleInsidePetInfo) 提取的丰富数据
+        if entry.get("new_pet_current_hp") is not None:
+            pet.current_hp = entry["new_pet_current_hp"]
+        if entry.get("new_pet_max_hp") is not None:
+            pet.max_hp = entry["new_pet_max_hp"]
+        if entry.get("new_pet_energy") is not None:
+            pet.energy = entry["new_pet_energy"]
+        battle_stats = entry.get("new_pet_battle_stats") or []
+        if len(battle_stats) >= 6 and battle_stats[5]:
+            pet.base_speed = battle_stats[5]
+        if entry.get("new_pet_passive_skill_id") is not None:
+            pet.innate_skill_id = entry["new_pet_passive_skill_id"]
         pet.recalc_hp_pct()
         return pet

@@ -48,7 +48,8 @@ def _print_summary(result) -> None:
                 hp = pet.get("current_hp", 0)
                 max_hp = pet.get("max_hp", 0)
                 energy = pet.get("energy", 0)
-                print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}")
+                spd = pet.get("effective_speed") or pet.get("base_speed") or "?"
+                print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}  SPD={spd}")
 
         # Formatted events
         if rs.formatted_events:

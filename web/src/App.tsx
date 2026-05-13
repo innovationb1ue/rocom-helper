@@ -8,6 +8,7 @@ import {
   ThunderboltOutlined,
   AimOutlined,
   HistoryOutlined,
+  StarOutlined,
 } from '@ant-design/icons';
 
 import Dashboard from './pages/Dashboard';
@@ -16,6 +17,7 @@ import TeamBuilder from './pages/TeamBuilder';
 import TypeChartPage from './pages/TypeChart';
 import BattleLive from './pages/BattleLive';
 import BattleHistory from './pages/BattleHistory';
+import SkillPresets from './pages/SkillPresets';
 
 const { Header, Content } = Layout;
 
@@ -25,6 +27,7 @@ const menuItems = [
   { key: '/teams', icon: <TeamOutlined />, label: <NavLink to="/teams">队伍</NavLink> },
   { key: '/types', icon: <ThunderboltOutlined />, label: <NavLink to="/types">克制表</NavLink> },
   { key: '/battle', icon: <AimOutlined />, label: <NavLink to="/battle">实时战斗</NavLink> },
+  { key: '/skill-presets', icon: <StarOutlined />, label: <NavLink to="/skill-presets">热门技能</NavLink> },
   { key: '/history', icon: <HistoryOutlined />, label: <NavLink to="/history">历史</NavLink> },
 ];
 
@@ -44,6 +47,7 @@ const App: React.FC = () => (
           <Route path="/teams" element={<TeamBuilder />} />
           <Route path="/types" element={<TypeChartPage />} />
           <Route path="/battle" element={<BattleLive />} />
+          <Route path="/skill-presets" element={<SkillPresets />} />
           <Route path="/history" element={<BattleHistory />} />
         </Routes>
       </Content>

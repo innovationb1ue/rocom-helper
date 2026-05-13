@@ -12,6 +12,7 @@ import TeamRoster from '../components/TeamRoster';
 import BattleEventLog from '../components/BattleEventLog';
 import BattleSummaryPanel from '../components/BattleSummaryPanel';
 import SkillPanel from '../components/SkillPanel';
+import OpponentSkillPanel from '../components/OpponentSkillPanel';
 import HookAdvicePanel from '../components/HookAdvicePanel';
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
@@ -28,7 +29,7 @@ const BattleLive: React.FC = () => {
     my_pets, opp_pets, my_active, opp_active,
     round, result, suggestions, connected,
     formattedEvents, battleSummary, skillAnalysis, traits, oppTraits,
-    hookAdvice,
+    hookAdvice, oppSkillAnalysis, oppSkillSource,
   } = useBattleStore();
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -131,6 +132,14 @@ const BattleLive: React.FC = () => {
 
       {/* 技能分析面板 */}
       <SkillPanel skills={skillAnalysis} oppActive={opp_active} traits={traits} />
+
+      {/* 对手技能分析面板 */}
+      <OpponentSkillPanel
+        skills={oppSkillAnalysis}
+        source={oppSkillSource}
+        myActive={my_active}
+        oppName={opp_active?.name}
+      />
 
       {/* 对手特性 */}
       {oppTraits && oppTraits.length > 0 && (

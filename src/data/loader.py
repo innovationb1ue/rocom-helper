@@ -456,6 +456,79 @@ def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]
     return result
 
 
+# ── Buff 速度修正查询 ──────────────────────────────────────────────
+
+_SPEED_STAT_PARAM = 6  # buffbase params[0] = 6 表示速度
+_speed_buff_cache: Optional[Dict[int, Dict[str, float]]] = None
+
+
+def _build_speed_buff_table() -> Dict[int, Dict[str, float]]:
+    """从 buff_map.json → buffbase_map.json 构建 buff_id → 速度修正映射。
+
+    buffbase param 结构 (params 按 3 个一组):
+      params[0] = 6 (速度属性标识)
+      params[1] = 0 → 固定值修改, params[2] = ±N
+      params[1] = 1 → 百分比修改, params[2] = N (N/10000)
+    """
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+
+    table: Dict[int, Dict[str, float]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        base_ids = buff_entry.get("buff_base_ids") or []
+        if not base_ids:
+            continue
+        flat = 0.0
+        pct = 0.0
+        for bb_id in base_ids:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            params_list = bb.get("buffbase_param", [])
+            # params 按 3 个一组解析: [stat_id, mode, value]
+            for i in range(0, len(params_list) - 2, 3):
+                try:
+                    p0 = params_list[i].get("params", [None])[0]
+                    p1 = params_list[i + 1].get("params", [None])[0]
+                    p2 = params_list[i + 2].get("params", [None])[0]
+                except (IndexError, AttributeError):
+                    continue
+                if p0 != _SPEED_STAT_PARAM or p2 is None:
+                    continue
+                if p1 == 0:
+                    flat += p2
+                elif p1 == 1:
+                    pct += p2 / 10000.0
+        if flat != 0 or pct != 0:
+            table[buff_id] = {"flat": flat, "pct": pct}
+    return table
+
+
+def get_speed_buff_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """从 buff 列表计算速度修正，返回 {"flat_total": float, "pct_total": float}。
+
+    stage 表示 buff 层数，效果乘以 stage。
+    """
+    global _speed_buff_cache
+    if _speed_buff_cache is None:
+        _speed_buff_cache = _build_speed_buff_table()
+
+    flat_total = 0.0
+    pct_total = 0.0
+    for buff in buff_list:
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        mods = _speed_buff_cache.get(buff_id)
+        if not mods:
+            continue
+        stage = max(1, int(buff.get("stage", 1)))
+        flat_total += mods.get("flat", 0.0) * stage
+        pct_total += mods.get("pct", 0.0) * stage
+    return {"flat_total": flat_total, "pct_total": pct_total}
+
+
 # ── Buff 伤害减免查询 ──────────────────────────────────────────────
 
 # buff_id → {"reduction": 0.8, "damage_types": [2, 3]} cached lookup
@@ -546,3 +619,70 @@ def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: in
     if is_rain and skill_element == _WATER_TYPE_ID:
         return 1.5
     return 1.0
+
+
+# ── 热门技能预设 ──────────────────────────────────────────────
+
+CONFIG_DIR = PROJECT_ROOT / "data" / "config"
+_POPULAR_SKILLS_PATH = CONFIG_DIR / "popular_skills.json"
+_popular_skills_cache: Optional[Dict[str, Any]] = None
+
+
+def _load_popular_skills() -> Dict[str, Any]:
+    """加载 popular_skills.json，返回完整配置。"""
+    global _popular_skills_cache
+    if _popular_skills_cache is not None:
+        return _popular_skills_cache
+    path = _POPULAR_SKILLS_PATH
+    if not path.exists():
+        _popular_skills_cache = {"version": 1, "presets": {}}
+        return _popular_skills_cache
+    try:
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, json.JSONDecodeError):
+        _popular_skills_cache = {"version": 1, "presets": {}}
+        return _popular_skills_cache
+    _popular_skills_cache = data if isinstance(data, dict) else {"version": 1, "presets": {}}
+    return _popular_skills_cache
+
+
+def get_popular_skills(base_id: int) -> Optional[Dict[str, Any]]:
+    """获取某精灵的热门技能预设。返回 {"name": ..., "skills": [...], "note": ...} 或 None。"""
+    data = _load_popular_skills()
+    presets = data.get("presets", {})
+    return presets.get(str(base_id))
+
+
+def get_all_popular_skills() -> Dict[str, Any]:
+    """获取全部热门技能预设。"""
+    return _load_popular_skills()
+
+
+def save_popular_skills(base_id: int, name: str, skills: List[int], note: str = "") -> None:
+    """保存某精灵的热门技能预设。"""
+    data = _load_popular_skills()
+    presets = data.setdefault("presets", {})
+    presets[str(base_id)] = {"name": name, "skills": skills, "note": note}
+    _save_popular_skills_file(data)
+
+
+def delete_popular_skills(base_id: int) -> bool:
+    """删除某精灵的热门技能预设。返回是否存在。"""
+    data = _load_popular_skills()
+    presets = data.get("presets", {})
+    key = str(base_id)
+    if key in presets:
+        del presets[key]
+        _save_popular_skills_file(data)
+        return True
+    return False
+
+
+def _save_popular_skills_file(data: Dict[str, Any]) -> None:
+    """将热门技能配置写入文件。"""
+    global _popular_skills_cache
+    _POPULAR_SKILLS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with _POPULAR_SKILLS_PATH.open("w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, indent=2)
+    _popular_skills_cache = data

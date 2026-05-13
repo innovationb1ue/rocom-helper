@@ -55,6 +55,18 @@ const TeamRoster: React.FC<Props> = ({ pets, activePet, label }) => {
                 <>E:{pet.energy}</>
               )}
             </Tag>
+            {pet.effective_speed != null && !isDefeated && (
+              <Tag
+                style={{ margin: 0, fontSize: 11 }}
+                color={
+                  pet.base_speed != null && pet.effective_speed > pet.base_speed ? 'green' :
+                  pet.base_speed != null && pet.effective_speed < pet.base_speed ? 'red' :
+                  undefined
+                }
+              >
+                S:{pet.effective_speed}
+              </Tag>
+            )}
             {isActive && (
               <Badge status="processing" style={{ marginLeft: -4 }} />
             )}

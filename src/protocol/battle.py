@@ -412,9 +412,19 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["energy_after"] = pick_first(collect_varints(detail, 26), low=0, high=99)
 
     elif entry_type == 4:
-        # damage — skill from field 6, damage/hp from field 12 IR sub
+        # damage — BattleDamageInfo from field 6, sync_data from field 12
         out["kind"] = "damage"
-        out.update(_extract_skill_ref(first_sub(sg.get(6, [])), skill_field=3))
+        dmg_info = first_sub(sg.get(6, []))
+        if dmg_info:
+            out.update(_extract_skill_ref(dmg_info, skill_field=3))
+            # is_critical (field 5, repeated bool — any nonzero = crit)
+            crit_vals = collect_varints(dmg_info, 5)
+            out["is_critical"] = any(v != 0 for v in crit_vals) if crit_vals else None
+            # restraint_type (field 7): -3..+3 effectiveness indicator
+            rt = pick_first(collect_varints(dmg_info, 7))
+            out["restraint_type"] = maybe_signed64(rt) if rt is not None else None
+            # dam_type (field 9): 1=physical, 2=special
+            out["dam_type"] = pick_first(collect_varints(dmg_info, 9))
         dmg_sub = None
         hp_sub = None
         ir = first_sub(sg.get(12, []))
@@ -578,12 +588,25 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                     out["new_pet_name"] = first_text(info_sub, 3)
                     out["new_pet_types"] = [SDT_TO_TYPE.get(v, v) for v in collect_varints(info_sub, 6)]
                     out["new_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
-                # Fallback: pet_state sub (field 1 of wrapper): pet_id at f21, name at f23
-                if not out.get("new_pet_name"):
-                    state_sub = first_sub(pwg.get(1, []))
-                    if state_sub:
+                # pet_state sub (field 1 of wrapper) = BattleInsidePetInfo
+                state_sub = first_sub(pwg.get(1, []))
+                if state_sub:
+                    # Fallback pet_id/name if not found in info_sub
+                    if not out.get("new_pet_name"):
                         out["new_pet_id"] = pick_first(collect_varints(state_sub, 21), low=1)
                         out["new_pet_name"] = first_text(state_sub, 23)
+                    # Extract battle stats: field 6 = [HP, ATK, DEF, SPA, SPD, SPE]
+                    ds = collect_varints(state_sub, 6)
+                    if len(ds) >= 7:
+                        out["new_pet_battle_stats"] = ds[1:7]
+                    # current_hp from field 25, energy from field 26
+                    if len(ds) >= 26:
+                        out["new_pet_current_hp"] = ds[25]
+                        out["new_pet_max_hp"] = ds[1]
+                    if len(ds) >= 27:
+                        out["new_pet_energy"] = ds[26]
+                    # passive_skill_id from field 64
+                    out["new_pet_passive_skill_id"] = pick_first(collect_varints(state_sub, 64))
 
     elif entry_type == 30:
         # BPT_COMBO_SKILL — from field 38 sub (BattleComboSkillCast)
@@ -772,6 +795,7 @@ def extract_13f4_refresh(record: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
     if detail.get("energy_after") == _ENERGY_BOTTLE_MAX and (detail.get("energy_delta") or 0) > 0:
         detail["action_name"] = "能量瓶"
+        detail["kind"] = "energy_bottle"
 
     detail["opcode"] = record.get("opcode")
     detail["opcode_hex"] = record.get("opcode_hex", "")

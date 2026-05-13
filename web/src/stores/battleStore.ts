@@ -32,6 +32,8 @@ export interface BattlePet {
   equipped_skills?: EquippedSkill[];
   base_id?: number;
   side?: number;
+  base_speed?: number;
+  effective_speed?: number;
 }
 
 export interface SkillAnalysis {
@@ -109,6 +111,8 @@ export interface BattleState {
   traits: PetTrait[];
   oppTraits: PetTrait[];
   hookAdvice: HookAdvice[];
+  oppSkillAnalysis: SkillAnalysis[];
+  oppSkillSource: string;
 }
 
 interface BattleStore extends BattleState {
@@ -123,6 +127,7 @@ interface BattleStore extends BattleState {
   setTraits: (traits: PetTrait[]) => void;
   setOppTraits: (traits: PetTrait[]) => void;
   setHookAdvice: (advice: HookAdvice[]) => void;
+  setOppSkillAnalysis: (skills: SkillAnalysis[], source: string) => void;
   clearExpiredAdvice: (currentRound: number) => void;
 }
 
@@ -143,6 +148,8 @@ const initialState: BattleState = {
   traits: [],
   oppTraits: [],
   hookAdvice: [],
+  oppSkillAnalysis: [],
+  oppSkillSource: '',
 };
 
 export const useBattleStore = create<BattleStore>((set) => ({
@@ -163,6 +170,7 @@ export const useBattleStore = create<BattleStore>((set) => ({
   setTraits: (traits) => set({ traits }),
   setOppTraits: (traits) => set({ oppTraits: traits }),
   setHookAdvice: (advice) => set({ hookAdvice: advice }),
+  setOppSkillAnalysis: (skills, source) => set({ oppSkillAnalysis: skills, oppSkillSource: source }),
   clearExpiredAdvice: (currentRound) => set((st) => ({
     hookAdvice: st.hookAdvice.filter(
       (a) => a.expires_round == null || a.expires_round >= currentRound

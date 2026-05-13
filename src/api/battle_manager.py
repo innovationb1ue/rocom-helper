@@ -188,6 +188,8 @@ class BattleManager:
                 "skills": advice_dict.get("skill_analysis", []),
                 "traits": advice_dict.get("traits", []),
                 "opp_traits": advice_dict.get("opp_traits", []),
+                "opp_skill_analysis": advice_dict.get("opp_skill_analysis", []),
+                "opp_skill_source": advice_dict.get("opp_skill_source", ""),
             },
             ensure_ascii=False,
         )

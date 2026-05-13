@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 from src.analysis.damage_calc import DamageCalculator, DamageResult
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
-from src.data.loader import get_skill_meta, get_skill_name
+from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills
 from src.game.type_chart import TypeChart
 
 
@@ -61,6 +61,8 @@ class BattleAdvice:
     suggestions: List[Dict[str, str]] = field(default_factory=list)
     traits: List[Dict[str, str]] = field(default_factory=list)
     opp_traits: List[Dict[str, str]] = field(default_factory=list)
+    opp_skill_analysis: List[SkillAnalysis] = field(default_factory=list)
+    opp_skill_source: str = ""  # "protocol" | "preset" | ""
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -68,6 +70,8 @@ class BattleAdvice:
             "suggestions": self.suggestions,
             "traits": self.traits,
             "opp_traits": self.opp_traits,
+            "opp_skill_analysis": [s.to_dict() for s in self.opp_skill_analysis],
+            "opp_skill_source": self.opp_skill_source,
         }
 
 
@@ -93,11 +97,21 @@ class BattleAdvisor:
         traits = self._extract_traits(my_active)
         opp_traits = self._extract_traits(opp_active)
 
+        # 对手技能分析：优先协议数据，回退到热门预设
+        opp_equipped, opp_source = self._resolve_opp_skills(opp_active)
+        opp_skill_analysis: List[SkillAnalysis] = []
+        if opp_equipped:
+            opp_skill_analysis = self._build_skill_analysis(
+                opp_active, my_active, opp_equipped, weather,
+            )
+
         return BattleAdvice(
             skill_analysis=skill_analysis,
             suggestions=suggestions,
             traits=traits,
             opp_traits=opp_traits,
+            opp_skill_analysis=opp_skill_analysis,
+            opp_skill_source=opp_source,
         )
 
     def _build_skill_analysis(
@@ -220,6 +234,38 @@ class BattleAdvisor:
                 continue
             skills.append({"skill_id": skill_id})
         return skills
+
+    @staticmethod
+    def _resolve_opp_skills(opp_active: Dict[str, Any]) -> tuple:
+        """解析对手技能：优先协议装备技能 → 已使用技能 → 热门预设。
+
+        Returns:
+            (skill_list, source) — source 为 "protocol" | "used" | "preset" | ""
+        """
+        # 1. 优先使用协议中的装备技能
+        equipped = (
+            opp_active.get("equipped_skills")
+            or opp_active.get("skills")
+            or []
+        )
+        if equipped:
+            return equipped, "protocol"
+
+        # 2. 回退到对手已使用过的技能（从战斗事件中追踪）
+        used = opp_active.get("used_skills") or []
+        if used:
+            return used, "used"
+
+        # 3. 回退到热门技能预设
+        base_id = opp_active.get("base_id")
+        if base_id:
+            preset = get_popular_skills(base_id)
+            if preset and preset.get("skills"):
+                return [
+                    {"skill_id": sid} for sid in preset["skills"]
+                ], "preset"
+
+        return [], ""
 
     @staticmethod
     def _extract_traits(pet: Dict[str, Any]) -> List[Dict[str, str]]:
