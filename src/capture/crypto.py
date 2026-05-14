@@ -44,6 +44,7 @@ def load_key_from_file(path: str) -> Optional[bytes]:
         try:
             return parse_key_text(first)
         except ValueError:
+            logger.debug("Failed to parse key from first line: %s", first[:32])
             return None
     for line in text.splitlines():
         if line.startswith("key_hex="):
@@ -52,14 +53,14 @@ def load_key_from_file(path: str) -> Optional[bytes]:
                 try:
                     return parse_key_text(value)
                 except ValueError:
-                    pass
+                    logger.debug("Failed to parse key_hex value: %s", value[:32])
         if line.startswith("key_ascii="):
             value = line.split("=", 1)[1].strip()
             if value:
                 try:
                     return parse_key_text(value)
                 except ValueError:
-                    pass
+                    logger.debug("Failed to parse key_ascii value: %s", value[:32])
     return None
 
 def write_key_file(path: str, key: bytes, flow_id: str) -> None:

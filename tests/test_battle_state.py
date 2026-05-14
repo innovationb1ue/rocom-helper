@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from src.analysis.battle_state import BattleStateTracker
+from src.analysis.battle_state import BattleStateTracker, _compute_effective_speed
 
 
 @pytest.fixture
@@ -256,6 +256,121 @@ class TestChangePet:
         ]))
         assert state["my_active"]["name"] == "草苗"
         assert state["my_active"]["buffs"] == []
+
+
+class TestSideRouting:
+    """side 路由测试：通过 pet_id 匹配而非槽位数值范围判断归属。"""
+
+    def test_change_pet_by_pet_id_not_slot_range(self, tracker):
+        """换宠时通过 new_pet_id 匹配 my_pets 判定归属，不依赖 battle_pet_id >= 401。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # Player pet 草苗 (id=101) swaps in at slot 403 (>=401, normally "opponent")
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 403,
+             "new_pet_name": "草苗", "new_pet_id": 101,
+             "new_pet_types": [3], "new_pet_level": 50,
+             "actor_side": 100001},
+        ]))
+        assert state["my_active"]["name"] == "草苗"
+
+    def test_opp_change_pet_by_pet_id_not_slot_range(self, tracker):
+        """换宠时通过 new_pet_id 匹配 opp_pets 判定归属，不依赖 battle_pet_id < 401。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # Opponent pet 电鼠 (id=201) swaps in at slot 3 (<401, normally "player")
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "电鼠", "new_pet_id": 201,
+             "new_pet_types": [4], "new_pet_level": 50,
+             "actor_side": 200002},
+        ]))
+        assert state["opp_active"]["name"] == "电鼠"
+
+    def test_skill_cast_routes_to_opp_active_by_slot_mapping(self, tracker):
+        """对手换宠后，其新槽位 actor_side=3 的 skill_cast 路由到 opp_active。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # First, opponent swaps to 电鼠 at slot 3
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "电鼠", "new_pet_id": 201,
+             "new_pet_types": [4], "new_pet_level": 50,
+             "actor_side": 200002},
+        ]))
+        # Then 电鼠 uses a skill at slot 3 — energy goes to opp_active
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "skill_cast", "actor_side": 3,
+             "energy_after": 8, "energy_delta": -2},
+        ]))
+        assert state["opp_active"]["energy"] == 8
+        # my_active energy should be unchanged
+        assert state["my_active"]["energy"] == 5
+
+    def test_energy_entry_routes_by_slot_mapping(self, tracker):
+        """对手槽位 3 的 energy 事件路由到 opp_active。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "电鼠", "new_pet_id": 201,
+             "new_pet_types": [4], "actor_side": 200002},
+        ]))
+        # Use some energy first
+        tracker.state["opp_active"]["energy"] = 2
+        # Energy event at slot 3
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "energy", "target_side": 3, "energy_after": 7},
+        ]))
+        assert state["opp_active"]["energy"] == 7
+
+    def test_actor_id_cached_for_future_change_pets(self, tracker):
+        """首次换宠记录 actor ID，后续同 actor 的换宠直接复用。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # First change: player actor 100001
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 2,
+             "new_pet_name": "草苗", "new_pet_id": 101,
+             "new_pet_types": [3], "actor_side": 100001},
+        ]))
+        assert tracker._player_actor_id == 100001
+        # Second change: same actor, pet_id not in any list
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "火龙", "new_pet_id": 100,
+             "new_pet_types": [1], "actor_side": 100001},
+        ]))
+        # Should still be player (matched by actor)
+        assert state["my_active"]["name"] == "火龙"
+
+    def test_unknown_actor_with_known_player_actor_is_opponent(self, tracker):
+        """当 player actor 已知时，遇到不同的未知大 actor 值判定为对手。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # First: player change records actor 100001
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 2,
+             "new_pet_name": "草苗", "new_pet_id": 101,
+             "new_pet_types": [3], "actor_side": 100001},
+        ]))
+        # Unknown actor 999999 with new pet not in any list → opponent
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "陌生宠", "new_pet_id": 99999,
+             "new_pet_types": [0], "actor_side": 999999},
+        ]))
+        assert state["opp_active"]["name"] == "陌生宠"
+        assert 3 in tracker._opponent_slots
+
+    def test_slot_mapping_persists_across_rounds(self, tracker):
+        """槽位映射在换宠后持续生效。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 3,
+             "new_pet_name": "电鼠", "new_pet_id": 201,
+             "new_pet_types": [4], "actor_side": 200002},
+        ]))
+        # Recorded: slot 3 = opponent
+        assert 3 in tracker._opponent_slots
+        # Fire a round_start (simulates new round)
+        tracker.handle_event(0x131A, {"round": 2, "wrappers": []})
+        # Slot mapping survives
+        assert 3 in tracker._opponent_slots
 
 
 class TestEffectApply:
@@ -580,3 +695,117 @@ class TestSuggestions:
     def test_no_suggestions_before_battle(self, tracker):
         """战斗开始前无建议。"""
         assert tracker.get_suggestions() == []
+
+
+class TestSpeedTracking:
+    """速度追踪测试 — 覆盖 base_speed 提取、effective_speed 计算、set-once 不变性。"""
+
+    def _enter_event_with_speed(self):
+        """battle_enter 事件，wrappers 包含 battle_stats。"""
+        return {
+            "opcode": 0x1316,
+            "battle_id": 12345,
+            "battle_mode": 1,
+            "round": 0,
+            "max_round": 30,
+            "wrappers": [
+                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
+                 "hp": 300, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 148]},
+                {"pet_id": 200, "pet_name": "水龟", "types": [2], "side": 401,
+                 "hp": 350, "max_hp": 350, "battle_stats": [350, 0, 0, 0, 0, 267]},
+            ],
+        }
+
+    def test_base_speed_from_battle_enter(self, tracker):
+        """battle_enter 的 battle_stats[5] 正确设置为 base_speed。"""
+        state = tracker.handle_event(0x1316, self._enter_event_with_speed())
+        assert state["my_active"]["base_speed"] == 148
+        assert state["opp_active"]["base_speed"] == 267
+
+    def test_effective_speed_equals_base_without_buffs(self, tracker):
+        """无 speed buff 时 effective_speed == base_speed。"""
+        state = tracker.handle_event(0x1316, self._enter_event_with_speed())
+        assert state["my_active"]["effective_speed"] == 148
+        assert state["opp_active"]["effective_speed"] == 267
+
+    def test_effective_speed_none_without_base(self, tracker):
+        """无 battle_stats 时 base_speed 和 effective_speed 均为 None。"""
+        state = tracker.handle_event(0x1316, _enter_event())
+        assert state["my_active"]["base_speed"] is None
+        assert state["my_active"]["effective_speed"] is None
+
+    def test_effective_speed_with_known_buff(self):
+        """speed buff 20010100 (+10 flat/stage) 在 stage=2 时 +20。"""
+        pet = {"name": "测试宠", "base_speed": 148, "buffs": [
+            {"id": 20010100, "stage": 2},
+        ]}
+        assert _compute_effective_speed(pet) == 168  # 148 + 10*2
+
+    def test_effective_speed_with_pct_buff(self):
+        """pct speed buff (20010011, +20% total) 在无 flat 时乘算。"""
+        pet = {"name": "测试宠", "base_speed": 150, "buffs": [
+            {"id": 20010011, "stage": 1},
+        ]}
+        assert _compute_effective_speed(pet) == 180  # 150 * 1.2
+
+    def test_effective_speed_minimum_one(self):
+        """effective_speed 最低为 1。"""
+        pet = {"name": "测试宠", "base_speed": 10, "buffs": [
+            {"id": 20010056, "stage": 2},  # -10 flat/stage → 10 - 20 = -10 → max(1, ...)
+        ]}
+        assert _compute_effective_speed(pet) == 1
+
+    def test_base_speed_from_change_pet(self, tracker):
+        """change_pet 的 new_pet_battle_stats[5] 正确设置新宠物 base_speed。"""
+        tracker.handle_event(0x1316, self._enter_event_with_speed())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 402,
+             "new_pet_name": "电鼠", "new_pet_id": 999,
+             "new_pet_types": [4], "new_pet_level": 50,
+             "new_pet_battle_stats": [280, 0, 0, 0, 0, 200],
+             "new_pet_current_hp": 280, "new_pet_max_hp": 280,
+             "new_pet_energy": 5},
+        ]))
+        assert state["opp_active"]["name"] == "电鼠"
+        assert state["opp_active"]["base_speed"] == 200
+
+    def test_base_speed_not_overwritten_by_round_start(self, tracker):
+        """round_start 提供不同 speed 时不覆盖已设置的 base_speed。"""
+        tracker.handle_event(0x1316, self._enter_event_with_speed())
+        assert tracker.state["my_active"]["base_speed"] == 148
+        # Round start with a different speed value in wrapper
+        tracker.handle_event(0x131A, {
+            "round": 1,
+            "wrappers": [
+                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
+                 "hp": 280, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 999]},
+            ],
+        })
+        # base_speed should remain 148 (set-once invariant)
+        assert tracker.state["my_active"]["base_speed"] == 148
+
+    def test_base_speed_set_from_round_start_when_initially_missing(self, tracker):
+        """battle_enter 无 battle_stats 时，round_start 补充 base_speed。"""
+        tracker.handle_event(0x1316, _enter_event())
+        assert tracker.state["my_active"]["base_speed"] is None
+        # Round start provides battle_stats
+        state = tracker.handle_event(0x131A, {
+            "round": 1,
+            "wrappers": [
+                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
+                 "hp": 300, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 148]},
+            ],
+        })
+        assert state["my_active"]["base_speed"] == 148
+
+    def test_battle_stats_zero_speed_not_set(self, tracker):
+        """battle_stats[5]=0 不应设置 base_speed。"""
+        state = tracker.handle_event(0x1316, {
+            "opcode": 0x1316, "battle_id": 1, "battle_mode": 1,
+            "round": 0, "max_round": 30,
+            "wrappers": [
+                {"pet_id": 100, "pet_name": "零速宠", "types": [1], "side": 1,
+                 "hp": 300, "max_hp": 300, "battle_stats": [300, 0, 0, 0, 0, 0]},
+            ],
+        })
+        assert state["my_active"]["base_speed"] is None

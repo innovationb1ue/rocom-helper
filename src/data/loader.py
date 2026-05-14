@@ -508,7 +508,9 @@ def _build_speed_buff_table() -> Dict[int, Dict[str, float]]:
 def get_speed_buff_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
     """从 buff 列表计算速度修正，返回 {"flat_total": float, "pct_total": float}。
 
-    stage 表示 buff 层数，效果乘以 stage。
+    stage 表示 buff 层数，效果乘以 stage（线性缩放）。
+    NOTE: 已验证 buff 20010100 (+10 flat/stage) 在 stage=8 时 base_speed=148→228，
+    线性假设成立。若发现非线性阶段公式需更新此处。
     """
     global _speed_buff_cache
     if _speed_buff_cache is None:

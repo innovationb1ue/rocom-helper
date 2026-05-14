@@ -66,10 +66,12 @@ class BattleManager:
         self._ws_clients.append(ws)
         self._ensure_bridge()
         await ws.send_json({"type": "connected", "message": "Battle state tracker ready"})
+        logger.info("battle WS client connected, total=%d", len(self._ws_clients))
 
     def remove_client(self, ws: WebSocket) -> None:
         if ws in self._ws_clients:
             self._ws_clients.remove(ws)
+            logger.debug("battle WS client removed, total=%d", len(self._ws_clients))
 
     # ------------------------------------------------------------------
     # Sniffer bridge
@@ -136,6 +138,7 @@ class BattleManager:
             try:
                 await ws.send_text(text)
             except Exception:
+                logger.debug("push_state send failed, removing client")
                 dead.append(ws)
         for ws in dead:
             self._ws_clients.remove(ws)
@@ -146,7 +149,7 @@ class BattleManager:
                 try:
                     await ws.send_text(sug_text)
                 except Exception:
-                    pass
+                    logger.debug("push suggestions send failed")
 
     async def _push_events(self, events: list) -> None:
         if len(events) == 1:
@@ -164,6 +167,7 @@ class BattleManager:
             try:
                 await ws.send_text(msg)
             except Exception:
+                logger.debug("push_events send failed, removing client")
                 dead.append(ws)
         for ws in dead:
             self._ws_clients.remove(ws)
@@ -175,6 +179,7 @@ class BattleManager:
             try:
                 await ws.send_text(msg)
             except Exception:
+                logger.debug("push_summary send failed, removing client")
                 dead.append(ws)
         for ws in dead:
             self._ws_clients.remove(ws)
@@ -198,6 +203,7 @@ class BattleManager:
             try:
                 await ws.send_text(msg)
             except Exception:
+                logger.debug("push_damage_analysis send failed, removing client")
                 dead.append(ws)
         for ws in dead:
             self._ws_clients.remove(ws)
@@ -212,6 +218,7 @@ class BattleManager:
             try:
                 await ws.send_text(msg)
             except Exception:
+                logger.debug("push_hook_advice send failed, removing client")
                 dead.append(ws)
         for ws in dead:
             self._ws_clients.remove(ws)

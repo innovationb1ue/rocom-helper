@@ -71,7 +71,7 @@ class SnifferManager:
             try:
                 self._loop.call_soon_threadsafe(cb, record)
             except Exception:
-                pass
+                logger.warning("record callback dispatch failed", exc_info=True)
 
     # ---- WebSocket 管理 ----
 
@@ -95,6 +95,7 @@ class SnifferManager:
                 try:
                     await ws.send_text(text)
                 except Exception:
+                    logger.debug("sniffer broadcast send failed, removing client")
                     dead.append(ws)
             for ws in dead:
                 self._ws_clients.remove(ws)
