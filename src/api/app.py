@@ -17,7 +17,26 @@ _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Roco PvP Helper API starting...")
+
+    # Auto-start sniffer (graceful degradation if Scapy/Npcap unavailable)
+    from src.api.sniffer_manager import get_sniffer_manager
+    _sniffer_mgr = get_sniffer_manager()
+    try:
+        await _sniffer_mgr.start()
+        logger.info("Sniffer auto-started successfully")
+    except Exception as exc:
+        logger.warning("Sniffer auto-start failed (non-fatal): %s", exc)
+
+    # Pre-register battle bridge (don't wait for first WS client)
+    from src.api.battle_manager import get_battle_manager
+    get_battle_manager().ensure_bridge()
+
     yield
+
+    try:
+        await _sniffer_mgr.stop()
+    except Exception:
+        pass
     logger.info("Roco PvP Helper API shutting down")
 
 

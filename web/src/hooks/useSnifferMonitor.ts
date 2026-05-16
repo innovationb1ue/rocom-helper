@@ -10,22 +10,18 @@ export function useSnifferMonitor() {
   const connectWs = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const url = `${protocol}//${window.location.hostname}:8000/api/sniffer/ws/monitor`;
-    console.log('[sniffer] connecting WebSocket:', url);
     const ws = new WebSocket(url);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log('[sniffer] WebSocket connected');
       setWsConnected(true);
     };
 
     ws.onclose = () => {
-      console.log('[sniffer] WebSocket closed');
       setWsConnected(false);
     };
 
-    ws.onerror = (e) => {
-      console.error('[sniffer] WebSocket error', e);
+    ws.onerror = () => {
       setWsConnected(false);
     };
 
@@ -42,13 +38,9 @@ export function useSnifferMonitor() {
   }, [updateStatus, addRecord, setWsConnected]);
 
   const startMonitoring = useCallback(async () => {
-    console.log('[sniffer] startMonitoring called');
     try {
-      // 先连接 WebSocket，确保不丢失状态变更推送
       connectWs();
-
       const res = await api.post('/sniffer/start');
-      console.log('[sniffer] API response:', res.data);
       updateStatus(
         res.data?.details?.status ?? 'listening',
         res.data?.details?.message ?? '监听中',
@@ -56,7 +48,6 @@ export function useSnifferMonitor() {
         res.data?.details?.key_hex ?? null,
       );
     } catch (err) {
-      console.error('[sniffer] start failed:', err);
       updateStatus('idle', `启动失败: ${err instanceof Error ? err.message : '未知错误'}`, 0, null);
     }
   }, [connectWs, updateStatus]);

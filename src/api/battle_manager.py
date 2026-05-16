@@ -64,7 +64,7 @@ class BattleManager:
     async def add_client(self, ws: WebSocket) -> None:
         await ws.accept()
         self._ws_clients.append(ws)
-        self._ensure_bridge()
+        self.ensure_bridge()
         await ws.send_json({"type": "connected", "message": "Battle state tracker ready"})
         logger.info("battle WS client connected, total=%d", len(self._ws_clients))
 
@@ -77,7 +77,7 @@ class BattleManager:
     # Sniffer bridge
     # ------------------------------------------------------------------
 
-    def _ensure_bridge(self) -> None:
+    def ensure_bridge(self) -> None:
         if self._bridge_registered:
             return
         self._bridge_registered = True

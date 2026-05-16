@@ -231,7 +231,12 @@ class SnifferManager:
             on_event=self._on_sniffer_event,
             packet_logger=pkt_log,
         )
-        self._sniffer.start()
+        try:
+            self._sniffer.start()
+        except Exception as exc:
+            self._set_state("idle", f"启动失败: {exc}")
+            self._sniffer = None
+            raise
 
         # 4. 短暂等待后评估实际状态（游戏可能已打开）
         await asyncio.sleep(0.3)

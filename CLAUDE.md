@@ -425,6 +425,21 @@ assert all(rs.battle_advice is None for rs in result.rounds)
 
 JSON 输出（`--json`，写入 `tmp/`）：结构化的 `ReplayResult` 序列化，包含上述所有字段。
 
+## 协议字段参考
+
+**编码时查阅字段含义的首选资源：**
+
+- `docs/proto_reference.md` — 战斗协议字段参考手册（枚举值、消息字段映射、游戏配置语义）
+- `data/game/proto_field_reference.json` — 结构化 JSON 版本（34 个枚举 + 386 个消息定义 + 游戏配置字段语义 + ID 交叉引用链）
+
+**何时查阅：**
+- 解析新协议字段时 — 先查 proto_reference.md 找到字段编号对应的名称和类型
+- 理解 buff/skill/effect 参数含义时 — 查阅"游戏配置字段语义"章节
+- 确认枚举值含义时 — 查阅"枚举值速查"章节（如 BattlePerformType、SkillRestraintType）
+- 追踪 ID 引用链时 — skill_result.effect_id → EFFECT_CONF/BUFF_CONF，buff_base_ids → BUFFBASE_CONF
+
+**数据来源：** 从 `references/Roco-Kingdom-World-Data/` 的 .proto 定义和游戏配置 JSON 中自动提取。
+
 ## 参考仓库
 
 以下外部仓库是协议解析和游戏数据的有用参考：

@@ -52,6 +52,7 @@ IN_BATTLE_OPCODES = {
 DAMAGE_OPCODES = {
     OPCODE_BATTLE_ENTER, OPCODE_ROUND_START,
     OPCODE_ACTION_RESOLVE, OPCODE_SPECIAL_REFRESH,
+    OPCODE_PVP_PERFORM, OPCODE_PREPLAY,
 }
 
 # ---------------------------------------------------------------------------

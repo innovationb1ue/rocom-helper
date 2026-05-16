@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.data.loader import get_buff_damage_reduction, get_buff_stat_modifiers, get_innate_skill
+from src.data.loader import get_buff_damage_reduction, get_buff_stat_modifiers, get_innate_skill, get_innate_skills_for_pet
 
 
 def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -18,6 +18,19 @@ def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
     return skills
 
 
+def _get_all_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """获取所有先天技能：来自 buffs 扫描 + 来自宠物被动天赋（pets 映射）。"""
+    skills = _get_active_innate_skills(pet)
+    base_id = pet.get("base_id")
+    if base_id:
+        pet_skills = get_innate_skills_for_pet(int(base_id))
+        seen_ids = {id(s) for s in skills}
+        for s in pet_skills:
+            if id(s) not in seen_ids:
+                skills.append(s)
+    return skills
+
+
 # ---------------------------------------------------------------------------
 # combo_modify hook  (post_calc stage)
 # ---------------------------------------------------------------------------
@@ -28,14 +41,13 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     attacker = ctx.get("attacker", {})
     defender = ctx.get("defender", {})
     combo_bonus = attacker.get("combo_bonus", 0)
-    combo_accumulator = attacker.get("combo_accumulator", 0)
 
     base_hits = ctx.get("hit_count", 1)
 
     additive_bonus = 0
     multiplier = 1
 
-    for skill in _get_active_innate_skills(attacker):
+    for skill in _get_all_innate_skills(attacker):
         if skill.get("effect_type") != "combo_modify":
             continue
         params = skill.get("effect_params", {})
@@ -61,7 +73,7 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
             if target_skill_id and current_skill_id == target_skill_id:
                 additive_bonus += params.get("value", 0)
 
-    total_hits = int((base_hits + combo_bonus + combo_accumulator) * multiplier + additive_bonus)
+    total_hits = int((base_hits + combo_bonus) * multiplier + additive_bonus)
     if total_hits >= 1:
         ctx["hit_count"] = total_hits
 
@@ -78,7 +90,7 @@ def stat_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     attacker = ctx.get("attacker", {})
 
     total_modifier = 0.0
-    for skill in _get_active_innate_skills(attacker):
+    for skill in _get_all_innate_skills(attacker):
         if skill.get("effect_type") != "stat_modify":
             continue
         params = skill.get("effect_params", {})
@@ -107,7 +119,7 @@ def type_resist_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     attacker = ctx.get("attacker", {})
 
     min_eff = 0.0
-    for skill in _get_active_innate_skills(attacker):
+    for skill in _get_all_innate_skills(attacker):
         if skill.get("effect_type") != "type_resist_modify":
             continue
         params = skill.get("effect_params", {})
@@ -150,7 +162,7 @@ def power_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """威力修正 — 附加吸血等效果，将元数据写入 context 供上层消费。"""
     attacker = ctx.get("attacker", {})
 
-    for skill in _get_active_innate_skills(attacker):
+    for skill in _get_all_innate_skills(attacker):
         if skill.get("effect_type") != "power_modify":
             continue
         params = skill.get("effect_params", {})

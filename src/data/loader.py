@@ -383,7 +383,7 @@ def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
         return []
     result = []
     for buff_id in pet_skills:
-        skill = get_innate_skill(buff_id)
+        skill = get_innate_skill(int(buff_id))
         if skill is not None:
             result.append(skill)
     return result

@@ -391,19 +391,32 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
     """Extract a single action entry from a 0x1324 sub-message."""
     sg = field_groups(sub)
     entry_type = pick_first(collect_varints(sub, 1))
+    # BattlePerformInfo top-level fields — names match proto definition
     out: Dict[str, Any] = {
         "type": entry_type,
+        "group_id": pick_first(collect_varints(sub, 2)),
+        "is_group_head": bool(pick_first(collect_varints(sub, 11)) or 0),
+        "cast_moment": pick_first(collect_varints(sub, 14)),
+        "group_ref": pick_first(collect_varints(sub, 26)),
+        "is_last_hit": bool(pick_first(collect_varints(sub, 27)) or 0),
+        "exec_index": pick_first(collect_varints(sub, 39)),
+        # backward compat aliases
         "index": pick_first(collect_varints(sub, 2)),
-        "phase_arg": pick_first(collect_varints(sub, 14)),
-        "state_arg": pick_first(collect_varints(sub, 26)),
-        "extra_arg": pick_first(collect_varints(sub, 27)),
         "event_ordinal": pick_first(collect_varints(sub, 39)),
     }
 
     if entry_type == 1:
         # skill_cast — skill from field 3, energy from field 12 IR sub
         out["kind"] = "skill_cast"
-        out.update(_extract_skill_ref(first_sub(sg.get(3, [])), skill_field=3))
+        skill_sub = first_sub(sg.get(3, []))
+        out.update(_extract_skill_ref(skill_sub, skill_field=3))
+        if skill_sub:
+            out["skill_perform_type"] = pick_first(collect_varints(skill_sub, 7))
+            out["is_interrupt"] = bool(pick_first(collect_varints(skill_sub, 8)) or 0)
+            out["perform_flag"] = pick_first(collect_varints(skill_sub, 10))
+            rt = collect_varints(skill_sub, 4)
+            if rt:
+                out["restraint_type"] = [maybe_signed64(v) for v in rt]
         ir_sub = first_sub(sg.get(12, []))
         detail = first_sub(field_groups(ir_sub).get(2, [])) if ir_sub else None
         if detail:
@@ -425,6 +438,9 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["restraint_type"] = maybe_signed64(rt) if rt is not None else None
             # dam_type (field 9): 1=physical, 2=special
             out["dam_type"] = pick_first(collect_varints(dmg_info, 9))
+            out["is_hit"] = bool(pick_first(collect_varints(dmg_info, 6)) or 0)
+            out["has_shield"] = bool(pick_first(collect_varints(dmg_info, 8)) or 0)
+            out["execution"] = bool(pick_first(collect_varints(dmg_info, 10)) or 0)
         dmg_sub = None
         hp_sub = None
         ir = first_sub(sg.get(12, []))
@@ -449,14 +465,25 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["target_hp_after"] = pick_first(collect_varints(hp_sub, 3), low=0, high=99999)
 
     elif entry_type == 2:
-        # effect_apply — from field 4 sub, related skills from field 12 IR sub
+        # effect_apply — from field 4 sub (BattleBuffChange), related skills from field 12 IR sub
         out["kind"] = "effect_apply"
         em = first_sub(sg.get(4, []))
         if em:
             _extract_actor_target(em, out)
             out["effect_id"] = pick_first(collect_varints(em, 3))
-            out["effect_stage"] = pick_first(collect_varints(em, 4))
+            # field 4 = BuffChangeType (ADD=1, CHANGE=2, REMOVE=3)
+            change_type = pick_first(collect_varints(em, 4))
+            out["change_type"] = change_type
             _attach_buff_meta(out, out.get("effect_id"))
+            # buff_info sub-message (field 8 = BattleBuffInfo)
+            bi = first_sub(field_groups(em).get(8, []))
+            if bi:
+                out["buff_stack"] = pick_first(collect_varints(bi, 4))
+                out["buff_left_round"] = pick_first(collect_varints(bi, 32))
+                out["buff_on_field_round"] = pick_first(collect_varints(bi, 31))
+                out["is_hidden"] = bool(pick_first(collect_varints(bi, 26)) or 0)
+                out["hidden_stack"] = pick_first(collect_varints(bi, 27))
+                out["del_flag"] = bool(pick_first(collect_varints(bi, 30)) or 0)
         ir = first_sub(sg.get(12, []))
         related: List[Dict[str, Any]] = []
         if ir:
@@ -482,31 +509,41 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["related_skills"] = related
 
     elif entry_type == 3:
-        # effect_stage — from field 5 sub
+        # effect_stage — from field 5 sub (BattleBuffTrigger)
         out["kind"] = "effect_stage"
         em = first_sub(sg.get(5, []))
         if em:
             _extract_actor_target(em, out)
             out["effect_id"] = pick_first(collect_varints(em, 3))
-            out["effect_base"] = pick_first(collect_varints(em, 6))
+            bb_ids = collect_varints(em, 6)
+            out["effect_base"] = pick_first(bb_ids)  # backward compat
+            out["buffbase_ids"] = bb_ids
+            out["perform_type"] = pick_first(collect_varints(em, 7))
             _attach_buff_meta(out, out.get("effect_id"))
             _attach_buffbase_meta(out, out.get("effect_base"))
 
     elif entry_type == 7:
-        # defeat — from field 9 sub
+        # defeat — from field 9 sub (BattleDeadInfo)
         out["kind"] = "defeat"
         dm = first_sub(sg.get(9, []))
         if dm:
             _extract_actor_target(dm, out)
-            out["defeat_arg"] = pick_first(collect_varints(dm, 3))
+            dead_type = pick_first(collect_varints(dm, 3))
+            out["defeat_arg"] = dead_type
+            out["dead_type"] = dead_type
+            DEAD_TYPE_NAMES = {0: "normal", 1: "wait_revive", 2: "keep_model",
+                               3: "blow_away", 4: "die_with_caster"}
+            if dead_type is not None:
+                out["dead_type_name"] = DEAD_TYPE_NAMES.get(dead_type, f"unknown_{dead_type}")
 
     elif entry_type == 10:
-        # effect_link — from field 15 sub
+        # effect_link — from field 15 sub (BattleShowLetters)
         out["kind"] = "effect_link"
         lm = first_sub(sg.get(15, []))
         if lm:
             _extract_actor_target(lm, out)
             out["effect_id"] = pick_first(collect_varints(lm, 3))
+            out["pet_id"] = pick_first(collect_varints(lm, 4))
             _attach_buff_meta(out, out.get("effect_id"))
 
     elif entry_type == 5:
@@ -554,6 +591,15 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
         rm = first_sub(sg.get(10, []))
         if rm:
             _extract_actor_target(rm, out)
+            out["revive_uin"] = pick_first(collect_varints(rm, 3))
+            # pet sub-message (field 2) — contains revived pet state
+            pet_sub = first_sub(field_groups(rm).get(2, []))
+            if pet_sub:
+                out["revive_pet_id"] = pick_first(collect_varints(pet_sub, 2))
+                out["revive_pet_name"] = first_text(pet_sub, 3)
+                revive_hp = pick_first(collect_varints(pet_sub, 3), low=0, high=99999)
+                if revive_hp is not None:
+                    out["revive_hp"] = revive_hp
 
     elif entry_type == 9:
         # BPT_EFFECT_TRIGGER — from field 13 sub (BattleEffectTrigger)
@@ -622,8 +668,13 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["skill_id"] = sid
             out["skill_name"] = skill_name(sid)
             _attach_skill_meta(out, sid)
+            rt = collect_varints(cm, 4)
+            if rt:
+                out["restraint_type"] = [maybe_signed64(v) for v in rt]
+            out["skill_perform_type"] = pick_first(collect_varints(cm, 7))
             out["combo_index"] = pick_first(collect_varints(cm, 8))
             out["combo_count"] = pick_first(collect_varints(cm, 9))
+            out["change_target_id"] = pick_first(collect_varints(cm, 10))
 
     elif entry_type == 25:
         # BPT_AI — from field 33 sub (BattleAIPerform)
@@ -670,6 +721,24 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                 })
             if pet_infos:
                 out["supply_pets"] = pet_infos
+
+    elif entry_type == 19:
+        # BPT_SKILL_STATE — field 24 sub (BattleSkillStateInfo)
+        out["kind"] = "skill_state"
+        sm = first_sub(sg.get(24, []))
+        if sm:
+            out["caster_pet_id"] = pick_first(collect_varints(sm, 1))
+            out["state_code"] = pick_first(collect_varints(sm, 2))
+
+    elif entry_type == 22:
+        # BPT_WEATHER_CHANGE — field 29 sub (BattleWeatherChange)
+        out["kind"] = "weather_change"
+        wm = first_sub(sg.get(29, []))
+        if wm:
+            out["weather_id"] = pick_first(collect_varints(wm, 2))
+            out["weather_expire_round"] = pick_first(collect_varints(wm, 5))
+            out["skill_id"] = pick_first(collect_varints(wm, 1))
+            out["skill_name"] = skill_name(out["skill_id"]) if out["skill_id"] else None
 
     else:
         out["kind"] = f"unknown_type_{entry_type}"

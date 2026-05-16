@@ -22,6 +22,8 @@ from src.analysis.constants import (
     OPCODE_BATTLE_ENTER,
     OPCODE_BATTLE_FINISH,
     OPCODE_LABELS,
+    OPCODE_PVP_PERFORM,
+    OPCODE_PREPLAY,
     OPCODE_ROUND_START,
     OPCODE_SPECIAL_REFRESH,
 )
@@ -51,6 +53,8 @@ _OPCODE_TRIGGER_MAP: Dict[int, List[HookTrigger]] = {
     OPCODE_ACTION_RESOLVE: [HookTrigger.ON_ACTION_RESOLVE],
     OPCODE_SPECIAL_REFRESH: [HookTrigger.ON_SPECIAL_REFRESH],
     OPCODE_BATTLE_FINISH: [HookTrigger.ON_BATTLE_FINISH],
+    OPCODE_PVP_PERFORM: [HookTrigger.ON_ACTION_RESOLVE],
+    OPCODE_PREPLAY: [HookTrigger.ON_ACTION_RESOLVE],
 }
 
 
@@ -158,7 +162,7 @@ class BattleProcessor:
     def opcode_to_triggers(opcode: int, detail: Dict[str, Any]) -> List[HookTrigger]:
         """opcode → HookTrigger 映射。0x1324 额外检查 entries 中的 kind。"""
         triggers = list(_OPCODE_TRIGGER_MAP.get(opcode, []))
-        if opcode == OPCODE_ACTION_RESOLVE:
+        if opcode in (OPCODE_ACTION_RESOLVE, OPCODE_PVP_PERFORM, OPCODE_PREPLAY):
             for entry in detail.get("entries", []):
                 kind = entry.get("kind")
                 if kind == "change_pet":

@@ -89,7 +89,7 @@ class TestPoisonStackTracking:
             assert p["poison_stacks"] > 0, f"Pet {p['name']} poison_stacks should be > 0"
 
     def test_poison_stacks_value_from_stage(self, session1_baseline_result):
-        """poison_stacks should match the last effect_stage from poison buff events."""
+        """poison_stacks should match the last buff_stack from poison buff events."""
         events, state = session1_baseline_result
         # Collect poison effect events per side
         poison_by_side = {}
@@ -102,7 +102,7 @@ class TestPoisonStackTracking:
                     and entry.get("effect_id") in POISON_BUFF_IDS
                 ):
                     side = entry.get("target_side")
-                    stage = entry.get("effect_stage", 0)
+                    stage = entry.get("buff_stack", 0)
                     if side not in poison_by_side:
                         poison_by_side[side] = []
                     poison_by_side[side].append(stage)
