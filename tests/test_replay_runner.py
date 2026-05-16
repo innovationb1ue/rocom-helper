@@ -246,7 +246,9 @@ class TestReplayRunnerSuggestions:
     def test_round_suggestions_aggregated(self, session1_runner_result):
         total_per_round = sum(len(rs.suggestions) for rs in session1_runner_result.rounds)
         total_per_event = sum(len(ev.suggestions) for ev in session1_runner_result.events)
-        assert total_per_round == total_per_event
+        # Round-level suggestions are deduplicated, so total_round <= total_event
+        assert total_per_round <= total_per_event
+        assert total_per_round > 0  # At least some suggestions present
 
     def test_suggestions_json_serializable(self, session1_runner_result):
         for ev in session1_runner_result.events:

@@ -109,7 +109,9 @@ def main():
     parser = argparse.ArgumentParser(description="Headless battle replay (no server needed)")
     parser.add_argument("--session", default="battle_session_1", help="Session directory name")
     parser.add_argument("--round", type=int, default=None, help="Stop at this round")
-    parser.add_argument("--json", "--no-json", default=True, action=argparse.BooleanOptionalAction, help="Write JSON result to tmp/ (default: --json, use --no-json to skip)")
+    parser.add_argument("--no-json", dest="write_json", action="store_false", help="Skip JSON output to tmp/")
+    parser.add_argument("--json", dest="write_json", action="store_true", help="Write JSON result to tmp/ (default)")
+    parser.set_defaults(write_json=True)
     args = parser.parse_args()
 
     from tests.packet_reader import load_battle_packets
@@ -129,7 +131,7 @@ def main():
 
     _print_summary(result)
 
-    if args.json:
+    if args.write_json:
         output = {
             "total_packets": result.total_packets,
             "stopped_early": result.stopped_early,

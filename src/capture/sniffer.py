@@ -23,6 +23,7 @@ from src.protocol.opcodes import summarize
 
 _DEFAULT_PORT = 8195
 _DEFAULT_BPF = "tcp port 8195"
+_STALE_KEY_THRESHOLD = 5
 
 
 def _flow_key_from_packet(packet: Any, port: int) -> Optional[Tuple[str, int, str, int]]:
@@ -68,7 +69,10 @@ class Sniffer:
         self._sniffer: Optional[AsyncSniffer] = None
         self._running = False
         self._lock = threading.Lock()
-        self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0}
+        self.stats: Dict[str, int] = {
+            "decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0,
+            "parse_fail": 0, "key_stale_clears": 0,
+        }
 
     def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
         if self.on_event:
@@ -92,8 +96,6 @@ class Sniffer:
                     key=self.preset_key,
                 )
                 self.flows[fk] = flow
-                if self.preset_key:
-                    write_key_file(self.key_file, self.preset_key, flow_id)
                 logger.info("新 TCP 流: %s", flow_id)
             return flow
 
@@ -195,6 +197,7 @@ class Sniffer:
             iv, plain = decrypt_4013_body(flow.key, be21.body)
         except ValueError as exc:
             self.stats["decrypt_fail"] += 1
+            flow.consecutive_parse_fail += 1
             if plog:
                 plog.log_be21_frame(
                     flow.flow_id, be21.direction, be21.cmd, be21.seq,
@@ -212,6 +215,20 @@ class Sniffer:
         }
         record = parse_record(pkt_dict)
         if record is None:
+            self.stats["parse_fail"] += 1
+            flow.consecutive_parse_fail += 1
+            if flow.consecutive_parse_fail >= _STALE_KEY_THRESHOLD:
+                logger.warning(
+                    "flow=%s 连续 %d 次解析失败，密钥可能过期",
+                    flow.flow_id, flow.consecutive_parse_fail,
+                )
+                flow.key = None
+                flow.consecutive_parse_fail = 0
+                self._emit("key_stale", {
+                    "flow_id": flow.flow_id,
+                    "consecutive_failures": _STALE_KEY_THRESHOLD,
+                })
+                self.stats["key_stale_clears"] += 1
             if plog:
                 plog.log_be21_frame(
                     flow.flow_id, be21.direction, be21.cmd, be21.seq,
@@ -229,6 +246,7 @@ class Sniffer:
         record["_summary_kind"] = kind
         record["_summary"] = summary
         self.stats["decrypt_ok"] += 1
+        flow.consecutive_parse_fail = 0
 
         if plog:
             plog.log_be21_frame(

@@ -411,6 +411,7 @@ class BattleStateTracker:
             self.state[active_key] = matched
             matched["buffs"] = []
             matched["combo_bonus"] = 0
+            matched["combo_accumulator"] = 0
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []
@@ -425,6 +426,9 @@ class BattleStateTracker:
                 matched["energy"] = min(10, entry["new_pet_energy"])
             if entry.get("new_pet_passive_skill_id") is not None:
                 matched["innate_skill_id"] = entry["new_pet_passive_skill_id"]
+            new_types = entry.get("new_pet_types")
+            if new_types:
+                matched["types"] = new_types
         side_label = "OPP" if is_opp else "MY"
         prev = entry.get("_prev_active_name", "?")
         logger.info("change_pet: %s %s → %s", side_label, prev, new_pet_name)
@@ -442,7 +446,8 @@ class BattleStateTracker:
         ename = entry.get("effect_name")
         # BuffChangeType: 0=NULL, 1=ADD, 2=CHANGE, 3=REMOVE
         if stage == 3:
-            # 移除 buff
+            # 移除 buff — 如果是 combo innate，效果永久累积（瞬态 buff 被移除说明已经生效）
+            self._accumulate_combo(active, effect_id)
             active["buffs"] = [b for b in buffs if b.get("id") != effect_id]
             return
         existing = next((b for b in buffs if b["id"] == effect_id), None)
@@ -461,13 +466,28 @@ class BattleStateTracker:
         if effect_id in POISON_BUFF_IDS:
             active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
+    @staticmethod
+    def _accumulate_combo(active: Dict[str, Any], effect_id: int) -> None:
+        """累积 combo innate buff 效果 — 仅累积每回合触发的瞬态 buff（value=1）。
+        持久性 innate buff（如特定技能连击+2）和一次性触发 buff 不在此累积，
+        它们通过 combo_modify_hook 的 buff 扫描或 additive 路径处理。"""
+        from src.data.loader import get_innate_skill
+        innate = get_innate_skill(effect_id)
+        if innate and innate.get("effect_type") == "combo_modify":
+            params = innate.get("effect_params", {})
+            trigger = params.get("trigger", "always")
+            value = params.get("value", 0)
+            # 仅累积 trigger="always" 且 value=1 的每回合瞬态 buff
+            if trigger == "always" and value == 1:
+                active["combo_accumulator"] = active.get("combo_accumulator", 0) + value
+
     def _handle_effect_stage_entry(self, entry: Dict[str, Any]) -> None:
-        actor_side = entry.get("actor_side")
+        target_side = entry.get("target_side")
         effect_id = entry.get("effect_id")
         new_stage = entry.get("effect_stage")
-        if actor_side is None:
+        if target_side is None:
             return
-        active = self._get_active_for_side(actor_side)
+        active = self._get_active_for_side(target_side)
         if active is not None:
             buffs = active.get("buffs", [])
             existing = next((b for b in buffs if b["id"] == effect_id), None)

@@ -28,6 +28,7 @@ def _make_attacker(
     current_hp=300,
     energy=10,
     combo_bonus=0,
+    combo_accumulator=0,
     poison_stacks=0,
     buffs=None,
     first_strike=False,
@@ -40,6 +41,7 @@ def _make_attacker(
         "current_hp": current_hp,
         "energy": energy,
         "combo_bonus": combo_bonus,
+        "combo_accumulator": combo_accumulator,
         "poison_stacks": poison_stacks,
         "first_strike": first_strike,
         "stats": [
@@ -102,10 +104,10 @@ class TestComboModifyHook:
         assert result["hit_count"] == 2  # base unchanged
 
     def test_combo_always_adds_hits(self):
-        """连击+1 (buff 20450020): always +1 hit"""
+        """连击+1 (buff 20450020): always +1 hit — 持久 buff 在 buff 列表中被 hook 扫描到"""
         attacker = _make_attacker(
             combo_bonus=3,
-            buffs=[{"id": 20450020}],
+            buffs=[{"id": 20450020}],  # 持久 buff，hook 直接扫描
         )
         ctx = {
             "min_damage": 50,
@@ -116,7 +118,7 @@ class TestComboModifyHook:
             "skill_meta": _make_skill(),
         }
         result = combo_modify_hook(ctx)
-        assert result["hit_count"] == 5  # (1 base + 3 combo) * 1 + 1 bonus
+        assert result["hit_count"] == 5  # (1 base + 3 combo + 0 acc) * 1 + 1 bonus
         assert result["min_damage"] == 50
         assert result["max_damage"] == 60
 
@@ -189,10 +191,10 @@ class TestComboModifyHook:
         assert result["hit_count"] == 4  # (2 + 2) * 1, no element bonus
 
     def test_combo_multiple_innate_skills(self):
-        """Multiple combo innate skills stack additively."""
+        """Multiple combo innate skills stack additively — persistent buffs scanned by hook."""
         attacker = _make_attacker(
             combo_bonus=2,
-            buffs=[{"id": 20450020}, {"id": 20450050}],  # 连击+1 + 通用连击+1
+            buffs=[{"id": 20450020}, {"id": 20450050}],  # 连击+1 + 通用连击+1 (persistent)
         )
         ctx = {
             "min_damage": 50,
@@ -203,7 +205,7 @@ class TestComboModifyHook:
             "skill_meta": _make_skill(),
         }
         result = combo_modify_hook(ctx)
-        assert result["hit_count"] == 5  # (1 + 2) * 1 + 1 + 1
+        assert result["hit_count"] == 5  # (1 + 2 + 0 acc) * 1 + 1 + 1
 
     def test_no_innate_buff_uses_base_combo(self):
         """Combo bonus but no innate skills → hit_count = base + combo_bonus."""

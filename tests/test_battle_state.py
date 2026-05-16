@@ -423,14 +423,14 @@ class TestEffectApply:
         assert len(state["opp_active"]["buffs"]) == 1
 
     def test_effect_stage_update(self, tracker):
-        """effect_stage 类型事件更新已有 buff 的 stage。"""
+        """effect_stage 类型事件通过 target_side 更新已有 buff 的 stage。"""
         tracker.handle_event(0x1316, _enter_event())
         tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
              "effect_id": 100, "effect_name": "烧伤", "effect_stage": 1},
         ]))
         state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "effect_stage", "actor_side": 1,
+            {"kind": "effect_stage", "target_side": 1,
              "effect_id": 100, "effect_stage": 3},
         ]))
         assert state["my_active"]["buffs"][0]["stage"] == 3

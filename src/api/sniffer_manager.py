@@ -114,6 +114,14 @@ class SnifferManager:
             self._save_key(data.get("key_hex"), data.get("flow_id", ""))
             self._set_state("key_captured", "密钥已捕获，正在监听数据")
             self._push({"type": "key_captured", **data})
+        elif event_type == "key_stale":
+            self._key_hex = None
+            if self._flow_count > 0:
+                self._set_state(
+                    "connected",
+                    "密钥可能过期，等待新密钥（如一直无密钥请重启游戏）",
+                )
+            self._push({"type": "key_stale", **data})
         elif event_type == "record":
             full_record = data.get("record")
             if full_record is not None:
@@ -128,7 +136,7 @@ class SnifferManager:
             if self._key_hex:
                 self._set_state("key_captured", "密钥已加载，正在监听数据")
             else:
-                self._set_state("connected", "游戏已连接，等待密钥...")
+                self._set_state("connected", "游戏已连接，等待密钥（如一直无密钥请重启游戏）")
 
     # ---- 监控循环 ----
 
@@ -172,7 +180,7 @@ class SnifferManager:
         if any_has_key or self._key_hex:
             self._set_state("key_captured", "密钥已获取，正在监听数据")
         elif self._state == "listening":
-            self._set_state("connected", "游戏已连接，等待密钥...")
+            self._set_state("connected", "游戏已连接，等待密钥（如一直无密钥请重启游戏）")
 
     # ---- 启动/停止 ----
 
