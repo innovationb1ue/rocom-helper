@@ -1,0 +1,59 @@
+{
+    "Name": "MEDAL_BOND_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "medal_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "petbase_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_species_range",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "suit_match",
+            "Type": "EStruct",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "MEDAL_BOND_CONF.suit_match",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "gender",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "suit_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

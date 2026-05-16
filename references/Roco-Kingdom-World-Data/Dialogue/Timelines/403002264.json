@@ -1,0 +1,17 @@
+{
+    "length": 3.0,
+    "dialogue_id": 403002264,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 19548,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        }
+    ]
+}

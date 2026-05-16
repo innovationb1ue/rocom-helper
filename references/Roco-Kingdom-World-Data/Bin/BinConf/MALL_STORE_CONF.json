@@ -1,0 +1,57 @@
+{
+    "Name": "MALL_STORE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "reset_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "reset_param",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "RandMallItem",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6,
+            "Struct": {
+                "Name": "MALL_STORE_CONF.RandMallItem",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "Id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "is_rand",
+                        "Type": "EBool",
+                        "Offset": 4,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 5,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

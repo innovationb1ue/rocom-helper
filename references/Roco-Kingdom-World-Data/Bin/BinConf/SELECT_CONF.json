@@ -1,0 +1,177 @@
+{
+    "Name": "SELECT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "online_process",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "text",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "opt_dia_relate",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "color",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "select_icon",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "initial_flags",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "enable_cond",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "enable_cond_params",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "times",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "times_decrease_cond",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "times_decrease_cond_params",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reset_type",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "reset_time",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "obtain_story_flags",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "lost_story_flags",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "notimes_disable",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "notimes_dialogue",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "select_deletnpc",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "select_deletnpc_times",
+            "Type": "EInt32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "select_next_dialogue",
+            "Type": "EInt32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "select_mark",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4
+        },
+        {
+            "Name": "select_skip",
+            "Type": "EBool",
+            "Offset": 92,
+            "Size": 1
+        },
+        {
+            "Name": "esc_skip",
+            "Type": "EBool",
+            "Offset": 93,
+            "Size": 1
+        },
+        {
+            "Name": "system_control_id",
+            "Type": "EUint32",
+            "Offset": 94,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "Name": "PET_TOPIC_TYPE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "topic_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "show_priority",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

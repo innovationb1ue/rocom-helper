@@ -1,0 +1,145 @@
+{
+    "length": 4.03,
+    "dialogue_id": 190222650,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": true,
+    "cached_dialogue_npc_id": 41025,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 41025,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": -1,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 41025,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 41025,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": -31.0,
+                "Y": -4.0,
+                "Z": 96.0
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -14.9,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 41076,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 82.5,
+                "Y": 116.0,
+                "Z": -3.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -56.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 184.0,
+                "Y": -61.0,
+                "Z": -5.7,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 157.4,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "SkipUserClick": false,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": 348.2,
+                "Y": -45.8,
+                "Z": 162.3
+            },
+            "RelativeRotation": {
+                "Pitch": -14.2,
+                "Yaw": 167.0,
+                "Roll": 0.0
+            },
+            "FOV": 90.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 41025,
+            "StartTime": 0.0,
+            "EndTime": 4.0,
+            "MinimalDuration": 0.1,
+            "Action": "dialogue2",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        }
+    ]
+}

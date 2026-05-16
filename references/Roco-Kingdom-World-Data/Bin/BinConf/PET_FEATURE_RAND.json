@@ -1,0 +1,46 @@
+{
+    "Name": "PET_FEATURE_RAND",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "feature_rand",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "PET_FEATURE_RAND.feature_rand",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "pet_feature_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "weight",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

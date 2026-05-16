@@ -1,0 +1,285 @@
+{
+    "Name": "BALL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "model",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "trail_fx",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "fx_source",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "bigworld_catch",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "catch_not_give_peer",
+            "Type": "EBool",
+            "Offset": 21,
+            "Size": 1
+        },
+        {
+            "Name": "solid_ball_act",
+            "Type": "EUint32",
+            "Offset": 22,
+            "Size": 4
+        },
+        {
+            "Name": "ball_prob",
+            "Type": "EUint32",
+            "Offset": 26,
+            "Size": 4
+        },
+        {
+            "Name": "Noeffect_ball_prob",
+            "Type": "EUint32",
+            "Offset": 30,
+            "Size": 4
+        },
+        {
+            "Name": "guarant_efficiency",
+            "Type": "EUint32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "static_catch_rate",
+            "Type": "EInt32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "ball_type",
+            "Type": "EInt32",
+            "Offset": 42,
+            "Size": 4
+        },
+        {
+            "Name": "ball_effect_type",
+            "Type": "EInt32",
+            "Offset": 46,
+            "Size": 4
+        },
+        {
+            "Name": "extra_effect_group",
+            "Type": "EStruct",
+            "Offset": 50,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "BALL_CONF.extra_effect_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "extra_effect",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "extra_effect_param1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "extra_effect_param2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "extra_effect_param3",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "extra_effect_param4",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "catch_action",
+            "Type": "EString",
+            "Offset": 54,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "param_blackboard",
+            "Type": "EInt32",
+            "Offset": 58,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "param_buff",
+            "Type": "EInt32",
+            "Offset": 62,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "param_skilldam",
+            "Type": "EInt32",
+            "Offset": 66,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "param_weather",
+            "Type": "EInt32",
+            "Offset": 70,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "catch_effect_blackboard",
+            "Type": "EString",
+            "Offset": 74,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ball_threshold_modify",
+            "Type": "EUint32",
+            "Offset": 78,
+            "Size": 4
+        },
+        {
+            "Name": "catch_bp_exp",
+            "Type": "EUint32",
+            "Offset": 82,
+            "Size": 4
+        },
+        {
+            "Name": "history_sup_prob",
+            "Type": "EUint32",
+            "Offset": 86,
+            "Size": 4
+        },
+        {
+            "Name": "hp_sup_prob",
+            "Type": "EUint32",
+            "Offset": 90,
+            "Size": 4
+        },
+        {
+            "Name": "pp_sup_prob",
+            "Type": "EUint32",
+            "Offset": 94,
+            "Size": 4
+        },
+        {
+            "Name": "happy_sup_prob",
+            "Type": "EUint32",
+            "Offset": 98,
+            "Size": 4
+        },
+        {
+            "Name": "debuff_sup_prob",
+            "Type": "EUint32",
+            "Offset": 102,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_prob",
+            "Type": "EUint32",
+            "Offset": 106,
+            "Size": 4
+        },
+        {
+            "Name": "global_catch_prob",
+            "Type": "EUint32",
+            "Offset": 110,
+            "Size": 4
+        },
+        {
+            "Name": "npc_id",
+            "Type": "EUint32",
+            "Offset": 114,
+            "Size": 4
+        },
+        {
+            "Name": "hidden_capture_correction",
+            "Type": "EUint32",
+            "Offset": 118,
+            "Size": 4
+        },
+        {
+            "Name": "ball_list_priority",
+            "Type": "EUint32",
+            "Offset": 122,
+            "Size": 4
+        },
+        {
+            "Name": "ball_icon",
+            "Type": "EString",
+            "Offset": 126,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ball_mini_icon",
+            "Type": "EString",
+            "Offset": 130,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ball_tips_icon",
+            "Type": "EString",
+            "Offset": 134,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

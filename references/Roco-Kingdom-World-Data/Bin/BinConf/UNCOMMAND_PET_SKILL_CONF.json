@@ -1,0 +1,37 @@
+{
+    "Name": "UNCOMMAND_PET_SKILL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "command_petlv_diff",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "command_percent",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "command_pet_skill",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "command_buff",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,457 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle.proto";
+import "com_team_battle.proto";
+import "com_recharge.proto";
+import "com_misc.proto";
+import "com_rpc.proto";
+import "com_handbook.proto";
+import "com_pet.proto";
+import "com_action.proto";
+import "com_activity.proto";
+import "com_home.proto";
+import "com_player.proto";
+import "com_player_data.proto";
+import "com_task.proto";
+import "com_dungeon.proto";
+import "com_relation.proto";
+import "space_data.proto";
+import "xls_enum.proto";
+import "feed_data.proto";
+
+enum InteractCancelStatus {
+  ICS_NORMAL = 0;
+  ICS_FUNCTIONBAN = 1;
+  ICS_PEER_FUNCTIONBAN = 2;
+  ICS_PEER_REFUSE = 3;
+  ICS_TIMEOUT = 4;
+  ICS_DOUBLE_RIDE_CANCEL = 5;
+}
+
+message DisconnectInfo {
+  bytes system_hardware = 1;
+  bytes channel = 2;
+}
+
+message NotifyMsg {
+  Next.DisconnectInfo dis_info = 1;
+}
+
+message ZonePlayerSyncNotify {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerSyncInfo sync_info = 2;
+}
+
+message ZoneNotifyModuleMark {
+  uint64 module_mark = 1;
+}
+
+message ZonePlayerInfoNotify {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerInfo player_info = 2;
+}
+
+message ZonePlayerPetHpChangeNotify {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetHpInfo pet_info = 2;
+  uint32 change_reason = 3;
+  int32 total_change_hp = 4;
+}
+
+message ZonePlayerInSafeZoneNotify {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerInChangePetZoneNotify {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerLeaveChangePetZoneNotify {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerAddRoleEnergyNotify {
+  Next.RetInfo ret_info = 1;
+  uint32 config_add_val = 2;
+  uint32 real_add_val = 3;
+}
+
+message ZoneTaskInfoNotify {
+  repeated Next.PlayerTaskInfo task_info_list = 1;
+  repeated uint32 delete_task_list = 2;
+  Next.RetInfo ret_info = 3;
+  uint32 open_task_num = 4;
+  uint32 guiding_task_num = 5;
+  uint32 is_all_activity_task = 6;
+}
+
+message ZoneClimbChapterNotify {
+  Next.ClimbChapterItem chapter_item = 1;
+}
+
+message ZoneErrorTipsNotify {
+  Next.RetInfo ret_info = 1;
+  bytes err_tips = 2;
+  uint32 is_debug_show = 3;
+  bool is_debug = 4;
+}
+
+message ZoneDungeonDataNotify {
+  repeated Next.DungeonStateInfo dungeon_state_list = 1;
+}
+
+message ZoneSceneDungeonStageNotify {
+  uint32 dungeon_cfg_id = 1;
+  repeated uint32 stage_cfg_id = 2;
+  bool dungeon_finish = 3;
+}
+
+message ZoneScenePreTeleportNotify {
+  int32 from_scene_res_cfg_id = 1;
+  int32 to_scene_cfg_id = 11;
+  int32 to_scene_res_cfg_id = 12;
+  uint64 to_scene_inst_id = 13;
+  Next.Point to_pt = 14;
+  string teleport_stub = 21;
+  int32 teleport_id = 22;
+  bool allow_cli_cache_pkg = 26;
+  bool is_no_loading_teleport = 27;
+}
+
+message ZoneScenePreTeleportNotifyAck {
+  string teleport_stub = 5;
+}
+
+message ZoneSceneCancelPreTeleportNotify {
+  string teleport_stub = 1;
+  int32 err_code = 2;
+}
+
+message ZoneSceneTeleportNotify {
+  int32 from_scene_cfg_id = 1;
+  int32 from_scene_res_cfg_id = 2;
+  uint64 from_scene_inst_id = 3;
+  Next.Point from_pt = 4;
+  int32 to_scene_cfg_id = 11;
+  int32 to_scene_res_cfg_id = 12;
+  uint64 to_scene_inst_id = 13;
+  Next.Point to_pt = 14;
+  Next.ActorInfo self_info = 21;
+  int32 teleport_reason = 22;
+  int32 teleport_id = 23;
+  int32 teleport_rule_id = 24;
+  uint32 home_room_level = 31;
+  bytes home_name = 32;
+}
+
+message ZoneSceneGuideBookNotify {
+  uint32 type = 1;
+  uint32 book_id = 2;
+  repeated uint32 stamp_index = 3;
+  Next.GuideBook book_data = 4;
+}
+
+message ZoneDiamondBuyStarTimesNotify {
+  uint32 buy_times = 1;
+}
+
+message ZoneGoodsRewardNotify {
+  Next.RetInfo ret_info = 1;
+  int32 reward_source = 2;
+  int32 flow_reason = 3;
+  int32 goods_id = 4;
+}
+
+message ZoneRedPointNotify {
+  repeated Next.RedPointGroup rp_group = 3;
+}
+
+message ZoneSceneBeInteractedNotify {
+  Next.PlayerInteractType type = 1;
+  Next.PlayerInteractBriefInfo player_info = 2;
+  Next.InteractCancelStatus cancel_status = 3;
+  bool auto_confirm_visiting = 4;
+}
+
+message ZoneSceneInteractResultNotify {
+  Next.PlayerInteractType type = 1;
+  uint32 uin = 2;
+  bool agree = 3;
+  Next.InteractCancelStatus cancel_status = 4;
+}
+
+message ZoneScenePickEggResultNotify {
+  enum Result {
+    FINISH = 1;
+    CANCEL = 2;
+    EXIT = 3;
+  }
+  uint32 uin = 1;
+  Next.ZoneScenePickEggResultNotify.Result result = 2;
+}
+
+message ZoneSceneApplyVisitNotify {
+  uint32 level = 2;
+  bytes name = 3;
+  uint32 uin = 4;
+  uint32 server_time = 5;
+  Next.PlayerCardBriefInfo card_info = 6;
+}
+
+message ZoneSceneApplyVisitResultNotify {
+  Next.RetInfo ret_info = 1;
+  bytes owner_name = 2;
+  bool agree = 3;
+  uint32 owner_uin = 4;
+}
+
+message ZoneSceneLeaveOnlineVisitNotify {
+  int32 reason = 1;
+}
+
+message ZoneSceneOnlineVisitorChangeNotify {
+  message VisitorBriefInfo {
+    uint32 uin = 1;
+    bytes name = 3;
+    uint32 level = 4;
+    Next.PlayerCardBriefInfo card_info = 5;
+    uint32 beast_start_match_time = 6;
+    Next.BeastCatchResult check_result = 7;
+    bool fighting = 8;
+    int32 catch_state = 9;
+    int32 gender = 10;
+    int32 world_lv = 11;
+    int32 pvp_rank_star = 12;
+    int32 scene_res_cfg_id = 13;
+  }
+  repeated Next.ZoneSceneOnlineVisitorChangeNotify.VisitorBriefInfo visitors = 1;
+  bool beast_match_success = 2;
+  bool beast_full_visitors = 3;
+  uint32 beast_star = 4;
+  uint32 battle_cfg_id = 5;
+  int32 change_reason = 6;
+  uint64 timestamp = 7;
+  uint32 change_visitor_uin = 8;
+}
+
+message ZoneSceneOnlineVisitorInfoNotify {
+  repeated Next.VisitorInfo visitor_info = 1;
+}
+
+message ZoneSceneVistorOwnerInfoNotify {
+  uint32 owner_uin = 1;
+  int32 pvp_rank_star = 2;
+}
+
+message ZoneSwitchServerToClientAiNty {
+  repeated uint64 actor_list = 1;
+  repeated Next.DotsComponentData comp_data_list = 2;
+}
+
+message ZoneSwitchClientToServerAiNty {
+  repeated uint64 actor_list = 1;
+}
+
+message ZoneSceneTeamBattleInviteNotify {
+  uint32 server_time = 1;
+  uint64 npc_logic_id = 2;
+  int32 challenge_type = 3;
+  int32 battle_cfg_id = 4;
+  int32 select_star = 5;
+}
+
+message ZoneSceneTeamBattleInviteResultNotify {
+  uint32 uin = 1;
+  bool agree = 2;
+}
+
+message ZoneSceneTeamBattleCancelNotify {
+  uint32 uin = 1;
+  bool overtime = 2;
+}
+
+message ZoneSceneTeamBattleMateSyncNotify {
+  repeated Next.TeamBattleMateInfo mate_infos = 1;
+  int32 sync_reason = 2;
+  uint32 update_uin = 3;
+  int32 challenge_type = 4;
+}
+
+message ZoneSceneTeamBattleStartNotify {
+}
+
+message ZoneSceneBeastCancelMatchNotify {
+  uint32 uin = 1;
+  bytes name = 2;
+}
+
+message ZoneScenePlayerVisitInfoSyncNotify {
+  uint32 online_visit_owner = 1;
+  bool first_enter_visiting = 2;
+}
+
+message ZoneSceneBeastCheckNotify {
+  Next.BeastCatchResult check_result = 1;
+}
+
+message ZoneHbCoverChangeNotify {
+  int32 cover_idx = 1;
+  uint32 hb_area_type = 2;
+  Next.HandbookCoverInfo cover_info = 3;
+}
+
+message ZonePlayerPkInfoNotify {
+  Next.PlayerPkInfo pk_info = 1;
+}
+
+message ZoneMailDeleteNotify {
+  repeated int64 mail_gid_list = 1;
+}
+
+message ZoneVisitRemainCatchTimesNotify {
+  uint32 remain_times = 1;
+  bool is_glass = 2;
+}
+
+message ZonePvpHistoryDataNotify {
+  Next.PlayerPvpHisCli pvp_his_cli = 1;
+}
+
+message ZoneMageBookNotify {
+  uint32 npc_id = 1;
+  uint32 item_id = 2;
+  bool has_award = 3;
+  int32 action = 4;
+}
+
+message ZoneIgnoreC2SCmdNotify {
+  int32 cmd_id = 1;
+}
+
+message ZoneMoneyInfoChangeNotity {
+  Next.MidasMoneyInfo data = 1;
+  Next.RetInfo ret_info = 2;
+  uint32 coupon_change_val = 3;
+}
+
+message ZonePlayerFeedInfoNotify {
+  Next.FeedDetailNotifyData data = 1;
+  uint64 grid_id = 2;
+}
+
+message ZoneBadgeChallengeSettleNotify {
+  bool is_finish_challenge = 1;
+  repeated uint32 upgrade_rewards = 2;
+  uint32 coins = 3;
+  bool is_win = 4;
+  repeated Next.BadgeChallengePetInfo pet_info = 5;
+  uint32 upgrade_num = 6;
+}
+
+message ZoneTextNotify {
+  Next.CommonTextInfo text_info = 1;
+}
+
+message ZoneFuncBlockingConfsChangeNotify {
+  repeated Next.FuncBlockingConfs func_blocking_confs_list = 1;
+}
+
+message ZoneRelationshipTreeChangedNotify {
+  Next.RelationshipTreeData tree_data = 1;
+  bool unlock_req_finish = 2;
+  bool remove_send_unlock_req = 3;
+  bool remove_recv_unlock_req = 4;
+  bool relationship_tree_add_friend = 5;
+}
+
+message ZoneRelationshipReqUnlockNotify {
+  uint32 req_uin = 1;
+  uint32 relationship_type = 2;
+}
+
+message ZoneRelationshipCancelUnlockNotify {
+  uint32 cancel_uin = 1;
+  uint32 relationship_type = 2;
+}
+
+message ZoneForceResetHomeLayoutNotify {
+  Next.RoomLayoutInfo room_layout_info = 1;
+}
+
+message ZoneHomeInfoChangeNotify {
+  bool is_home_visiting = 1;
+  uint32 home_owner_uin = 2;
+  bool is_online_visiting_home = 3;
+}
+
+message ZoneDailyLimitNotify {
+  bytes tips = 1;
+  uint32 hour = 2;
+}
+
+message ZoneBagItemLimitNotify {
+  uint32 item_conf_id = 1;
+  uint32 num = 2;
+}
+
+message ZoneBattlePassTaskUpdateNotify {
+  Next.PlayerBattlePassTaskInfo task_info = 8;
+}
+
+message ZoneRatingPopupNotify {
+  int32 rating_popup_id = 1;
+}
+
+message ZoneHomeAccessInfoNotify {
+  Next.HomeAccessInfo access_info = 1;
+}
+
+message PlayerStartUpPrivilegeInfoCli {
+  int64 cli_startup_day = 1;
+  int32 cli_startup_channel = 2;
+  int32 is_first_startup = 3;
+}
+
+message ZoneStartUpPrivilegeInfoNotify {
+  Next.PlayerStartUpPrivilegeInfoCli start_up_privilege_info_cli = 1;
+}
+
+message ZoneInteractActionResultNtf {
+  int32 act_type = 1;
+  bool avatar_hp_change = 2;
+  bool pet_or_charge_bag_item_change = 3;
+}
+
+message ZoneLockClientCmdNotify {
+  int32 cmd_id = 1;
+  int32 msg_idx = 2;
+}
+
+message ZoneChatEmojiItemChangeNotify {
+  message ZoneChatEmojiItemChange {
+    dataconfig.OpType op_type = 1;
+    Next.PlayerEmojiItem emoji_item = 2;
+  }
+  repeated Next.ZoneChatEmojiItemChangeNotify.ZoneChatEmojiItemChange emoji_item_change_list = 1;
+}
+
+message ZoneLotteryRewardResultNotify {
+  Next.RetInfo ret_info = 1;
+  int32 lottery_item = 2;
+  uint64 trans_id = 3;
+  int32 lottery_result = 4;
+}
+
+message ZoneClientWaterMarkChangeNotify {
+  Next.PlayerClientWaterMarkInfo client_water_mark_info = 1;
+}
+
+message ZoneActivityOpenNotify {
+  uint32 activity_id = 1;
+}
+
+message ZoneChooseNewFactionNotify {
+  uint32 activity_id = 1;
+  repeated Next.FinishFactionItem finished_faction = 2;
+}

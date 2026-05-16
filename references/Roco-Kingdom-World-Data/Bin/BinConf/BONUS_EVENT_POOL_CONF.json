@@ -1,0 +1,149 @@
+{
+    "Name": "BONUS_EVENT_POOL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "accumulate_type",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "enabletime",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disabletime",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "camp_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "petbase_field",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "field_match_type",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "petbase_field_param",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "petbase_need_persent",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "pool_id",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "bonus_type",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "bonus_param",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "weight",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "weight_season_badge",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "show_text",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "show_effect",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "show_icon",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sound_id",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "show_text_type",
+            "Type": "EString",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "weight_group",
+            "Type": "EUint32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "is_rare",
+            "Type": "EBool",
+            "Offset": 80,
+            "Size": 1
+        }
+    ]
+}

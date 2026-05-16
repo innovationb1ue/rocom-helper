@@ -1,0 +1,74 @@
+{
+    "Name": "SEASON_TIPS_TAB_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "tips_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tips_icon",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tab_group",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 12,
+            "Struct": {
+                "Name": "SEASON_TIPS_TAB_CONF.tab_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "page_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "page_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "page_name",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "page_icon_select",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "page_icon",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,268 @@
+{
+    "length": 39.98,
+    "dialogue_id": 10016070,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 158.8,
+                "Y": 284.2,
+                "Z": 87.7
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -109.6,
+                "Roll": 0.0
+            }
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": 143.4,
+                "Y": 450.6,
+                "Z": 147.3
+            },
+            "RelativeRotation": {
+                "Pitch": -4.6,
+                "Yaw": -93.7,
+                "Roll": 0.0
+            },
+            "FOV": 60.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 5.0,
+            "KeepLast": false,
+            "Stop": false,
+            "Scale": 0.5,
+            "FocalActorID0": 47588,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": -1,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 15.0,
+            "KeepLast": false,
+            "Stop": false,
+            "Scale": 0.2,
+            "FocalActorID0": 47066,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": 47588,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 20.0,
+            "EndTime": 25.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 3,
+            "BlendExp": 1.0,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": 441.8,
+                "Y": 581.2,
+                "Z": 151.1
+            },
+            "RelativeRotation": {
+                "Pitch": -2.4,
+                "Yaw": -118.9,
+                "Roll": 0.0
+            },
+            "FOV": 45.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 10.0,
+            "KeepLast": true,
+            "Stop": false,
+            "Scale": 0.5,
+            "FocalActorID0": 47588,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": -1,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 20.0,
+            "KeepLast": true,
+            "Stop": false,
+            "Scale": 0.2,
+            "FocalActorID0": 47066,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": 47588,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 47066,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": -36.6,
+                "Y": -863.9,
+                "Z": 99.5
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 120.0,
+                "Roll": 0.0
+            }
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCMoveAction",
+            "Name": "\u79fb\u52a8",
+            "OwnerActorID": 47066,
+            "StartTime": 30.0,
+            "EndTime": 35.0,
+            "MinimalDuration": 0.1,
+            "TargetLocation": {
+                "X": 111.5,
+                "Y": -296.2,
+                "Z": 99.5
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 100.0,
+                "Roll": 0.0
+            }
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 35.0,
+            "EndTime": 36.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "TargetActorID": 47066,
+            "RelativeLocation": {
+                "X": 300.0,
+                "Y": 0.0,
+                "Z": 20.0
+            },
+            "RelativeRotation": {
+                "Pitch": 0.0,
+                "Yaw": -180.0,
+                "Roll": 0.0
+            },
+            "FOV": 90.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 35.0,
+            "KeepLast": true,
+            "Stop": true,
+            "Scale": 2.0,
+            "FocalActorID0": 0,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": 0,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 35.1,
+            "EndTime": 40.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 3,
+            "BlendExp": 1.0,
+            "TargetActorID": 47066,
+            "RelativeLocation": {
+                "X": 500.0,
+                "Y": 0.0,
+                "Z": 20.0
+            },
+            "RelativeRotation": {
+                "Pitch": 0.0,
+                "Yaw": 180.0,
+                "Roll": 0.0
+            },
+            "FOV": 45.0
+        }
+    ]
+}

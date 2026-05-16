@@ -1,0 +1,77 @@
+{
+    "Name": "FASHION_WAND_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "WandName",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "magic_name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "magic_icon",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "WandMesh",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "wand_tips_text",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "wand_video_male",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "wand_video_female",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "magic_list",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6
+        }
+    ]
+}

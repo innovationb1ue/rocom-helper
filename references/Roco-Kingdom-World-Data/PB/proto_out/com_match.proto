@@ -1,0 +1,57 @@
+package Next;
+
+import "com_pet.proto";
+
+enum PvpMatchState {
+  PMS_NONE = 0;
+  PMS_MATCHING = 1;
+  PMS_MATCHED = 2;
+  PMS_CANCEL = 3;
+  PMS_MATCH_FAILED = 4;
+}
+
+enum MatchCancelReason {
+  MCR_CLIENT_OP = 1;
+  MCR_SERVER_OP = 2;
+}
+
+message MatchInfo {
+  uint32 pvp_id = 1;
+  int32 p = 2;
+  double r = 103;
+  int32 rd = 4;
+  int32 pvp_rank_star = 5;
+  int32 lose_streak = 6;
+  int32 pvp_rank_master_score = 7;
+  int32 pvp_prof_score = 8;
+  uint32 uin = 10;
+  uint64 zone_inst_id = 11;
+  uint32 start_ut = 12;
+  repeated Next.PetData welfare_team = 13;
+  int32 pve_battle_conf_id = 14;
+  repeated uint32 matched_uins = 15;
+  int32 win_streak = 16;
+  int32 pvp_rank_order = 17;
+  int32 pvp_rank_season_max_star = 18;
+  int32 welfare_team_role_magic_id = 19;
+  Next.PvpMatchState state = 20;
+  uint32 max_sec = 21;
+  uint32 pve_succ_ut = 22;
+  int32 pvp_team_score = 23;
+}
+
+message MatchSuccInfo {
+  uint32 uin = 1;
+  uint64 zone_inst_id = 2;
+  double r = 103;
+  int32 rd = 4;
+  int32 pvp_rank_star = 5;
+  repeated Next.PetData welfare_team = 6;
+  int32 pve_battle_conf_id = 7;
+  int32 win_streak = 8;
+  int32 pvp_rank_order = 9;
+  int32 lose_streak = 10;
+  int32 pvp_rank_master_score = 11;
+  int32 pvp_rank_season_max_star = 12;
+  int32 welfare_team_role_magic_id = 13;
+}

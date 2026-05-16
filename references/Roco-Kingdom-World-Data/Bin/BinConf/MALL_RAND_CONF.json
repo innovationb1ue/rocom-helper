@@ -1,0 +1,39 @@
+{
+    "Name": "MALL_RAND_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "RandItem",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 24,
+            "Struct": {
+                "Name": "MALL_RAND_CONF.RandItem",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "Id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "weight",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

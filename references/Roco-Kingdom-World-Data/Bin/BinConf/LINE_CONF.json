@@ -1,0 +1,45 @@
+{
+    "Name": "LINE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "scene_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "link",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 30,
+            "Struct": {
+                "Name": "LINE_CONF.link",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "link_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "link_param",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

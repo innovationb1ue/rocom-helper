@@ -1,0 +1,31 @@
+{
+    "Name": "PET_HOME_LIMIT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "pet_limit",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "cool_down_offset_lower",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "cool_down_offset_upper",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

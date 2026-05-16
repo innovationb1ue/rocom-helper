@@ -1,0 +1,38 @@
+{
+    "Name": "AONE_FINAL_BATTLE_PETSLIST_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "ID",
+    "Properties": [
+        {
+            "Name": "ID",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "monster_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "debut_dialogue_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "called_dialogue_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "keyword",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

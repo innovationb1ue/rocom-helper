@@ -1,0 +1,52 @@
+{
+    "Name": "SKILL_RANDOM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "skill_pool",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "SKILL_RANDOM_CONF.skill_pool",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "skill_or_skill_pool",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "prob",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

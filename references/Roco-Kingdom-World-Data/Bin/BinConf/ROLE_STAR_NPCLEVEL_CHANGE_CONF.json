@@ -1,0 +1,58 @@
+{
+    "Name": "ROLE_STAR_NPCLEVEL_CHANGE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "world_level",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "index_param",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "ROLE_STAR_NPCLEVEL_CHANGE_CONF.index_param",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "param",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "level",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "down_wave",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,138 @@
+{
+    "Name": "SALON_ITEM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gender",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "description",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "avatar_id",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "colour_type",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "colour_id",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "texture_id",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "is_present_colour",
+            "Type": "EBool",
+            "Offset": 44,
+            "Size": 1
+        },
+        {
+            "Name": "is_free_item",
+            "Type": "EBool",
+            "Offset": 45,
+            "Size": 1
+        },
+        {
+            "Name": "model",
+            "Type": "EString",
+            "Offset": 46,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "change_bp",
+            "Type": "EString",
+            "Offset": 50,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_quality",
+            "Type": "EUint32",
+            "Offset": 54,
+            "Size": 4
+        },
+        {
+            "Name": "acquire_struct",
+            "Type": "EStruct",
+            "Offset": 58,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "SALON_ITEM_CONF.acquire_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "acquire_way_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "behavior_id",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

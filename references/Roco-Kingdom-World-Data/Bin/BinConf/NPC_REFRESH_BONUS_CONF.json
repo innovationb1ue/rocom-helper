@@ -1,0 +1,214 @@
+{
+    "Name": "NPC_REFRESH_BONUS_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "event_prepose_condition",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "NPC_REFRESH_BONUS_CONF.event_prepose_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "condition_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "condition_param1",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "condition_param2",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "event_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "event_count_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "count_param",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "bonus_type",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "bonus_id",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "is_repeat_bonus",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "probability",
+            "Type": "EStruct",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "NPC_REFRESH_BONUS_CONF.probability",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "event_count_value",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "bonus_prob",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "event_close_condition",
+            "Type": "EStruct",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "NPC_REFRESH_BONUS_CONF.event_close_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "close_condition_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "close_param1",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "close_param2",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "prob_type",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "prob_param1",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "prob_param2",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_dead_or_teleport_reset_count",
+            "Type": "EBool",
+            "Offset": 56,
+            "Size": 1
+        },
+        {
+            "Name": "trig_time_reset_type",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "trig_time_reset_begin",
+            "Type": "EString",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "trig_time_reset_gap",
+            "Type": "EString",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bonus_event_petbase_field_count",
+            "Type": "EUint32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "is_refresh_petbase_field_count",
+            "Type": "EBool",
+            "Offset": 73,
+            "Size": 1
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "Name": "PVP_RANDOM_PET_LIBRARY_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "pet_type",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "expand_pet",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "PVP_RANDOM_PET_LIBRARY_CONF.expand_pet",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "pet_info_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "weight",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "level",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

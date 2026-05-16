@@ -1,0 +1,235 @@
+{
+    "Name": "PET_HANDBOOK",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "include_petbase_id",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 9,
+            "Struct": {
+                "Name": "PET_HANDBOOK.include_petbase_id",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "petbase_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "belong_area_handbook",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "type_desc",
+            "Type": "ELocalizedString",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "design_base",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "description_habitat",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "roco_scale",
+            "Type": "EFloat",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_auto_reward",
+            "Type": "EStruct",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "PET_HANDBOOK.unlock_auto_reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "reward_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "count",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "pet_topic_reward",
+            "Type": "EStruct",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6,
+            "Struct": {
+                "Name": "PET_HANDBOOK.pet_topic_reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "pet_topic_complete_num",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "auto_award",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "pet_handbook_reward",
+                        "Type": "EStruct",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "ArrayDim": 4,
+                        "Struct": {
+                            "Name": "PET_HANDBOOK.pet_topic_reward.pet_handbook_reward",
+                            "Type": "EStruct",
+                            "Properties": [
+                                {
+                                    "Name": "award_type",
+                                    "Type": "EInt32",
+                                    "Offset": 0,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "award_id",
+                                    "Type": "EUint32",
+                                    "Offset": 4,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "award_count",
+                                    "Type": "EUint32",
+                                    "Offset": 8,
+                                    "Size": 4
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "pet_topic",
+            "Type": "EStruct",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 11,
+            "Struct": {
+                "Name": "PET_HANDBOOK.pet_topic",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "topic_Id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "topic_type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "topic_data_1",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "topic_data_2",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "topic_data_3",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "topic_desc",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "topic_cnt",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "topic_reward",
+                        "Type": "EUint32",
+                        "Offset": 28,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+{
+    "Name": "MEGAMAP_REFRESH_BLACKLIST",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_rule",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "Name": "ACTIVITY_INHERITANCE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "day_num",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "pet_whitelist",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "appearance",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "color_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "acceleration_date",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "acceleration_rate",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,108 @@
+{
+    "Name": "ACTIVITY_PET_CATCH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "first_task_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_task_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "points_max",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "reward_group",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 20,
+            "Struct": {
+                "Name": "ACTIVITY_PET_CATCH_CONF.reward_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "points_condition",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_id",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_count",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "preview_reward_group",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "ACTIVITY_PET_CATCH_CONF.preview_reward_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "preview_reward_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "preview_reward_param",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "preview_reward_count",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

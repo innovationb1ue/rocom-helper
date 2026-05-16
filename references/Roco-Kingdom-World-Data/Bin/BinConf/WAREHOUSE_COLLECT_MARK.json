@@ -1,0 +1,86 @@
+{
+    "Name": "WAREHOUSE_COLLECT_MARK",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "mark_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "default_diplay_mark",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "mark_type",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "locked_mark_icon",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_icon",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_flat_icon",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_small_flat_icon",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_desc_text",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_unlock_task",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "mark_unlock_text",
+            "Type": "EString",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mark_unlock_amount",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        }
+    ]
+}

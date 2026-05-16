@@ -1,0 +1,100 @@
+{
+    "Name": "ACTIVITY_SPEC_FLOWER_SEED_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bool_self_selected_flower_seed",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "enum_pet_evo",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "pet_evo_param",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_group_id",
+            "Type": "EUint32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "enum_star",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "star_param",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "pet_info_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "bool_catch_delete",
+            "Type": "EBool",
+            "Offset": 33,
+            "Size": 1
+        },
+        {
+            "Name": "enum_reward_condition",
+            "Type": "EInt32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "reward_condition_param",
+            "Type": "EUint32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "enum_reward",
+            "Type": "EInt32",
+            "Offset": 42,
+            "Size": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 46,
+            "Size": 4
+        },
+        {
+            "Name": "activity_team_battle_star_level",
+            "Type": "EUint32",
+            "Offset": 50,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

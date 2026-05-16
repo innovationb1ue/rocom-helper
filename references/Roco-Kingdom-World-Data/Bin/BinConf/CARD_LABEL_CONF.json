@@ -1,0 +1,72 @@
+{
+    "Name": "CARD_LABEL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "label_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "label_text",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_initial_unlock",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "label_name",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_description",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bottom_description",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "card_quality",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_map",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "label_icon",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

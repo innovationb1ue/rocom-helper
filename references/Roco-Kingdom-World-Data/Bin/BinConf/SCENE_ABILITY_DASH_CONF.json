@@ -1,0 +1,100 @@
+{
+    "Name": "SCENE_ABILITY_DASH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "allow_long_press",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "dash_accelerate",
+            "Type": "EUint32",
+            "Offset": 5,
+            "Size": 4
+        },
+        {
+            "Name": "dash_acc_curve",
+            "Type": "EString",
+            "Offset": 9,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "dash_deacc_curve",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "speed_curve",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "dash_max_speed",
+            "Type": "EUint32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "vitality_id",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "basic_movement_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "dash_start_vitality_cost",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "dash_duration",
+            "Type": "EFloat",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "dashing_vitality_cost",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "dash_cooldown",
+            "Type": "EFloat",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "dash_rotate_speed",
+            "Type": "EUint32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "maintain_press_time",
+            "Type": "EFloat",
+            "Offset": 53,
+            "Size": 4
+        }
+    ]
+}

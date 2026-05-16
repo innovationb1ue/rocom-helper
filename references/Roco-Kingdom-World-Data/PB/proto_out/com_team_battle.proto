@@ -1,0 +1,109 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_misc.proto";
+import "com_scene.proto";
+
+enum TeamBattleQueryFlag {
+  TBQF_NONE = 0;
+  TBQF_TEAM_MATE_LIST = 1;
+  TBQF_TEAM_MATE_INFOS = 2;
+  TBQF_TEAM_BLOOD_BATTLE_INFO = 3;
+  TBQF_TEAM_BEAST_RESULT_INFO = 4;
+}
+
+enum TeamBattleChallengeType {
+  TBCT_NONE = 0;
+  TBCT_BLOOD_SINGLE = 1;
+  TBCT_BLOOD_TEAM = 2;
+  TBCT_BEAST = 3;
+  TBCT_BEAST_SINGLE = 4;
+}
+
+enum TeamBattleMateChangeReason {
+  TBMCR_ENTER = 0;
+  TBMCR_PREPARE = 1;
+  TBMCR_PET = 2;
+  TBMCR_LOGIN = 3;
+}
+
+enum TeamBattleMatePrepareState {
+  TBMPS_NONE = 0;
+  TBMPS_IDLE = 1;
+  TBMPS_SELECT_PET = 2;
+  TBMPS_OK = 3;
+}
+
+enum TeamBattleChangeMatchReason {
+  TBCMR_START = 0;
+  TBCMR_OWNER_CANCEL = 1;
+  TBCMR_VISITOR_DISAGREE = 2;
+  TBCMR_VISITOR_OVERTIME = 3;
+  TBCMR_OWNER_OFFLINE = 4;
+  TBCMR_EMPTY_VISITORS = 5;
+  TBCMR_RESONANCE = 6;
+  TBCMR_SUCCESS = 7;
+  TBCMR_MATCHSVR = 8;
+  TBCMR_DISBAND = 9;
+}
+
+message NpcBattleAssist {
+  uint32 id = 1;
+  uint32 pet_conf_id = 2;
+  uint32 pet_level = 3;
+  uint32 npc_id = 4;
+  repeated uint32 pet_conf_ids = 5;
+}
+
+message TeamBattleInfo {
+  int32 team_battle_type = 11;
+  uint64 npc_logic_id = 6;
+  uint64 npc_obj_id = 7;
+  uint32 start_battle_time = 12;
+  uint32 end_timestamp = 27;
+  uint32 npc_cfg_id = 1;
+  uint32 star = 2;
+  uint32 blood = 3;
+  uint32 battle_petbase_id = 5;
+  bool randed_battle_npc_glass = 4;
+  bool battle_npc_glass = 8;
+  Next.GlassInfo battle_npc_glass_info = 32;
+  bool battle_npc_shiny = 28;
+  uint32 camp_cfg_id = 9;
+  uint32 battle_npc_lv = 10;
+  uint32 battle_npc_hp_talent = 13;
+  uint32 battle_npc_attack_talent = 14;
+  uint32 battle_npc_special_attack_talent = 15;
+  uint32 battle_npc_defense_talent = 16;
+  uint32 battle_npc_special_defense_talent = 17;
+  uint32 battle_npc_speed_talent = 18;
+  uint32 battle_npc_gender = 19;
+  uint32 battle_npc_nature = 20;
+  int32 battle_cfg_id = 21;
+  int32 select_star = 23;
+  uint32 catch_vitem_quantity = 24;
+  uint32 spec_flower_seed_id = 25;
+  uint32 activity_id = 26;
+  repeated Next.InnerBattleTask battle_tasks = 29;
+  uint32 bind_pet_gid = 30;
+  uint32 bind_petbase_id = 33;
+  uint32 bind_evolution_id = 34;
+  uint32 medal_id = 37;
+  repeated Next.NpcBattleAssist npc_assists = 31;
+  repeated Next.FlowerSeedBossData visit_flower_seed_boss_datas = 35;
+  uint32 select_flower_owner_id = 36;
+}
+
+message TeamBattleMateInfo {
+  uint32 uin = 1;
+  uint32 pet_gid = 2;
+  uint32 pet_cfg_id = 3;
+  int32 mutation_type = 4;
+  uint32 pet_lv = 5;
+  int32 prepare_state = 6;
+  uint32 npc_id = 7;
+  uint32 helper_id = 8;
+  uint32 team_idx = 10;
+  repeated uint32 pet_cfg_ids = 11;
+  Next.GlassInfo glass_info = 12;
+}

@@ -1,0 +1,75 @@
+{
+    "Name": "NRC_AI_BB_INITIATE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "blackboard_input",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 120,
+            "Struct": {
+                "Name": "NRC_AI_BB_INITIATE_CONF.blackboard_input",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "blackboard_name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "annotation",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "data_type",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "additional_para",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "addition_str",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

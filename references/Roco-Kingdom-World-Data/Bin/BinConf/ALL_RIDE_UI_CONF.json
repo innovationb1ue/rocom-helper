@@ -1,0 +1,109 @@
+{
+    "Name": "ALL_RIDE_UI_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "move_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "active_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "button_icon",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_block_icon",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_press_icon",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_icon_2",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_block_icon_2",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_press_icon_2",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "off_button_icon",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "off_button_block_icon",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "off_button_press_icon",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_icon_double_ride",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_block_icon_double_ride",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_press_icon_double_ride",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

@@ -1,0 +1,146 @@
+{
+    "Name": "TASK_SUMMARY",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "show_paragraph",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "task_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_des",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sequence_res",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "res_conf",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "TASK_SUMMARY.res_conf",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "tod",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "weather",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "bg_res",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "extra_res",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "pc_action",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pc_pos",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "camera_para",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "light_conf",
+            "Type": "EStruct",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "TASK_SUMMARY.light_conf",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "tod_pc",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "weather_pc",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "light_para",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

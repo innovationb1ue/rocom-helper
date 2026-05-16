@@ -1,0 +1,80 @@
+{
+    "Name": "TERRITORY_TRIAL_CHALLENGE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "topic",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "battle",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "boss",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "boss_point",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "boss_entry",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "guard",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 20,
+            "Struct": {
+                "Name": "TERRITORY_TRIAL_CHALLENGE_CONF.guard",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "monster",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "point",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "entry",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

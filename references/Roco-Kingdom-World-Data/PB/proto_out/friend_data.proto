@@ -1,0 +1,104 @@
+package Next;
+
+import "com_home.proto";
+import "com_battle_enum.proto";
+import "com_player_data.proto";
+import "xls_enum.proto";
+
+enum FriendSource {
+  FRIEND_SOURCE_NONE = 0;
+  FS_VISIT = 1;
+  FS_PVP = 2;
+  FS_PET_EGG_EXCHANGE = 3;
+}
+
+message FriendHomeInfo {
+  bytes home_name = 1;
+  uint32 home_experience = 2;
+  uint32 home_level = 3;
+  uint32 room_level = 4;
+  uint32 home_comfort_level = 5;
+  bool home_pet_can_steal = 15;
+  bool home_plant_can_pick = 16;
+  repeated Next.HomePetBriefInfo home_pets = 20;
+  Next.CraftableFurnitureList craftable_furniture = 40;
+}
+
+message FriendRoleInfo {
+  string openid = 1;
+  uint32 uin = 2;
+  bytes name = 3;
+  bytes note = 4;
+  bytes head_img = 5;
+  uint32 level = 6;
+  bool online = 8;
+  uint32 gender = 9;
+  uint32 last_logout_time = 10;
+  bytes signature = 11;
+  uint32 world_level = 12;
+  uint32 send_visit_apply_time = 13;
+  uint32 card_skin_selected = 14;
+  uint32 regist_date = 15;
+  Next.FriendSource source = 16;
+  uint32 card_icon_selected = 17;
+  uint32 card_label_first_selected = 18;
+  uint32 card_label_last_selected = 19;
+  uint32 card_handbook_collect_num = 20;
+  uint32 card_music_id = 21;
+  Next.PlayerBattleBriefInfo battle_brief_info = 23;
+  Next.FriendHomeInfo home_info = 24;
+  uint64 add_friend_time = 25;
+  uint64 pinned_time = 26;
+  dataconfig.BattlePassGiftGrade bp_gift_grade = 27;
+  string card_bussiness_card_url = 28;
+  int32 friend_type = 29;
+  bytes plat_nick_name = 30;
+  Next.PlayerStartUpPrivilegeInfo start_up_privilege_info = 31;
+  int32 cli_login_channel = 32;
+  bool is_chat_node_unlock = 33;
+  int32 unlocked_rel_node_num = 34;
+  Next.FriendPositionInfo pos_info = 35;
+  Next.FriendVisitInfo visit_info = 36;
+}
+
+message FriendRoleHomeExtInfo {
+  bool home_pet_can_steal = 1;
+  bool home_plant_can_pick = 2;
+  int32 search_ret = 3;
+}
+
+message FriendRoleExtInfo {
+  uint32 uin = 1;
+  Next.FriendRoleHomeExtInfo home_ext_info = 2;
+  int32 search_ret = 3;
+}
+
+message FriendRequestInfo {
+  string openid = 1;
+  uint32 uin = 2;
+  bytes name = 3;
+  bytes head_img = 4;
+  uint32 level = 5;
+  uint32 world_level = 6;
+  bool online = 7;
+  uint32 gender = 8;
+  bytes signature = 9;
+  uint64 req_time = 10;
+  Next.PlayerCardBriefInfo card_info = 11;
+  uint32 regist_date = 12;
+  Next.FriendSource source = 13;
+}
+
+message BlackListRoleInfo {
+  string openid = 1;
+  uint32 uin = 2;
+  bytes name = 3;
+  bytes head_img = 4;
+  uint32 level = 5;
+  bool online = 6;
+  uint32 gender = 7;
+  bytes signature = 8;
+  uint64 block_time = 9;
+  Next.PlayerCardBriefInfo card_info = 10;
+  uint32 regist_date = 11;
+}

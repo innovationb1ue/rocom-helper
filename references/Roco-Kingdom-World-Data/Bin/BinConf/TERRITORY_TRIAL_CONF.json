@@ -1,0 +1,100 @@
+{
+    "Name": "TERRITORY_TRIAL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "topic",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "period",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "redirect",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "challenge_id",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "play_reward_text",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pet_id",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "play_reward",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "point_reward",
+            "Type": "EStruct",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "TERRITORY_TRIAL_CONF.point_reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "point_required",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

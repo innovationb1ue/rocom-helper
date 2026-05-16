@@ -1,0 +1,100 @@
+{
+    "Name": "TALE_NIGHTMARE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "title",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_by_task",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_text",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_res",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "matl_conf",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "TALE_NIGHTMARE_CONF.matl_conf",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "matl_bag_item",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "matl_num",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "matl_text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "task",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "npc_res",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_seal",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_des",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

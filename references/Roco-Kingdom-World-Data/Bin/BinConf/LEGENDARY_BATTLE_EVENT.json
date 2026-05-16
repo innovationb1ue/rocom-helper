@@ -1,0 +1,134 @@
+{
+    "Name": "LEGENDARY_BATTLE_EVENT",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "quest_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "quest_brief",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "duration",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "appear_time",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disappear_time",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "story_flag",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "world_level",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "task_id",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "photo_path",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "refresh_content_id_1",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_content_id_2",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_content_id_3",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "pet_base_id",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "battle_key",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_difficulty",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "battle_id",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "title",
+            "Type": "EString",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

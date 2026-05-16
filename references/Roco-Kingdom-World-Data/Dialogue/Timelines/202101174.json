@@ -1,0 +1,723 @@
+{
+    "length": 3.0,
+    "dialogue_id": 202101174,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 560245,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": -2,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 389.1,
+                "Y": 295.8,
+                "Z": -7.5,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -9.1,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 20747,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 658.5,
+                "Y": 122.8,
+                "Z": 71.3,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "ReportLocation": false,
+            "PinOnGround": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": -1,
+            "StartTime": -0.2,
+            "TargetLocation": {
+                "X": 664.7,
+                "Y": 365.7,
+                "Z": -0.5,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -69.8,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 20747,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 20747,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": -50.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 20747,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 0,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 560240,
+            "StartTime": 0.01,
+            "TargetLocation": {
+                "X": 673.5,
+                "Y": 103.5,
+                "Z": -7.5,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 40.5,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 560247,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 441.5,
+                "Y": 171.4,
+                "Z": -7.5,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 7.2,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 560090,
+            "StartTime": 0.0,
+            "TargetLocation": {
+                "X": 932.0,
+                "Y": 135.9,
+                "Z": -7.5,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 162.8,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "\u8bbe\u7f6e\u4f4d\u7f6e",
+            "OwnerActorID": 560118,
+            "StartTime": 0.01,
+            "TargetLocation": {
+                "X": 872.0,
+                "Y": -65.0,
+                "Z": -7.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 152.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 560247,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 20747,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 20747,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 560090,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 20747,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 20747,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": -50.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 560118,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 20747,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 20747,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": -50.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 560247,
+            "StartTime": 0.0,
+            "EndTime": 2.3333332538604736,
+            "MinimalDuration": 0.1,
+            "Action": "happy1",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 560118,
+            "StartTime": 0.0,
+            "EndTime": 2.3333332538604736,
+            "MinimalDuration": 0.1,
+            "Action": "happy1",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 560090,
+            "StartTime": 0.0,
+            "EndTime": 2.3333332538604736,
+            "MinimalDuration": 0.1,
+            "Action": "happy1",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "EndTime": 2.5,
+            "MinimalDuration": 0.1,
+            "Action": "roleplayhappy",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 560240,
+            "StartTime": 0.0,
+            "EndTime": 1.3333333730697632,
+            "MinimalDuration": 0.1,
+            "Action": "skill1loop",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 20747,
+            "StartTime": 0.0,
+            "EndTime": 1.9333332777023315,
+            "MinimalDuration": 0.1,
+            "Action": "sitdownloop",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 1.0,
+            "EndTime": 2.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 2.0,
+            "EndTime": 3.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 3.0,
+            "EndTime": 4.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 4.0,
+            "EndTime": 5.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 5.0,
+            "EndTime": 6.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 6.0,
+            "EndTime": 7.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 7.0,
+            "EndTime": 8.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 8.0,
+            "EndTime": 9.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 9.0,
+            "EndTime": 10.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 10.0,
+            "EndTime": 11.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 11.0,
+            "EndTime": 12.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 12.0,
+            "EndTime": 13.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 13.0,
+            "EndTime": 14.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": -2,
+            "StartTime": 0.0,
+            "EndTime": 1.5,
+            "MinimalDuration": 0.1,
+            "Action": "happy",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 14.0,
+            "EndTime": 15.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 15.0,
+            "EndTime": 16.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 658.3,
+                "Y": 122.4,
+                "Z": 72.8,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineMeshMoveAction",
+            "Name": "Mesh\u79fb\u52a8",
+            "OwnerActorID": 20747,
+            "StartTime": 16.0,
+            "EndTime": 17.0,
+            "MinimalDuration": 0.1,
+            "bMove": true,
+            "TargetLocation": {
+                "X": 656.8,
+                "Y": 120.2,
+                "Z": 83.2,
+                "Base": "Mesh"
+            },
+            "bRotate": false,
+            "TargetRotation": {
+                "Pitch": 13.9,
+                "Yaw": 70.0,
+                "Roll": 3.1
+            },
+            "bReportPos": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSayState",
+            "Name": "\u89d2\u8272\u8bf4\u8bdd",
+            "OwnerActorID": 0,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "PlayFacialAnim": true
+        }
+    ]
+}

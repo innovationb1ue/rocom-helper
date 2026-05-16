@@ -1,0 +1,73 @@
+{
+    "Name": "PET_REPORT_SCORE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "point",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "perfect_ratio",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "amazing_ratio",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "good_ratio",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "normal_ratio",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "differentblood_ratio",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "bossblood_ratio",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "glass_ratio",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "shining_ratio",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "chaos_two_ratio",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        }
+    ]
+}

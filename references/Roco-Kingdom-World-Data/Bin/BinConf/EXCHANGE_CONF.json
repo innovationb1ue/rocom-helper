@@ -1,0 +1,244 @@
+{
+    "Name": "EXCHANGE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2
+        },
+        {
+            "Name": "exchange_time_limit_group",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_data",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_list",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "disapper_time",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "use_type",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "is_check_npc_near",
+            "Type": "EBool",
+            "Offset": 32,
+            "Size": 1
+        },
+        {
+            "Name": "exchange_time_lower_limit",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "exchange_time_upper_limit",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "get_item",
+            "Type": "EStruct",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "EXCHANGE_CONF.get_item",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "get_goods_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "get_goods_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "get_goods_num",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "extra_percent",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "extra_get_item",
+            "Type": "EStruct",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "EXCHANGE_CONF.extra_get_item",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "extra_get_goods_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "extra_get_goods_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "extra_get_goods_num",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "cost_item",
+            "Type": "EStruct",
+            "Offset": 53,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "EXCHANGE_CONF.cost_item",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "cost_goods_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "cost_goods_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "cost_goods_num",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "visual_item_cost_type",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "visual_item_cost_num",
+            "Type": "EUint32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "Ban_Other_Home_Build",
+            "Type": "EBool",
+            "Offset": 65,
+            "Size": 1
+        },
+        {
+            "Name": "furniture_build_level",
+            "Type": "EUint32",
+            "Offset": 66,
+            "Size": 4
+        },
+        {
+            "Name": "random_weight_struct",
+            "Type": "EStruct",
+            "Offset": 70,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "EXCHANGE_CONF.random_weight_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "Random_Weight_LEVEL",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "is_shareable",
+            "Type": "EBool",
+            "Offset": 74,
+            "Size": 1
+        },
+        {
+            "Name": "is_common",
+            "Type": "EBool",
+            "Offset": 75,
+            "Size": 1
+        },
+        {
+            "Name": "sort_id",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        }
+    ]
+}

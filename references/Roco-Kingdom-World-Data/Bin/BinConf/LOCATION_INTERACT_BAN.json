@@ -1,0 +1,40 @@
+{
+    "Name": "LOCATION_INTERACT_BAN",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "locaion_interact_ban_list",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "LOCATION_INTERACT_BAN.locaion_interact_ban_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "location_interact_ban",
+                        "Type": "EBool",
+                        "Offset": 0,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

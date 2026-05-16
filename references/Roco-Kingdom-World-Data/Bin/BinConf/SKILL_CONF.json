@@ -1,0 +1,339 @@
+{
+    "Name": "SKILL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "ELocalizedString",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "desc",
+            "Type": "ELocalizedString",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "flavor_text",
+            "Type": "ELocalizedString",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "energy_rule",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "energy_cost",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "dam_para",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "Skill_Type",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "skill_dam_type",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "skill_feature",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "damage_type",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "contact_type",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "skill_priority",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "damage_rule",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "target_type",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "target_count",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "cd_round",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "hit_para",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "skill_result",
+            "Type": "EStruct",
+            "Offset": 76,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6,
+            "Struct": {
+                "Name": "SKILL_CONF.skill_result",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "effect_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "result_target_type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "cast_moment",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "success_rate",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "buff_level_rule",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "buff_group_level",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "res_id",
+            "Type": "EString",
+            "Offset": 80,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 84,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "field_belong",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4
+        },
+        {
+            "Name": "target_field",
+            "Type": "EUint32",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "field_skill",
+            "Type": "EUint32",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_show",
+            "Type": "EUint32",
+            "Offset": 100,
+            "Size": 4
+        },
+        {
+            "Name": "describe_type",
+            "Type": "EInt32",
+            "Offset": 104,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "env_ban",
+            "Type": "EUint32",
+            "Offset": 108,
+            "Size": 4
+        },
+        {
+            "Name": "skill_time",
+            "Type": "EInt32",
+            "Offset": 112,
+            "Size": 4
+        },
+        {
+            "Name": "target_blood_limit",
+            "Type": "EUint32",
+            "Offset": 116,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "worldbuff_res_id",
+            "Type": "EString",
+            "Offset": 120,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "can_changed",
+            "Type": "EUint32",
+            "Offset": 124,
+            "Size": 4
+        },
+        {
+            "Name": "common_type",
+            "Type": "EString",
+            "Offset": 128,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "common_type_number",
+            "Type": "EUint32",
+            "Offset": 132,
+            "Size": 4
+        },
+        {
+            "Name": "use_type",
+            "Type": "EString",
+            "Offset": 136,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_showlens",
+            "Type": "EUint32",
+            "Offset": 140,
+            "Size": 4
+        },
+        {
+            "Name": "special_aoe",
+            "Type": "EUint32",
+            "Offset": 144,
+            "Size": 4
+        },
+        {
+            "Name": "resonance_sk_black_list",
+            "Type": "EUint32",
+            "Offset": 148,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "resonance_sk_black_list_feature",
+            "Type": "EUint32",
+            "Offset": 152,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "delete_resonance_sk_black_list_layer",
+            "Type": "EUint32",
+            "Offset": 156,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "monitor_data_version",
+            "Type": "EUint32",
+            "Offset": 160,
+            "Size": 4
+        },
+        {
+            "Name": "delete_resonance_sk_black_list_target",
+            "Type": "EUint32",
+            "Offset": 164,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "delete_resonance_sk_black_list",
+            "Type": "EUint32",
+            "Offset": 168,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

@@ -1,0 +1,211 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_misc.proto";
+
+enum SceneEventStatus {
+  SES_SMALLER = 0;
+  SES_BIGGER = 1;
+  SES_EQUAL = 2;
+  SES_BONUS = 3;
+}
+
+message TeleportReason {
+  enum ENUM {
+    NONE = 0;
+    BATTLE_DIE = 1;
+    BIG_WORLD_DIE = 2;
+    ENTER_ONLINE_VISIT = 3;
+    LEAVE_ONLINE_VISIT = 4;
+    BATTLE_SURRENDER = 5;
+    NEED_REENTER_SCENE = 6;
+    WORLDCOMBAT_PET_ALL_DIE = 7;
+    ENTER_DUNGEON = 8;
+    EXIT_DUNGEON = 9;
+    MINIGAME = 10;
+    ENTER_HOME = 11;
+    LEAVE_HOME = 12;
+    UNSTUCK = 13;
+    HOME_ENTER_ONLINE_VISIT = 14;
+    TOGETHER_ENTER_ONLINE_VISIT = 15;
+    PET_GUARD_STEAL_HIT = 16;
+    ENTER_VISIBLE_AREA = 17;
+    LEAVE_VISIBLE_AREA = 18;
+    DUNGEON_RUN_AWAY = 101;
+  }
+}
+
+message CampFruitData {
+  uint32 fruit_id = 1;
+  uint32 fruit_pos = 2;
+  repeated uint32 npc_refresh_content_id = 3;
+  repeated uint32 used_area_id = 4;
+  repeated uint32 npc_id = 5;
+}
+
+message CampFruitInfo {
+  repeated Next.CampFruitData fruit_data = 1;
+  uint64 last_fruit_take_out_timestamp = 2;
+}
+
+message OwlSanctuaryFruitNpcInfo {
+  uint32 owl_sanctuary_content_id = 1;
+  repeated uint32 npc_id = 2;
+}
+
+message CampFruitNpcInfo {
+  uint32 camp_content_id = 1;
+  repeated Next.OwlSanctuaryFruitNpcInfo owl_sanctuary_fruit_npc_info = 2;
+}
+
+message OwlSanctuaryFruitBriefInfo {
+  uint32 fruit_id = 1;
+  repeated uint32 npc_id = 2;
+  uint32 fruit_active_timestamp = 3;
+  uint32 slot_active_timestamp = 4;
+}
+
+message VisitorOwlSanctuaryDetectInfo {
+  uint32 uin = 1;
+  bool is_detected = 2;
+}
+
+message OwlSanctuaryDetectInfo {
+  bool is_detected = 1;
+  repeated Next.VisitorOwlSanctuaryDetectInfo visitor_detect_info = 2;
+}
+
+message AvatarOwlSanctuaryInfo {
+  uint32 npc_content_id = 1;
+  bool is_upgrade = 2;
+  bool is_detected = 3;
+  Next.Position npc_pos = 4;
+  repeated Next.OwlSanctuaryFruitBriefInfo fruit_brief_infos = 5;
+  int32 level = 6;
+  Next.OwlSanctuaryFruitInfo fruit_info = 8;
+  uint64 logic_id = 9;
+  Next.OwlSanctuaryDetectInfo detect_info = 10;
+  uint64 obj_id = 11;
+}
+
+message OwlSanctuaryFruitNpcGenerateData {
+  int32 npc_refresh_content_id = 1;
+  int32 area_id = 2;
+  int32 npc_id = 3;
+  int32 refresh_max_num = 4;
+  int32 owl_content_id = 5;
+}
+
+message OwlSanctuaryFruitData {
+  uint32 fruit_id = 1;
+  uint32 fruit_gid = 2;
+  bool is_active = 7;
+  repeated Next.OwlSanctuaryFruitNpcGenerateData npc_generate_data = 8;
+  uint32 fruit_active_timestamp = 9;
+  uint32 slot_active_timestamp = 10;
+  repeated int32 npc_ids = 11;
+}
+
+message VisitorOwlSanctuaryFruitData {
+  uint32 uin = 1;
+  repeated Next.OwlSanctuaryFruitData fruit_data = 2;
+}
+
+message OwlSanctuaryFruitInfo {
+  repeated Next.OwlSanctuaryFruitData fruit_data = 1;
+  bool is_init_fruit_set = 3;
+  repeated Next.VisitorOwlSanctuaryFruitData visitor_fruit_data = 4;
+}
+
+message FusionOwlSanctuaryFruitNpcGenerateData {
+  int32 npc_refresh_content_id = 1;
+  int32 area_id = 2;
+  int32 npc_id = 3;
+  int32 refresh_max_num = 4;
+}
+
+message FusionOwlSanctuaryInfo {
+  uint32 owl_sanctuary_content_id = 1;
+  uint32 last_refresh_timestamp = 2;
+  repeated Next.FusionOwlSanctuaryFruitNpcGenerateData npc_generate_datas = 3;
+}
+
+message RefreshPetEggData {
+  uint32 pet_egg_id = 1;
+  repeated uint32 petbase_id = 2;
+}
+
+message CampRefreshPetEggInfo {
+  uint32 camp_id = 1;
+  repeated Next.RefreshPetEggData camp_pet_egg_data = 2;
+}
+
+message OwlSanctuaryPetEggInfo {
+  uint32 owl_sanctuary_id = 1;
+  repeated Next.RefreshPetEggData owl_sanctuary_pet_egg_data = 2;
+}
+
+message NavMeshFilterParams {
+  int32 include_nav_flag = 1;
+  int32 exclude_nav_flag = 2;
+  int32 model_nav_query_exclude_flags = 3;
+  int32 query_area_id = 4;
+  Next.Position query_extent = 5;
+  int32 layer = 6;
+  int64 dynamic_flag = 7;
+}
+
+message SceneEventInfo {
+  int32 id = 1;
+  int32 status = 2;
+  uint32 hit_times = 3;
+  int32 bonus_type = 4;
+  int32 bonus_event_pool_cfg_id = 5;
+}
+
+message HabitatAreaInfo {
+  message GroupAreaIds {
+    repeated uint32 area_conf_id = 1;
+  }
+  repeated Next.HabitatAreaInfo.GroupAreaIds habitat_areas = 1;
+}
+
+message SceneFriendInfo {
+  uint32 friend_uin = 1;
+}
+
+message FlowerSeedBossData {
+  uint64 seed_npc_logic_id = 1;
+  int32 seed_star = 2;
+  int32 inner_petbase_id = 3;
+  bool inner_glass = 4;
+  bool randed_battle_npc_glass = 5;
+  bool inner_shiny = 17;
+  Next.GlassInfo inner_glass_info = 21;
+  uint32 inner_pet_lv = 6;
+  uint32 inner_pet_hp_talent = 7;
+  uint32 inner_pet_attack_talent = 8;
+  uint32 inner_pet_special_attack_talent = 9;
+  uint32 inner_pet_defense_talent = 10;
+  uint32 inner_pet_special_defense_talent = 11;
+  uint32 inner_pet_speed_talent = 12;
+  uint32 inner_pet_gender = 13;
+  uint32 inner_pet_nature = 14;
+  uint32 catch_vitem_quantity = 15;
+  uint32 spec_flower_seed_id = 16;
+  uint32 activity_id = 18;
+  uint32 end_timestamp = 19;
+  uint32 battle_star_rule = 20;
+  uint32 battle_star_offset = 22;
+  uint32 min_star = 23;
+  repeated Next.InnerBattleTask battle_tasks = 24;
+  uint32 bind_pet_gid = 25;
+  uint32 bind_petbase_id = 26;
+  uint32 bind_evolution_id = 27;
+  uint64 owner_id = 28;
+  uint32 blood = 29;
+  uint32 camp_cfg_id = 30;
+  uint32 seed_npc_cfg_id = 31;
+  uint64 seed_npc_obj_id = 32;
+  uint32 medal_id = 33;
+}

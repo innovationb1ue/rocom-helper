@@ -1,0 +1,31 @@
+{
+    "Name": "PVP_RANK_TRIAL_PET_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "baseid",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "pet_info_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "level",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

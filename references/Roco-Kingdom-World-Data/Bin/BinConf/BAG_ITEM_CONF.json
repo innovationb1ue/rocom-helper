@@ -1,0 +1,433 @@
+{
+    "Name": "BAG_ITEM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "sort_id",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "npcid",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_release",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "description",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "flavor_text",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "big_icon",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "TUIbutton_icon",
+            "Type": "EString",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "model",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "is_para_reward",
+            "Type": "EBool",
+            "Offset": 49,
+            "Size": 1
+        },
+        {
+            "Name": "lable_type",
+            "Type": "EInt32",
+            "Offset": 50,
+            "Size": 4
+        },
+        {
+            "Name": "type_desc",
+            "Type": "EString",
+            "Offset": 54,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_interior_finish",
+            "Type": "EBool",
+            "Offset": 58,
+            "Size": 1
+        },
+        {
+            "Name": "can_see",
+            "Type": "EUint32",
+            "Offset": 59,
+            "Size": 4
+        },
+        {
+            "Name": "throw_function_id",
+            "Type": "EUint32",
+            "Offset": 63,
+            "Size": 4
+        },
+        {
+            "Name": "magic_id",
+            "Type": "EInt32",
+            "Offset": 67,
+            "Size": 4
+        },
+        {
+            "Name": "player_skill_id",
+            "Type": "EUint32",
+            "Offset": 71,
+            "Size": 4
+        },
+        {
+            "Name": "can_charging",
+            "Type": "EUint32",
+            "Offset": 75,
+            "Size": 4
+        },
+        {
+            "Name": "icon_charging1",
+            "Type": "EString",
+            "Offset": 79,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_charging2",
+            "Type": "EString",
+            "Offset": 83,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "initial_use_times",
+            "Type": "EUint32",
+            "Offset": 87,
+            "Size": 4
+        },
+        {
+            "Name": "can_use_in_battle",
+            "Type": "EUint32",
+            "Offset": 91,
+            "Size": 4
+        },
+        {
+            "Name": "can_use_in_bag",
+            "Type": "EUint32",
+            "Offset": 95,
+            "Size": 4
+        },
+        {
+            "Name": "can_use_in_pet_bag",
+            "Type": "EUint32",
+            "Offset": 99,
+            "Size": 4
+        },
+        {
+            "Name": "is_consume",
+            "Type": "EUint32",
+            "Offset": 103,
+            "Size": 4
+        },
+        {
+            "Name": "is_auto_use",
+            "Type": "EUint32",
+            "Offset": 107,
+            "Size": 4
+        },
+        {
+            "Name": "show_quantity",
+            "Type": "EUint32",
+            "Offset": 111,
+            "Size": 4
+        },
+        {
+            "Name": "item_behavior",
+            "Type": "EStruct",
+            "Offset": 115,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "BAG_ITEM_CONF.item_behavior",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "use_action",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ratio",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ratio2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "can_stack",
+            "Type": "EUint32",
+            "Offset": 119,
+            "Size": 4
+        },
+        {
+            "Name": "can_not_repeat",
+            "Type": "EUint32",
+            "Offset": 123,
+            "Size": 4
+        },
+        {
+            "Name": "can_compose",
+            "Type": "EUint32",
+            "Offset": 127,
+            "Size": 4
+        },
+        {
+            "Name": "compose_num",
+            "Type": "EUint32",
+            "Offset": 131,
+            "Size": 4
+        },
+        {
+            "Name": "compose_id",
+            "Type": "EUint32",
+            "Offset": 135,
+            "Size": 4
+        },
+        {
+            "Name": "expire_time",
+            "Type": "EString",
+            "Offset": 139,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_quality",
+            "Type": "EUint32",
+            "Offset": 143,
+            "Size": 4
+        },
+        {
+            "Name": "acquire_struct",
+            "Type": "EStruct",
+            "Offset": 147,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "BAG_ITEM_CONF.acquire_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "acquire_way_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "behavior_id",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param1",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "param2",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param3",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "is_daily_reward",
+            "Type": "EUint32",
+            "Offset": 151,
+            "Size": 4
+        },
+        {
+            "Name": "is_close_bagui",
+            "Type": "EUint32",
+            "Offset": 155,
+            "Size": 4
+        },
+        {
+            "Name": "outline_icon",
+            "Type": "EString",
+            "Offset": 159,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "effect_description",
+            "Type": "EString",
+            "Offset": 163,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "badge_pos",
+            "Type": "EUint32",
+            "Offset": 167,
+            "Size": 4
+        },
+        {
+            "Name": "mark_start_task",
+            "Type": "EInt32",
+            "Offset": 171,
+            "Size": 4
+        },
+        {
+            "Name": "mark_end_task",
+            "Type": "EInt32",
+            "Offset": 175,
+            "Size": 4
+        },
+        {
+            "Name": "icon_sign",
+            "Type": "EString",
+            "Offset": 179,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "known_name",
+            "Type": "EString",
+            "Offset": 183,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "known_description",
+            "Type": "EString",
+            "Offset": 187,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_no_display_in_main",
+            "Type": "EUint32",
+            "Offset": 191,
+            "Size": 4
+        },
+        {
+            "Name": "is_home_plant_item",
+            "Type": "EUint32",
+            "Offset": 195,
+            "Size": 4
+        },
+        {
+            "Name": "key_identifier",
+            "Type": "EUint32",
+            "Offset": 199,
+            "Size": 4
+        },
+        {
+            "Name": "ban_pet_return",
+            "Type": "EBool",
+            "Offset": 203,
+            "Size": 1
+        },
+        {
+            "Name": "tips_not_show_inventory",
+            "Type": "EBool",
+            "Offset": 204,
+            "Size": 1
+        }
+    ]
+}

@@ -1,0 +1,82 @@
+{
+    "Name": "SCENE_ABILITY_FLYING_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "jump_height",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "gravity",
+            "Type": "EFloat",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "max_downward_spd",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "basic_movement_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "max_speed_curve",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "accelerate",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "turn_threshold",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "fly_delta_angular_speed",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "ride_pet_bp",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ascend_ability_id",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "jump_curve",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

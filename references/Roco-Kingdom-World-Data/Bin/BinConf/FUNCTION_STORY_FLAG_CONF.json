@@ -1,0 +1,61 @@
+{
+    "Name": "FUNCTION_STORY_FLAG_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "story_flag_action_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "action_string_param",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "action_int_param",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "apply_to_visitor",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "unreachable_range",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "range_data",
+            "Type": "EInt32",
+            "Offset": 25,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,5909 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle.proto";
+import "com_battle_enum.proto";
+import "com_match.proto";
+import "com_team_battle.proto";
+import "com_goods.proto";
+import "com_recharge.proto";
+import "com_shop.proto";
+import "com_misc.proto";
+import "com_rpc.proto";
+import "com_handbook.proto";
+import "com_monster.proto";
+import "com_pet.proto";
+import "com_pet_team.proto";
+import "com_account.proto";
+import "com_action.proto";
+import "com_activity.proto";
+import "com_appearance.proto";
+import "com_bookshelf.proto";
+import "com_home.proto";
+import "com_player.proto";
+import "com_player_data.proto";
+import "com_player_settings.proto";
+import "com_task.proto";
+import "com_actor.proto";
+import "com_scene.proto";
+import "com_relation.proto";
+import "xls_enum.proto";
+import "space_data.proto";
+import "friend_data.proto";
+import "battle_data.proto";
+import "feed_data.proto";
+import "com_world_map.proto";
+import "com_scene_ai.proto";
+
+enum RecycleThrowPetReason {
+  RTPR_NONE = 0;
+  RTPR_BATTLE = 1;
+  RTPR_SERVER_BUSINESS = 2;
+  RTPR_FRIEND_RIDE = 3;
+  RTPR_CLIENT_REQ = 4;
+}
+
+enum BagSellType {
+  SELL_ONE = 0;
+  SELL_BATCH = 1;
+}
+
+enum PetMedalAction {
+  PMA_WEAR = 1;
+  PMA_TAKE_OFF = 2;
+  PMA_REPLACE = 3;
+}
+
+enum ZoneFriendGetFriendListScene {
+  ZONE_FRIEND_GET_FRIEND_LIST_SCENE_DEFAULT = 0;
+  ZONE_FRIEND_GET_FRIEND_LIST_SCENE_UIN_LIST = 1;
+  ZONE_FRIEND_GET_FRIEND_LIST_SCENE_FURNITURE_ID = 2;
+  ZONE_FRIEND_GET_FRIEND_LIST_SCENE_REFRESH = 3;
+  ZONE_FRIEND_GET_FRIEND_LIST_SCENE_BP_GIFT = 4;
+}
+
+enum UpdateFriendInfoType {
+  MODIFY_NOTE = 1;
+  MODIFY_PINNED = 2;
+}
+
+enum PVP_RANK_STEP {
+  STEP_PK = 1;
+  STEP_SETTLE = 2;
+  STEP_IDLE = 3;
+}
+
+enum PVP_RANK_MASTER_TYPE {
+  PVP_RANK_MASTER_TYPE_NONE = 0;
+  PVP_RANK_MASTER_TYPE_MASTER = 1;
+  PVP_RANK_MASTER_TYPE_TOP_MASTER = 2;
+}
+
+enum MarqueePriorityType {
+  MARQUEE_PRIORITY_LOW = 1;
+  MARQUEE_PRIORITY_MIDDLE = 2;
+  MARQUEE_PRIORITY_HIGH = 3;
+}
+
+enum MobileOpType {
+  BIND = 0;
+  UNBIND = 1;
+}
+
+enum QueryFriendHomeInfoType {
+  HOME_BASIC_INFO = 1;
+  HOME_PLANT_INFO = 2;
+  HOME_PET_INFO = 4;
+  ALL = 255;
+}
+
+enum SeasonPagePlayType {
+  SPPT_PV = 1;
+  SPPT_POP_WINDOWS = 2;
+}
+
+enum ZoneSecondaryPasswordAction {
+  SPA_None = 0;
+  SPA_SET = 1;
+  SPA_PASS = 2;
+  SPA_FREE = 3;
+  SPA_UNSET = 4;
+}
+
+enum ZoneSecondaryPasswordForceDisable {
+  SPFD_None = 0;
+  SPFD_DISABLE = 1;
+  SPFD_CANCEL = 2;
+}
+
+enum TeleportToPlayerReason {
+  TTPR_NONE = 0;
+  TTPR_VISIBLE_CIRCLE = 1;
+  TTPR_WORLD_MAP_VISIT = 2;
+}
+
+message ZoneLoginReq {
+  bytes openid = 1;
+  Next.PlatInfo plat_info = 2;
+  Next.ClientInfo cli_info = 3;
+  bool is_login = 4;
+  bool leaving_online_visiting = 5;
+  int32 quality = 6;
+}
+
+message ZoneLoginRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerInfo player_info = 2;
+  uint64 svr_time = 3;
+  bool need_reconnect = 4;
+  Next.BanInfo ban_info = 7;
+  Next.PlayerSecLightFeatureData feature_data = 8;
+  int32 svr_time_zone = 9;
+}
+
+message ZoneLogoutReq {
+  uint32 uin = 1;
+  Next.ClientDevInfo dev_info = 2;
+  bool is_notify_cli = 3;
+}
+
+message ZoneLogoutRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRegisterReq {
+  bytes openid = 1;
+  Next.PlatInfo plat_info = 2;
+  Next.ClientInfo cli_info = 3;
+  bytes name = 4;
+  string cdkey = 5;
+  string label = 6;
+}
+
+message ZoneRegisterRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 uin = 2;
+  uint32 regist_beg_time = 3;
+  uint32 regist_end_time = 4;
+}
+
+message ZoneHeartbeatReq {
+}
+
+message ZoneHeartbeatRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 svr_time = 2;
+}
+
+message ZoneKickoutNty {
+  int32 kickout_type = 1;
+  int32 kickout_sub_type = 4;
+  Next.MultiLangPb kickout_msg = 2;
+  string kickout_txt_id = 5;
+  Next.BanInfo ban_info = 3;
+}
+
+message ZoneEnterSceneReq {
+}
+
+message ZoneEnterSceneRsp {
+  Next.RetInfo ret_info = 1;
+  int32 scene_cfg_id = 2;
+  int32 scene_res_cfg_id = 3;
+  uint64 scene_inst_id = 4;
+  uint32 home_room_level = 5;
+  bytes home_name = 6;
+  Next.ActorInfo self_info = 11;
+}
+
+message ZoneSceneMoveReq {
+  uint64 time_stamp = 1;
+  Next.Position to_pos = 2;
+  Next.Position to_rot = 3;
+  Next.Position speed = 4;
+  Next.Position acceleration = 5;
+  int32 move_mode = 6;
+  int32 custom_mode = 7;
+  bool stop_move = 8;
+  repeated Next.MoveSegmentInfo move_seg_list = 12;
+  uint64 platform_actor_id = 14;
+  Next.Position ctrl_rot = 15;
+  int32 scene_cfg_id = 17;
+  bool ride_move = 18;
+  Next.Point mate_point = 19;
+  int32 mate_move_mode = 20;
+}
+
+message ZoneSceneMoveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneInteractMoveReq {
+  Next.Point to_point = 1;
+}
+
+message ZoneSceneInteractMoveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneCastSceneSkillReq {
+  uint32 time_stamp = 1;
+  int32 skill_id = 2;
+  int32 skill_status_type = 3;
+  bool is_add_status = 4;
+}
+
+message ZoneSceneCastSceneSkillRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneSyncPlayerStatusReq {
+  uint64 time_stamp = 1;
+  int32 status = 2;
+  int32 op_code = 3;
+  int32 sub_status = 4;
+  bool is_normal_remove = 6;
+  Next.PlayerStatusCustomParams custom_status_param = 7;
+  repeated Next.PlayerStatusSyncInfo sync_status_info_list = 8;
+}
+
+message ZoneSceneSyncPlayerStatusRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneNpcNextActReq {
+  Next.TrigInteractType.ENUM trig_interact_type = 8;
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  Next.Point avatar_pt = 3;
+  Next.Point npc_pt = 4;
+  uint32 data1 = 5;
+  uint32 battle_radius = 6;
+  int32 cur_dialog_id = 7;
+  Next.Point battle_center = 15;
+  bool first_act = 11;
+  bytes commit_cur_act_params = 12;
+  bytes begin_next_act_params = 13;
+  Next.ClientNpcBlackboard npc_ai_blackboard = 14;
+  repeated Next.CheerMonsterInitInfo cheer_monster_init_info = 16;
+  int32 battle_type = 17;
+  uint32 ride_id = 18;
+  repeated uint64 onlooker_obj_id = 19;
+  bytes extra_data = 21;
+  bool begin_skip_dialog = 22;
+  int32 sit_npc_seat_idx = 23;
+  Next.Point before_sit_point = 24;
+}
+
+message ZoneSceneNpcNextActRsp {
+  repeated uint32 fail_dungeon_ret = 1;
+  Next.RetInfo ret_info = 2;
+  repeated Next.InteractActResult act_results = 3;
+  repeated Next.InteractCommitResult commit_results = 4;
+}
+
+message ZoneSceneNpcsInteractReq {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  uint64 source_npc_id = 3;
+}
+
+message ZoneSceneNpcsInteractRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneNpcDialogSelectReq {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  int32 select_id = 3;
+  Next.Point avatar_pt = 4;
+  Next.Point npc_pt = 5;
+  Next.Point battle_center = 7;
+  uint32 battle_radius = 6;
+}
+
+message ZoneSceneNpcDialogSelectRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.InteractActResult act_results = 2;
+  repeated Next.InteractCommitResult commit_results = 3;
+}
+
+message ZoneSceneNpcCancelActReq {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  bool force = 3;
+}
+
+message ZoneSceneNpcCancelActRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message QuickChangeMainTeamInfo {
+  uint32 main_team_idx = 1;
+  uint32 team_type = 2;
+}
+
+message ZoneSceneBeginThrowReq {
+  Next.ThrowType throw_type = 1;
+  int32 gid = 2;
+  int64 throw_id = 3;
+  int32 item_conf_id = 4;
+  Next.QuickChangeMainTeamInfo change_team = 5;
+}
+
+message ZoneSceneBeginThrowRsp {
+  Next.RetInfo ret_info = 1;
+  int64 throw_id = 2;
+  Next.QuickChangeMainTeamInfo change_team = 3;
+}
+
+message ThrowCombineInfo {
+  repeated int32 gid = 1;
+}
+
+message ZoneSceneEndThrowReq {
+  Next.ThrowType throw_type = 1;
+  int32 gid = 2;
+  Next.ThrowEffect throw_effect = 3;
+  repeated Next.ThrowTargetNpcInfo throw_target_npc_infos = 4;
+  int64 throw_id = 5;
+  Next.Position end_throw_pos = 6;
+  int32 fly_distance = 7;
+  repeated int32 params = 8;
+  Next.ThrowBattleInfo throw_battle_info = 11;
+  Next.ThrowCreateInfo throw_create_info = 12;
+  Next.ThrowMagicInfo throw_magic_info = 13;
+  Next.ThrowCombineInfo throw_combine_info = 14;
+  Next.ThrowStatusInfo throw_status_info = 15;
+  int32 item_conf_id = 16;
+}
+
+message ZoneSceneEndThrowRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ThrowBagItemResult throw_bagitem_result = 11;
+  Next.ZoneCatchResult catch_result = 12;
+  repeated Next.ThrowRandomActionInfo random_result = 13;
+  Next.ThrowPetResult throw_pet_result = 14;
+  Next.ThrowMagicCreateNPCResult throw_magic_create_npc_result = 15;
+}
+
+message ZoneSceneProcessThrowReq {
+  Next.ThrowType throw_type = 1;
+  int32 gid = 2;
+  repeated Next.ThrowTargetNpcInfo throw_target_npc_infos = 3;
+  int64 throw_id = 4;
+  int32 item_conf_id = 5;
+}
+
+message ZoneSceneProcessThrowRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneCreateScenePetReq {
+  int32 gid = 1;
+  Next.Point create_pt = 2;
+  int64 throw_id = 3;
+  Next.ClientCreatePetReason create_reason = 4;
+}
+
+message ZoneSceneCreateScenePetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRecycleThrowPetReq {
+  int32 gid = 1;
+  Next.RecycleThrowPetReason reason = 2;
+}
+
+message ZoneSceneRecycleThrowPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneThrowCollisionReq {
+  Next.ThrowType throw_type = 1;
+  int32 gid = 2;
+  int32 throw_id = 3;
+  Next.Position collision_pos = 4;
+  int32 fly_distance = 5;
+  int32 item_conf_id = 6;
+}
+
+message ZoneSceneThrowCollisionRsp {
+  Next.RetInfo ret_info = 1;
+  bool is_broken = 2;
+  int32 throw_power = 3;
+}
+
+message ZoneScenePetPowerDashInteractReq {
+  int32 gid = 1;
+  uint64 npc_actor_id = 2;
+  int32 option_id = 3;
+  Next.SceneBasePetData pet_data = 4;
+}
+
+message ZoneScenePetPowerDashInteractRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneNtyAuraEnableStReq {
+  int64 aura_id = 1;
+  bool is_enabled = 2;
+}
+
+message ZoneSceneNtyAuraEnableStRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChangeSelectedThrowItemReq {
+  Next.ThrowItemInfo cur_selected_throw_item = 1;
+  int32 cur_selected_magic_item_gid = 2;
+}
+
+message ZoneChangeSelectedThrowItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChangeSelectedThrowItemNotify {
+  Next.RetInfo ret_info = 1;
+  Next.ThrowItemInfo cur_selected_throw_item = 2;
+  int32 cur_selected_magic_item_gid = 3;
+}
+
+message ZoneChangeRoleMagicItemReq {
+  uint32 item_gid = 1;
+  uint32 item_conf_id = 2;
+}
+
+message ZoneChangeRoleMagicItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneNpcBattleSeriesReq {
+  repeated uint64 npc_id_list = 1;
+}
+
+message ZoneSceneNpcBattleSeriesRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneGeneralOpReq {
+  uint32 op_type = 1;
+  repeated uint64 param_list = 2;
+}
+
+message ZoneSceneGeneralOpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneSetNpcPosReq {
+  repeated Next.SetNpcPosItem npc_list = 4;
+}
+
+message ZoneSceneSetNpcPosRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.SetNpcPosItem failed_npc_list = 2;
+}
+
+message ZoneSceneSetBroadcastLimitReq {
+  uint32 new_limit = 1;
+}
+
+message ZoneSceneSetBroadcastLimitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneClientEnterSceneFinishNty {
+  uint64 actor_id = 1;
+  string feature_data = 2;
+}
+
+message ZoneSceneClientEnterSceneFinishNtyAck {
+  Next.RetInfo ret_info = 1;
+  bool enabled_no_loading_teleport = 6;
+  repeated Next.ActorInfo other_actors = 7;
+  repeated uint64 deleted_other_actor_ids = 8;
+  int32 add_or_update_other_actors_total_batch = 9;
+  Next.SelfActorAdjustData adjust_data = 21;
+  Next.HomeInfo home_info = 22;
+}
+
+message ZoneSceneClientInitAoiIncrUpdateNty {
+  int32 batch_id = 1;
+  int32 total_batch = 2;
+  repeated Next.ActorInfo other_actors = 3;
+}
+
+message ZoneSceneHeartbeatNty {
+  uint64 heartbeat_seq = 1;
+  int32 server_logic_tick_ivl = 6;
+}
+
+message ZoneSceneHeartbeatNtyRsp {
+  uint64 heartbeat_seq = 1;
+  string pass_data = 6;
+}
+
+message ZoneSceneHeartbeatResultNty {
+  Next.RetInfo ret_info = 1;
+  uint64 heartbeat_seq = 6;
+  uint64 server_time = 11;
+  int32 trans_delay_time = 12;
+  int32 avg_trans_delay_time = 14;
+  uint64 server_logic_frame = 13;
+  string pass_data = 16;
+}
+
+message ZoneScenePlayerActNtyReq {
+  int32 player_act = 1;
+  int32 player_sub_act = 2;
+}
+
+message ZoneScenePlayerActNtyRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneEnableBattleNtyReq {
+  uint64 actor_id = 1;
+  bool enable_battle = 2;
+}
+
+message ZoneSceneEnableBattleNtyRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneClientAiCommandReq {
+  uint64 actor_id = 1;
+  uint64 action_id = 2;
+  Next.Position pos = 3;
+  int32 command_param = 4;
+  repeated Next.ClientAiCommandInfo command_list = 5;
+}
+
+message ZoneSceneClientAiCommandRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneClientRemoteStoreReq {
+  string meth = 1;
+  string key = 2;
+  bytes value = 3;
+  int64 live_time = 4;
+  int64 cli_stub = 5;
+}
+
+message ZoneClientRemoteStoreRsp {
+  Next.RetInfo ret_info = 1;
+  bytes value = 2;
+  int64 cli_stub = 3;
+}
+
+message ZoneClientRemoteStorageChangeNty {
+  repeated string del_keys = 1;
+  repeated Next.ClientRemoteStorageData update_rs_datas = 2;
+}
+
+message ZoneGetBagReq {
+  uint32 ext = 1;
+  int32 type = 2;
+}
+
+message ZoneGetBagRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBagInfo bag_info = 2;
+}
+
+message ZoneUseBagItemReq {
+  uint32 gid = 1;
+  uint32 num = 2;
+  uint32 para = 3;
+  repeated uint32 change_attr_type = 4;
+  repeated uint32 target_type = 5;
+  uint32 change_talent_type = 6;
+  uint32 result_type = 7;
+  uint32 para2 = 8;
+  uint32 item_conf_id = 9;
+}
+
+message ZoneUseBagItemRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GoodsReward reward = 2;
+  uint32 use_bag_id = 4;
+}
+
+message ZoneUseMultiBagItemReq {
+  message BagItemInfo {
+    uint32 gid = 1;
+    uint32 num = 2;
+    uint32 para = 3;
+    uint32 item_conf_id = 4;
+  }
+  repeated Next.ZoneUseMultiBagItemReq.BagItemInfo item_info = 1;
+}
+
+message ZoneUseMultiBagItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message BagSellNode {
+  uint32 gid = 1;
+  uint32 num = 2;
+}
+
+message ZoneSellBagItemReq {
+  uint32 gid = 1;
+  uint32 num = 2;
+  Next.BagSellType type = 3;
+  repeated Next.BagSellNode gid_list = 5;
+}
+
+message ZoneSellBagItemRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GoodsReward reward = 2;
+}
+
+message ZoneModifyBagItemFlagsReq {
+  message ModifyInfo {
+    uint32 gid = 1;
+    uint32 bag_item_flags = 2;
+    uint32 slot_idx = 3;
+    uint32 item_conf_id = 4;
+  }
+  repeated Next.ZoneModifyBagItemFlagsReq.ModifyInfo modify_info = 1;
+}
+
+message ZoneModifyBagItemFlagsRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BattleItemInfo items = 2;
+}
+
+message ZoneModifyBagListSortReq {
+  dataconfig.BagItemType item_type = 1;
+  dataconfig.Sequence sort_type = 2;
+}
+
+message ZoneModifyBagListSortRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message CSExchangeItem {
+  message Goods {
+    dataconfig.GoodsType goods_type = 1;
+    uint32 goods_id = 2;
+    int32 goods_num = 3;
+  }
+  uint32 id = 1;
+  int32 num = 2;
+  repeated Next.CSExchangeItem.Goods cost_goods = 3;
+}
+
+message ZoneExchangeReq {
+  uint32 exchange_id = 1;
+  uint32 exchange_num = 2;
+  uint64 npc_space_obj_id = 3;
+  repeated uint32 cost_goods_id = 4;
+  Next.CSExchangeItem exchange_item = 5;
+}
+
+message ZoneExchangeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GoodsReward reward = 2;
+  Next.CSUnlockedExchangeRecipe recipes = 3;
+}
+
+message ZoneBatchExchangeReq {
+  repeated Next.CSExchangeItem exchange_items = 1;
+}
+
+message ZoneBatchExchangeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneVisualItemUpgradeReq {
+  uint32 visual_item_type = 1;
+  uint32 visual_item_upgrade_conf_id = 2;
+  uint64 npc_space_obj_id = 3;
+}
+
+message ZoneVisualItemUpgradeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GoodsReward reward = 2;
+}
+
+message BattleEnterBattleFieldReq {
+}
+
+message BattleEnterBattleFieldRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetEvoluteReq {
+  uint32 pet_gid = 1;
+  uint32 chosen_evolve_idx = 2;
+}
+
+message ZonePetEvoluteRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetUseBagItemReq {
+  message BagItemInfo {
+    uint32 id = 1;
+    uint32 num = 2;
+  }
+  uint32 pet_gid = 1;
+  repeated Next.ZonePetUseBagItemReq.BagItemInfo bag_item_info = 2;
+  dataconfig.PetTrainType pet_train_type = 3;
+}
+
+message ZonePetUseBagItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetBasePointAssignReq {
+  message BasePointInfo {
+    dataconfig.AttributeType attribute_type = 1;
+    int32 add_num = 2;
+  }
+  repeated Next.ZonePetBasePointAssignReq.BasePointInfo base_point_info = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZonePetBasePointAssignRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetSetFollowReq {
+  uint32 gid = 1;
+}
+
+message ZonePetSetFollowRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 gid = 2;
+}
+
+message ZonePetEquipSkillReq {
+  repeated Next.PetSkillEquipInfo equip_info = 1;
+  uint32 gid = 2;
+  uint32 team_type = 3;
+}
+
+message ZonePetEquipSkillRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetDeleteReq {
+  uint32 gid = 1;
+}
+
+message ZonePetDeleteRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetRenameReq {
+  uint32 gid = 1;
+  bytes name = 2;
+}
+
+message ZonePetRenameRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZoneShopGetInfoReq {
+  uint32 shop_id = 1;
+}
+
+message ZoneShopGetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ShopData shop_data = 2;
+}
+
+message ZoneShopBuyItemReq {
+  repeated Next.ShopBuyItemInfo buy_item_info = 1;
+  int32 shop_id = 2;
+  uint32 content_id = 3;
+  uint64 version = 4;
+}
+
+message ZoneShopBuyItemRsp {
+  Next.RetInfo ret_info = 1;
+  int32 shop_id = 2;
+  repeated Next.ShopBuyItemInfo buy_item_info = 3;
+  Next.ShopData shop_data = 4;
+}
+
+message ZoneShopExchangeReq {
+  int32 shop_id = 1;
+  repeated Next.ShopBuyItemInfo goods_list = 2;
+  uint32 content_id = 3;
+  uint64 version = 4;
+}
+
+message ZoneShopExchangeRsp {
+  Next.RetInfo ret_info = 1;
+  int32 shop_id = 2;
+  repeated Next.ShopBuyItemInfo goods_list = 3;
+  Next.ShopData shop_data = 4;
+}
+
+message ZoneShopBatchGetInfoReq {
+  repeated uint32 shop_ids = 1;
+}
+
+message ZoneShopBatchGetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.ShopData shop_datas = 2;
+}
+
+message ZoneSetFashionDataReq {
+  repeated int32 fashion_item_wear_id = 1;
+  int32 wardrobe_index = 2;
+  string wardrobe_name = 3;
+  bool use_wardrobe = 4;
+  bool trig_by_interact = 5;
+  int32 wear_suit_id = 6;
+  repeated int32 salon_item_wear_id = 7;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 8;
+}
+
+message ZoneSetFashionDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_FashionInfo fashion_info = 2;
+}
+
+message ZoneSetSalonDataReq {
+  repeated Next.SalonItemWearData salon_item_wear_data = 1;
+}
+
+message ZoneSetSalonDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_SalonInfo salon_info = 2;
+}
+
+message ZoneTaskRewardReq {
+  repeated uint32 task_list = 1;
+}
+
+message ZoneTaskRewardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTaskInfo rewarded_task_list = 2;
+  repeated Next.PlayerTaskInfo next_task_list = 3;
+}
+
+message ZoneGetTaskSummaryReq {
+  uint32 task_id = 1;
+}
+
+message ZoneGetTaskSummaryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.TaskSummaryInfo data = 2;
+}
+
+message ZoneTaskQueryReq {
+  repeated uint32 task_list = 1;
+  uint32 task_state = 2;
+  uint32 task_paragraph_id = 3;
+}
+
+message ZoneTaskQueryRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTaskInfo task_info_list = 2;
+}
+
+message ZoneTaskTraceReq {
+  uint32 task_id = 1;
+  uint32 use_trace = 2;
+}
+
+message ZoneTaskTraceRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTaskInfo task_info_list = 2;
+}
+
+message ZoneTaskTrackReq {
+  uint32 curr_track_task = 1;
+  uint32 new_track_task = 2;
+}
+
+message ZoneTaskTrackRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTaskStateReq {
+  uint32 task_id = 1;
+  uint32 new_state = 2;
+}
+
+message ZoneTaskStateRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTaskSheetStateReq {
+}
+
+message ZoneTaskSheetStateRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.TaskTypeInfo task_type_list = 2;
+}
+
+message TaskTokenOwnedInfo {
+  uint32 task_token_id = 1;
+  uint32 task_token_get_time = 2;
+  uint32 sub_task_id = 3;
+  uint32 is_locked = 4;
+}
+
+message ZoneTaskPanelAllInfoReq {
+}
+
+message ZoneTaskPanelAllInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.TaskTypeInfo task_type_list = 2;
+  repeated Next.PlayerSubTaskInfo_SubTaskTokenTriggeredTaskInfo sub_task_token_triggered_task_info = 3;
+  repeated uint32 sub_task_id = 4;
+  uint32 last_get_time = 5;
+  repeated Next.TaskTokenOwnedInfo task_token_owned_data = 6;
+}
+
+message ZoneWorldLevelTaskOpenReq {
+}
+
+message ZoneWorldLevelTaskOpenRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 world_level_task_id = 2;
+  Next.EMTaskState task_state = 3;
+}
+
+message ZoneWorldLevelTaskQueryReq {
+  uint32 world_level_task_id = 1;
+}
+
+message ZoneWorldLevelTaskQueryRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 world_level_task_id = 2;
+  Next.WorldLevelTaskState world_level_task_state = 3;
+}
+
+message ZoneRewardAdventureChapterReq {
+  uint32 chapter_id = 1;
+}
+
+message ZoneRewardAdventureChapterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneQueryAdventureChapterReq {
+}
+
+message ZoneQueryAdventureChapterRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 chapter_id = 2;
+  bool rewarded = 3;
+  uint32 region_id = 4;
+}
+
+message ZoneSceneQueryBossNpcInfoReq {
+  uint32 friend_uin = 1;
+}
+
+message ZoneSceneQueryBossNpcInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BossNpcInfos flower_npcs = 2;
+  Next.BossNpcInfos world_leader_npcs = 3;
+  Next.BossNpcInfos legendary_npcs = 4;
+}
+
+message ZoneSceneSpecFlowerSeedInfoNty {
+  Next.BossNpcInfos flowers = 1;
+}
+
+message ZoneQueryInvestTaskReq {
+}
+
+message ZoneQueryInvestTaskRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTaskInfo invest_task_list = 2;
+  repeated Next.PlayerTaskInfo clue_task_list = 3;
+  repeated Next.PlayerTaskInfo topic_task_list = 4;
+  uint32 remain_time = 5;
+  uint32 special_reward_item = 6;
+}
+
+message ZoneReportTaskReq {
+  dataconfig.TaskClientTriggerType tctt = 1;
+  uint32 data = 2;
+}
+
+message ZoneReportTaskRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCancelTaskRedPointReq {
+  uint32 task_id = 1;
+}
+
+message ZoneCancelTaskRedPointRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFriendDataChangedNotify {
+  uint32 action = 1;
+  Next.FriendRoleInfo friend_data = 2;
+}
+
+message ZoneGameTimeChangeReq {
+  uint32 time = 1;
+}
+
+message ZoneGameTimeChangeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneModGameTimeReq {
+  bool pause = 1;
+  int32 addi_time = 2;
+  int64 time_stamp = 3;
+  uint64 npc_id = 4;
+  int32 minigame_cfg_id = 5;
+}
+
+message ZoneSceneModGameTimeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetLevelAwardReq {
+  uint32 level = 1;
+}
+
+message ZoneGetLevelAwardRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerLevelAwardInfo awards = 2;
+}
+
+message ZoneQueryLevelAwardReq {
+}
+
+message ZoneQueryLevelAwardRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerLevelAwardInfo awards = 2;
+}
+
+message ZoneSceneCreateBattleReq {
+  Next.SourceData source_data = 1;
+  uint32 battle_conf_id = 2;
+  uint32 npc_conf_id = 3;
+  uint32 npc_level = 4;
+  uint64 npc_obj_id = 6;
+  Next.Point avatar_pt = 7;
+  Next.Point npc_pt = 8;
+  uint32 option_id = 9;
+  uint64 npc_logic_id = 10;
+  repeated Next.CheerMonsterInitInfo cheer_npcs = 11;
+  repeated Next.BattleTaskInfo task_infos = 12;
+}
+
+message ZoneSceneCreateBattleRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneMatchNotify {
+  enum TYPE {
+    START_MATCH = 1;
+    CANCEL_MATCH = 2;
+  }
+  uint32 match_start_ut = 2;
+  uint32 pvp_id = 3;
+  Next.PvpMatchState state = 4;
+}
+
+message ZoneSceneMatchStartReq {
+  uint32 pvp_id = 1;
+}
+
+message ZoneSceneMatchStartRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneMatchCancelReq {
+}
+
+message ZoneSceneMatchCancelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRoleAttrReq {
+  string name = 1;
+  dataconfig.ESexValue sex = 2;
+  uint32 image = 3;
+  repeated Next.SalonItemWearData salon_item_wear_data = 4;
+  int32 fashion_item_id = 5;
+  int32 fashion_suit_id = 6;
+}
+
+message ZoneRoleAttrRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo appearance_info = 2;
+}
+
+message ZoneConfirmReviveReq {
+}
+
+message ZoneConfirmReviveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetFreeReq {
+  repeated uint32 pet_gid = 1;
+}
+
+message ZonePetFreeRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 pet_gid = 2;
+}
+
+message ZoneSceneEndChapterReq {
+  uint64 npc_id = 1;
+  uint32 option_id = 2;
+}
+
+message ZoneSceneEndChapterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTrackTaskNpcReq {
+  repeated uint32 task_id_list = 1;
+  bool only_not_break_journey = 2;
+}
+
+message ZoneTrackTaskNpcRsp {
+  message ParentTask {
+    uint32 task_id = 1;
+    uint32 parent_task_id = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.TaskTrackingItem tracking_list = 2;
+  bool only_not_break_journey = 3;
+  repeated Next.ZoneTrackTaskNpcRsp.ParentTask parent_list = 4;
+}
+
+message ZoneGmClearBagItemReq {
+}
+
+message ZoneGmClearBagItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSubRoleHpReq {
+  uint32 sub_val = 1;
+  uint32 sub_reason = 2;
+  bool has_half_injure = 3;
+}
+
+message ZoneSubRoleHpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetBreakthroughReq {
+  uint32 gid = 1;
+}
+
+message ZonePetBreakthroughRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetInspireReq {
+  uint32 gid = 1;
+}
+
+message ZonePetInspireRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetGrowReq {
+  uint32 pet_gid = 1;
+  uint32 grow_times = 2;
+}
+
+message ZonePetGrowRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetTeamChangeReq {
+  repeated Next.PetTeam teams = 1;
+  repeated uint32 team_idxs = 2;
+  uint32 team_type = 3;
+  bool strict_check = 4;
+  bool update_backpack = 5;
+  uint32 main_team_idx = 6;
+}
+
+message ZonePetTeamChangeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetChangeMainTeamReq {
+  uint32 main_team_idx = 1;
+  uint32 team_type = 2;
+}
+
+message ZonePetChangeMainTeamRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneOpenPetBagReq {
+  repeated uint32 pet_gid = 1;
+}
+
+message ZoneOpenPetBagRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetHandbookAwardReq {
+  uint32 award_pt = 1;
+  uint32 hb_area_type = 2;
+}
+
+message ZoneGetHandbookAwardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetEquipPossessionReq {
+  uint32 equip_item_gid = 1;
+  uint32 equip_pet_gid = 2;
+  uint32 equip_slot_idx = 3;
+  uint32 remove_slot_idx = 4;
+  uint32 remove_pet_gid = 5;
+  uint32 equip_item_conf_id = 6;
+}
+
+message ZonePetEquipPossessionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetRemovePossessionReq {
+  uint32 remove_slot_idx = 1;
+  uint32 remove_pet_gid = 2;
+}
+
+message ZonePetRemovePossessionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetMedalCommonReq {
+  uint32 pet_gid = 1;
+  uint32 medal_gid = 2;
+  uint32 action = 3;
+  uint32 medal_conf_id = 4;
+}
+
+message ZonePetMedalCommonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneEnterDungeonReq {
+  uint32 dungeon_id = 1;
+}
+
+message ZoneEnterDungeonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneExitDungeonReq {
+  uint32 teleport_id = 1;
+  bool initiative_exit = 2;
+}
+
+message ZoneExitDungeonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSyncTempReq {
+  uint32 world_temp = 1;
+  int32 field_temp = 2;
+}
+
+message ZoneSyncTempRsp {
+  Next.RetInfo ret_info = 1;
+  int32 body_temp_final_val = 2;
+  uint32 reach_final_time = 3;
+}
+
+message ZoneAutoSupplyCarryonReq {
+  bool is_auto_supply = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneAutoSupplyCarryonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneClientEventReq {
+  message ClientEvent {
+    uint32 event = 1;
+    bool is_start = 2;
+    bytes tag = 3;
+  }
+  repeated Next.ZoneSceneClientEventReq.ClientEvent client_event = 4;
+}
+
+message ZoneSceneClientEventRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneDotsExecuteDataReq {
+  repeated Next.SystemExecuteTime systems_cost_time = 1;
+  uint64 total_cost_time = 2;
+  uint64 ai_count = 3;
+}
+
+message ZoneSceneDotsExecuteDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCampLevelUpReq {
+  uint32 camp_content_id = 1;
+  uint32 current_level = 2;
+}
+
+message ZoneCampLevelUpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneUpgradeCarryonReq {
+  uint32 pet_gid = 1;
+  uint32 slot_idx = 2;
+  bool is_equipped = 3;
+  uint32 upgrade_item_gid = 4;
+  uint32 upgrade_item_conf_id = 5;
+}
+
+message ZoneUpgradeCarryonRsp {
+  Next.RetInfo ret_info = 1;
+  Next.Possession res_carryon = 2;
+}
+
+message ZoneResonanceCarryonReq {
+  uint32 pet_gid = 1;
+  uint32 result_carryon_idx = 2;
+  bool is_equipped = 3;
+  uint32 result_item_gid = 4;
+  uint32 cost_item_gid = 5;
+  uint32 result_item_conf_id = 6;
+  uint32 cost_item_conf_id = 7;
+}
+
+message ZoneResonanceCarryonRsp {
+  Next.RetInfo ret_info = 1;
+  Next.Possession res_carryon = 2;
+}
+
+message ZoneSceneStartMinigameReq {
+  uint32 minigame_cfg_id = 1;
+}
+
+message ZoneSceneStartMinigameRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneExitMinigameReq {
+  uint32 minigame_cfg_id = 1;
+}
+
+message ZoneSceneExitMinigameRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReopenMinigameReq {
+  uint32 minigame_cfg_id = 1;
+}
+
+message ZoneReopenMinigameRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRewardMinigameReq {
+  uint32 minigame_cfg_id = 1;
+}
+
+message ZoneSceneRewardMinigameRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBackpackTeamUpdateReq {
+  repeated uint32 new_team_pet_gid = 1;
+}
+
+message ZoneBackpackTeamUpdateRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetStarRecoverTimeReq {
+}
+
+message ZoneGetStarRecoverTimeRsp {
+  int32 next_recover_time = 1;
+  int32 total_recover_time = 2;
+  Next.RetInfo ret_info = 3;
+}
+
+message ZoneGetStarDebrisInfoReq {
+}
+
+message ZoneGetStarDebrisInfoRsp {
+  bool is_recover = 1;
+  uint32 recover_time = 2;
+  Next.RetInfo ret_info = 3;
+}
+
+message ZoneSceneVerifyInteractCondReq {
+  uint64 npc_obj_id = 1;
+  int32 option_id = 2;
+}
+
+message ZoneSceneVerifyInteractCondRsp {
+  Next.RetInfo ret_info = 1;
+  int32 need_cond_param = 2;
+}
+
+message ZoneSceneNpcPendantInteractReq {
+  uint64 npc_id = 1;
+  int32 pendant_cfg_id = 2;
+  int32 id = 3;
+}
+
+message ZoneSceneNpcPendantInteractRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneReceiveOwlRefugeRewardReq {
+  uint64 npc_id = 1;
+  int32 reward_idx = 2;
+}
+
+message ZoneSceneReceiveOwlRefugeRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message CSUnlockedExchangeRecipe {
+  message Recipe {
+    uint32 exchange_id = 1;
+    bool is_online_shared = 2;
+  }
+  repeated Next.CSUnlockedExchangeRecipe.Recipe recipes = 1;
+}
+
+message ZoneGetExchangeInfoReq {
+}
+
+message ZoneGetExchangeInfoRsp {
+  message Exchange {
+    uint32 exchange_group = 1;
+    uint32 exchange_times = 2;
+    uint32 next_refresh_time = 3;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneGetExchangeInfoRsp.Exchange exchange_list = 2;
+}
+
+message ZoneGetUnlockedExchangeReq {
+}
+
+message ZoneGetUnlockedExchangeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.CSUnlockedExchangeRecipe recipes = 2;
+  repeated Next.ZoneGetExchangeInfoRsp.Exchange exchange_list = 3;
+}
+
+message ZoneUnlockExchangeRecipeNotify {
+  Next.CSUnlockedExchangeRecipe recipes = 1;
+  bool is_full = 2;
+}
+
+message ZoneHandbookChangeNotify {
+  message AreaHandbookChangeInfo {
+    uint32 hb_area_type = 1;
+    uint32 curr_found_coll_num = 2;
+    uint32 curr_collect_coll_num = 3;
+  }
+  Next.HandbookRecordCollection record_coll = 1;
+  bool is_new = 4;
+  uint32 change_pet_base_id = 5;
+  repeated Next.ZoneHandbookChangeNotify.AreaHandbookChangeInfo area_hb_change_info = 6;
+}
+
+message ZoneHandbookStatChangeNotify {
+  repeated Next.HandbookRecordCollection hb_coll = 1;
+}
+
+message ZoneGetHandbookStatReq {
+  uint32 page = 1;
+  int64 version = 2;
+}
+
+message ZoneGetHandbookStatRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HandbookRecordCollection hb_coll = 2;
+  uint32 total_page = 3;
+  uint32 req_page = 4;
+  uint32 page_cap = 5;
+  int64 version = 6;
+}
+
+message ZoneGetPetStatReq {
+  int64 version = 1;
+  repeated uint32 cached_pets = 2;
+  repeated uint32 no_cached_pets = 3;
+}
+
+message ZoneGetPetStatRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HandbookRecordCollection hb_coll = 2;
+  int64 version = 3;
+}
+
+message ZoneGetHandbookTopicAwardReq {
+  uint32 hb_id = 1;
+  int32 reward_idx = 2;
+  int32 area_type = 3;
+  uint32 topic_id = 4;
+}
+
+message TopicAwardItem {
+  uint32 hb_id = 1;
+  repeated uint32 reward_idxs = 2;
+  repeated uint32 topic_ids = 3;
+}
+
+message ZoneGetHandbookTopicAwardRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 hb_id = 2;
+  int32 reward_idx = 3;
+  repeated Next.TopicAwardItem award_items = 4;
+  uint32 topic_id = 5;
+}
+
+message ZoneGetPetHabitatReq {
+  uint32 pet_base_id = 1;
+}
+
+message ZoneGetPetHabitatRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 area_conf_id = 2;
+  Next.HabitatAreaInfo area_info = 3;
+}
+
+message ZoneSceneAIModifyLogicStatusReq {
+  uint64 npc_obj_id = 1;
+  repeated Next.LogicStatusOpInfo operation = 2;
+}
+
+message ZoneSceneAIModifyLogicStatusRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneStrongStormNty {
+  bool enter = 1;
+}
+
+message ZoneTlogReportReq {
+  string tlog_tag = 1;
+  string tlog_content = 2;
+}
+
+message ZoneTlogReportRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldAttackHitReq {
+  uint64 attack_actor_id = 1;
+  uint64 hit_actor_id = 2;
+}
+
+message ZoneSceneWorldAttackHitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldAttackCollideReq {
+  uint64 attack_actor_id = 1;
+}
+
+message ZoneSceneWorldAttackCollideRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneDotsComponentSyncReq {
+  uint64 actor_id = 1;
+  repeated Next.BytesData component_datas = 2;
+}
+
+message ZoneDotsComponentSyncRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSwitchClientToServerAiReq {
+  repeated uint64 actor_list = 1;
+  repeated Next.DotsComponentData comp_data_list = 2;
+  repeated Next.Point point_list = 3;
+}
+
+message ZoneSwitchClientToServerAiRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint64 success_list = 2;
+}
+
+message ZoneHopeNotify {
+  Next.HopeInstruction instruction = 1;
+}
+
+message ZoneFriendGetFriendListReq {
+  uint32 count = 1;
+  int32 friend_type = 2;
+  repeated Next.PlayerBriefInfoGroup groups = 10;
+  Next.ZoneFriendGetFriendListScene scene = 11;
+  repeated uint32 uin_list = 12;
+  int32 furniture_id = 13;
+  int32 client_data1 = 14;
+  int32 client_data2 = 15;
+  int32 client_data3 = 16;
+  int32 client_data4 = 17;
+}
+
+message ZoneFriendGetFriendListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.FriendRoleInfo friend_role_list = 2;
+  int32 pack_index = 3;
+  bool is_end = 4;
+  repeated Next.FriendRoleInfo recommend_player_list = 5;
+  uint32 refresh_gap = 6;
+  int32 friend_type = 10;
+  Next.ZoneFriendGetFriendListScene scene = 11;
+  repeated uint32 uin_list = 12;
+  int32 furniture_id = 13;
+  int32 client_data1 = 14;
+  int32 client_data2 = 15;
+  int32 client_data3 = 16;
+  int32 client_data4 = 17;
+}
+
+message ZoneGetFriendExtInfoListReq {
+  repeated int32 uin_list = 1;
+}
+
+message ZoneGetFriendExtInfoListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.FriendRoleExtInfo ext_info_list = 2;
+}
+
+message ZoneFriendSearchPlayerReq {
+  int32 uin = 1;
+}
+
+message ZoneFriendSearchPlayerRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FriendRoleInfo player_info = 2;
+  bool is_friend = 3;
+  bool is_black_role = 4;
+  Next.BanInfo ban_info = 5;
+}
+
+message ZoneFriendBatchSearchPlayerReq {
+  repeated string openid_list = 1;
+}
+
+message ZoneSearchPlayerResult {
+  string openid = 1;
+  Next.FriendRoleInfo player_info = 2;
+  bool is_friend = 3;
+  bool is_black_role = 4;
+  int32 search_ret = 5;
+}
+
+message ZoneFriendBatchSearchPlayerRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneSearchPlayerResult role_list = 2;
+  Next.BanInfo ban_info = 3;
+}
+
+message ZoneFriendAddOrRemoveFriendReq {
+  enum TYPE {
+    ADD_FRIEND = 1;
+    REMOVE_FRIEND = 2;
+  }
+  int32 uin = 1;
+  Next.ZoneFriendAddOrRemoveFriendReq.TYPE oper_type = 2;
+}
+
+message ZoneFriendAddOrRemoveFriendRsp {
+  Next.RetInfo ret_info = 1;
+  int32 type = 2;
+  Next.BanInfo ban_info = 3;
+}
+
+message ZoneFriendConfirmAddFriendReq {
+  enum TYPE {
+    AGREE_REQ = 1;
+    REFUSE_REQ = 2;
+  }
+  int32 uin = 1;
+  Next.ZoneFriendConfirmAddFriendReq.TYPE oper_type = 2;
+}
+
+message ZoneFriendConfirmAddFriendRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FriendRoleInfo change_friend_role = 2;
+  int32 type = 3;
+  Next.BanInfo ban_info = 4;
+}
+
+message ZoneFriendAddOrRemoveFriendNotify {
+  enum TYPE {
+    ADD_FRIEND_REQ = 1;
+    REMOVE_FRIEND = 2;
+    ADD_FRIEND_AGREE = 3;
+    REMOVE_FRIEND_REQ = 4;
+  }
+  int32 uin = 1;
+  Next.ZoneFriendAddOrRemoveFriendNotify.TYPE oper_type = 2;
+  Next.FriendRoleInfo change_friend_role = 3;
+  Next.FriendRequestInfo new_req_friend = 4;
+}
+
+message ZoneReportPlayerReq {
+  int32 uin = 1;
+  repeated int32 type_list = 2;
+  bytes report_text = 3;
+}
+
+message ZoneReportPlayerRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFriendUpdateFriendInfoReq {
+  int32 uin = 1;
+  bytes note = 2;
+  bool is_pinned = 3;
+  Next.UpdateFriendInfoType type = 4;
+}
+
+message ZoneFriendUpdateFriendInfoRsp {
+  Next.RetInfo ret_info = 1;
+  int32 uin = 2;
+  bytes note = 3;
+  uint64 pinned_time = 4;
+  Next.UpdateFriendInfoType type = 5;
+}
+
+message ZoneFriendGetBriefFriendListReq {
+}
+
+message ZoneFriendGetBriefFriendListRsp {
+  message BriefFriendInfo {
+    int32 uin = 1;
+    bytes note = 2;
+    int64 pinned_time = 3;
+    uint32 friend_type = 4;
+    bytes plat_nick_name = 5;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated int32 friend_uin_list = 2;
+  repeated Next.ZoneFriendGetBriefFriendListRsp.BriefFriendInfo friend_list = 3;
+}
+
+message ZoneFriendGetAddFriendListReq {
+  uint32 count = 1;
+}
+
+message ZoneFriendGetAddFriendListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.FriendRequestInfo add_friend_list = 2;
+  int32 pack_index = 3;
+  bool is_end = 4;
+}
+
+message ZoneFriendGetBlackListReq {
+  uint32 count = 1;
+}
+
+message ZoneFriendGetBlackListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BlackListRoleInfo black_role_list = 2;
+  int32 pack_index = 3;
+  bool is_end = 4;
+}
+
+message ZoneFriendAddOrRemoveBlackListReq {
+  enum TYPE {
+    ADD = 1;
+    REMOVE = 2;
+  }
+  int32 uin = 1;
+  Next.ZoneFriendAddOrRemoveBlackListReq.TYPE oper_type = 2;
+}
+
+message ZoneFriendAddOrRemoveBlackListRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BlackListRoleInfo changed_black_info = 2;
+  int32 type = 3;
+  Next.FriendRoleInfo change_friend_role = 4;
+}
+
+message ZoneChatGetChatListReq {
+  uint32 uin = 1;
+  uint32 count = 2;
+  uint32 visit_owner_uin = 3;
+}
+
+message ZoneChatSyncOfflineRedPointReq {
+}
+
+message ZoneChatSyncOfflineRedPointRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFriendBatchRemoveFriendReq {
+  repeated int32 uin_list = 1;
+}
+
+message ZoneFriendBatchRemoveFriendRsp {
+  Next.RetInfo ret_info = 1;
+  repeated int32 uin_list = 2;
+  repeated Next.FriendRoleInfo change_friend_role = 3;
+}
+
+message ZoneFriendGetRecommendFriendListReq {
+  uint32 count = 1;
+}
+
+message ZoneFriendGetRecommendFriendListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.FriendRoleInfo recommend_player_list = 2;
+}
+
+message ZoneInviteFriendReq {
+  uint32 friend_uin = 1;
+}
+
+message ZoneInviteFriendRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetSignedCommArkReq {
+  int32 business_type = 1;
+}
+
+message ZoneGetSignedCommArkRsp {
+  Next.RetInfo ret_info = 1;
+  int32 business_type = 2;
+  string signed_ark = 3;
+}
+
+message ZoneSceneModifyGuideLogicStatusReq {
+  Next.LogicStatusOpInfo op = 1;
+}
+
+message ZoneSceneModifyGuideLogicStatusRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneAddPetRecordReq {
+  enum Reason {
+    UNKOWN = 0;
+    TAKE_PHOTO = 1;
+  }
+  uint32 base_id = 1;
+  Next.ZoneAddPetRecordReq.Reason reason = 2;
+}
+
+message ZoneAddPetRecordRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneAddPetRecordAndShareReq {
+  uint32 base_id = 1;
+}
+
+message ZoneAddPetRecordAndShareRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneActivitySelectTrackContentsReq {
+  repeated int32 pet_base_id = 1;
+  repeated int32 track_content_ids = 2;
+  bool cancel_trace = 3;
+}
+
+message ZoneActivitySelectTrackContentsRsp {
+  Next.RetInfo ret_info = 1;
+  Next.NpcTraceInfo npc_trace_info = 2;
+}
+
+message ZoneChatGetChatListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.ChatSessionInfo chat_session_list = 2;
+  uint32 first_chat_session_uin = 3;
+  repeated Next.ChatMessageInfo first_chat_message_list = 4;
+  int32 pack_index = 5;
+  bool is_end = 6;
+  uint32 req_uin = 7;
+}
+
+message ZoneChatSendChatMessageReq {
+  uint32 uin = 1;
+  bytes chat_message = 2;
+  uint32 visit_owner_uin = 3;
+}
+
+message ZoneChatSendChatMessageRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ChatMessageInfo chat_message = 2;
+  uint32 recv_uin = 3;
+  Next.BanInfo ban_info = 4;
+}
+
+message ZoneChatUpdateChatInfoNotify {
+  Next.ChatMessageInfo chat_message = 1;
+  Next.ChatSessionInfo chat_session = 2;
+}
+
+message ZoneChatRemoveChatListReq {
+  uint32 uin = 1;
+}
+
+message ZoneChatRemoveChatListRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 uin = 2;
+}
+
+message ZoneChatGetChatMessageReq {
+  uint32 uin = 1;
+  uint32 offset = 2;
+  uint32 count = 3;
+  uint32 visit_owner_uin = 4;
+}
+
+message ZoneChatGetChatMessageRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.ChatMessageInfo chat_message_list = 2;
+  uint32 uin = 3;
+  uint32 offset = 4;
+  uint32 count = 5;
+}
+
+message ZoneEraseRedPointReq {
+  repeated Next.RedPointGroup point_group = 1;
+}
+
+message ZoneEraseRedPointRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneDungeonInfoQueryReq {
+  uint32 dungeon_cfg_id = 1;
+}
+
+message ZoneSceneDungeonInfoQueryRsp {
+  message CollectionInfo {
+    int32 collecttion_type = 1;
+    int32 collection_num = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  int32 dungeon_state = 2;
+  repeated Next.ZoneSceneDungeonInfoQueryRsp.CollectionInfo collections = 3;
+}
+
+message ZoneJudgePayReq {
+  string openid = 1;
+  uint32 pay_amount = 2;
+}
+
+message ZoneJudgePayRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HopeInstruction instruction = 2;
+}
+
+message ZoneSceneApplyVisitReq {
+  uint32 visit_uin = 1;
+}
+
+message ZoneSceneApplyVisitRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 extra_data = 2;
+}
+
+message ZoneSceneApplyVisitConfirmReq {
+  uint32 apply_uin = 1;
+  bool agree = 2;
+  Next.Position pos = 3;
+}
+
+message ZoneSceneApplyVisitConfirmRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneApplyVisitListQueryReq {
+}
+
+message ZoneSceneApplyVisitListQueryRsp {
+  message ApplyInfo {
+    uint32 icon = 1;
+    uint32 level = 2;
+    bytes name = 3;
+    uint32 uin = 4;
+    uint32 apply_time = 5;
+    Next.PlayerCardBriefInfo card_info = 6;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneSceneApplyVisitListQueryRsp.ApplyInfo apply_list = 2;
+}
+
+message ZoneSceneKickOutVisitReq {
+  uint32 kick_out_uin = 1;
+}
+
+message ZoneSceneKickOutVisitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneExitVisitReq {
+}
+
+message ZoneSceneExitVisitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneDisbandVisitReq {
+}
+
+message ZoneSceneDisbandVisitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneVisitNetworkSyncReq {
+}
+
+message ZoneSceneVisitNetworkSyncRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneQueryVisitorInfoReq {
+}
+
+message ZoneQueryVisitorInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.VisitorInfo visitor_infos = 2;
+}
+
+message ZoneUnlockPetHabitReq {
+  uint32 group_id = 1;
+  uint32 group_num = 2;
+}
+
+message ZoneUnlockPetHabitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetBattlePassInfoReq {
+}
+
+message ZoneGetBattlePassInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBattlePassInfo battle_pass_info = 2;
+  Next.PlayerBattlePassBriefInfo battle_pass_brief_info = 3;
+}
+
+message ZoneSelectBattlePassThemeReq {
+  uint32 theme_id = 1;
+}
+
+message ZoneSelectBattlePassThemeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBattlePassInfo battle_pass_info = 2;
+}
+
+message ZoneReceiveBattlePassAllTaskReq {
+}
+
+message ZoneReceiveBattlePassAllTaskRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTaskInfo task_info_list = 2;
+}
+
+message ZoneReceiveBattlePassRewardReq {
+  bool receive_all_reward = 1;
+  uint32 index = 2;
+}
+
+message ZoneReceiveBattlePassRewardRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBattlePassInfo battle_pass_info = 2;
+}
+
+message ZoneClientOperationReq {
+  Next.ClientOperation operation = 1;
+}
+
+message ZoneClientOperationRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetHatchStatusReq {
+  uint32 egg_gid = 1;
+}
+
+message ZoneGetHatchStatusRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 hatched_secs = 2;
+}
+
+message ZoneGetAllHatchStatusReq {
+}
+
+message ZoneGetAllHatchStatusRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 egg_gid = 2;
+  repeated uint32 hatched_secs = 3;
+}
+
+message ZoneStopHatchReq {
+  uint32 egg_gid = 1;
+}
+
+message ZoneStopHatchRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSetPlayerNameReq {
+  bytes name = 1;
+}
+
+message ZoneSetPlayerNameRsp {
+  Next.RetInfo ret_info = 1;
+  bytes name = 2;
+  uint32 last_name_changed_time = 3;
+  Next.BanInfo ban_info = 4;
+}
+
+message ZoneSetPlayerCardIconReq {
+  uint32 icon_id = 1;
+}
+
+message ZoneSetPlayerCardIconRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZoneSetPlayerCardSkinReq {
+  uint32 skin_id = 1;
+}
+
+message ZoneSetPlayerCardSkinRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZoneUpgradePlayerCardSkinReq {
+  uint32 skin_id = 1;
+}
+
+message ZoneUpgradePlayerCardSkinRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+  uint32 skin_id = 3;
+}
+
+message ZoneSetPlayerCardLabelReq {
+  uint32 label_first_id = 1;
+  uint32 label_last_id = 2;
+}
+
+message ZoneSetPlayerCardLabelRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZoneSetPlayerCardSignatureReq {
+  bytes signature = 1;
+}
+
+message ZoneSetPlayerCardSignatureRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+  Next.BanInfo ban_info = 3;
+}
+
+message ZoneGetPlayerCardInfoReq {
+}
+
+message ZoneGetPlayerCardInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardInfo player_card_info = 2;
+  Next.PlayerCardBriefInfo player_card_brief_info = 3;
+}
+
+message ZoneGetPlayerCardBriefInfoReq {
+  enum GetSource {
+    FRIEND = 1;
+    SCENE = 2;
+  }
+  uint32 uin = 1;
+  Next.ZoneGetPlayerCardBriefInfoReq.GetSource source = 2;
+}
+
+message ZoneGetPlayerCardBriefInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo player_card_brief_info = 2;
+  bytes note = 3;
+  bool is_friend = 4;
+  bool is_black_role = 5;
+  bool online = 6;
+  uint32 register_timestamp = 7;
+  uint32 pinned_time = 8;
+  int32 friend_type = 9;
+  bytes plat_nick_name = 10;
+  Next.PlayerStartUpPrivilegeInfo start_up_privilege_info = 11;
+}
+
+message ZoneSetPlayerCardFavoritePetInfoReq {
+  dataconfig.SkillDamType skill_dam_type = 1;
+  uint32 pet_base_id = 2;
+  dataconfig.MutationDiffType mutation_diff_type = 3;
+}
+
+message ZoneSetPlayerCardFavoritePetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZoneSetPlayerCardCollectPetInfoReq {
+  uint32 card_module_id = 1;
+  repeated Next.PlayerCardBriefInfo_CollectPetInfo collect_pet_info = 2;
+}
+
+message ZoneSetPlayerCardCollectPetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZoneSetPlayerCardCollectFashionInfoReq {
+  uint32 card_module_id = 1;
+  repeated Next.PlayerCardBriefInfo_CollectFashionInfo collect_fashion_info = 2;
+}
+
+message ZoneSetPlayerCardCollectFashionInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerCardBriefInfo card_brief_info = 2;
+}
+
+message ZonePlayerShareInfoReq {
+  uint32 share_base_id = 1;
+  uint32 share_part_id = 2;
+  uint32 opt = 3;
+}
+
+message ZonePlayerShareInfoRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 reward_received = 2;
+  uint32 opt = 3;
+}
+
+message ZoneVodVideoSignatureReq {
+}
+
+message ZoneVodVideoSignatureRsp {
+  Next.RetInfo ret_info = 1;
+  string signature = 2;
+  string file_name = 3;
+}
+
+message ZonePublishVideoToWechatReq {
+  string video_file_id = 1;
+}
+
+message ZonePublishVideoToWechatRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCrackEggReq {
+  uint32 egg_gid = 1;
+  uint32 select_ball_gid = 2;
+  uint32 select_glass_color = 3;
+  uint32 select_glass_particle = 4;
+}
+
+message ZoneCrackEggRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 hatched_pet_gid = 2;
+}
+
+message ZoneClearDungeonReq {
+  int32 dungeon_cfg_id = 1;
+}
+
+message ZoneClearDungeonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRandomSubTaskNotify {
+  repeated uint32 sub_task_id = 1;
+}
+
+message ZoneOpenSubTaskReq {
+  uint32 sub_task_id = 1;
+}
+
+message ZoneOpenSubTaskRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSetSubTaskTokenReq {
+  message SetSubTaskTokenAction {
+    uint32 sub_task_id = 1;
+    repeated Next.PlayerSubTaskInfo_TaskTokenOwnedInfo task_token_owned_info = 2;
+  }
+  repeated Next.ZoneSetSubTaskTokenReq.SetSubTaskTokenAction action = 1;
+}
+
+message ZoneSetSubTaskTokenRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetSubTaskReq {
+}
+
+message ZoneGetSubTaskRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 sub_task_id = 2;
+  uint32 last_get_time = 3;
+}
+
+message ZoneStartPetTravelReq {
+  uint32 camp_content_id = 1;
+  repeated uint32 pet_gid = 2;
+  uint32 travel_lv = 3;
+}
+
+message ZoneStartPetTravelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCompletePetTravelReq {
+  uint32 camp_content_id = 1;
+}
+
+message ZoneCompletePetTravelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRecallPetTravelReq {
+  uint32 camp_content_id = 1;
+}
+
+message ZoneRecallPetTravelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetPetTravelInfoReq {
+}
+
+message ZoneGetPetTravelInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetTravelInfo travel_info = 2;
+}
+
+message ZoneCompleteAllPetTravelReq {
+}
+
+message ZoneCompleteAllPetTravelRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetTravelInfo travel_info = 2;
+}
+
+message ZoneStartAllPetTravelAgainReq {
+  repeated Next.PetTravelInfo travel_info = 1;
+}
+
+message ZoneStartAllPetTravelAgainRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetTravelInfo travel_info = 2;
+}
+
+message ZoneGetTaskTokenOwnedInfoReq {
+}
+
+message ZoneGetTaskTokenOwnedInfoRsp {
+  message TaskTokenOwnedData {
+    uint32 task_token_id = 1;
+    uint32 task_token_get_time = 2;
+    uint32 sub_task_id = 3;
+    uint32 is_locked = 4;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneGetTaskTokenOwnedInfoRsp.TaskTokenOwnedData task_token_owned_data = 2;
+}
+
+message ZoneGetOngoingSubTaskInfoReq {
+  uint32 sub_task_id = 1;
+}
+
+message ZoneGetOngoingSubTaskInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerSubTaskInfo_OngoingSubTaskInfo ongoing_sub_task_info = 2;
+}
+
+message ZoneSceneSetOwlSanctuaryFruitReq {
+  uint32 content_id = 1;
+  repeated Next.OwlSanctuaryFruitData fruit_data = 2;
+}
+
+message ZoneSceneSetOwlSanctuaryFruitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetCampFruitNpcInfosReq {
+  repeated int32 camp_content_ids = 1;
+}
+
+message ZoneGetCampFruitNpcInfosRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.CampFruitNpcInfo camp_fruit_npc_infos = 2;
+}
+
+message ZoneGetOwlSanctuaryFruitInfoReq {
+  uint32 content_id = 1;
+}
+
+message ZoneGetOwlSanctuaryFruitInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.OwlSanctuaryFruitInfo owl_sanctuary_fruit_info = 2;
+}
+
+message ZoneSceneTeamBattleInfoQueryReq {
+  uint64 npc_logic_id = 1;
+  int32 query_source = 2;
+}
+
+message ZoneSceneTeamBattleInfoQueryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.TeamBattleInfo team_battle_info = 2;
+  int32 query_source = 3;
+}
+
+message ZoneSceneTeamBattleChallengeReq {
+  uint64 npc_obj_id = 1;
+  uint64 npc_logic_id = 2;
+  int32 challenge_type = 3;
+  uint32 battle_cfg_id = 4;
+  bool cancel_current_match = 6;
+  int32 blood_type = 7;
+}
+
+message ZoneSceneTeamBattleChallengeRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 visitors = 3;
+  int32 challenge_type = 4;
+  repeated Next.TeamBattleMateInfo mate_infos = 5;
+  Next.BanInfo ban_info = 6;
+}
+
+message ZoneSceneTeamBattleConfirmInviteReq {
+  bool agree = 1;
+  int32 challenge_type = 2;
+}
+
+message ZoneSceneTeamBattleConfirmInviteRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZoneSceneTeamBattlePrepareReq {
+  bool prepare = 1;
+}
+
+message ZoneSceneTeamBattlePrepareRsp {
+  Next.RetInfo ret_info = 1;
+  bool prepare = 2;
+}
+
+message ZoneSceneTeamBattleUpdatePetReq {
+  uint32 new_pet_gid = 1;
+  uint32 team_idx = 2;
+}
+
+message ZoneSceneTeamBattleUpdatePetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTeamBattlePetQueryReq {
+  repeated uint32 to_uin = 1;
+  repeated uint32 to_gid = 2;
+}
+
+message ZoneSceneTeamBattlePetQueryRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetData pet_data = 2;
+}
+
+message ZoneSceneTeamBattleCancelReq {
+}
+
+message ZoneSceneTeamBattleCancelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTeamBattleStartReq {
+  uint64 npc_obj_id = 2;
+  uint64 npc_logic_id = 3;
+  int32 challenge_type = 4;
+}
+
+message ZoneSceneTeamBattleStartRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTeamBattleQueryReq {
+}
+
+message ZoneSceneTeamBattleQueryRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 flower_logic_id = 4;
+}
+
+message ZoneSceneWorldCombatEnterReq {
+  uint64 npc_id = 1;
+  Next.Position npc_pos = 2;
+}
+
+message ZoneSceneWorldCombatEnterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatExitReq {
+  uint64 npc_id = 1;
+}
+
+message ZoneSceneWorldCombatExitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillCastReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillCastInfo skill_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillCastRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillSpawnNpcReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillSpawnNpcInfo skill_spawn_npc_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillSpawnNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillSpawnBulletReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillSpawnBulletInfo skill_spawn_bullet_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillSpawnBulletRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillFireBulletReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillFireBulletInfo skill_fire_bullet_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillFireBulletRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillBuffReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillBuffInfo skill_buff_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillBuffRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillEndReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillEndInfo skill_end_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatHitReq {
+  uint64 victim_id = 1;
+  Next.WorldCombatHitInfo hit_info = 2;
+}
+
+message ZoneSceneWorldCombatHitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillJumpReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillJumpInfo skill_jump_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillJumpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillJumpEndReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillJumpEndInfo skill_jump_end_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillJumpEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillRcdReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillRcdInfo skill_rcd_info = 2;
+}
+
+message ZoneSceneWorldCombatSkillRcdRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldCombatSkillPetCollisionReq {
+  uint64 npc_id = 1;
+  Next.WorldCombatSkillPetCollisionInfo skill_pet_collision = 2;
+}
+
+message ZoneSceneWorldCombatSkillPetCollisionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneLeaveWorldCombatAreaReq {
+  uint64 npc_id = 1;
+}
+
+message ZoneSceneLeaveWorldCombatAreaRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneReEnterWorldCombatAreaReq {
+  uint64 npc_id = 1;
+}
+
+message ZoneSceneReEnterWorldCombatAreaRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneSyncStaminaReq {
+  int32 stamina = 1;
+  uint64 time_stamp = 2;
+}
+
+message ZoneSceneSyncStaminaRsp {
+  Next.RetInfo ret_info = 1;
+  int32 server_stamina = 2;
+  int32 server_stamina_max = 3;
+  int32 stamina_state = 4;
+}
+
+message ZoneSceneGetStaminaInfoReq {
+}
+
+message ZoneSceneGetStaminaInfoRsp {
+  Next.RetInfo ret_info = 1;
+  int32 server_stamina = 2;
+  int32 server_stamina_max = 3;
+  int32 stamina_state = 4;
+}
+
+message ZoneSceneChangeMoveModeReq {
+  int32 move_id = 1;
+  int32 stamina = 2;
+  int32 need_start_cost = 3;
+}
+
+message ZoneSceneChangeMoveModeRsp {
+  Next.RetInfo ret_info = 1;
+  int32 server_stamina = 2;
+  int32 server_move_id = 3;
+}
+
+message ZoneSceneUnstuckTeleportReq {
+  bool ignore_cooldown = 1;
+}
+
+message ZoneSceneUnstuckTeleportRsp {
+  Next.RetInfo ret_info = 1;
+  int32 cooldown = 2;
+}
+
+message ZoneGetSubTaskTokenTriggeredTaskInfoReq {
+}
+
+message ZoneGetSubTaskTokenTriggeredTaskInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerSubTaskInfo_SubTaskTokenTriggeredTaskInfo sub_task_token_triggered_task_info = 2;
+}
+
+message ZonePetPerceivingReq {
+  int32 gid = 1;
+  bool is_begin = 2;
+}
+
+message ZonePetPerceivingRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneBeastStartMatchReq {
+  int32 battle_cfg_id = 1;
+  uint64 beast_logic_id = 3;
+  uint64 beast_obj_id = 4;
+}
+
+message ZoneSceneBeastStartMatchRsp {
+  enum RESULT {
+    NONE = 0;
+    WAITING_VISITOR = 1;
+    FOUND_OWNER = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  int32 result = 2;
+  uint32 start_match_time = 3;
+  Next.Position beast_pos = 4;
+}
+
+message ZoneSceneBeastJoinVisitReq {
+  bool agree = 1;
+  Next.Position pos = 2;
+}
+
+message ZoneSceneBeastJoinVisitRsp {
+  Next.RetInfo ret_info = 1;
+  bool agree = 2;
+}
+
+message ZoneSceneBeastCancelMatchReq {
+}
+
+message ZoneSceneBeastCancelMatchRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneQueryBeastChallengeReq {
+  uint64 npc_obj_id = 1;
+  uint64 npc_logic_id = 2;
+}
+
+message ZoneSceneQueryBeastChallengeRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BeastResonanceInfo resonance_infos = 2;
+  int32 select_star = 3;
+  int32 available_challenge_num_via_star = 4;
+  int32 available_challenge_num_via_star_max = 5;
+}
+
+message ZoneSceneQuitBeastCatchReq {
+  uint64 npc_obj_id = 1;
+  uint64 npc_logic_id = 2;
+}
+
+message ZoneSceneQuitBeastCatchRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneReentrantBeastCatchReq {
+  uint64 npc_logic_id = 1;
+  uint64 npc_obj_id = 2;
+}
+
+message ZoneSceneReentrantBeastCatchRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTeamBattleSelectPetReq {
+  enum SelectState {
+    SS_NONE = 0;
+    SS_SELECTING = 1;
+    SS_CANCEL = 2;
+  }
+  int32 select_state = 1;
+}
+
+message ZoneSceneTeamBattleSelectPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetPlayerTeachInfoReq {
+}
+
+message ZoneGetPlayerTeachInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerTeachInfo teach_infos = 2;
+}
+
+message ZoneSetPlayerTeachReadedReq {
+  uint32 teach_id = 1;
+}
+
+message ZoneSetPlayerTeachReadedRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerTeachUnlockNotify {
+  uint32 teach_id = 1;
+}
+
+message ZonePkSelectPetReq {
+  uint32 pet_gid = 1;
+}
+
+message ZonePkSelectPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePkCancelPrepareReq {
+}
+
+message ZonePkCancelPrepareRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePkExitReq {
+}
+
+message ZonePkExitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePvpHisQueryReq {
+}
+
+message ZonePvpHisQueryRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PvpFightHis his = 2;
+  int32 win_count = 3;
+  int32 lose_count = 4;
+}
+
+message RewardInfo {
+  int32 id = 1;
+  int32 reward_id = 2;
+  bool received = 3;
+  bool available = 4;
+  Next.RetInfo ret_info = 5;
+}
+
+message TopMasterInfo {
+  Next.PVP_RANK_MASTER_TYPE type = 1;
+  Next.PVP_RANK_MASTER_TYPE prev_type = 2;
+  Next.PVP_RANK_MASTER_TYPE next_type = 3;
+}
+
+message ZonePvpInfoQueryReq {
+  bool whole_trial_pets = 1;
+}
+
+message ZonePvpInfoQueryRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 season_id = 2;
+  Next.PVP_RANK_STEP step = 3;
+  uint32 step_finish_ut = 4;
+  int32 pvp_rank_star = 5;
+  int32 pvp_rank_order = 6;
+  repeated Next.RewardInfo star_reward = 7;
+  repeated Next.RewardInfo week_reward = 9;
+  uint32 week_refresh_ut = 10;
+  int32 week_win_count = 11;
+  int32 week_win_count_required = 12;
+  Next.TrialPet trial_pet = 13;
+  bool pvp_week_benefit = 14;
+  Next.TopMasterInfo top_master = 15;
+  int32 prev_season_star = 16;
+  uint32 daily_first_win_time = 17;
+}
+
+message ZoneGetPvpRankWeekTaskRewardReq {
+  repeated int32 id = 1;
+}
+
+message ZoneGetPvpRankWeekTaskRewardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.RewardInfo reward = 2;
+}
+
+message ZoneGetPvpRankSeasonRewardReq {
+  repeated int32 rank_star = 1;
+}
+
+message ZoneGetPvpRankSeasonRewardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.RewardInfo reward = 2;
+}
+
+message ZoneQueryPvpRankSeasonInfoReq {
+  uint32 season_id = 1;
+}
+
+message ZoneQueryPvpRankSeasonInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.RankSeasonInfo rank_season_info = 2;
+}
+
+message ZonePlayerOpenActivityReq {
+  uint32 activity_id = 1;
+}
+
+message ZonePlayerOpenActivityRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ActivityBriefInfo {
+  uint32 activity_id = 1;
+  string activity_name = 2;
+  uint32 maintab_id = 3;
+  uint32 priority = 4;
+}
+
+message ZoneGetPlayerActivityInfoReq {
+}
+
+message ZoneGetPlayerActivityInfoRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 login_days = 3;
+  repeated Next.ActivityBriefInfo activity_brief_info = 4;
+  Next.PlayerActivityLoginHistory login_history = 5;
+}
+
+message ZoneGetPlayerActivityDataReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneGetPlayerActivityDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerActivityInfo_ActivityData activity_data = 2;
+}
+
+message ZonePlayerActivityDataChangeNty {
+  Next.PlayerActivityInfo_ActivityData activity_data = 1;
+}
+
+message ZoneGetPlayerActivityHistoryDataReq {
+  dataconfig.ActivityType activity_type = 1;
+}
+
+message ZoneGetPlayerActivityHistoryDataRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerActivityInfo_ActivityData activity_data = 2;
+}
+
+message ZoneAddPlayerActivityPartRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_part_id = 2;
+}
+
+message ZoneAddPlayerActivityPartRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityPartRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_part_id = 2;
+}
+
+message ZoneReceivePlayerActivityPartRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityConditionRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_part_id = 2;
+}
+
+message ZoneReceivePlayerActivityConditionRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivitySeasonCheckinRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_reward_index = 2;
+  repeated uint32 activity_reward_indexs = 3;
+}
+
+message ZoneReceivePlayerActivitySeasonCheckinRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityStageRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_stage_id = 4;
+  repeated uint32 stage_index = 5;
+}
+
+message ZoneReceivePlayerActivityStageRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityDisposableRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_stage_id = 2;
+}
+
+message ZoneReceivePlayerActivityDisposableRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityPetCatchRewardReq {
+  uint32 activity_id = 1;
+  repeated uint32 point_index = 2;
+}
+
+message ZonePlayerBattlePassInfoNotify {
+  Next.PlayerBattlePassInfo battle_pass_info = 1;
+}
+
+message ZoneReceivePlayerActivityPetCatchRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerNewActivityRewardNotify {
+  uint32 activity_id = 1;
+  uint32 activity_reward_id = 2;
+  uint32 activity_stage_id = 3;
+}
+
+message ZoneSceneReportAvatarAroundNpcReq {
+  uint64 npc_obj_id = 1;
+  uint64 npc_logic_id = 2;
+  bool enter = 3;
+}
+
+message ZoneSceneReportAvatarAroundNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneAiReportReq {
+  uint64 npc_obj_id = 1;
+  int32 report_type = 2;
+  int32 ai_seq_id = 3;
+  Next.Point client_point = 4;
+  uint64 attack_obj_id = 10;
+  int32 dialog_id = 11;
+  repeated Next.SceneAiReportInfo report_list = 12;
+}
+
+message ZoneSceneAiReportRsp {
+  Next.RetInfo ret_info = 1;
+  int32 ai_seq_id = 2;
+}
+
+message ZoneMarqueePlayNotify {
+  string content = 1;
+  uint32 stop_time = 2;
+  Next.MarqueePriorityType priority = 3;
+}
+
+message ZoneSetPlayerCardAppearanceInfoReq {
+  Next.PlayerCardBriefInfo_AppearanceInfo appearance_info = 1;
+}
+
+message ZoneSetPlayerCardAppearanceInfoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneScenePerceivingNpcReq {
+  repeated uint64 npc_ids = 1;
+}
+
+message ZoneScenePerceivingNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneSetAvatarPosReq {
+  Next.Point pos = 1;
+  uint32 reason = 2;
+}
+
+message ZoneSceneSetAvatarPosRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneNewFashionSuitNotify {
+  uint32 fashion_suit_id = 1;
+}
+
+message ZoneCheckVisualItemUpgradeRedPointReq {
+}
+
+message ZoneCheckVisualItemUpgradeRedPointRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCheckStoragePetReq {
+  repeated uint32 pet_gids = 1;
+}
+
+message ZoneCheckStoragePetRsp {
+  message EvolvePet {
+    uint32 pet_gid = 1;
+    uint32 evolve_id = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated uint32 can_evolve_pets = 2;
+  repeated uint32 can_breakthrough_pets = 3;
+  repeated Next.ZoneCheckStoragePetRsp.EvolvePet evolve_pets = 4;
+}
+
+message ZoneUnlockTeachConditionReq {
+  dataconfig.TeachClientTrigger client_trigger = 1;
+}
+
+message ZoneUnlockTeachConditionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneUpdatePetCollectTagReq {
+  message CollectionInfo {
+    uint32 pet_gid = 1;
+    bool is_collect = 2;
+    dataconfig.PetPartnerMarkType partner_mark = 3;
+  }
+  repeated Next.ZoneUpdatePetCollectTagReq.CollectionInfo collection_info = 1;
+}
+
+message ZoneUpdatePetCollectTagRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneMageBookQueryReq {
+}
+
+message ZoneMageBookQueryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerMageBookInfo data = 2;
+}
+
+message ZoneMageBookAwardReq {
+  uint32 npc_id = 1;
+}
+
+message ZoneMageBookAwardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneAddPlayerActivityPartRewardNty {
+  uint32 activity_id = 1;
+  uint32 activity_part_id = 2;
+}
+
+message ZoneGetBagItemInfoByPageReq {
+  uint32 page = 1;
+  uint64 version = 2;
+}
+
+message ZoneGetBagItemInfoByPageRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 total_page = 2;
+  uint32 req_page = 3;
+  Next.PlayerBagInfo bag_info = 4;
+  uint32 page_num = 5;
+  uint64 version = 6;
+  uint64 no_new_data = 7;
+}
+
+message ZoneGetPetInfoByPageReq {
+  uint32 page = 1;
+  uint64 version = 2;
+}
+
+message ZoneGetPetInfoByPageRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 total_page = 2;
+  uint32 req_page = 3;
+  Next.PetDataInfoList pet_info = 4;
+  uint32 page_num = 5;
+  uint64 version = 6;
+  uint64 no_new_data = 7;
+}
+
+message ZoneClientReportData2Req {
+  string report_data = 1;
+  int32 type = 2;
+}
+
+message ZoneClientReportData2Rsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneClientReportDataReq {
+  string report_data = 1;
+  int32 type = 2;
+  int32 send_type = 3;
+  uint64 battle_id = 4;
+}
+
+message ZoneClientReportDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReportDataSend2Client {
+  string report_data = 1;
+  int32 type = 2;
+}
+
+message ZoneClientReportLightFeatureReq {
+  string report_data = 1;
+}
+
+message ZoneClientReportLightFeatureRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneClientReportNpcForAreaReq {
+  repeated uint64 npc_obj_id = 1;
+  bool is_enter = 2;
+}
+
+message ZoneClientReportNpcForAreaRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTaskReadedReq {
+  uint32 task_id = 1;
+}
+
+message ZoneTaskReadedRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBookDataQueryReq {
+  dataconfig.TaleTaskType book_type = 1;
+}
+
+message ZoneBookDataQueryRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BookData book_datas = 2;
+}
+
+message ZoneBookDataChangeNty {
+  bool is_new = 1;
+  Next.BookData book_data = 2;
+}
+
+message ZoneSetBookReadedReq {
+  dataconfig.TaleTaskType book_type = 1;
+  uint32 book_id = 2;
+}
+
+message ZoneSetBookReadedRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBookGetRewardReq {
+  dataconfig.TaleTaskType book_type = 1;
+  uint32 book_id = 2;
+}
+
+message ZoneBookGetRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetTaskSwitchDataReq {
+}
+
+message ZoneGetTaskSwitchDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerTaskSwitchData task_switch = 2;
+}
+
+message ZoneChangeTaskSwitchDataReq {
+  uint32 switch_id = 1;
+  uint32 is_open = 2;
+}
+
+message ZoneChangeTaskSwitchDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerTaskSwitchData task_switch = 2;
+}
+
+message ZoneTssMessageCheckReq {
+  bytes message = 1;
+  dataconfig.TssMsgType message_type = 2;
+}
+
+message ZoneTssMessageCheckRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneCancelPlayerTransformReq {
+  int32 cancel_reason = 1;
+}
+
+message ZoneSceneCancelPlayerTransformRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneCheckNameReq {
+  bytes name = 1;
+}
+
+message ZoneCheckNameRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneApplyMusicReq {
+  Next.MusicApplyInfo apply_info = 1;
+}
+
+message ZoneApplyMusicRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetCreditScoreReq {
+  string openid = 1;
+  int32 account_type = 2;
+  bool need_response = 3;
+}
+
+message ZoneGetCreditScoreRsp {
+  Next.RetInfo ret_info = 1;
+  int32 score = 2;
+  int32 tag_black = 3;
+  int32 tag_ugc = 4;
+}
+
+message ZoneSelectLimitedFlowerSeedPetReq {
+  uint32 spec_flower_seed_id = 1;
+  uint32 activity_id = 2;
+}
+
+message ZoneSelectLimitedFlowerSeedPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetLimitedFlowerSeedInfoReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneGetLimitedFlowerSeedInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerLimitedFlowerSeedInfo limited_flower_seed_info = 2;
+}
+
+message ZoneUnsetMusicReq {
+  uint32 music_id = 1;
+}
+
+message ZoneUnsetMusicRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneQueryBalanceReq {
+  Next.ClientTokenInfo token_info = 1;
+}
+
+message ZoneQueryBalanceRsp {
+  Next.RetInfo ret_info = 1;
+  Next.MidasMoneyInfo money_info = 2;
+}
+
+message ZoneBuyGoodsByMidasReq {
+  uint32 goods_id = 1;
+  uint32 type = 2;
+  Next.ClientTokenInfo token_info = 3;
+  uint32 shop_id = 4;
+  uint64 version = 5;
+}
+
+message ZoneBuyGoodsByMidasRsp {
+  Next.RetInfo ret_info = 1;
+  bytes app_meta_data = 2;
+  bytes token = 3;
+  bytes url_param = 4;
+  uint32 goods_id = 5;
+  bytes midas_goods_id = 6;
+  uint32 type = 7;
+  uint32 shop_id = 8;
+  Next.ShopData shop_data = 9;
+}
+
+message ZoneGetPlayerShinyPetDayInfoReq {
+}
+
+message ZoneGetPlayerShinyPetDayInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerShinyPetDayInfo info = 2;
+}
+
+message ZonePlayerShinyPetDayInfoChangeNty {
+  Next.PlayerShinyPetDayInfo info = 1;
+}
+
+message ZonePlayerEnterOrLeaveTreasureHuntAreaNty {
+  uint32 activity_id = 1;
+  uint32 activity_sub_id = 2;
+  bool is_enter = 3;
+}
+
+message ZoneGetMobileVeriCodeReq {
+  Next.MobileOpType op_type = 1;
+  string mobile_num = 2;
+}
+
+message ZoneGetMobileVeriCodeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerMobileBindData mobile_bind_info = 2;
+}
+
+message ZoneMobileOpReq {
+  Next.MobileOpType op_type = 1;
+  string mobile_num = 2;
+  string veri_code = 3;
+  bool unbind_all_scenes = 5;
+}
+
+message ZoneMobileOpRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerMobileBindData mobile_bind_info = 4;
+}
+
+message ZoneGetMobileBindInfoReq {
+}
+
+message ZoneGetMobileBindInfoRsp {
+  Next.RetInfo ret_info = 1;
+  string mask_mobile_num = 2;
+  uint32 uin = 3;
+  string openid = 4;
+  uint32 bind_flag = 5;
+  string local_mobile_num = 6;
+  string bind_use_sms_with_btn = 7;
+  string unbind = 8;
+  string unbind_game_confirmation = 9;
+  string unbind_game_result = 10;
+  string unbind_channel_confirmation = 11;
+  string unbind_channel_result = 12;
+  string unbind_confirmation = 13;
+  string unbind_result = 14;
+}
+
+message ZoneGetMobileBindingRewardReq {
+}
+
+message ZoneGetMobileBindingRewardRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerMobileBindData mobile_bind_info = 4;
+}
+
+message ZoneReceivePlayerActivityShinyPetDayRewardReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneReceivePlayerActivityShinyPetDayRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceiveActivityCoCreationRewardReq {
+  uint32 activity_id = 1;
+  bool is_task_reward = 2;
+}
+
+message ZoneReceiveActivityCoCreationRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSupplyActivityCoCreationRewardReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneSupplyActivityCoCreationRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneActivitySetCoCreationEmojReq {
+  uint32 activity_id = 1;
+  uint32 emoj_id = 2;
+  bool is_cancel = 3;
+}
+
+message ZoneActivitySetCoCreationEmojRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ActivityCoCreationEmojInfo emoj_info = 2;
+  repeated uint32 emoj_list = 3;
+}
+
+message ZoneActivityGetCoCreationEmojReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneActivityGetCoCreationEmojRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ActivityCoCreationEmojInfo emoj_info = 2;
+  repeated uint32 emoj_list = 3;
+}
+
+message ZoneReceiveActivityConditionGroupRewardReq {
+  uint32 activity_id = 1;
+  uint32 group_id = 2;
+  uint32 condition_id = 3;
+}
+
+message ZoneReceiveActivityConditionGroupRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityShinyPetDayPetalReq {
+}
+
+message ZoneReceivePlayerActivityShinyPetDayPetalRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceivePlayerActivityTreasureHuntRewardReq {
+  uint32 activity_id = 1;
+  uint32 activity_sub_id = 2;
+}
+
+message ZoneReceivePlayerActivityTreasureHuntRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceiveShopTotalConsumptionRewardReq {
+  uint32 shop_id = 1;
+  uint32 reward_level = 2;
+}
+
+message ZoneReceiveShopTotalConsumptionRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneReceiveGpContestRewardReq {
+  bool final = 1;
+  uint32 seq = 2;
+}
+
+message ZoneReceiveGpContestRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetPlayerGpContestInfoReq {
+}
+
+message ZoneGetPlayerGpContestInfoRsp {
+  Next.PlayerGPContestInfo gp_contest_info = 1;
+  Next.RetInfo ret_info = 2;
+}
+
+message ZoneAckReceiveDungeonFinishReq {
+  uint32 dungeon_cfg_id = 1;
+  repeated uint32 stage_cfg_ids = 2;
+}
+
+message ZoneAckReceiveDungeonFinishRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneMonthCardGetInfoReq {
+}
+
+message ZoneMonthCardGetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.MonthCardData month_data = 2;
+}
+
+message ZoneMonthCardGetInfoNty {
+  Next.MonthCardData month_data = 2;
+}
+
+message ZoneGetCosUploadUrlReq {
+  int32 type = 1;
+  string file_name = 2;
+  uint32 file_size = 3;
+  string file_md5 = 4;
+  uint64 battle_id = 5;
+  string client_version = 6;
+}
+
+message ZoneGetCosUploadUrlRsp {
+  Next.RetInfo ret_info = 1;
+  string url = 2;
+  int32 type = 3;
+  string file_name = 4;
+  string gen_filename = 5;
+  string access_url = 6;
+}
+
+message ZoneGetCosSignatureReq {
+}
+
+message ZoneGetCosSignatureRsp {
+  Next.RetInfo ret_info = 1;
+  string signature = 2;
+}
+
+message ZoneQueryPlayerSettingsReq {
+}
+
+message ZoneQueryPlayerSettingsRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerSettings settings = 2;
+}
+
+message ZoneModifyPlayerSettingsReq {
+  Next.PlayerSettings settings = 1;
+}
+
+message ZoneModifyPlayerSettingsRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChallengeCreateBattleReq {
+  Next.SourceData source_data = 1;
+  Next.Point avatar_pt = 2;
+  bool use_big_world_team = 3;
+  uint32 dungeon_id = 4;
+  uint32 priority_pet_gid = 5;
+}
+
+message ZoneChallengeCreateBattleRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneExitChallengeReq {
+  bool stay_dungeon = 1;
+}
+
+message ZoneExitChallengeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChallengeStarRewardReq {
+  int32 activity_id = 1;
+  int32 star_num = 2;
+}
+
+message ZoneChallengeStarRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChallengeSetBuffReq {
+  int32 activity_id = 1;
+  int32 buff_rule_id = 2;
+}
+
+message ZoneChallengeSetBuffRsp {
+  Next.RetInfo ret_info = 1;
+  int32 buff_rule_id = 2;
+}
+
+message ZoneChallengeSetModuleUnlockReadedReq {
+  int32 activity_id = 1;
+  int32 module_id = 2;
+}
+
+message ZoneChallengeSetModuleUnlockReadedRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneWeeklyChallengeCreateBattleReq {
+  Next.EClientBattleSourceType source_type = 1;
+  uint32 activity_id = 2;
+  uint32 challenge_id = 3;
+  Next.Point avatar_pt = 4;
+  uint32 priority_pet_gid = 5;
+}
+
+message ZoneWeeklyChallengeCreateBattleRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneWeeklyChallengeAttrBalanceReq {
+  uint32 activity_id = 1;
+  uint32 challenge_id = 2;
+}
+
+message ZoneWeeklyChallengeAttrBalanceRsp {
+  Next.RetInfo ret_info = 1;
+  bool is_need_balance = 2;
+  uint32 balance_level = 3;
+  uint32 balance_grow = 4;
+  repeated Next.PetData pet_data = 5;
+  repeated uint32 monster_conf_id = 6;
+  repeated uint32 monster_level = 7;
+  uint32 balance_effort = 8;
+}
+
+message ZoneWeeklyChallengePhotoUploadReq {
+  uint32 activity_id = 1;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeDataPhoto photo_info = 2;
+  uint32 team_id = 3;
+}
+
+message ZoneWeeklyChallengePhotoUploadRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam team_photo = 2;
+}
+
+message ZoneWeeklyChallengeHistoryPhotoReq {
+}
+
+message ZoneWeeklyChallengeHistoryPhotoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam history_photos = 2;
+}
+
+message ZoneWeeklyChallengeUpdatePhotoReq {
+  uint32 activity_id = 1;
+  uint32 team_id = 2;
+}
+
+message ZoneWeeklyChallengeUpdatePhotoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam team_photo = 2;
+}
+
+message ZoneReportSafetyDataReq {
+  uint32 reported_uin = 1;
+  Next.SafetyBusinessInfo business_data = 2;
+}
+
+message ZoneReportSafetyDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetAppearanceInfoReq {
+}
+
+message ZoneGetAppearanceInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo appearance_info = 2;
+}
+
+message ZoneNewFashionItemNotify {
+  repeated uint32 fashion_item_ids = 1;
+  bool is_deduct = 2;
+}
+
+message ZoneNewSalonItemNotify {
+  repeated uint32 salon_item_ids = 1;
+  bool is_deduct = 2;
+}
+
+message ZoneNewFashionBondNotify {
+  repeated Next.FashionBondItem fashion_bond_item = 1;
+  bool is_deduct = 2;
+}
+
+message ZoneCheckColorSuitStateReq {
+  int32 fashion_bond_id = 1;
+}
+
+message ZoneCheckColorSuitStateRsp {
+  Next.RetInfo ret_info = 1;
+  dataconfig.FashionBondColorSuitState color_suit_state = 2;
+}
+
+message ZoneClaimColorSuitReq {
+  int32 fashion_bond_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneClaimColorSuitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneColorSuitStateChangeNty {
+  int32 fashion_bond_id = 1;
+  dataconfig.FashionBondColorSuitState color_suit_state = 2;
+}
+
+message ZoneGetClaimableGlassTintReq {
+  int32 fashion_bond_id = 1;
+  bool is_shining = 2;
+}
+
+message ZoneGetClaimableGlassTintRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.GlassInfo claimable_glass = 3;
+}
+
+message ZoneClaimGlassTintReq {
+  int32 fashion_bond_id = 1;
+  bool is_shining = 2;
+  Next.GlassInfo glass = 3;
+  int32 fashion_item_id = 4;
+}
+
+message ZoneClaimGlassTintRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.GlassTintChange change_to_owned = 2;
+}
+
+message ZoneGlassTintChangeNty {
+  repeated Next.GlassTintChange change_to_claimable = 1;
+  repeated Next.GlassTintChange change_to_lock = 2;
+}
+
+message ZoneSceneNpcControlReq {
+  int32 operate_type = 1;
+  int32 content_id = 2;
+  uint64 npc_id = 3;
+  Next.Point point = 4;
+}
+
+message ZoneSceneNpcControlRsp {
+  Next.RetInfo ret_info = 1;
+  int32 operate_type = 2;
+  uint64 npc_id = 3;
+}
+
+message ZoneRecallTalentChangeReq {
+  uint32 pet_gid = 1;
+}
+
+message ZoneRecallTalentChangeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSetRandomShopShownIndexesReq {
+  int32 shop_id = 1;
+  repeated int32 indexes = 2;
+}
+
+message ZoneSetRandomShopShownIndexesRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBagItemPlayerHasExchangeConcernedNotify {
+  repeated int32 bag_item_id = 1;
+}
+
+message ZoneSetVisitPermissionSettingReq {
+  int32 permission_type = 1;
+}
+
+message ZoneSetVisitPermissionSettingRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneNewCardIconNotify {
+  Next.PlayerCardInfo_CardItemOwnedInfo card_item_info = 1;
+}
+
+message ZoneNewCardSkinNotify {
+  Next.PlayerCardInfo_CardItemOwnedInfo card_item_info = 1;
+}
+
+message ZoneNewCardLabelNotify {
+  Next.PlayerCardInfo_CardItemOwnedInfo card_item_info = 1;
+}
+
+message ZoneActiveHideOrShowContentReq {
+  uint32 content_id = 1;
+  bool is_show = 2;
+}
+
+message ZoneActiveHideOrShowContentRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTryInstantiateNpcReq {
+  uint32 content_cfg_id = 1;
+  uint64 npc_objid = 2;
+  int32 taskid = 3;
+  int32 traceidx = 4;
+}
+
+message ZoneGuideInfoNotify {
+  repeated Next.GuideGroup guide_info = 1;
+}
+
+message ZoneFinishGuideReq {
+  uint32 group_id = 1;
+  repeated uint32 index = 2;
+}
+
+message ZoneFinishGuideRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GuideGroup sync_group = 2;
+}
+
+message ZoneTryInstantiateNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneClientCaveStateNotify {
+  string cave_name = 1;
+  Next.Position pos = 2;
+}
+
+message ZoneSceneClientCaveStateNotifyAck {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneClientCaveStateReq {
+  string cave_name = 1;
+  Next.Position pos = 2;
+}
+
+message ZoneSceneClientCaveStateRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTaskTeleportReq {
+  int32 teleport_type = 1;
+  int32 scene_res_cfg_id = 2;
+  Next.Point to_point = 3;
+  int32 dungeon_cfg_id = 4;
+  int32 task_id = 5;
+}
+
+message ZoneTaskTeleportRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneNpcTraceQueryReq {
+  repeated int32 npc_cfg_id = 1;
+  bool cancel_trace = 2;
+  repeated int32 pet_base_id = 3;
+}
+
+message ZoneNpcTraceQueryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.NpcTraceInfo npc_trace_info = 2;
+  repeated int32 pet_base_id = 3;
+}
+
+message ZoneSceneWorldCombatSkillPosLerpSyncReq {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillPosLerpSyncInfo info = 2;
+  bool allow_wait = 3;
+}
+
+message ZoneSceneWorldCombatSkillPosLerpSyncRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneQuerySceneTaskStatReq {
+  uint32 uin = 1;
+}
+
+message ZoneQuerySceneTaskStatRsp {
+  Next.RetInfo ret_info = 1;
+  Next.TaskScenesvrStateData scene_state_data = 2;
+}
+
+message ZoneGmModifyNpcDataReq {
+  int32 type = 1;
+  int32 param1 = 2;
+  int32 param2 = 3;
+  int32 task_id = 4;
+  uint32 uin = 5;
+}
+
+message ZoneGmModifyNpcDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeSaveRoomLayoutReq {
+  Next.RoomLayoutInfo room_layout_info = 1;
+  bool force_save = 2;
+}
+
+message ZoneSceneHomeSaveRoomLayoutRsp {
+  Next.RetInfo ret_info = 1;
+  Next.RoomLayoutInfo room_layout_info = 2;
+}
+
+message ZoneSceneHomeLoadRoomLayoutReq {
+}
+
+message ZoneSceneHomeLoadRoomLayoutRsp {
+  Next.RetInfo ret_info = 1;
+  Next.RoomLayoutInfo room_layout_info = 2;
+}
+
+message ZoneHomeQueryLevelRewardReq {
+}
+
+message ZoneHomeQueryLevelRewardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.RewardState state = 2;
+}
+
+message ZoneHomeClaimLevelRewardReq {
+  uint32 level = 1;
+}
+
+message ZoneHomeClaimLevelRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeFurnitureFoldReq {
+  uint32 room_id = 1;
+  bool fold_all = 2;
+  Next.RoomFurnitureDetails furniture_info = 3;
+}
+
+message ZoneHomeFurnitureFoldRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeStartExpandRoomReq {
+  uint32 room_level = 1;
+}
+
+message ZoneSceneHomeStartExpandRoomRsp {
+  Next.RetInfo ret_info = 1;
+  Next.RoomExpansionInfo room_expansion_info = 2;
+}
+
+message ZoneSceneHomeFinishExpandRoomReq {
+  uint32 room_level = 1;
+}
+
+message ZoneSceneHomeFinishExpandRoomRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeInfo home_info = 2;
+}
+
+message ZoneSceneHomeRenameRoomReq {
+  uint32 room_id = 1;
+  bytes room_name = 2;
+}
+
+message ZoneSceneHomeRenameRoomRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeEnterEditReq {
+  bool is_edit = 1;
+}
+
+message ZoneSceneHomeEnterEditRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeEnterReq {
+  enum HomeSceneType {
+    HomeSceneType_Home = 1;
+    HomeSceneType_Plant = 2;
+  }
+  uint32 home_owner_id = 1;
+  Next.ZoneSceneHomeEnterReq.HomeSceneType home_scene_type = 2;
+  uint32 world_map_cfg_id = 3;
+}
+
+message ZoneSceneHomeEnterRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 home_owner_id = 2;
+}
+
+message ZoneSceneHomeLeaveReq {
+}
+
+message ZoneSceneHomeLeaveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeQueryFriendHomeInfoReq {
+  uint32 uin = 1;
+  uint32 query_info_type = 2;
+}
+
+message ZoneHomeQueryFriendHomeInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.CellHomeBriefInfo friend_cell_home_brief_info = 2;
+  Next.PlayerHomeBriefInfo friend_home_brief_info = 3;
+  uint32 uin = 4;
+  bool home_feature_opened = 5;
+}
+
+message ZoneSceneHomeGetVistHistoryReq {
+}
+
+message ZoneSceneHomeGetVistHistoryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeVisitHistoryInfo visit_history = 2;
+}
+
+message ZoneSceneHomeGetVisitorInfoReq {
+  uint32 home_owner_id = 1;
+}
+
+message ZoneSceneHomeGetVisitorInfoRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 home_owner_id = 2;
+  repeated Next.HomeVisitorInfo visitor_info = 3;
+}
+
+message ZoneSceneHomeTeamCreateReq {
+  Next.HomeTeamType team_type = 1;
+  uint32 world_map_cfg_id = 2;
+}
+
+message ZoneSceneHomeTeamCreateRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeTeamInfo team_info = 2;
+}
+
+message ZoneSceneHomeTeamRespondInviteReq {
+  uint32 team_leader_id = 1;
+  Next.HomeTeamRespondType respond_type = 2;
+}
+
+message ZoneSceneHomeTeamRespondInviteRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeTeamInfo team_info = 2;
+}
+
+message ZoneSceneHomeTeamEnterHomeReq {
+}
+
+message ZoneSceneHomeTeamEnterHomeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeTeamLeaveHomeReq {
+  uint64 entry_id = 1;
+  bool use_special_teleport = 2;
+}
+
+message ZoneSceneHomeTeamLeaveHomeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeTeamDisbandReq {
+}
+
+message ZoneSceneHomeTeamDisbandRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeTeamInfo team_info = 2;
+}
+
+message ZoneSceneHomeTeamQueryReq {
+}
+
+message ZoneSceneHomeTeamQueryRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeTeamInfo team_info = 2;
+  uint32 team_init_member_count = 3;
+}
+
+message ZoneHomePlantSeedCompoundReq {
+  int32 seed_id = 1;
+  int32 seed_num = 2;
+}
+
+message ZoneHomePlantSeedCompoundRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePlantSeedEquipReq {
+  message HomePlantSeedModifyInfo {
+    uint32 gid = 1;
+    uint32 bag_item_flags = 2;
+    uint32 item_conf_id = 4;
+    uint32 plant_tab = 5;
+  }
+  repeated Next.ZoneHomePlantSeedEquipReq.HomePlantSeedModifyInfo modify_info = 1;
+}
+
+message ZoneHomePlantSeedEquipRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomePlantCropReq {
+  int32 land_id = 1;
+  int32 seed_gid = 2;
+}
+
+message ZoneSceneHomePlantCropRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneScenePlayerServerInfoNotify {
+  string zonesvr_buspp_inst_id = 1;
+  string scenesvr_buspp_inst_id = 2;
+  string battlesvr_buspp_inst_id = 3;
+  string zone_player_last_sync_time = 4;
+  string scene_last_update_timestamp_in_us = 5;
+  string cell_id = 6;
+  int64 faketime_offset_in_millis = 7;
+}
+
+message ZoneGetNpcChallengeImageReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneGetNpcChallengeImageRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BattleAppearanceInfo npc_challenge_image_info = 2;
+}
+
+message ZoneHomeWarehouseDecompositionReq {
+  message FurnitureInfo {
+    uint32 gid = 1;
+    uint32 num = 2;
+  }
+  repeated Next.ZoneHomeWarehouseDecompositionReq.FurnitureInfo target_list = 1;
+}
+
+message ZoneHomeWarehouseDecompositionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeWarehouseGetBuildListReq {
+  uint32 home_id = 1;
+  bool need_self_list = 2;
+}
+
+message ZoneHomeWarehouseGetBuildListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated int32 ding_list = 2;
+  repeated int32 home_list = 3;
+  uint64 next_update_timestamp = 4;
+  repeated int32 self_list = 5;
+}
+
+message ZoneHomeWarehouseBuildReq {
+  int32 bag_item_id = 1;
+  int32 num = 2;
+}
+
+message ZoneHomeWarehouseBuildRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeClaimUnlockedFurnitureRewardReq {
+  int32 handbook_id = 1;
+}
+
+message ZoneHomeClaimUnlockedFurnitureRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeGetUnlockedFurnitureInfoReq {
+}
+
+message ZoneHomeGetUnlockedFurnitureInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomeUnlockedFurnitureInfo unlocked_furniture_info = 2;
+}
+
+message ZoneHomeGetCraftableFriendListReq {
+  int32 furniture_id = 1;
+  int32 page = 2;
+}
+
+message ZoneHomeGetCraftableFriendListRsp {
+  Next.RetInfo ret_info = 1;
+  int32 total_num = 3;
+  repeated Next.HomeCraftableFurnitureFriendInfo friend_list = 4;
+}
+
+message ZoneHomePetPlaceReq {
+  int32 pet_gid = 1;
+  uint64 furniture_guid = 3;
+  Next.Point born_pt = 4;
+}
+
+message ZoneHomePetPlaceRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomePetInfo home_pet_info = 2;
+}
+
+message ZoneHomePetUnplaceReq {
+  message PetUnplaceInfo {
+    uint64 npc_obj_id = 1;
+    uint64 furniture_guid = 2;
+  }
+  repeated Next.ZoneHomePetUnplaceReq.PetUnplaceInfo pet_unplace_info_list = 1;
+  bool force = 3;
+}
+
+message ZoneHomePetUnplaceRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HomePetInfo home_pet_info_list = 2;
+}
+
+message ZoneHomePetLoadFoodReq {
+  uint32 item_gid = 1;
+  uint32 item_conf_id = 2;
+}
+
+message ZoneHomePetLoadFoodRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePetReplaceFoodReq {
+  uint32 old_item_gid = 1;
+  uint32 old_item_conf_id = 2;
+  uint32 new_item_gid = 3;
+  uint32 new_item_conf_id = 4;
+}
+
+message ZoneHomePetReplaceFoodRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePetUnloadFoodReq {
+  uint32 item_gid = 1;
+  uint32 item_conf_id = 2;
+}
+
+message ZoneHomePetUnloadFoodRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePetFeedReq {
+  uint64 npc_obj_id = 1;
+  uint32 pet_gid = 2;
+  uint32 bag_item_conf_id = 3;
+  uint32 bag_item_gid = 4;
+}
+
+message ZoneHomePetFeedRsp {
+  Next.RetInfo ret_info = 1;
+  Next.HomePetFeedInfo feed_info = 2;
+}
+
+message ZoneHomePetFeedCancelReq {
+  uint64 npc_obj_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneHomePetFeedCancelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePetCanStealReq {
+  uint64 npc_obj_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneHomePetCanStealRsp {
+  Next.RetInfo ret_info = 1;
+  bool can_steal = 2;
+  int32 reason = 3;
+}
+
+message ZoneHomePetStealReq {
+  uint64 npc_obj_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneHomePetStealRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HomePetGoodsInfo steal_goods = 2;
+  uint32 pet_gid = 3;
+}
+
+message ZoneHomePetFetchAwardReq {
+  uint64 npc_obj_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneHomePetFetchAwardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HomePetGoodsInfo fetch_goods = 2;
+}
+
+message ZoneHomePetFoodCompoundReq {
+  int32 food_cfg_id = 1;
+  int32 food_num = 2;
+  repeated int32 cost_item_cfg_id = 3;
+}
+
+message ZoneHomePetFoodCompoundRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSetNavigationModeTypeReq {
+  uint32 mode_type = 1;
+}
+
+message ZoneSetNavigationModeTypeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomePetGuardReq {
+  repeated uint32 pet_guard_pids = 1;
+}
+
+message ZoneHomePetGuardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 pet_guard_pids = 2;
+}
+
+message ZoneTaskConditionTriggerReq {
+  uint32 condition_type = 1;
+  uint32 taskid = 2;
+  uint32 task_condition_idx = 3;
+}
+
+message ZoneTaskConditionTriggerRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneStartBadgeChallengeReq {
+  uint32 id = 1;
+}
+
+message ZoneStartBadgeChallengeRsp {
+  repeated Next.ChallengeEventCardInfo event_infos = 1;
+  Next.RetInfo ret_info = 2;
+  uint32 remain_coin = 3;
+  uint32 refresh_need_coin = 4;
+  repeated Next.ChallengeEventCardInfo level_infos = 5;
+}
+
+message ZoneSelectBadgeChallengeCardReq {
+  uint32 index = 1;
+}
+
+message ZoneSelectBadgeChallengeCardRsp {
+  repeated Next.ChallengeEventCardInfo event_infos = 1;
+  Next.RetInfo ret_info = 2;
+}
+
+message ZoneFixedBadgeChallengeCardReq {
+  uint32 index = 1;
+}
+
+message ZoneFixedBadgeChallengeCardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRefreshBadgeChallengeCardReq {
+}
+
+message ZoneRefreshBadgeChallengeCardRsp {
+  repeated Next.ChallengeEventCardInfo event_infos = 1;
+  uint32 remain_coin = 2;
+  Next.RetInfo ret_info = 3;
+  uint32 refresh_need_coin = 4;
+  repeated uint32 pet_unit_type = 5;
+}
+
+message ZoneCombineBadgeChallengeCardReq {
+  repeated uint32 indexes = 1;
+}
+
+message ZoneCombineBadgeChallengeCardRsp {
+  repeated Next.ChallengeEventCardInfo event_infos = 2;
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBadgeChallengeSelectUpgradeReq {
+  repeated uint32 index = 1;
+}
+
+message ZoneBadgeChallengeSelectUpgradeRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 upgrade_ids = 2;
+}
+
+message ZoneBadgeChallengeEnterReq {
+  uint32 node_id = 1;
+}
+
+message ZoneBadgeChallengeEnterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFeedMagicCreateReq {
+  uint32 uin = 1;
+  string content = 2;
+  Next.Position create_pos = 3;
+  string ext_info = 4;
+  int32 music_id = 5;
+}
+
+message ZoneFeedMagicCreateRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+  Next.BanInfo ban_info = 3;
+}
+
+message ZoneFeedMagicFeedbackReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  string comment_content = 3;
+  uint32 category = 4;
+}
+
+message ZoneFeedMagicFeedbackRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+  Next.BanInfo ban_info = 3;
+  Next.FeedCommentInfo comment_info = 4;
+}
+
+message ZoneFeedMagicDeleteReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint32 category = 3;
+}
+
+message ZoneFeedMagicDeleteRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 feed_id = 2;
+  uint64 grid_id = 3;
+}
+
+message ZoneFeedMagicAttitudeReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint32 attitude = 3;
+  uint32 category = 4;
+}
+
+message ZoneFeedMagicAttitudeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+}
+
+message ZoneFeedCommentAttitudeReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint64 feedback_id = 3;
+  uint32 attitude = 4;
+  uint32 category = 5;
+}
+
+message ZoneFeedCommentAttitudeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FeedCommentInfo comment_info = 2;
+}
+
+message ZoneFeedHandWritingEnhanceReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+}
+
+message ZoneFeedHandWritingEnhanceRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+}
+
+message ZoneFeedGetCtrlDataReq {
+  uint32 uin = 1;
+}
+
+message ZoneFeedGetCtrlDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneFeedCtrlData data = 2;
+}
+
+message ZoneFeedGetFeedCommentReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint32 type = 3;
+  uint32 page_num = 4;
+}
+
+message ZoneFeedGetFeedCommentRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FeedCommentListData comment_info = 2;
+  Next.ZoneMagicFeedInfo feed = 3;
+}
+
+message ZoneFeedPlayerUninterestedReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint32 category = 3;
+}
+
+message ZoneFeedPlayerUninterestedRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 feed_id = 2;
+}
+
+message ZoneFeedFlowerPickupReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+}
+
+message ZoneFeedFlowerPickupRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFeedMagicCommentDeleteReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  uint64 feedback_id = 3;
+  uint32 category = 4;
+}
+
+message ZoneFeedMagicCommentDeleteRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+  uint64 feedback_id = 3;
+}
+
+message ZoneFeedVideoBeginReq {
+}
+
+message ZoneFeedVideoBeginRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFeedVideoGetUploadUrlReq {
+  string file_name = 1;
+  Next.Position create_pos = 2;
+  string content = 3;
+}
+
+message ZoneFeedVideoGetUploadUrlRsp {
+  Next.RetInfo ret_info = 1;
+  string file_name = 2;
+  string upload_url = 3;
+  Next.FeedVideoUploadInfo video_upload_info = 4;
+  Next.BanInfo ban_info = 5;
+}
+
+message ZoneFeedVideoCreateReq {
+  string content = 1;
+  Next.Position create_pos = 2;
+  string file_name = 3;
+  string file_md5 = 4;
+  Next.FeedVideoBaseInfo base_info = 5;
+  string base_info_md5 = 6;
+}
+
+message ZoneFeedVideoCreateRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed_info = 2;
+  Next.FeedVideoInfo feed_video_info = 3;
+  Next.FeedVideoUploadInfo video_upload_info = 4;
+  Next.BanInfo ban_info = 5;
+}
+
+message ZoneFeedVideoFeedbackReq {
+  uint32 uin = 1;
+  uint64 feed_id = 2;
+  string comment_content = 3;
+}
+
+message ZoneFeedVideoFeedbackRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed = 2;
+  Next.BanInfo ban_info = 3;
+  Next.FeedCommentInfo comment_info = 4;
+}
+
+message ZoneGetFeedDetailReq {
+  uint64 feed_id = 1;
+}
+
+message ZoneGetFeedDetailRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneMagicFeedInfo feed_info = 2;
+  Next.FeedVideoInfo feed_video_info = 3;
+}
+
+message ZoneFeedVideoEndReq {
+}
+
+message ZoneFeedVideoEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneFeedVideoDelUploadFileReq {
+  string file_name = 1;
+}
+
+message ZoneFeedVideoDelUploadFileRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FeedVideoUploadInfo video_upload_info = 2;
+}
+
+message ZonePetSharePetTeamReq {
+  uint32 team_type = 1;
+  uint32 team_idx = 2;
+}
+
+message ZonePetSharePetTeamRsp {
+  Next.RetInfo ret_info = 1;
+  string id = 2;
+  Next.SharedPetTeamInfo team = 3;
+}
+
+message ZonePetApplySharedPetTeamReq {
+  string id = 1;
+  uint32 team_type = 2;
+  Next.SharedPetTeamInfo shared_team = 3;
+}
+
+message ZonePetApplySharedPetTeamRsp {
+  Next.RetInfo ret_info = 1;
+  Next.SharedPetTeamInfo shared_team = 2;
+  Next.AdjustedPetTeamInfo adjusted_team = 3;
+}
+
+message ZonePetGetAlternativePetsReq {
+  Next.SharedPetInfo shared_pet = 1;
+  uint32 team_type = 2;
+  repeated uint32 team_mates = 3;
+}
+
+message ZonePetGetAlternativePetsRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.AdjustedPet pets = 2;
+}
+
+message ZonePetTeamShareAutoCompleteTeamReq {
+  uint32 team_type = 1;
+  Next.SharedPetTeamInfo shared_team = 2;
+  Next.AdjustedPetTeamInfo current_team = 3;
+}
+
+message ZonePetTeamShareAutoCompleteTeamRsp {
+  Next.RetInfo ret_info = 1;
+  Next.AdjustedPetTeamInfo completed_team = 2;
+}
+
+message ZonePetTeamShareQuickAdjustReq {
+  message ExchangeInfo {
+    uint32 exchange_id = 1;
+    uint32 exchange_num = 2;
+    repeated uint32 cost_goods_id = 3;
+  }
+  message BagItemInfo {
+    uint32 gid = 1;
+    uint32 num = 2;
+    uint32 para = 3;
+    uint32 item_conf_id = 4;
+    repeated uint32 change_attr_type = 5;
+    repeated uint32 target_type = 6;
+    uint32 change_talent_type = 7;
+    uint32 result_type = 8;
+    uint32 para2 = 9;
+  }
+  repeated Next.ZonePetTeamShareQuickAdjustReq.ExchangeInfo exchange_info = 1;
+  repeated Next.ZonePetTeamShareQuickAdjustReq.BagItemInfo item_info = 2;
+}
+
+message ZonePetTeamShareQuickAdjustRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneOpenMagicBookSheetReq {
+}
+
+message ZoneOpenMagicBookSheetRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 chapter_id = 2;
+  bool rewarded = 3;
+  repeated Next.PlayerTaskInfo chapter_task_list = 5;
+  repeated Next.PlayerTaskInfo invest_task_list = 6;
+  repeated Next.PlayerTaskInfo clue_task_list = 7;
+  repeated Next.PlayerTaskInfo topic_task_list = 8;
+  uint32 remain_time = 9;
+  uint32 special_reward_item = 10;
+}
+
+message ZoneSetTaskRecoverAllReq {
+}
+
+message ZoneSetTaskRecoverAllRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneMoveFinishTaskReq {
+  uint64 time_stamp = 1;
+  Next.Position to_pos = 2;
+  int32 scene_cfg_id = 3;
+}
+
+message ZoneMoveFinishTaskRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationInteractInviteReq {
+  uint32 target_uin = 1;
+  dataconfig.InteractInviteType interact_type = 2;
+  Next.RelationInteractSubType interact_sub_type = 3;
+  Next.InteractParam param = 4;
+}
+
+message ZoneSceneRelationInteractInviteRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZoneSceneRelationInteractInterruptReq {
+}
+
+message ZoneSceneRelationInteractInterruptRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationInteractAcceptReq {
+  uint32 target_uin = 1;
+  dataconfig.InteractInviteType interact_type = 2;
+  Next.RelationInteractSubType interact_sub_type = 3;
+  Next.InteractParam param = 4;
+}
+
+message ZoneSceneRelationInteractAcceptRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 target_uin = 2;
+  dataconfig.InteractInviteType interact_type = 3;
+  Next.RelationInteractSubType interact_sub_type = 4;
+  Next.InteractParam param = 5;
+  Next.BanInfo ban_info = 6;
+}
+
+message ZoneSceneRelationInteractChangeReq {
+  uint32 target_uin = 1;
+  dataconfig.InteractInviteType interact_type = 2;
+  Next.RelationInteractSubType interact_sub_type = 3;
+}
+
+message ZoneSceneRelationInteractChangeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.RelationInteractSubType interact_sub_type = 2;
+}
+
+message ZoneSceneRelationInteractEndReq {
+  uint32 target_uin = 1;
+  dataconfig.InteractInviteType interact_type = 2;
+  Next.RelationInteractSubType interact_sub_type = 3;
+}
+
+message ZoneSceneRelationInteractEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationRecoverBeginReq {
+  uint32 recover_mate_uin = 1;
+}
+
+message ZoneSceneRelationRecoverBeginRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationRecoverEndReq {
+}
+
+message ZoneSceneRelationRecoverEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationRecoverModifyBuffReq {
+  int32 buff_val = 1;
+}
+
+message ZoneSceneRelationRecoverModifyBuffRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRelationTravelTogetherSyncReq {
+  Next.Position pos_diff = 1;
+  Next.Position report_pos = 2;
+}
+
+message ZoneSceneRelationTravelTogetherSyncRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTogetherTeleportConfirmReq {
+  bool together_recover = 1;
+}
+
+message ZoneSceneTogetherTeleportConfirmRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneOpenRelationshipTreeReq {
+  uint32 peer_uin = 1;
+}
+
+message ZoneOpenRelationshipTreeRsp {
+  message RelationshipTreePeerInfo {
+    string openid = 1;
+    uint32 uin = 2;
+    bytes name = 3;
+    bytes note = 4;
+    uint32 level = 5;
+    uint32 gender = 6;
+    bytes signature = 7;
+    Next.PlayerBattleState battle_state = 8;
+    Next.PlayerBattleBriefInfo battle_brief_info = 9;
+    uint32 card_icon_selected = 10;
+  }
+  Next.RetInfo ret_info = 1;
+  Next.RelationshipTreeData tree_data = 2;
+  uint32 unlock_relation_type = 3;
+  Next.PlayerBattleState peer_battle_state = 4;
+  Next.PlayerBattleBriefInfo peer_battle_brief_info = 5;
+  Next.ZoneOpenRelationshipTreeRsp.RelationshipTreePeerInfo peer_info = 6;
+}
+
+message ZoneUnlockRelationshipNodeReq {
+  uint32 peer_uin = 1;
+  uint32 relationship_type = 2;
+}
+
+message ZoneUnlockRelationshipNodeRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 peer_uin = 2;
+  uint32 relationship_type = 3;
+  Next.BanInfo ban_info = 4;
+}
+
+message ZoneConfirmUnlockRelationshipNodeReq {
+  uint32 peer_uin = 1;
+  uint32 relationship_type = 2;
+}
+
+message ZoneConfirmUnlockRelationshipNodeRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 peer_uin = 2;
+  uint32 relationship_type = 3;
+  Next.BanInfo ban_info = 4;
+}
+
+message ZoneCancelUnlockRelationshipNodeReq {
+  uint32 peer_uin = 1;
+  uint32 relationship_type = 2;
+}
+
+message ZoneCancelUnlockRelationshipNodeRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 peer_uin = 2;
+  uint32 relationship_type = 3;
+}
+
+message ZoneCloseRelationshipTreeReq {
+  uint32 peer_uin = 1;
+}
+
+message ZoneCloseRelationshipTreeRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 peer_uin = 2;
+}
+
+message ZoneScenePetTreeInteractHoldReq {
+  uint64 pet_npc_id = 1;
+}
+
+message ZoneScenePetTreeInteractHoldRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneCreateSceneSeatReq {
+  Next.Point create_pt = 1;
+  int32 npc_config_id = 2;
+  repeated Next.Point create_pts = 3;
+}
+
+message ZoneSceneCreateSceneSeatRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRecycleSceneSeatReq {
+  uint64 recycle_npc_id = 1;
+}
+
+message ZoneSceneRecycleSceneSeatRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneOpSeatReq {
+  Next.OpSeatType op_type = 1;
+  uint64 npc_id = 2;
+  int32 seat_idx = 3;
+  int32 leave_point_idx = 4;
+  bool normal_leave_seat = 5;
+}
+
+message ZoneSceneOpSeatRsp {
+  Next.RetInfo ret_info = 1;
+  Next.OpSeatType op_type = 2;
+  int32 seat_idx = 3;
+  int32 leave_point_idx = 4;
+}
+
+message ZoneFashionSuitsLevelUpReq {
+  int32 fashion_suit_id = 1;
+  int32 level = 2;
+  repeated int32 components = 5;
+}
+
+message ZoneFashionSuitsLevelUpRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_FashionInfo_SuitInfo suit_info = 2;
+}
+
+message ZoneChangeWornComponentsReq {
+  int32 suit_id = 1;
+  repeated int32 components_is_worn = 2;
+}
+
+message ZoneChangeWornComponentsRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_FashionInfo_SuitInfo suit_info = 2;
+}
+
+message ZoneChangeWardrobeReq {
+  int32 wardrobe_index = 1;
+}
+
+message ZoneChangeWardrobeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_FashionInfo_WardrobeData wardrobe_data = 2;
+  int32 current_wardrobe_index = 3;
+}
+
+message ZoneGiftGivingReq {
+  uint32 receiver_uin = 1;
+  dataconfig.GoodsType goods_type = 2;
+  int32 goods_id = 3;
+  int32 goods_gid = 4;
+  int32 goods_num = 5;
+}
+
+message ZoneGiftGivingRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZoneGiftReceivingReq {
+  uint32 giver_uin = 1;
+  int32 gift_unique_id = 2;
+  dataconfig.GoodsType goods_type = 3;
+  int32 goods_id = 4;
+  int32 goods_num = 5;
+}
+
+message ZoneGiftReceivingRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZoneSeasonInfoReq {
+}
+
+message SeasonPartChangeInfo {
+  int32 instead_start_time = 1;
+  int32 instead_red_point_id = 2;
+  int32 instead_item_id = 3;
+}
+
+message SeasonPartInfo {
+  int32 part_id = 1;
+  int32 red_point_id = 2;
+  int32 item_id = 3;
+  repeated Next.SeasonPartChangeInfo change_info = 4;
+}
+
+message ZoneSeasonInfoRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 season_id = 2;
+  int32 season_kv_type = 3;
+  uint32 popup_time = 4;
+  uint32 season_start_time = 5;
+  uint32 season_end_time = 6;
+  repeated Next.SeasonPartInfo part_info = 7;
+  uint32 light_talent_count = 8;
+  uint32 season_pv_time = 9;
+  uint32 season_pop_windows_time = 10;
+}
+
+message ZoneSetSeasonKvTypeReq {
+  uint32 season_id = 1;
+  int32 season_kv_type = 2;
+}
+
+message ZoneSetSeasonKvTypeRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 season_id = 2;
+  int32 season_kv_type = 3;
+}
+
+message ZoneSetSeasonFirstPopReq {
+  uint32 season_id = 1;
+  int32 pop_type = 2;
+}
+
+message ZoneSetSeasonFirstPopRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 season_id = 2;
+  int32 pop_type = 3;
+  uint32 pop_time = 4;
+}
+
+message ZoneSetSeasonPopupReq {
+  uint32 season_id = 1;
+}
+
+message ZoneSetSeasonPopupRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneLightSeasonTalentPointReq {
+  uint32 point_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneLightSeasonTalentPointRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 material_cnt = 2;
+}
+
+message ZoneClearSeasonTalentPointReq {
+}
+
+message ZoneClearSeasonTalentPointRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 material_cnt = 2;
+}
+
+message ZoneGetSeasonTalentPointReq {
+}
+
+message ZoneGetSeasonTalentPointRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 material_cnt = 2;
+  repeated Next.SeasonPlayerGrowth light_growth_list = 3;
+}
+
+message ZoneGetUserSubscribeTplInfoReq {
+  repeated int32 tpl_type_list = 1;
+  int32 need_openlink = 2;
+}
+
+message UserSubscribeTplInfo {
+  int32 tpl_type = 1;
+  string tpl_id = 2;
+  int32 is_subscribed = 3;
+}
+
+message ZoneGetUserSubscribeTplInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.UserSubscribeTplInfo tpl_info_list = 2;
+  string openlink = 3;
+}
+
+message ZoneStarLightInfoNotify {
+  int32 increment_star_light_num = 1;
+  Next.PlayerStarLightInfo star_light_info = 2;
+  bool is_share_from_wild_no_battle = 3;
+}
+
+message ZoneWishingStarExchangeReq {
+}
+
+message ZoneWishingStarExchangeRsp {
+  Next.RetInfo ret_info = 1;
+  int32 exchange_num = 2;
+  Next.PlayerStarLightInfo star_light_info = 3;
+}
+
+message ZonePhotoAlbumUploadUrlReq {
+  int32 album_type = 1;
+  string photo_name = 2;
+}
+
+message ZonePhotoAlbumUploadUrlRsp {
+  Next.RetInfo ret_info = 1;
+  string url = 2;
+  string photo_name = 3;
+  int32 album_type = 4;
+  Next.BanInfo ban_info = 5;
+}
+
+message ZonePhotoAlbumDownloadUrlReq {
+  repeated string photo_list = 1;
+}
+
+message ZonePhotoAlbumDownloadUrlRsp {
+  message PhotoDownLoadInfo {
+    string photo_name = 1;
+    string url = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZonePhotoAlbumDownloadUrlRsp.PhotoDownLoadInfo download_list = 2;
+}
+
+message ZonePhotoAlbumPreviewReq {
+}
+
+message ZonePhotoAlbumPreviewRsp {
+  message PhotoFile {
+    string photo_name = 1;
+    string photo_md5 = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZonePhotoAlbumPreviewRsp.PhotoFile photo_list = 2;
+}
+
+message ZonePhotoAlbumDeleteReq {
+  repeated string photo_list = 1;
+}
+
+message ZonePhotoAlbumDeleteRsp {
+  Next.RetInfo ret_info = 1;
+  repeated string photo_list = 2;
+}
+
+message ZonePhotoAlbumUploadSuccessReq {
+  string photo_name = 1;
+  string photo_md5 = 2;
+}
+
+message ZonePhotoAlbumUploadSuccessRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBusinessCardUploadSuccessReq {
+  string photo_name = 1;
+}
+
+message ZoneBusinessCardUploadSuccessRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBusinessCardInfo business_card_info = 2;
+}
+
+message ZonePetTeamFriendGetListReq {
+  uint32 team_type = 1;
+  uint32 page_num = 2;
+  string filter = 3;
+}
+
+message ZonePetTeamFriendGetListRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 total_page = 2;
+  uint32 req_page = 3;
+  uint32 page_num = 4;
+  repeated Next.FriendPetTeamInfo pet_team_info = 5;
+  uint32 team_type = 6;
+  string filter = 7;
+}
+
+message ZonePetTeamFriendMirrorReq {
+  uint32 team_type = 1;
+  uint32 team_idx = 2;
+  uint32 target_uin = 3;
+  uint32 target_team_idx = 4;
+}
+
+message ZonePetTeamFriendMirrorRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BanInfo ban_info = 2;
+}
+
+message ZonePetTeamFriendGetMirrorPetDataReq {
+}
+
+message ZonePetTeamFriendGetMirrorPetDataRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetData mirror_pet_data = 2;
+}
+
+message ZoneGetFashionBondLastTabReq {
+}
+
+message ZoneGetFashionBondLastTabRsp {
+  Next.RetInfo ret_info = 1;
+  int32 last_fashionbond_tab = 2;
+}
+
+message ZoneSetFashionBondLastTabReq {
+  int32 last_fashionbond_tab = 1;
+}
+
+message ZoneSetFashionBondLastTabRsp {
+  Next.RetInfo ret_info = 1;
+  int32 last_fashionbond_tab = 2;
+}
+
+message ZoneGetPetReportInfosByPageReq {
+  int32 page_num = 1;
+}
+
+message ZoneGetPetReportInfosByPageRsp {
+  Next.RetInfo ret_info = 1;
+  int32 req_page = 2;
+  int32 tot_page = 3;
+  repeated Next.PetReportInfo pet_report_infos = 4;
+}
+
+message ZoneFinishPetReportReq {
+}
+
+message ZoneFinishPetReportRsp {
+  Next.RetInfo ret_info = 1;
+  int64 submit_pet_reward = 2;
+}
+
+message ZoneSceneWorldMapEntryInfoIncrNty {
+  int32 batch_id = 1;
+  int32 total_batch = 2;
+  Next.WorldMapEntries entries = 3;
+}
+
+message ZoneQueryNpcPetDataReq {
+  uint32 target_uin = 1;
+  uint32 target_pet_gid = 2;
+  uint64 target_pet_npc_id = 3;
+}
+
+message ZoneQueryNpcPetDataRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FriendRoleInfo player_info = 2;
+  dataconfig.PlayerRelationshipType relationship_type = 3;
+  Next.PetData target_pet_data = 4;
+  bool is_first_interact = 5;
+}
+
+message ZoneQueryGiftingEggTimesReq {
+  uint32 target_uin = 1;
+}
+
+message ZoneQueryGiftingEggTimesRsp {
+  Next.RetInfo ret_info = 1;
+  int32 times = 2;
+}
+
+message ZoneSceneGetFollowInfoReq {
+  int32 confirm_talk_id = 1;
+}
+
+message ZoneSceneGetFollowInfoRsp {
+  Next.RetInfo ret_info = 1;
+  int32 follow_id = 2;
+  int32 task_id = 3;
+  int32 new_state = 4;
+  int32 conf_id = 5;
+}
+
+message ZoneTogetherCatchPetForGiftingReq {
+  uint32 pet_gid = 1;
+  bool is_for_check = 2;
+}
+
+message ZoneTogetherCatchPetForGiftingRsp {
+  Next.RetInfo ret_info = 1;
+  bool is_for_check = 2;
+  uint32 pet_gid = 3;
+}
+
+message ZoneSecondaryPasswordGetInfoReq {
+}
+
+message ZoneSecondaryPasswordGetInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.SecondaryPasswordStatus status = 2;
+  uint32 status_timestamp = 3;
+  int32 default_free = 4;
+  int32 waiting_duration = 5;
+}
+
+message ZoneSecondaryPasswordUnsetNotify {
+}
+
+message ZoneSecondaryPasswordGetAuthInfoReq {
+}
+
+message ZoneSecondaryPasswordGetAuthInfoRsp {
+  Next.RetInfo ret_info = 1;
+  bytes salting = 2;
+  bytes public_key = 3;
+  bytes public_key_md5 = 4;
+  bytes sequence = 5;
+  Next.SecondaryPasswordStatus status = 6;
+  uint32 status_timestamp = 7;
+  int32 default_free = 8;
+  int32 waiting_duration = 9;
+}
+
+message ZoneSecondaryPasswordCheckReq {
+  Next.ZoneSecondaryPasswordAction action = 1;
+  bytes encode_secondary_password = 2;
+  bytes old_encode_secondary_password = 3;
+  int32 pass_action = 4;
+  bytes public_key_md5 = 5;
+  int32 default_free = 6;
+}
+
+message ZoneSecondaryPasswordCheckRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSecondaryPasswordForceDisableReq {
+  Next.ZoneSecondaryPasswordForceDisable action_type = 1;
+}
+
+message ZoneSecondaryPasswordForceDisableRsp {
+  Next.RetInfo ret_info = 1;
+  Next.ZoneSecondaryPasswordForceDisable action_type = 2;
+}
+
+message ZoneSecondaryPasswordCancelFreeReq {
+}
+
+message ZoneSecondaryPasswordCancelFreeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSecondaryPasswordActionCheckReq {
+  int32 action = 1;
+}
+
+message ZoneSecondaryPasswordActionCheckRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSecondaryPasswordNeedCheckNotify {
+}
+
+message ZoneSecondaryPasswordSetUnSetReq {
+}
+
+message ZoneSecondaryPasswordSetUnSetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSecondaryPasswordSetUnsetReq {
+}
+
+message ZoneSecondaryPasswordSetUnsetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneShareFormNotify {
+  repeated Next.ShareFormItem share_form_item = 1;
+}
+
+message ZoneShareFormExpireNotify {
+  repeated uint32 expire_ids = 1;
+}
+
+message ZoneGetShareFormInfoReq {
+  uint32 pet_id = 1;
+}
+
+message ZoneGetShareFormInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.ShareFormItem share_form_item = 2;
+}
+
+message ZoneChooseInheritPetReq {
+  uint32 pet_gid = 1;
+  uint32 activity_id = 2;
+  bool take_back = 3;
+}
+
+message ZoneChooseInheritPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneClaimNetbarRewardReq {
+  string ip = 1;
+  repeated string macs = 2;
+  string netbar_token = 3;
+}
+
+message ZoneClaimNetbarRewardRsp {
+  Next.RetInfo ret_info = 1;
+  int32 netbar_errcode = 2;
+}
+
+message ZoneGetRecommendPetTeamReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneGetRecommendPetTeamRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.RecommendPetTeamInfo recommend_pet_team = 2;
+}
+
+message ZoneChooseActivityFactionReq {
+  uint32 activity_id = 1;
+  dataconfig.ActivityFaction faction = 2;
+}
+
+message ZoneChooseActivityFactionRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRefreshMixActivityTaskReq {
+  uint32 activity_id = 1;
+  uint32 task_id = 2;
+}
+
+message ZoneRefreshMixActivityTaskRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerActivityInfo_ActivityData activity_data = 2;
+}
+
+message ZoneActivityFactionRankReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneActivityFactionRankRsp {
+  Next.RetInfo ret_info = 1;
+  Next.FactionRankInfo rank_info = 2;
+}
+
+message ZoneActivityUnlockAdvanceReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneActivityUnlockAdvanceRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneActivityPreHeatRewardReq {
+  uint32 activity_id = 1;
+  uint32 operate_type = 2;
+  uint32 section_id = 3;
+}
+
+message ZoneActivityPreHeatRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneActivityPetCertificationReq {
+  uint32 activity_id = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneActivityPetCertificationRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneConfirmLotteryRewardReq {
+  int32 lottery_item = 1;
+  uint64 trans_id = 2;
+}
+
+message ZoneConfirmLotteryRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneClientStartUpReq {
+  int32 cli_startup_channel = 1;
+}
+
+message ZoneClientStartUpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneRecycleFriendRidePetReq {
+  uint32 friend_uin = 1;
+}
+
+message ZoneSceneRecycleFriendRidePetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGetSimShareLuckyBagReq {
+}
+
+message ZoneGetSimShareLuckyBagRsp {
+  Next.RetInfo ret_info = 1;
+  string gift_code = 2;
+}
+
+message ZoneErrorCodeNotify {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneChoosePetPartnerReq {
+  uint32 pet_base_id = 1;
+  bool is_inherit = 2;
+  bool commit = 3;
+  bool miantain_expression = 4;
+  uint32 activity_id = 5;
+}
+
+message ZoneChoosePetPartnerRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneRewardSeasonAdventureChapterReq {
+  uint32 chapter_id = 1;
+}
+
+message ZoneRewardSeasonAdventureChapterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneUpgradeSeasonAdventureBadgeReq {
+}
+
+message ZoneUpgradeSeasonAdventureBadgeRsp {
+  Next.RetInfo ret_info = 1;
+  Next.SeasonAdventureBadge badge_info = 2;
+}
+
+message ZoneOpenSeasonAdventureReq {
+  uint32 chapter_id = 1;
+}
+
+message SeasonAdventureBadge {
+  uint32 badge_lvl = 1;
+  uint32 cur_progress = 2;
+  int32 full_progress = 3;
+}
+
+message ZoneOpenSeasonAdventureRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 season_id = 2;
+  uint32 chapter_id = 3;
+  bool rewarded = 4;
+  repeated Next.PlayerTaskInfo chapter_task_list = 5;
+  Next.SeasonAdventureBadge badge_info = 6;
+  repeated Next.PlayerSeasonAdventureChapter chapter_base_infos = 7;
+}
+
+message ZoneSceneSwitchLookAtTargetReq {
+  uint64 target_actor_id = 1;
+  bool enable = 2;
+}
+
+message ZoneSceneSwitchLookAtTargetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneNpcChallengeBattleChangeNty {
+  Next.NpcChallengeItem npc_challenge_item = 1;
+  Next.RetInfo ret_info = 2;
+}
+
+message ZonePetBoxLastOpenBoxReq {
+  int32 box_id = 1;
+}
+
+message ZonePetBoxLastOpenBoxRsp {
+  Next.RetInfo ret_info = 1;
+  int32 box_id = 2;
+}
+
+message ZonePetBoxUnlockReq {
+  int32 box_id = 1;
+}
+
+message ZonePetBoxUnlockRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PetBox box_info = 2;
+}
+
+message ZonePetBoxTidyReq {
+  int32 last_open_box_id = 1;
+}
+
+message ZonePetBoxTidyRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetBox box_info = 2;
+  int32 last_open_box_id = 3;
+}
+
+message ZonePetBoxChangePetReq {
+  Next.PetBoxPetChange ori_info = 1;
+  Next.PetBoxPetChange tar_info = 2;
+}
+
+message ZonePetBoxChangePetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetBoxSettingUpReq {
+  repeated int32 box_ids = 1;
+}
+
+message ZonePetBoxSettingUpRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetBox box_info = 2;
+}
+
+message ZonePetBoxSetMarkTypeReq {
+  int32 box_id = 1;
+  dataconfig.WarehouseMarkType mark_type = 2;
+  string box_name = 3;
+}
+
+message ZonePetBoxSetMarkTypeRsp {
+  Next.RetInfo ret_info = 1;
+  int32 box_id = 2;
+  dataconfig.WarehouseMarkType mark_type = 3;
+  string box_name = 4;
+}
+
+message ZonePetBoxMarkTypeUnlockNty {
+  int32 mark_type = 1;
+}
+
+message ZoneQueryPetBalancedAttrReq {
+  repeated uint32 gid = 1;
+  bool is_weekly_challenge = 2;
+}
+
+message ZoneQueryPetBalancedAttrRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PetData pet_data = 2;
+}
+
+message ZoneGetInviteUserListReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneGetInviteUserListRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.InvitedUser invited_users = 2;
+}
+
+message ZoneTotalPopularityValueReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneTotalPopularityValueRsp {
+  Next.RetInfo ret_info = 1;
+  int32 value = 2;
+}
+
+message ZoneSceneTeleportToPlayerReq {
+  uint32 uin = 1;
+  Next.TeleportToPlayerReason tele_reason = 2;
+}
+
+message ZoneSceneTeleportToPlayerRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 uin = 2;
+  Next.TeleportToPlayerReason tele_reason = 3;
+  Next.Point point = 4;
+}
+
+message ZoneGetTeachingTabReq {
+}
+
+message ZoneGetTeachingTabRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerTeachingTabInfo teaching_tab = 2;
+}
+
+message ZoneClaimTeachingRewardReq {
+  dataconfig.TeachingType teaching_type = 1;
+  int32 id = 2;
+}
+
+message ZoneClaimTeachingRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTriggerTeachingBattleReq {
+  dataconfig.TeachingType teaching_type = 1;
+  int32 id = 2;
+}
+
+message ZoneTriggerTeachingBattleRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneTypeAdvantageTeachingReadReq {
+  int32 id = 2;
+}
+
+message ZoneTypeAdvantageTeachingReadRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneQueryDownloadRewardsReq {
+}
+
+message ZoneQueryDownloadRewardsRsp {
+  message RewardItem {
+    int32 id = 1;
+    int32 num = 2;
+    dataconfig.GoodsType type = 3;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneQueryDownloadRewardsRsp.RewardItem items = 2;
+}
+
+message ZonePetTreeFirstInteractNty {
+  int32 pet_base_id = 1;
+  int32 fashion_bond_id = 2;
+}
+
+message ZoneActivityCommonRewardsReq {
+  uint32 activity_id = 1;
+  uint32 activity_sub_id = 2;
+  repeated int32 params = 3;
+}
+
+message ZoneActivityCommonRewardsRsp {
+  Next.RetInfo ret_info = 1;
+  repeated int32 params = 2;
+}
+
+message ZoneSelectMainTeamPetReq {
+  int32 gid = 1;
+}
+
+message ZoneSelectMainTeamPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSelectTeamBattleFlowerSeedBossReq {
+  uint32 uin = 1;
+  uint64 npc_logic_id = 2;
+}
+
+message ZoneSelectTeamBattleFlowerSeedBossRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 uin = 2;
+  uint64 npc_logic_id = 3;
+}
+
+message ZoneFinishExperienceCardPopupReq {
+  uint32 activity_id = 1;
+}
+
+message ZoneFinishExperienceCardPopupRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePetTogetherTaskNotify {
+  uint32 gid = 1;
+  int32 pet_status_flags = 2;
+  uint32 task_id = 3;
+}
+
+message ZoneUpdateFashionInfoNotify {
+  Next.PlayerAppearanceInfo_FashionInfo fashion_info = 1;
+}
+
+message ZoneSetUsingRpBehaviorReq {
+  repeated uint32 player_rp_behavior_using_list = 1;
+}
+
+message ZoneSetUsingRpBehaviorRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint32 player_rp_behavior_using_list = 2;
+}
+
+message ZoneSceneSyncPlayerStatusPreCheckReq {
+  Next.PlayerStatusSyncInfo sync_status_info = 1;
+}
+
+message ZoneSceneSyncPlayerStatusPreCheckRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneUpdateBagItemIdFlagReq {
+  repeated Next.PlayerBagItemIdFlagInfo bag_item_id_flags = 1;
+}
+
+message ZoneUpdateBagItemIdFlagRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBagItemIdFlagList bag_item_id_flags = 2;
+}
+
+message ZoneGetBagItemIdFlagReq {
+}
+
+message ZoneGetBagItemIdFlagRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBagItemIdFlagList bag_item_id_flags = 2;
+}
+
+message ZoneTokenInvalidNotify {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZonePlayerSeasonAdvBadgeEffectNotify {
+  uint32 badge_lvl = 1;
+  uint32 season_adv_prob_add = 2;
+  uint32 season_adv_shining_extra_weight = 3;
+}

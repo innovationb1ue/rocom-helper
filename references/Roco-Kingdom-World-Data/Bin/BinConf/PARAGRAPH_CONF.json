@@ -1,0 +1,116 @@
+{
+    "Name": "PARAGRAPH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "sorthels",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unit_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "paragraph_order",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "plot_name",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "plot_paragraph_order",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "show_task_start",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "title",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "title_new",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sub_disappear",
+            "Type": "EBool",
+            "Offset": 33,
+            "Size": 1
+        },
+        {
+            "Name": "is_hide_paragraph",
+            "Type": "EBool",
+            "Offset": 34,
+            "Size": 1
+        },
+        {
+            "Name": "description",
+            "Type": "EString",
+            "Offset": 35,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "description_new",
+            "Type": "EString",
+            "Offset": 39,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "paragraph_background",
+            "Type": "EString",
+            "Offset": 43,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Reward",
+            "Type": "EUint32",
+            "Offset": 47,
+            "Size": 4
+        },
+        {
+            "Name": "is_map_task",
+            "Type": "EBool",
+            "Offset": 51,
+            "Size": 1
+        },
+        {
+            "Name": "season_task",
+            "Type": "EBool",
+            "Offset": 52,
+            "Size": 1
+        }
+    ]
+}

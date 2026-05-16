@@ -1,0 +1,75 @@
+{
+    "Name": "HABITAT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "mid_position",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "belong_camp",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "common_unit_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "common_role_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "relevance",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "HABITAT_CONF.relevance",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "other_habitat_id",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "distance",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "relation",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

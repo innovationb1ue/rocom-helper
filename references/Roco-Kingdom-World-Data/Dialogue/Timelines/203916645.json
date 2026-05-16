@@ -1,0 +1,179 @@
+{
+    "length": 15.5,
+    "dialogue_id": 203916645,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 20738,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": 4.4,
+            "EndTime": 5.4,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "SkipUserClick": false,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": -403.4,
+                "Y": 595.4,
+                "Z": 20.8
+            },
+            "RelativeRotation": {
+                "Pitch": 11.8,
+                "Yaw": 130.9,
+                "Roll": 0.0
+            },
+            "FOV": 80.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 20719,
+            "StartTime": 0.0,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 0,
+            "HeadTurnTo": 0.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 1.0,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 20719,
+            "StartTime": 0.0,
+            "EndTime": 4.0,
+            "MinimalDuration": 0.1,
+            "Action": "Dialogue1",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraMoveState_Parallel",
+            "Name": "\u5e73\u79fb\u8fd0\u955c",
+            "OwnerActorID": -101,
+            "StartTime": 4.4,
+            "EndTime": 15.9,
+            "MinimalDuration": 0.1,
+            "MoveDistance": 20.0,
+            "MoveDirection": 0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "\u81ea\u7531\u955c\u5934",
+            "OwnerActorID": -101,
+            "StartTime": -0.3,
+            "EndTime": 0.7,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "SkipUserClick": false,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": 430.5,
+                "Y": -944.4,
+                "Z": 283.5
+            },
+            "RelativeRotation": {
+                "Pitch": -12.0,
+                "Yaw": 114.5,
+                "Roll": 0.0
+            },
+            "FOV": 80.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraMoveState_Parallel",
+            "Name": "\u5e73\u79fb\u8fd0\u955c",
+            "OwnerActorID": -101,
+            "StartTime": -0.2,
+            "EndTime": 11.9,
+            "MinimalDuration": 0.1,
+            "MoveDistance": 20.0,
+            "MoveDirection": 1
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 20719,
+            "StartTime": 4.0,
+            "EndTime": 9.3,
+            "MinimalDuration": 0.1,
+            "Action": "Dialogue2",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "\u52a8\u4f5c",
+            "OwnerActorID": 20719,
+            "StartTime": 9.3,
+            "EndTime": 14.2,
+            "MinimalDuration": 0.1,
+            "Action": "Dialogue3",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 20719,
+            "StartTime": 8.8,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 0,
+            "HeadTurnTo": 20.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 0.5,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetupAction",
+            "Name": "\u671d\u5411",
+            "OwnerActorID": 20719,
+            "StartTime": 3.9,
+            "BodyTargetActorID": 0,
+            "BodyTurnTo": 0.0,
+            "BodyTurnSpeedScale": 1.0,
+            "HeadTargetActorID": 0,
+            "HeadTurnTo": -30.0,
+            "HeadTurnToY": 0.0,
+            "HeadTurnSpeedScale": 0.5,
+            "EyeTargetActorID": 0,
+            "EyeTurnToHorizontal": 0.0,
+            "EyeTurnToVertical": 0.0,
+            "EyeTurnSpeedScale": 1.0
+        }
+    ]
+}

@@ -1,0 +1,192 @@
+{
+    "Name": "ACTIVITY_TREASURE_HUNT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "subitem_image_path",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "subitem_unlock_image_path",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "subitem_name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "appear_time",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "lock_time",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "top_up_text",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "area_polygon_id",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "radius",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "world_map_activity_conf_id",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "text1",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "limit_pet",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "text2",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "text3",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "text4",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "option_action_type",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "option_action_param1",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "option_action_param2",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "option_action_param3",
+            "Type": "EUint32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "task_id",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "content_id",
+            "Type": "EUint32",
+            "Offset": 84,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "effect_group",
+            "Type": "EStruct",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "ACTIVITY_TREASURE_HUNT_CONF.effect_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "dis2D_over",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "dis2D_less",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "play_G6",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "if_show_content",
+                        "Type": "EBool",
+                        "Offset": 12,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

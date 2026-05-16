@@ -1,0 +1,76 @@
+{
+    "Name": "BONUS_EVENT_ACCU_POOL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "accumulate_type",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "priority",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "max_count",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "accu_times",
+            "Type": "EStruct",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "BONUS_EVENT_ACCU_POOL_CONF.accu_times",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "accu_trig_times",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "accutrig_prob",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "is_not_change",
+                        "Type": "EBool",
+                        "Offset": 8,
+                        "Size": 1
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "trig_times",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "trig_prob",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,100 @@
+{
+	"Desc": "2v2的2号宠物选招",
+	"TargetA": 6,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -10,
+		"Z": -50
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 40,
+		"Z": -40
+	},
+	"SprintArmLength": 800,
+	"CameraFov": 85,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CameraCurve":
+	{
+		"1":
+		{
+			"Duration": 0.5,
+			"Curve": 0
+		},
+		"5":
+		{
+			"Duration": 0.5,
+			"Curve": 0
+		}
+	},
+	"CurvesArray": [
+		{
+			"IsEnable": true,
+			"TargetCameraId": 6,
+			"Duration": 0.29999999999999999,
+			"CameraName": "技能的摄像机位置",
+			"CurveId": 4
+		}
+	],
+	"ControllerArray": [
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": -4,
+				"Y": 4
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -100,
+				"Y": 100
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -50,
+				"Y": 50
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": -25,
+				"Y": 25
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 30,
+				"Y": -80
+			},
+			"Desc": "none"
+		}
+	]
+}

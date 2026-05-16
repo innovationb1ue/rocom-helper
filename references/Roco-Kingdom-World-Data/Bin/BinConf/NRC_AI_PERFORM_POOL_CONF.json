@@ -1,0 +1,316 @@
+{
+    "Name": "NRC_AI_PERFORM_POOL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ai_rand_method",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "param1",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "pool_number",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "ai_perform_group_1",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_1",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_1",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "ai_perform_group_2",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_2",
+            "Type": "EStruct",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_2",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "ai_perform_group_3",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_3",
+            "Type": "EStruct",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_3",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "ai_perform_group_4",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_4",
+            "Type": "EStruct",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_4",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "ai_perform_group_5",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_5",
+            "Type": "EStruct",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_5",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "ai_perform_group_6",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "ai_group_param_6",
+            "Type": "EStruct",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "NRC_AI_PERFORM_POOL_CONF.ai_group_param_6",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "ai_group",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ai_group_role_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ai_group_priority",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

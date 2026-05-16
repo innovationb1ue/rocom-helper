@@ -1,0 +1,55 @@
+{
+    "Name": "AI_MODEL_WARM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "nrc_ai_model",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "warm_action_probs_threshold",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "warm_control_attack_ratio",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "warm_control_energy_thr",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "warm_control_attack_th",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "warm_control_restraint_pet",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "warm_control_hurt_thr",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        }
+    ]
+}

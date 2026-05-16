@@ -1,0 +1,154 @@
+{
+    "Name": "AREA_HANDBOOK",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "area_handbook_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "enter_ban_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "collected_red_point_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "topic_red_point_id",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "count_reward_handbook_red_point_id",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bg_name",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cover_res",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cover_open_btn",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cover_open_btn_bg",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "inside_open_btn",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "collect_reward_res",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "not_collect_node_res",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "not_collect_node_bar",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "collect_node_res",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bottom_cover_res",
+            "Type": "EString",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "trophy_res",
+            "Type": "EString",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "book_res",
+            "Type": "EString",
+            "Offset": 76,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "fruit_tree_wakeup",
+            "Type": "EString",
+            "Offset": 80,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

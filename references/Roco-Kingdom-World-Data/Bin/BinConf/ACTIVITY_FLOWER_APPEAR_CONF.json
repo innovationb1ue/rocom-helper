@@ -1,0 +1,67 @@
+{
+    "Name": "ACTIVITY_FLOWER_APPEAR_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "flower_group",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "ACTIVITY_FLOWER_APPEAR_CONF.flower_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "petbase_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "seed_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "img",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "img_preview",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "appear_task_id",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "activity_option_id",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,104 @@
+{
+    "Name": "TYPE_ADVANTAGE_TEACH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "type_display_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_icon_resource",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_advantage_resource",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_advantage_depict",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "list_order",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "should_count_different_evo_chain",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "type_advantage_unlock_type",
+            "Type": "EInt32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "type_advantage_unlock_type_param1",
+            "Type": "EInt32",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "type_advantage_unlock_type_param2",
+            "Type": "EInt32",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "unlock_display",
+            "Type": "EString",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_battle_display_name",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_display",
+            "Type": "EString",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_advantage_train",
+            "Type": "EUint32",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

@@ -1,0 +1,54 @@
+{
+    "Name": "MEGAMAP_CLASS_NAME_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "class",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "res_class",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "MEGAMAP_CLASS_NAME_CONF.res_class",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "class_id",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "class_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

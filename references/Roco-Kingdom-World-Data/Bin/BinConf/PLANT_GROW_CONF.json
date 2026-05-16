@@ -1,0 +1,251 @@
+{
+    "Name": "PLANT_GROW_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "plant_tab",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "plant_harvest",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "home_lv",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "plant_grow_grade",
+            "Type": "EStruct",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "PLANT_GROW_CONF.plant_grow_grade",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "plant_vitem_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "plant_vitem_value",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "vitem_type_get",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "vitem_type_get_value",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "harvest_vitem_type_get",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "harvest_vitem_type_get_value",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "water_reduce_plant_grow_time_para",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "water_continue_max_time_para",
+                        "Type": "EUint32",
+                        "Offset": 28,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "water_reduce_limit_percent_para",
+                        "Type": "EUint32",
+                        "Offset": 32,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "manure_add_harvest_percent",
+                        "Type": "EUint32",
+                        "Offset": 36,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "manure_cd",
+                        "Type": "EUint32",
+                        "Offset": 40,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "model_scale",
+                        "Type": "EInt32",
+                        "Offset": 44,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "plant_grow",
+                        "Type": "EStruct",
+                        "Offset": 48,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "ArrayDim": 2,
+                        "Struct": {
+                            "Name": "PLANT_GROW_CONF.plant_grow_grade.plant_grow",
+                            "Type": "EStruct",
+                            "Properties": [
+                                {
+                                    "Name": "plant_stage",
+                                    "Type": "EInt32",
+                                    "Offset": 0,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "plant_npc_refresh_id",
+                                    "Type": "EInt32",
+                                    "Offset": 4,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "plant_stage_time",
+                                    "Type": "EInt32",
+                                    "Offset": 8,
+                                    "Size": 4
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Name": "plant_reap_num",
+                        "Type": "EInt32",
+                        "Offset": 52,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "plant_reap_percent",
+                        "Type": "EInt32",
+                        "Offset": 56,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "plant_harvest_standard",
+                        "Type": "EInt32",
+                        "Offset": 60,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "steal_same_plant_num_max",
+                        "Type": "EUint32",
+                        "Offset": 64,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "steal_plant_expectation",
+                        "Type": "EStruct",
+                        "Offset": 68,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "ArrayDim": 2,
+                        "Struct": {
+                            "Name": "PLANT_GROW_CONF.plant_grow_grade.steal_plant_expectation",
+                            "Type": "EStruct",
+                            "Properties": [
+                                {
+                                    "Name": "steal_plant_num",
+                                    "Type": "EUint32",
+                                    "Offset": 0,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "steal_plant_num_per",
+                                    "Type": "EUint32",
+                                    "Offset": 4,
+                                    "Size": 4
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Name": "steal_same_plant_harvest_num_max",
+                        "Type": "EUint32",
+                        "Offset": 72,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "steal_plant_harvest_expectation",
+                        "Type": "EStruct",
+                        "Offset": 76,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "ArrayDim": 3,
+                        "Struct": {
+                            "Name": "PLANT_GROW_CONF.plant_grow_grade.steal_plant_harvest_expectation",
+                            "Type": "EStruct",
+                            "Properties": [
+                                {
+                                    "Name": "steal_plant_harvest_num",
+                                    "Type": "EUint32",
+                                    "Offset": 0,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "steal_plant_harvest_num_per",
+                                    "Type": "EUint32",
+                                    "Offset": 4,
+                                    "Size": 4
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "Name": "get_star_light_value_owner",
+                        "Type": "EUint32",
+                        "Offset": 80,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "get_star_light_value_visitor",
+                        "Type": "EUint32",
+                        "Offset": 84,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

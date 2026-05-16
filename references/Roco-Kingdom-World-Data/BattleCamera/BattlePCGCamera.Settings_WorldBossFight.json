@@ -1,0 +1,11 @@
+[{"MinDist":550,"Height":10,"XOffset":0,"Degrees":25,"Use":1,"ScreenDist":0.5,"FOV":75,"YOffset":0},
+{"MinDist":550,"Height":10,"XOffset":0,"Degrees":15,"Use":1,"ScreenDist":0.5,"FOV":75,"YOffset":0},
+{"MinDist":550,"Height":20,"XOffset":0,"Degrees":25,"Use":1,"ScreenDist":0.5,"FOV":75,"YOffset":0},
+{"MinDist":350,"Height":10,"XOffset":0,"Degrees":35,"Use":1,"ScreenDist":0.35,"FOV":75,"YOffset":0},
+{"MinDist":550,"BodyTypeOverride":{"Smaller":{"Height":5,"FOV":70,"Degrees":60},
+"Larger":{"Height":5,"FOV":80,"Degrees":60}},"ScreenDist":0.45,"FOV":70,"Height":5,"Degrees":60,"Use":1,"Time":0.3,"XOffset":0,"YOffset":0},
+{"MinDist":550,"BodyTypeOverride":{"Smaller":{"Height":5,"FOV":70,"Degrees":55},
+"Larger":{"Height":5,"FOV":80,"Degrees":55}},"ScreenDist":0.42,"FOV":70,"Height":5,"Degrees":55,"Use":1,"Time":0.3,"XOffset":0,"YOffset":0},
+{"MinDist":550,"BodyTypeOverride":{"Smaller":{"Height":0,"FOV":70,"Degrees":30},"Larger":{"Height":0,"FOV":80,"Degrees":30}},"ScreenDist":0.35,"FOV":70,"Height":0,"Degrees":30,"Use":1,"Time":0.3,"XOffset":0,"YOffset":0},
+{"MinDist":550,"BodyTypeOverride":{"Smaller":{"Height":10,"FOV":70,"Degrees":45},"Larger":{"Height":3,"FOV":80,"Degrees":48}},"ScreenDist":0.4,"FOV":80,"Height":3,"Degrees":48,"Use":1,"Time":0.3,"XOffset":0,"YOffset":0},
+{"MinDist":550,"ScreenDist":0.35,"FOV":75,"Height":20,"Degrees":45,"Use":1,"Time":0.3,"XOffset":0,"YOffset":0},{"EnemyFocusDist":0.9,"SelfFocusDist":0.7,"FOV":90,"XOffset":0,"YOffset":0}]

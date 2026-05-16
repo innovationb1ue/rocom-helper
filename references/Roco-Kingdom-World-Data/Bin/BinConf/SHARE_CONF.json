@@ -1,0 +1,129 @@
+{
+    "Name": "SHARE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "login_required",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "login_channel",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "login_plat",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "share_type",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "system_control_limit",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "qrcode_scenario",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "qrcode_link",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "share_pattern",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "share_icon",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unsuccess_tip",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "package_name_android",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "package_name_ios",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "package_name_harmony",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pkg_channel_list",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "button_area",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

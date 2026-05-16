@@ -1,0 +1,155 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_scene.proto";
+
+enum MapMarkOpType {
+  MMOT_NONE = 0;
+  MMOT_ADD_MARK = 1;
+  MMOT_REMOVE_MARK = 2;
+  MMOT_MODIFY_MARK = 3;
+}
+
+enum NavigationModeType {
+  NMT_NONE = 0;
+  NMT_MINIMAP = 1;
+  NMT_COMPASS = 2;
+}
+
+message MapMarkInfo {
+  int32 mark_number = 1;
+  Next.Position pos = 2;
+}
+
+message LayeredWorldMapExploreInfoOne {
+  uint32 npc_id = 1;
+  uint32 belong_camp = 2;
+  int32 explore_num = 3;
+  int32 total_num = 4;
+}
+
+message LayeredWorldMapExploreInfo {
+  repeated Next.LayeredWorldMapExploreInfoOne explore_infos = 1;
+}
+
+message LockStatus {
+  enum ENUM {
+    NONE = 0;
+    LOCKED = 1;
+    UNLOCKED = 2;
+    DUNGEON_FINISH = 3;
+  }
+}
+
+message WorldMapSyncInterruptReason {
+  enum ENUM {
+    TickTimeout = 1;
+  }
+}
+
+message WorldMapEntryType {
+  enum ENUM {
+    MySelf = 1;
+    BText = 2;
+    Npc = 4;
+    Area = 8;
+    SceneEvent = 16;
+    Mark = 32;
+  }
+}
+
+message WorldMapPetStatus {
+  enum ENUM {
+    NotMet = 1;
+    Fought = 2;
+    Caught = 3;
+  }
+}
+
+message WorldMapMarkType {
+  enum ENUM {
+    None = 0;
+    NormalMark = 1;
+    PetMark = 2;
+  }
+}
+
+message WorldMapNpcInfo {
+  uint64 npc_logic_id = 1;
+  int32 npc_cfg_id = 2;
+  int32 npc_refresh_id = 3;
+  Next.Position npc_pos = 4;
+  int32 npc_level = 6;
+  int32 npc_remain_time = 7;
+  int32 status = 8;
+  uint64 create_avatar_id = 9;
+  string create_avatar_name = 10;
+  int32 layer_id = 11;
+}
+
+message WorldMapPetInfo {
+  int32 petbase_cfg_id = 1;
+  int32 pet_status = 2;
+}
+
+message WorldMapEntry_Npc {
+  int32 world_map_cfg_id = 1;
+  repeated Next.WorldMapNpcInfo world_map_npc_infos = 2;
+  uint32 next_npc_refresh_time = 3;
+  Next.Position pos = 4;
+  Next.GlassInfo glass_info = 5;
+  int32 mutation_type = 6;
+}
+
+message WorldMapEntry_Area {
+  int32 world_map_cfg_id = 1;
+  bool have_explored = 2;
+}
+
+message WorldMapEntry_SceneEvent {
+  Next.SceneEventInfo event_info = 1;
+}
+
+message WorldMapEntry_Task {
+  uint32 task_id = 1;
+  repeated Next.Position pos = 2;
+}
+
+message WorldMapEntry_BText {
+  int32 world_map_cfg_id = 1;
+  repeated Next.WorldMapPetInfo pet_infos = 2;
+}
+
+message WorldMapEntry_Mark {
+  int32 mark_id = 1;
+  Next.WorldMapMarkType.ENUM type = 2;
+  int32 world_map_cfg_id = 3;
+  string name = 4;
+  bool is_track = 5;
+  Next.Position pos = 6;
+  int32 layer_id = 7;
+  int32 scene_id = 8;
+}
+
+message WorldMapEntry {
+  message WorldMapEntry_MySelf {
+  }
+  Next.WorldMapEntryType.ENUM entry_type = 1;
+  uint64 entry_id = 2;
+  Next.WorldMapEntry.WorldMapEntry_MySelf myself_entry_info = 6;
+  Next.WorldMapEntry_BText btext_entry_info = 7;
+  Next.WorldMapEntry_Npc npc_entry_info = 8;
+  Next.WorldMapEntry_Area area_entry_info = 9;
+  Next.WorldMapEntry_SceneEvent scene_event = 10;
+  Next.WorldMapEntry_Task task_entry_info = 11;
+  Next.WorldMapEntry_Mark mark_entry_info = 12;
+}
+
+message WorldMapEntries {
+  repeated Next.WorldMapEntry entry_infos = 1;
+}
+
+message WorldMapAutoTrackNpcInfo {
+  uint64 npc_logic_id = 1;
+  Next.Position pos = 2;
+}

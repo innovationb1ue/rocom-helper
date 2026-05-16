@@ -1,0 +1,25 @@
+{
+    "Name": "ROLE_WORLD_LEVEL_MAP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "list_type",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "grade_num",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

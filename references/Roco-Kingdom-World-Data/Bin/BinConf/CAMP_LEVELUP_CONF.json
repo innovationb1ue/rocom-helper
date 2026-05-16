@@ -1,0 +1,143 @@
+{
+    "Name": "CAMP_LEVELUP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "content_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "level",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "pet_fruit_num",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "levelup_cost_item_type",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "levelup_cost_item_id",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "levelup_cost_item_num",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "levelup_reward",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "travel_time",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "lay_chance",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "extra_lay_chance",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "reward_item",
+            "Type": "EStruct",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "CAMP_LEVELUP_CONF.reward_item",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "reward_item_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_item_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_item_num",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "extra_reward_item_num",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "regional_division",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "travel_goal",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "is_travel_vaild",
+            "Type": "EBool",
+            "Offset": 60,
+            "Size": 1
+        },
+        {
+            "Name": "travel_destination_des",
+            "Type": "EString",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

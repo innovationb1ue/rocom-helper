@@ -1,0 +1,15 @@
+package Next;
+
+message StoryFlagChangeType {
+  enum ENUM {
+    Add = 1;
+    Delete = 2;
+    Set = 3;
+  }
+}
+
+message PlayerStoryFlagInfo {
+  int32 version = 1;
+  repeated int32 story_flags = 2;
+  repeated int32 cached_story_flags = 3;
+}

@@ -1,0 +1,131 @@
+{
+    "Name": "ACTIVITY_REWARD_BY_STAGE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "end_time",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "duration_time",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "bIsRecallActivity",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "required_group",
+            "Type": "EStruct",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "ACTIVITY_REWARD_BY_STAGE_CONF.required_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "required_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "required_param",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "image_path",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "petbase_id",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_text",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "next_tips_text",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disposable_reward_id",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "reward_group",
+            "Type": "EStruct",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "ACTIVITY_REWARD_BY_STAGE_CONF.reward_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "reward_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "unlock_day",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "lock_icon",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

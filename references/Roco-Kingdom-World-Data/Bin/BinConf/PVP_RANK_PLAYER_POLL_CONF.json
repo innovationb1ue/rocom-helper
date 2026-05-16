@@ -1,0 +1,85 @@
+{
+    "Name": "PVP_RANK_PLAYER_POLL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_score_min",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_score",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "max_score",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_fight_num_robot",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_fight_win_num_robot",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_fight_num",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "new_player_fight_win_num",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "player_pet",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "player_change_pet",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "player_skill",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "deduction_day",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "deduction_time",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        }
+    ]
+}

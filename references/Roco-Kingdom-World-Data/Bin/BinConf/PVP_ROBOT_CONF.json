@@ -1,0 +1,61 @@
+{
+    "Name": "PVP_ROBOT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "star_total_range",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "losing_streak",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8
+        },
+        {
+            "Name": "battle_before_num",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "ai_model_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "new_day_percent_robot",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_type",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "medal_is_open",
+            "Type": "EBool",
+            "Offset": 28,
+            "Size": 1
+        }
+    ]
+}

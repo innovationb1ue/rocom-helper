@@ -1,0 +1,238 @@
+{
+    "Name": "DUNGEON_STAGE",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "dungeon_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "stage_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "has_stage_finish_ui",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "start_condition",
+            "Type": "EStruct",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "DUNGEON_STAGE.start_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data3",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "start_action",
+            "Type": "EStruct",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "DUNGEON_STAGE.start_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "finish_condition",
+            "Type": "EStruct",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "DUNGEON_STAGE.finish_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data3",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "finish_action",
+            "Type": "EStruct",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "DUNGEON_STAGE.finish_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "stage_content",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "stage_combination",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "reset_type",
+            "Type": "EInt32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "revive_point",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "version",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,71 @@
+{
+	"Desc": "A1最终战-P2-表演技能",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": 10,
+		"Z": -22
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 275,
+		"Z": 200
+	},
+	"SprintArmLength": 1225,
+	"CameraFov": 85,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CurvesArray": [
+		{
+			"IsEnable": true,
+			"TargetCameraId": 1,
+			"Duration": 0.29999999999999999,
+			"CameraName": "捕捉机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 3,
+			"Duration": 0.29999999999999999,
+			"CameraName": "道具对友机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 5,
+			"Duration": 0.29999999999999999,
+			"CameraName": "换宠机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 9,
+			"Duration": 0.69999999999999996,
+			"CameraName": "技能表演机位",
+			"CurveId": 1
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 6,
+			"Duration": 0.29999999999999999,
+			"CameraName": "技能的摄像机位置",
+			"CurveId": 4
+		}
+	],
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 200
+			},
+			"Desc": ""
+		}
+	]
+}

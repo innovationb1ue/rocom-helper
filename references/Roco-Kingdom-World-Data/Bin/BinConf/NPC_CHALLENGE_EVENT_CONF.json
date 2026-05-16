@@ -1,0 +1,116 @@
+{
+    "Name": "NPC_CHALLENGE_EVENT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "topic",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "period",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "rule",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_set",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "star_reward",
+            "Type": "EStruct",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 12,
+            "Struct": {
+                "Name": "NPC_CHALLENGE_EVENT_CONF.star_reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "star_required",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "show_reward",
+            "Type": "EStruct",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "NPC_CHALLENGE_EVENT_CONF.show_reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "item_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "item_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "item_count",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,59 @@
+{
+    "Name": "BAN_ACTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "type",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "allow_list",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 30,
+            "Struct": {
+                "Name": "BAN_ACTION_CONF.allow_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "allowed_list",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "banned_cond_list",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "BAN_ACTION_CONF.banned_cond_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "banned_list",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

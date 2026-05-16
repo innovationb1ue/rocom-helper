@@ -1,0 +1,89 @@
+{
+    "Name": "PET_BEHAVIOR_REACTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "reaction_random",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "PET_BEHAVIOR_REACTION_CONF.reaction_random",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "behavior_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "behavior_ids",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "reaction_ai",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "weight",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "home_reaction_ai",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "home_reaction_weight",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "friend_reaction_fix_value",
+                        "Type": "EInt32",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "stranger_reaction_fix_value",
+                        "Type": "EInt32",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

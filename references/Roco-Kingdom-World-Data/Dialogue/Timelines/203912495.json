@@ -1,0 +1,446 @@
+{
+    "length": -0.14,
+    "dialogue_id": 203912495,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": true,
+    "cached_dialogue_npc_id": 20662,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "显示对话UI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraSetupEvent_FreeCamera",
+            "Name": "自由镜头",
+            "OwnerActorID": -101,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "BlendType": 1,
+            "BlendExp": 1.0,
+            "SkipUserClick": false,
+            "TargetActorID": -6,
+            "RelativeLocation": {
+                "X": 831.6,
+                "Y": 182.3,
+                "Z": 55.9
+            },
+            "RelativeRotation": {
+                "Pitch": 1.0,
+                "Yaw": 163.6,
+                "Roll": 0.0
+            },
+            "FOV": 80.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSayState",
+            "Name": "角色说话",
+            "OwnerActorID": 0,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "PlayFacialAnim": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430021,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 576.0,
+                "Y": 567.0,
+                "Z": -53.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -102.2,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430022,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 459.0,
+                "Y": 536.0,
+                "Z": -58.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -64.1,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430023,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 46.0,
+                "Y": 533.0,
+                "Z": -49.4,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -109.1,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430024,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 223.0,
+                "Y": 637.0,
+                "Z": -53.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -107.9,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430025,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 171.0,
+                "Y": -657.0,
+                "Z": -53.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 144.8,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430026,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 175.0,
+                "Y": 200.0,
+                "Z": -49.4,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -166.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430027,
+            "StartTime": -0.1,
+            "TargetLocation": {
+                "X": 539.0,
+                "Y": -551.0,
+                "Z": -53.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 160.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430028,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 330.9,
+                "Y": 211.1,
+                "Z": -53.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -140.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430029,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 509.0,
+                "Y": 259.4,
+                "Z": -59.1,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -168.3,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430030,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 406.0,
+                "Y": -106.0,
+                "Z": -53.2,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 151.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430036,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": -59.0,
+                "Y": -511.0,
+                "Z": -49.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 81.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 20625,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 465.0,
+                "Y": -277.0,
+                "Z": -53.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 149.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 20626,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 434.0,
+                "Y": -400.0,
+                "Z": -53.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 143.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 20663,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 176.0,
+                "Y": -183.0,
+                "Z": -49.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 160.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 430020,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 67.0,
+                "Y": -236.0,
+                "Z": -49.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 87.1,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": 20751,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 85.0,
+                "Y": -468.0,
+                "Z": -49.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 117.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": -2,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 0.0,
+                "Y": 0.0,
+                "Z": -49.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": 0.0,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSetLocationEvent",
+            "Name": "设置位置",
+            "OwnerActorID": -1,
+            "StartTime": -0.14,
+            "TargetLocation": {
+                "X": 747.0,
+                "Y": 246.0,
+                "Z": -51.0,
+                "Base": "Mesh"
+            },
+            "TargetRotation": {
+                "Pitch": 0.0,
+                "Yaw": -173.6,
+                "Roll": 0.0
+            },
+            "ReportLocation": false,
+            "PinOnGround": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "动作",
+            "OwnerActorID": 430028,
+            "StartTime": 0.0,
+            "EndTime": 4.0,
+            "MinimalDuration": 0.1,
+            "Action": "watchout",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "动作",
+            "OwnerActorID": 430029,
+            "StartTime": 0.0,
+            "EndTime": 6.4,
+            "MinimalDuration": 0.1,
+            "Action": "think",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCActorAnimAction",
+            "Name": "动作",
+            "OwnerActorID": 430028,
+            "StartTime": 5.7,
+            "EndTime": 8.366666746139526,
+            "MinimalDuration": 0.1,
+            "Action": "handonchin",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": -1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": false
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraMoveState_Parallel",
+            "Name": "平移运镜",
+            "OwnerActorID": -101,
+            "StartTime": 0.0,
+            "EndTime": 4.2,
+            "MinimalDuration": 0.1,
+            "MoveDistance": 10.0,
+            "MoveDirection": 1
+        }
+    ]
+}

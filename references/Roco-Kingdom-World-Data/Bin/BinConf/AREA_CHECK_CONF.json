@@ -1,0 +1,56 @@
+{
+    "Name": "AREA_CHECK_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "desc",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "area_id",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "area_radius",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "param1_in",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "param2_in",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "param1_out",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "param2_out",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        }
+    ]
+}

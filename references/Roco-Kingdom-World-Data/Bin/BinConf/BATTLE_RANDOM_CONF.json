@@ -1,0 +1,39 @@
+{
+    "Name": "BATTLE_RANDOM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "battle",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "BATTLE_RANDOM_CONF.battle",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "battle_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "prob",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

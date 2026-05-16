@@ -1,0 +1,73 @@
+package Next;
+
+import "xls_enum.proto";
+import "com_base_types.proto";
+import "com_pet.proto";
+
+message PetEggData {
+  Next.PetEggBrief egg_brief = 15;
+  Next.PetEggCore egg_core = 16;
+}
+
+message PetEggBrief {
+  uint32 conf_id = 1;
+  uint32 height = 2;
+  uint32 weight = 3;
+  uint32 hatched_secs = 4;
+  uint32 last_hatch_update_sec = 5;
+  uint32 max_hatched_secs = 6;
+  uint32 start_hatch_time = 9;
+  dataconfig.EggAcquireWayType src = 10;
+  bool is_precious = 11;
+  string from_player_name = 13;
+  string from_pet_name = 14;
+  uint32 from_player_uin = 15;
+  uint32 from_pet_gid = 16;
+  uint32 random_egg_conf = 17;
+  uint32 mutation_type = 18;
+  Next.GlassInfo glass_info = 19;
+  repeated dataconfig.SkillDamType skill_dam_type = 20;
+  dataconfig.PreciousEggType precious_egg_type = 21;
+  uint32 ball_id = 22;
+  uint32 egg_piece_id = 23;
+}
+
+message PetEggCore {
+  uint32 blood_id = 1;
+  uint32 nature = 2;
+  repeated uint32 break_enhance_enum = 3;
+  uint32 speciality_id = 4;
+  uint32 egg_conf = 5;
+  uint32 mutation_type = 6;
+  Next.GlassInfo glass_info = 7;
+  repeated Next.PetEggAttributeValue attr_list = 8;
+  int32 voice = 9;
+  uint32 pet_info_id = 10;
+  bytes name = 11;
+  uint32 gender = 12;
+  uint32 nature_attr_id = 13;
+  Next.PetNatureAttrChangeWay nature_attr_change_way = 14;
+  Next.ActivityPartnerPetData activity_partner_pet_data = 15;
+  int32 goods_second_reason = 16;
+  dataconfig.PetNameSource name_src = 17;
+}
+
+message PetEggAttributeValue {
+  dataconfig.AttributeType attr_type = 1;
+  int32 attr_value = 2;
+}
+
+message PetEggCoreRecord {
+  uint32 egg_gid = 1;
+  Next.PetEggCore egg_core = 2;
+}
+
+message GiftEggInfo {
+  uint32 friend_uin = 1;
+  int32 gift_times = 2;
+}
+
+message GiftEggList {
+  uint32 last_refresh_time = 1;
+  repeated Next.GiftEggInfo infos = 2;
+}

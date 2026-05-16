@@ -1,0 +1,85 @@
+{
+    "Name": "MODEL_COLLISION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "collision_info",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 80,
+            "Struct": {
+                "Name": "MODEL_COLLISION_CONF.collision_info",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "comp_name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "type_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "is_hit_box",
+                        "Type": "EBool",
+                        "Offset": 8,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "size_param",
+                        "Type": "EInt32",
+                        "Offset": 9,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "is_attach_to_mesh",
+                        "Type": "EBool",
+                        "Offset": 13,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "init_location",
+                        "Type": "EInt32",
+                        "Offset": 14,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "init_rotation",
+                        "Type": "EInt32",
+                        "Offset": 18,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "init_scale",
+                        "Type": "EInt32",
+                        "Offset": 22,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

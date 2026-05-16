@@ -1,0 +1,390 @@
+package Next;
+
+import "com_base_types.proto";
+import "xls_enum.proto";
+
+enum CommonTextInfoParamType {
+  COMMON_TEXT_INFO_PARAM_DEFAULT = 0;
+  COMMON_TEXT_INFO_PARAM_AREA_FUNC_ID = 1;
+}
+
+enum DialogSkipState {
+  DSS_NONE = 0;
+  DSS_SKIPPABLE = 1;
+  DSS_SKIPPING = 2;
+  DSS_STOP = 3;
+  DSS_STOP_AND_SKIPPABLE = 4;
+  DSS_ACT_INVALID = 5;
+}
+
+enum GeneralColumnType {
+  COLUMN_TYPE_NONE = 0;
+  COLUMN_TYPE_BYTES = 1;
+  COLUMN_TYPE_INT32 = 2;
+  COLUMN_TYPE_INT64 = 3;
+  COLUMN_TYPE_STRING = 4;
+}
+
+enum SubscriptionDef {
+  SUBSCRIPTION_BUCKET_NUM = 100;
+  SUBSCRIPTION_PARTITION_NUM = 100;
+  SUBSCRIPTION_LEASE_RELEASE_AHEAD_PERIOD_MS = 200;
+}
+
+enum ERedStatusBusiness {
+  RED_STATUS_BU_NONE = 0;
+}
+
+enum EventReportType {
+  ERT_NONE = 0;
+}
+
+message AttrType {
+  enum ENUM {
+    BaseAttrBegin = 0;
+    Lv = 1;
+    Hp = 2;
+    MoveSpd = 3;
+    WorldLv = 4;
+    HpMax = 5;
+    BaseAttrEnd = 6;
+    AvatarAttrBegin = 100;
+    BodyTemp = 101;
+    NatureTemp = 102;
+    Stamina = 103;
+    StaminaMax = 104;
+    HpTemporary = 105;
+    HpHalfInjure = 106;
+    AvatarAttrEnd = 107;
+    NpcAttrBegin = 200;
+    NpcAttrEnd = 201;
+  }
+}
+
+message AttrPresentTag {
+  enum ENUM {
+    Default = 0;
+    None = 1;
+    AIAddHp = 2;
+  }
+}
+
+message ActorAttrMendsPartType {
+  enum ENUM {
+    Buff = 1;
+    EquipPartType = 2;
+  }
+}
+
+message TrigInteractType {
+  enum ENUM {
+    Normal = 0;
+    ThrowPet = 1;
+    ThrowBagItem = 2;
+    ThrowMagic = 3;
+    SceneNpc = 4;
+    PetPowerDash = 5;
+  }
+}
+
+message CreatureAttrs_SimpleAttr32 {
+  int32 val = 2;
+}
+
+message CreatureAttrs_SimpleAttr64 {
+  int64 val = 2;
+}
+
+message CreatureAttrs_ComplexAttr32 {
+  int32 val = 2;
+  int32 base = 3;
+  int32 total_addi_amend = 4;
+  repeated int32 addi_amends = 5;
+  int32 total_mul_amend = 6;
+  repeated int32 mul_amends = 7;
+}
+
+message CreatureAttrs_ComplexAttr64 {
+  int32 type = 1;
+  int64 val = 2;
+  int64 base = 3;
+  int64 total_addi_amend = 4;
+  repeated int64 addi_amends = 5;
+  int32 total_mul_amend = 6;
+  repeated int32 mul_amends = 7;
+}
+
+message SystemExecuteTime {
+  message TimeCost {
+    uint64 start_time = 1;
+    uint64 cost_time = 2;
+  }
+  string key = 1;
+  Next.SystemExecuteTime.TimeCost value = 2;
+}
+
+message InnerPet {
+  int32 petbase_id = 1;
+  uint32 mutation_type = 2;
+  uint32 pet_lv = 3;
+  uint32 hp_talent = 4;
+  uint32 attack_talent = 5;
+  uint32 special_attack_talent = 6;
+  uint32 defense_talent = 7;
+  uint32 special_defense_talent = 8;
+  uint32 speed_talent = 9;
+  uint32 gender = 10;
+  uint32 nature = 11;
+  Next.GlassInfo glass_info = 13;
+}
+
+message FlowerCatchInfo {
+  uint32 pet_gid = 1;
+}
+
+message InnerBattleTask {
+  uint32 task_id = 1;
+  uint32 task_state = 2;
+  Next.FlowerCatchInfo catch_info = 3;
+}
+
+message SpecFlowerSeed {
+  uint32 spec_flower_seed_id = 1;
+  uint32 content_cfg_id = 2;
+  int32 seed_star = 3;
+  Next.InnerPet inner_pet = 4;
+  uint32 catch_vitem_quantity = 5;
+  uint32 activity_id = 6;
+  uint32 end_timestamp = 7;
+  repeated Next.InnerBattleTask battle_tasks = 8;
+  uint32 bind_pet_gid = 9;
+  uint32 bind_petbase_id = 10;
+  uint32 bind_evolution_id = 11;
+  uint32 medal_id = 12;
+}
+
+message Transform {
+  Next.Position pos = 1;
+  Next.Position rot = 2;
+  Next.Position scale = 3;
+}
+
+message EnvInfoLabelTag {
+  uint32 Tag = 1;
+  uint32 Value = 2;
+}
+
+message EnvLabelTags {
+  int32 index_z = 1;
+  repeated Next.EnvInfoLabelTag cell_tags = 2;
+}
+
+message SubmitPetData {
+  uint32 petbase_id = 1;
+  uint32 evolution_chain_id = 2;
+  repeated dataconfig.SkillDamType skill_dam_types = 3;
+  repeated uint32 blood_id = 4;
+}
+
+message AutoIncrementInfo {
+  dataconfig.AutoIncrementType type = 1;
+  uint32 key1 = 2;
+  uint32 key2 = 3;
+  uint64 step = 7;
+  uint64 seq = 8;
+  bool is_minus = 9;
+}
+
+message CommonTextInfoArgs {
+  uint32 type = 1;
+  string param = 2;
+}
+
+message CommonTextInfo {
+  string text_id = 1;
+  repeated Next.CommonTextInfoArgs args = 2;
+}
+
+message FuncBlockingConfItem {
+  int32 func_id = 1;
+  int32 is_open = 2;
+  int32 is_audit = 3;
+  int32 version_rule = 4;
+  string open_client_version_ios = 5;
+  string open_client_version_android = 6;
+  string open_client_version_pc = 7;
+  int32 channel_conf_id = 8;
+  string open_client_version_harmony_os = 9;
+  string open_client_version_harmony_pc = 10;
+  repeated int32 login_plat_limit = 11;
+}
+
+message FuncBlockingChannelConfItem {
+  int32 channel_conf_id = 1;
+  repeated int32 display_platform = 2;
+  repeated string pkg_channel_hidden_list = 3;
+  repeated string pkg_channel_show_list = 4;
+}
+
+message FuncBlockingConfs {
+  int32 func_type = 1;
+  repeated Next.FuncBlockingConfItem func_confs = 2;
+  repeated Next.FuncBlockingChannelConfItem channel_confs = 3;
+}
+
+message ObjSyncInfo {
+  uint64 id = 1;
+  int32 sync_id = 2;
+  bytes data = 3;
+}
+
+message GeneralColumnFieldInfo {
+  string column_name = 1;
+  Next.GeneralColumnType column_type = 2;
+}
+
+message GeneralColumnFieldsInfo {
+  repeated Next.GeneralColumnFieldInfo field_info_list = 1;
+}
+
+message GeneralColumnField {
+  bytes bytes_val = 1;
+  int32 int32_val = 2;
+  int64 int64_val = 3;
+  string str_val = 4;
+  uint64 uint64_val = 5;
+}
+
+message GeneralColumnRecord {
+  uint64 id = 1;
+  uint64 id2 = 2;
+  uint64 id3 = 3;
+  uint64 id4 = 4;
+  uint64 id5 = 5;
+  repeated Next.GeneralColumnField field_list = 6;
+  Next.DataLeaseInfo lease_info = 7;
+  int32 version = 8;
+}
+
+message GeneralColumnRecordList {
+  repeated Next.GeneralColumnRecord record_list = 1;
+}
+
+message SubscriptionBucketLease {
+  int64 lease_deadline = 1;
+}
+
+message GlobalConfInfo {
+  int32 num = 1;
+  repeated int32 num_list = 2;
+  string str = 3;
+  string key = 4;
+  int32 id = 5;
+}
+
+message GlobalConfList {
+  repeated Next.GlobalConfInfo global_list = 1;
+}
+
+message RobotInfo {
+  uint32 id = 1;
+  bytes openid = 2;
+  uint32 dead_time = 3;
+  uint32 patrol_type = 4;
+  uint32 bron_area_id = 5;
+  uint32 target_area_id = 6;
+  uint32 patrol_interval_time = 7;
+}
+
+message AIBattlePet {
+  uint32 gid = 1;
+  uint32 conf_id = 2;
+  uint32 blood_id = 3;
+  repeated uint32 equip_skills = 4;
+}
+
+message ClientRemoteStorageData {
+  string key = 1;
+  bytes value = 2;
+  int64 expire_time = 3;
+  int64 create_time = 4;
+}
+
+message PlayerClientRSInfo {
+  repeated Next.ClientRemoteStorageData client_rs_data_list = 1;
+}
+
+message BytesData {
+  uint64 id = 1;
+  uint64 id2 = 2;
+  uint64 id3 = 3;
+  uint64 id4 = 4;
+  uint64 id5 = 5;
+  repeated uint64 data_index = 6;
+  bytes data = 7;
+  bytes data2 = 8;
+  Next.DataLeaseInfo lease_info = 9;
+}
+
+message BytesColumnData {
+  message ColumnData {
+    string column_name = 1;
+    bytes data = 2;
+  }
+  uint64 id = 1;
+  repeated Next.BytesColumnData.ColumnData column_data = 2;
+  Next.DataLeaseInfo lease_info = 3;
+  bool require_insert = 4;
+}
+
+message BytesListData {
+  uint64 id = 1;
+  uint64 id2 = 2;
+  uint64 id3 = 3;
+  uint64 id4 = 4;
+  uint64 id5 = 5;
+  int64 index = 6;
+  bytes data = 7;
+  bytes data2 = 8;
+  Next.DataLeaseInfo lease_info = 9;
+}
+
+message DataLeaseInfo {
+  enum ValidationPolicy {
+    VALIDATION_POLICY_NONE = 0;
+    VALIDATION_POLICY_LOOSE = 1;
+    VALIDATION_POLICY_STRICT = 2;
+  }
+  message Lease {
+    uint64 lease_instance_id = 1;
+    uint64 lease_version = 2;
+    uint64 lease_last_sync_time = 3;
+  }
+  Next.DataLeaseInfo.ValidationPolicy policy = 1;
+  Next.DataLeaseInfo.Lease lease_token = 2;
+  Next.DataLeaseInfo.Lease lease_data = 3;
+}
+
+message DotsComponentData {
+  repeated Next.BytesData component_datas = 1;
+}
+
+message SceneSeasonInfo {
+  int32 season_id = 1;
+  int32 season_adv_shining_extra_weight = 2;
+  int32 season_adv_catch_prob_add = 3;
+}
+
+message KeyValueItem {
+  string key = 1;
+  string value = 2;
+}
+
+message KeyValueList {
+  repeated Next.KeyValueItem kvlist = 1;
+}
+
+message VItem {
+  dataconfig.GoodsType goods_type = 1;
+  uint32 goods_num = 2;
+}

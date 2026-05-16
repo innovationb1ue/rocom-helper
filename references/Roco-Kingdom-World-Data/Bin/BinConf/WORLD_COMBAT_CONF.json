@@ -1,0 +1,238 @@
+{
+    "Name": "WORLD_COMBAT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "npc_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_content_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "scene_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "whether_display",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "world_boss_refer",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "background_color",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name1",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "whether_nightmare",
+            "Type": "EBool",
+            "Offset": 36,
+            "Size": 1
+        },
+        {
+            "Name": "trophy_id",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "sequence_id",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_task_id",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "task_name",
+            "Type": "EString",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "camp_id",
+            "Type": "EUint32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "living_area_name",
+            "Type": "EString",
+            "Offset": 57,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "area_func",
+            "Type": "EUint32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "escape_pos_id",
+            "Type": "EUint32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "block_id",
+            "Type": "EUint32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "min_battle_distance",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "finish_type",
+            "Type": "EInt32",
+            "Offset": 77,
+            "Size": 4
+        },
+        {
+            "Name": "option",
+            "Type": "EStruct",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "WORLD_COMBAT_CONF.option",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "stage_shield",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "reward_refresh_content_id",
+            "Type": "EUint32",
+            "Offset": 85,
+            "Size": 4
+        },
+        {
+            "Name": "bgm_world_combat_state",
+            "Type": "EString",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "affiliate_npc",
+            "Type": "EUint32",
+            "Offset": 93,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "preloading_npc",
+            "Type": "EUint32",
+            "Offset": 97,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "prompt_banner",
+            "Type": "EString",
+            "Offset": 101,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "teleport_skill",
+            "Type": "EUint32",
+            "Offset": 105,
+            "Size": 4
+        },
+        {
+            "Name": "boss_weakness_group",
+            "Type": "EStruct",
+            "Offset": 109,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "WORLD_COMBAT_CONF.boss_weakness_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "boss_weakness",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "weakness_ratio",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "weakness_bonus",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "hit_anim_alpha",
+            "Type": "EInt32",
+            "Offset": 113,
+            "Size": 4
+        }
+    ]
+}

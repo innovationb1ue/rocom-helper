@@ -1,0 +1,159 @@
+package Next;
+
+import "com_base_types.proto";
+import "rpc_options.proto";
+import "xls_enum.proto";
+
+enum FeedType {
+  FEED_TYPE_NONE = 0;
+  FEED_TYPE_MAGIC = 1;
+  FEED_TYPE_FLOWER = 2;
+  FEED_TYPE_SYSTEM = 3;
+}
+
+enum FeedFlowerType {
+  FEED_FLOWER_TYPE_NONE = 0;
+  FEED_FLOWER_TYPE_YUCHANGCAO = 1;
+  FEED_FLOWER_TYPE_XINGMANGHUA = 2;
+}
+
+enum FeedAttitudeType {
+  FEED_ATTITUDE_TYPE_NONE = 0;
+  FEED_ATTITUDE_TYPE_LIKE = 1;
+  FEED_ATTITUDE_TYPE_HUG = 2;
+  FEED_ATTITUDE_TYPE_INSPIRATION = 3;
+  FEED_ATTITUDE_TYPE_PERPLEXITY = 4;
+}
+
+enum FeedCommentAttitudeType {
+  FEED_COMMENT_ATTITUDE_TYPE_NONE = 0;
+  FEED_COMMENT_ATTITUDE_TYPE_GOOD = 1;
+  FEED_COMMENT_ATTITUDE_TYPE_BAD = 2;
+}
+
+enum FeedGetCommentType {
+  FEED_GET_COMMNET_TYPE_NONE = 0;
+  FEED_GET_COMMNET_TYPE_DEFAULT = 1;
+  FEED_GET_COMMNET_TYPE_TIME = 2;
+}
+
+enum FeedMagicNpcValidType {
+  FEED_MAGIC_NPC_VALID_TYPE_VALID = 0;
+  FEED_MAGIC_NPC_VALID_TYPE_UNINITED = -1;
+  FEED_MAGIC_NPC_VALID_TYPE_INVLAID = -2;
+  FEED_MAGIC_NPC_VALID_TYPE_PLANENESS_NOLAND = 1;
+  FEED_MAGIC_NPC_VALID_TYPE_TOO_HIGH = 3;
+  FEED_MAGIC_NPC_VALID_TYPE_WATER = 4;
+  FEED_MAGIC_NPC_VALID_TYPE_OVAELAP = 10;
+  FEED_MAGIC_NPC_VALID_TYPE_OVAELAP_NOTLOADED = 11;
+  FEED_MAGIC_NPC_VALID_TYPE_AIRWALL = 30;
+  FEED_MAGIC_NPC_VALID_TYPE_NORMAL = 100;
+}
+
+message ZoneFeedCtrlData {
+  uint32 uin = 1;
+  uint32 last_attitude_timestamp = 2;
+  uint32 last_magic_feed_timestamp = 3;
+  uint32 today_magic_feed_count = 4;
+  uint32 last_flower_feed_timestamp = 5;
+  uint32 today_flower_feed_count = 6;
+  uint32 daily_magic_feed_count = 7;
+  Next.FeedVideoUploadInfo video_upload_info = 8;
+}
+
+message ZoneMagicFeedInfo {
+  uint64 feed_id = 1;
+  uint32 uin = 2;
+  string name = 3;
+  uint32 create_timestamp = 4;
+  uint32 expire_timestamp = 5;
+  uint32 comment_num = 6;
+  uint32 attitude_like_num = 7;
+  uint32 attitude_hug_num = 8;
+  uint32 attitude_inspiration_num = 9;
+  uint32 attitude_perplexity_num = 10;
+  string content = 11;
+  Next.Position create_pos = 12;
+  uint32 card_icon_selected = 13;
+  uint32 attitude = 14;
+  uint64 grid_id = 15;
+  string ext_info = 16;
+  uint32 category = 17;
+  int32 music_id = 18;
+}
+
+message ZoneFlowerFeedInfo {
+  uint64 feed_id = 1;
+  uint32 uin = 2;
+  string name = 3;
+  uint32 type = 4;
+  uint32 create_timestamp = 5;
+  uint32 expire_timestamp = 6;
+  Next.Position create_pos = 7;
+  uint64 grid_id = 8;
+  string ext_info = 9;
+  uint32 category = 10;
+}
+
+message GridFeedDetailInfo {
+  uint64 grid_id = 1;
+  repeated Next.ZoneMagicFeedInfo magic_feeds = 2;
+  repeated Next.ZoneFlowerFeedInfo flower_feeds = 3;
+  repeated Next.ZoneMagicFeedInfo my_magic_feeds = 4;
+  repeated Next.ZoneMagicFeedInfo system_magic_feeds = 5;
+  repeated Next.ZoneMagicFeedInfo magic_videos = 6;
+  repeated Next.ZoneMagicFeedInfo my_magic_videos = 7;
+}
+
+message FeedDetailNotifyData {
+  repeated Next.GridFeedDetailInfo grid_feed_list = 1;
+  uint64 grid_id = 2;
+  repeated uint64 grid_list = 3;
+}
+
+message FeedCommentInfo {
+  uint64 feedback_id = 1;
+  uint32 uin = 2;
+  string name = 3;
+  uint32 create_timestamp = 4;
+  string comment = 5;
+  uint32 good_num = 6;
+  uint32 bad_num = 7;
+  uint32 card_icon_selected = 8;
+  uint32 comment_attitude = 9;
+}
+
+message FeedCommentListData {
+  uint64 feed_id = 1;
+  uint32 page_num = 2;
+  repeated Next.FeedCommentInfo comment_list = 3;
+}
+
+message FeedVideoBaseInfo {
+  repeated int32 fashion_id = 1;
+  repeated uint32 pet_base_id = 2;
+  repeated string chat_msg = 3;
+  Next.Position player_pos = 4;
+  uint32 version = 5;
+}
+
+message FeedVideoInfo {
+  string file_name = 1;
+  string file_url = 2;
+  string file_md5 = 3;
+  string base_info_md5 = 4;
+}
+
+message FileUploadInfo {
+  string file_name = 1;
+  uint32 upload_timestamp = 2;
+  uint32 expire_timestamp = 3;
+  Next.Position create_pos = 4;
+  string content = 5;
+  string upload_url = 6;
+}
+
+message FeedVideoUploadInfo {
+  repeated Next.FileUploadInfo file_list = 1;
+  repeated Next.FileUploadInfo expired_file_list = 2;
+}

@@ -1,0 +1,19 @@
+{
+    "Name": "AUDIO_LENGTH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "max_time",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        }
+    ]
+}

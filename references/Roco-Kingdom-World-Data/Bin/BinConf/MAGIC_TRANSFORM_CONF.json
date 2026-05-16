@@ -1,0 +1,108 @@
+{
+    "Name": "MAGIC_TRANSFORM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "is_pet",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 5,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "transform_group",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "function_ban_ref",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "aim_path",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "time",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "area_func_id",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "model_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "use_confirm_panel",
+            "Type": "EBool",
+            "Offset": 33,
+            "Size": 1
+        },
+        {
+            "Name": "which_bantype",
+            "Type": "EInt32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "player_story_flag",
+            "Type": "EInt32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "use_lique_fx",
+            "Type": "EBool",
+            "Offset": 42,
+            "Size": 1
+        },
+        {
+            "Name": "lique_start_fx",
+            "Type": "EString",
+            "Offset": 43,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "lique_end_fx",
+            "Type": "EString",
+            "Offset": 47,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "idle_anim",
+            "Type": "EString",
+            "Offset": 51,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

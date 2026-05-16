@@ -1,0 +1,55 @@
+{
+    "Name": "CUSTOMCAMERA_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "POS_OFFSET_X",
+            "Type": "EFloat",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "POS_OFFSET_Y",
+            "Type": "EFloat",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "POS_OFFSET_Z",
+            "Type": "EFloat",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "ROT_OFFSET_X",
+            "Type": "EFloat",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "ROT_OFFSET_Y",
+            "Type": "EFloat",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "ROT_OFFSET_Z",
+            "Type": "EFloat",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "DIST",
+            "Type": "EFloat",
+            "Offset": 28,
+            "Size": 4
+        }
+    ]
+}

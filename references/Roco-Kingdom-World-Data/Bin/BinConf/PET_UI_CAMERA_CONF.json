@@ -1,0 +1,25 @@
+{
+    "Name": "PET_UI_CAMERA_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "camera_yaobi_len",
+            "Type": "EFloat",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "camera_yaobi_pitch",
+            "Type": "EFloat",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

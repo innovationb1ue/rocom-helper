@@ -1,0 +1,33 @@
+{
+    "Name": "PVP_RANDOM_SKILL_LIST_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "skills",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 20,
+            "Struct": {
+                "Name": "PVP_RANDOM_SKILL_LIST_CONF.skills",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "skill",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

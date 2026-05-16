@@ -1,0 +1,147 @@
+{
+    "Name": "GUIDE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "auto_create",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "trigger_range",
+            "Type": "EUint32",
+            "Offset": 5,
+            "Size": 4
+        },
+        {
+            "Name": "side_trigger_range",
+            "Type": "EUint32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "move_speed",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "max_lifetime",
+            "Type": "EUint32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "speed_gradient_ratio",
+            "Type": "EFloat",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "mid_point_index",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "position",
+            "Type": "EInt32",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "rotation",
+            "Type": "EInt32",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "scale",
+            "Type": "EInt32",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "spline_point",
+            "Type": "EStruct",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 60,
+            "Struct": {
+                "Name": "GUIDE_CONF.spline_point",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "InputKey",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "Position",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ArriveTangent",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "LeaveTangent",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "Rotation",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "Scale",
+                        "Type": "EInt32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "Type",
+                        "Type": "EInt32",
+                        "Offset": 24,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,52 @@
+{
+    "Name": "ATTRIBUTE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "attribute",
+    "Properties": [
+        {
+            "Name": "attribute",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "attribute_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "attribute_icon",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "attr_ui_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "is_ui_show",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "is_percent_attr",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        }
+    ]
+}

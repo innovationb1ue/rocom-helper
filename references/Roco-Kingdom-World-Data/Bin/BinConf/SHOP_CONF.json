@@ -1,0 +1,152 @@
+{
+    "Name": "SHOP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "shop_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "shop_icon",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "shop_location",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "checkout_icon",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_enable",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "is_cumulative",
+            "Type": "EBool",
+            "Offset": 25,
+            "Size": 1
+        },
+        {
+            "Name": "multi_buy",
+            "Type": "EBool",
+            "Offset": 26,
+            "Size": 1
+        },
+        {
+            "Name": "shop_type",
+            "Type": "EInt32",
+            "Offset": 27,
+            "Size": 4
+        },
+        {
+            "Name": "random_shop_goods_num",
+            "Type": "EInt32",
+            "Offset": 31,
+            "Size": 4
+        },
+        {
+            "Name": "enable_time",
+            "Type": "EString",
+            "Offset": 35,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disable_time",
+            "Type": "EString",
+            "Offset": 39,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "refresh_time",
+            "Type": "EString",
+            "Offset": 43,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "duration",
+            "Type": "EString",
+            "Offset": 47,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "refresh_time_slot",
+            "Type": "EInt32",
+            "Offset": 51,
+            "Size": 4
+        },
+        {
+            "Name": "purchase_limit",
+            "Type": "EInt32",
+            "Offset": 55,
+            "Size": 4
+        },
+        {
+            "Name": "content_id",
+            "Type": "EUint32",
+            "Offset": 59,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "goods",
+            "Type": "EStruct",
+            "Offset": 63,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "SHOP_CONF.goods",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "goods_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "goods_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

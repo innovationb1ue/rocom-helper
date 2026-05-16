@@ -1,0 +1,59 @@
+{
+    "Name": "FUNCTION_BAN_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ban_desc",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "desc_priority",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "auto_clear_status",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "function_ban_list",
+            "Type": "EStruct",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 123,
+            "Struct": {
+                "Name": "FUNCTION_BAN_CONF.function_ban_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "function_ban_switch",
+                        "Type": "EBool",
+                        "Offset": 0,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

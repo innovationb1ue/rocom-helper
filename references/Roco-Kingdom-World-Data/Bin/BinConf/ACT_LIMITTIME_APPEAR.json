@@ -1,0 +1,117 @@
+{
+    "Name": "ACT_LIMITTIME_APPEAR",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "petbase_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "open_world_map",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "option_txt1",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "track_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "track_refresh_id_priority",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "track_type_param1",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "option_txt2",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "condition_id",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pet_img1",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pet_img1_zoom",
+            "Type": "EFloat",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "pet_img2",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "condition_group",
+            "Type": "EStruct",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 12,
+            "Struct": {
+                "Name": "ACT_LIMITTIME_APPEAR.condition_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "hide_track_start",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "hide_track_end",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,31 @@
+{
+    "Name": "UI_COMPASS",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "status_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "is_exhale_compass",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "is_hide_role",
+            "Type": "EBool",
+            "Offset": 9,
+            "Size": 1
+        }
+    ]
+}

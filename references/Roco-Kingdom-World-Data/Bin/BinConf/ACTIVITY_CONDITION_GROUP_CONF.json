@@ -1,0 +1,107 @@
+{
+    "Name": "ACTIVITY_CONDITION_GROUP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "entire_reward",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "reward_des",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "fashion_bond_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "required_part_num",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "part_group",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "ACTIVITY_CONDITION_GROUP_CONF.part_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "part_name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "part_enum",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "include_condition_id",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "require_world_level",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "unlock_tips",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "dialogue_group",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 15,
+            "Struct": {
+                "Name": "ACTIVITY_CONDITION_GROUP_CONF.dialogue_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "dialogue_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

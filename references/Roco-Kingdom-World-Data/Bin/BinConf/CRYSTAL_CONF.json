@@ -1,0 +1,19 @@
+{
+    "Name": "CRYSTAL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "type",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        }
+    ]
+}

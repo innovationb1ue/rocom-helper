@@ -1,0 +1,190 @@
+{
+    "Name": "MALL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "IconPath",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Desc",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Enable",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "limit_type",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "replenish_cnt",
+            "Type": "EUint32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "keep_replenish_cnt",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "keep_replenish_limit",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "ISWeekendSell",
+            "Type": "EBool",
+            "Offset": 33,
+            "Size": 1
+        },
+        {
+            "Name": "IsHide",
+            "Type": "EBool",
+            "Offset": 34,
+            "Size": 1
+        },
+        {
+            "Name": "EnableTime",
+            "Type": "EString",
+            "Offset": 35,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "DisableTime",
+            "Type": "EString",
+            "Offset": 39,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "GoodsType",
+            "Type": "EInt32",
+            "Offset": 43,
+            "Size": 4
+        },
+        {
+            "Name": "MaxBuyCount",
+            "Type": "EUint32",
+            "Offset": 47,
+            "Size": 4
+        },
+        {
+            "Name": "time_start",
+            "Type": "EString",
+            "Offset": 51,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "time_end",
+            "Type": "EString",
+            "Offset": 55,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "RewardGoodsType",
+            "Type": "EInt32",
+            "Offset": 59,
+            "Size": 4
+        },
+        {
+            "Name": "RewardGoodsId",
+            "Type": "EUint32",
+            "Offset": 63,
+            "Size": 4
+        },
+        {
+            "Name": "RewardGoodsNum",
+            "Type": "EUint32",
+            "Offset": 67,
+            "Size": 4
+        },
+        {
+            "Name": "limitID",
+            "Type": "EUint32",
+            "Offset": 71,
+            "Size": 4
+        },
+        {
+            "Name": "Discount",
+            "Type": "EUint32",
+            "Offset": 75,
+            "Size": 4
+        },
+        {
+            "Name": "SellPriceItem",
+            "Type": "EStruct",
+            "Offset": 79,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "MALL_CONF.SellPriceItem",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "Type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "Id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "Cost",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "LimitTime",
+            "Type": "EUint32",
+            "Offset": 83,
+            "Size": 4
+        },
+        {
+            "Name": "Isfree",
+            "Type": "EBool",
+            "Offset": 87,
+            "Size": 1
+        }
+    ]
+}

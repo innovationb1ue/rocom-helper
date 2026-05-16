@@ -1,0 +1,63 @@
+{
+    "length": 2.6,
+    "dialogue_id": 302001699,
+    "wait_user_click_at_end": false,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 42220,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineHideUIEvent",
+            "Name": "\u9690\u85cf\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCPerformAnimAction",
+            "Name": "Perform\u8868",
+            "OwnerActorID": -1,
+            "StartTime": 1.7,
+            "PerformID": 302
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSayState",
+            "Name": "\u89d2\u8272\u8bf4\u8bdd",
+            "OwnerActorID": 0,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "PlayFacialAnim": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineLiquidTransformAnimAction",
+            "Name": "\u679c\u51bb\u53d8\u8eab\u52a8\u753b",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "Action": "show",
+            "BlendInTime": 0.2,
+            "BlendOutTime": 0.2,
+            "LoopCount": 1,
+            "StartPoint": 0.0,
+            "EndPoint": 0.0,
+            "StopAnimAtEnd": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineBlockInputState",
+            "Name": "\u5c4f\u853d\u8f93\u5165",
+            "OwnerActorID": -100,
+            "StartTime": 0.0,
+            "EndTime": 4.7,
+            "MinimalDuration": 0.1
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCPerformAnimAction",
+            "Name": "Perform\u8868",
+            "OwnerActorID": -1,
+            "StartTime": 3.0,
+            "PerformID": 302
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+package Next;
+
+import "com_base_types.proto";
+import "xls_enum.proto";
+
+message PointList {
+  repeated Next.Point points = 1;
+}
+
+message TeamBattleNPC {
+  int64 actor_id = 1;
+}
+
+message FBEyeOpen {
+  int64 IsOpen = 1;
+}
+
+message HasP2Win {
+  int64 HasWin = 1;
+}
+
+message LastEquipBall {
+  int64 EquipBallId = 1;
+}

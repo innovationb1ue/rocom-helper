@@ -1,0 +1,368 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_monster.proto";
+import "com_pet.proto";
+
+enum ThrowType {
+  NONE = 0;
+  THROW_BAGITEM = 1;
+  THROW_PET = 2;
+  THROW_MAGIC = 3;
+}
+
+enum ThrowEffect {
+  TE_NONE = 0;
+  CREATE = 1;
+  CATCH = 2;
+  TRIG_PET_INTERACT = 7;
+  CREATE_PET_INTERACT = 8;
+  TRIG_MAGIC_INTERACT = 11;
+  TRIG_MAGIC_INTERACT_SCENE_OBJ = 12;
+}
+
+enum ThrowTargetNpcAIStatus {
+  DETECTED_AVATAR = 1;
+  RESIST_CATCH = 2;
+}
+
+enum OpSeatType {
+  OST_NONE = 0;
+  OST_LEAVE = 1;
+  OST_CHANGE = 2;
+}
+
+enum PlayerTransformCancelReason {
+  PTCR_PLAYER_CANCEL = 1;
+  PTCR_SKILL_HIT = 2;
+  PTCR_STATUS_BAN = 3;
+  PTCR_TIMEOUT = 4;
+  PTCR_LEAVE_AREA = 5;
+  PTCR_ACT_CANCEL = 6;
+  PTCR_TASK_CANCEL = 7;
+  PTCR_BEGIN_BATTLE = 8;
+  PTCR_BEGIN_WORLD_COMBAT = 9;
+  PTCR_BEGIN_TELEPORT = 10;
+  PTCR_ENTER_DUNGEON = 11;
+  PTCR_REVIVE = 12;
+  PTCR_MODIFY_FROM_UNUSED_SCENE = 14;
+}
+
+enum PlayerInteractType {
+  PIT_None = 0;
+  Visiting = 1;
+  InviteVisiting = 2;
+  Fighting = 4;
+  ExchangeEgg = 8;
+}
+
+enum OnlineVisitorInfoChangeReason {
+  OVICR_NONE = 0;
+  OVICR_CATCH_STATE = 1;
+  OVICR_VISITOR_NUM = 2;
+  OVICR_VISITOR_LOGIN = 3;
+  OVICR_VISITOR_BATTLE = 4;
+  OVICR_BRIEF_CHANGE = 5;
+}
+
+enum VisitPermissionSettingType {
+  VPST_NONE = 0;
+  VPST_JOIN_DIRECT = 1;
+  VPST_JOIN_AFTER_AGREE = 2;
+}
+
+enum OnlineVisitorLeaveReason {
+  OVLR_NONE = 0;
+  OVLR_OWNER_DISBAND = 1;
+  OVLR_OWNER_KICK_OUT = 2;
+  OVLR_OWNER_OVER_TIME = 3;
+  OVLR_VISITOR_OVER_TIME = 4;
+  OVLR_VISITOR_PASSIVE_OUT = 5;
+  OVLR_OWNER_EXCEPTIONAL_DESTROY = 6;
+  OVLR_ERROR_CALLBACK = 7;
+  OVLR_OVER_TIME_LOGIN = 8;
+  OVLR_VISITOR_EXIT = 9;
+  OVLR_ENTER_HOME = 10;
+  OVLR_TOGETHER_LEAVE = 11;
+  OVLR_OWNER_DISBAND_NO_TELEPORT = 12;
+}
+
+enum OnlineVisitQueryFlag {
+  OVQF_NONE = 0;
+  OVQF_ONLINE = 1;
+  OVQF_READY = 2;
+  OVQF_OWNER = 3;
+}
+
+message MoveSegmentInfo {
+  Next.Position pos = 1;
+  uint64 time_stamp = 2;
+}
+
+message MoveInfo {
+  uint64 time_stamp = 1;
+  Next.Position to_pos = 2;
+  Next.Position to_rot = 3;
+  Next.Position speed = 4;
+  Next.Position acceleration = 5;
+  int32 move_mode = 6;
+  int32 custom_mode = 7;
+  bool stop_move = 8;
+  repeated Next.MoveSegmentInfo move_seg_list = 12;
+  uint64 platform_actor_id = 14;
+  Next.Position ctrl_rot = 15;
+  bool ride_move = 17;
+}
+
+message ThrowItemInfo {
+  Next.ThrowType cur_selected_throw_type = 1;
+  uint32 cur_selected_gid = 2;
+  uint32 last_selected_pet_gid = 3;
+}
+
+message ThrowItem {
+  Next.ThrowType selected_throw_type = 1;
+  int32 selected_gid = 2;
+}
+
+message ThrowPetInfo {
+  int32 gid = 1;
+  uint64 npc_id = 2;
+  uint64 related_npc_id = 3;
+  uint32 related_option_id = 4;
+  uint64 npc_logic_id = 5;
+  uint64 throw_timestamp = 6;
+}
+
+message BeginThrowInfo {
+  int64 id = 1;
+  int32 throw_type = 2;
+  int32 gid = 3;
+  Next.Position pos = 4;
+  int64 throw_time = 5;
+  int32 conf_id = 6;
+  Next.Position last_collision_pos = 7;
+  bool has_broken = 8;
+  int32 collision_counts = 9;
+  uint64 create_ball_npc_id = 10;
+  uint64 create_ball_npc_logic_id = 11;
+  uint64 roll_back_ball_conf_id = 12;
+  int32 charge_level = 13;
+}
+
+message ClientNpcBlackboard {
+  int32 tod = 1;
+  int32 sleeping = 2;
+  int32 new_skill = 3;
+  uint64 ai_status = 4;
+  bool back_of_head = 5;
+  int32 pre_act_tag = 6;
+  int32 pre_act_param = 7;
+}
+
+message ThrowBattleInfo {
+  Next.Point avatar_pt = 1;
+  Next.Point npc_pt = 2;
+  int32 radius = 3;
+  Next.ClientNpcBlackboard npc_ai_blackboard = 4;
+  Next.Point battle_center = 5;
+  repeated Next.CheerMonsterInitInfo cheer_monster_init_info = 6;
+  bool is_battle_action = 7;
+  int32 battle_type = 8;
+  uint32 ride_id = 9;
+  repeated uint64 onlooker_obj_id = 10;
+  int32 visit_remain_shiny_catch_times = 11;
+}
+
+message ThrowCreateInfo {
+  Next.Point create_pt = 1;
+  bool need_create_pet = 2;
+}
+
+message ThrowPetData {
+  int32 nature = 2;
+  int32 height = 3;
+  int32 weight = 4;
+  int32 level = 5;
+  int32 mutation_type = 6;
+  uint32 gid = 7;
+}
+
+message ThrowTargetNpcInfo {
+  uint64 npc_id = 1;
+  int32 npc_conf_id = 2;
+  int32 option_id = 3;
+  uint64 npc_ai_status = 4;
+  int32 npc_ai_behavior = 5;
+  Next.Position npc_pos = 6;
+  string weakness_pos_name = 7;
+  string gain_expose_pos_name = 8;
+  bool is_back_stab = 9;
+  uint64 npc_logic_id = 10;
+}
+
+message ThrowMagicCreateNPCInfo {
+  int32 npc_refresh_conf_id = 1;
+  Next.Point create_pt = 2;
+}
+
+message ThrowMagicInfo {
+  int32 strength_level = 1;
+  int32 charge_percentage = 2;
+  repeated uint64 target_avatar_ids = 51;
+  Next.ThrowMagicCreateNPCInfo create_npc_info = 52;
+  repeated uint32 target_avatar_uins = 53;
+  repeated bool target_is_friend_list = 54;
+}
+
+message ThrowStatusInfo {
+  int32 ability_status = 1;
+  int32 mode = 2;
+}
+
+message ThrowRandomActionInfo {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  int32 interact_id = 3;
+}
+
+message SceneCatchResult {
+  bool is_catched = 1;
+  int32 probability = 2;
+  int32 monter_level = 3;
+  Next.MonsterDiffInfo diff_info = 4;
+  bool is_tech_satisfied = 5;
+  bool is_detected = 6;
+  uint32 caught_camp = 7;
+  bool is_visiting = 8;
+  string visit_owner_name = 9;
+  int32 caught_weather = 10;
+  uint64 caught_ai_status = 11;
+  int32 gender = 12;
+  bool use_visit_catch_time = 13;
+}
+
+message ThrowBagItemResult {
+  bool is_broken = 1;
+  int32 roll_back_conf_id = 2;
+  int32 throw_power = 3;
+}
+
+message ThrowPetResult {
+  bool is_exceed_interaction_threshold = 1;
+}
+
+message ThrowMagicCreateNPCResult {
+  uint64 npc_obj_id = 1;
+}
+
+message ThrowSeatInfoOne {
+  int32 npc_cfg_id = 1;
+  uint64 npc_id = 2;
+  bool is_call_out = 3;
+}
+
+message ThrowSeatInfo {
+  repeated Next.ThrowSeatInfoOne seat_info_list = 3;
+}
+
+message PetSubmitRewardInfo {
+  uint32 bonus_id = 1;
+  int32 bonus_param = 2;
+}
+
+message InteractActResult {
+  int32 action_type = 1;
+  bytes act_rsp_params = 2;
+}
+
+message InteractCommitResult {
+  int32 action_type = 1;
+  bytes act_rsp_params = 2;
+}
+
+message PlayerInteractBriefInfo {
+  uint32 uin = 1;
+  int32 level = 2;
+  bytes name = 3;
+  int32 icon = 4;
+  uint32 apply_time = 5;
+  int32 world_level = 6;
+}
+
+message PlayerAbilityData {
+  uint32 id = 1;
+  uint32 pet_gid = 2;
+}
+
+message PlayerAbilityInfo {
+  repeated Next.PlayerAbilityData ability_info = 1;
+  uint32 scene_ability_id = 2;
+}
+
+message HistoricalInteractInfo {
+  uint32 uin = 1;
+  uint32 time = 2;
+}
+
+message PlayerInteractInfo {
+  repeated Next.HistoricalInteractInfo historical_exchange_egg_infos = 1;
+  repeated Next.HistoricalInteractInfo historical_sparring_infos = 2;
+}
+
+message PlayerVisitData_VisitApplyInfo {
+  uint32 apply_uin = 1;
+  uint32 apply_time = 2;
+}
+
+message PlayerVisitData_BeastBattleInfo {
+  uint32 beast_match_owner = 2;
+  uint64 beast_match_dst_id = 3;
+}
+
+message PlayerVisitData_RecentVisitPlayer {
+  uint32 visit_uin = 1;
+  uint32 visit_time = 2;
+}
+
+message PlayerVisitData {
+  uint32 visit_time = 1;
+  bool build_visiting = 2;
+  uint64 visit_owner_obj_id = 3;
+  repeated Next.PlayerVisitData_VisitApplyInfo recieve_applys = 4;
+  repeated Next.PlayerVisitData_VisitApplyInfo send_applys = 5;
+  uint64 backup_scenesvr_inst_id = 6;
+  Next.PlayerSceneInfo backup_scene_info = 7;
+  uint32 forbidden_track_task = 8;
+  Next.PlayerVisitData_BeastBattleInfo beast_info = 9;
+  repeated Next.PlayerVisitData_RecentVisitPlayer visit_players = 10;
+  int32 visit_status = 11;
+  uint32 leave_visiting_time = 12;
+  bool not_visiting_login = 13;
+  int32 permission_setting = 14;
+  bool online_visit_teleporting = 15;
+}
+
+message OnlineVisitorItem {
+  uint32 visitor = 1;
+  uint32 alive_time = 2;
+  bool online_visiting = 3;
+}
+
+message OnlineVisitReportData {
+  uint32 owner_uin = 1;
+  repeated Next.OnlineVisitorItem visitors = 2;
+}
+
+message ExchangeData {
+  uint32 exchange_id = 1;
+  uint32 exchange_times = 2;
+  uint32 next_refresh_time = 3;
+  uint32 exchange_group = 4;
+}
+
+message PlayerExchangeInfo {
+  repeated Next.ExchangeData exchange_data = 1;
+  uint32 last_refresh_time = 2;
+  repeated uint32 unlocked_recipes = 3;
+}

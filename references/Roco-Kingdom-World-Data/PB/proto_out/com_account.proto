@@ -1,0 +1,576 @@
+package Next;
+
+import "xls_enum.proto";
+
+enum ClientAccountType {
+  CAT_WECHAT = 1;
+  CAT_QQ = 2;
+}
+
+enum WorldIdType {
+  WIDT_CHINESE_MAINLAND = 0;
+  WIDT_OTHER = 3;
+}
+
+enum GameStatus {
+  GAME_STATUS_INTIAL = 0;
+  GAME_STATUS_WAITING = 1;
+  GAME_STATUS_CONFIRM = 3;
+  GAME_STATUS_PREPARE = 4;
+  GAME_STATUS_START = 5;
+  GAME_STATUS_END = 6;
+  GAME_STATUS_ABNORMAL = 7;
+}
+
+enum FlowModule {
+  FLOW_MODULE_NONE = 0;
+  FLOW_MODULE_GM = 1;
+  FLOW_MODULE_MINIGAME = 2;
+  FLOW_MODULE_MAGIC = 3;
+  FLOW_MODULE_MALL = 4;
+  FLOW_MODULE_PENDANT = 5;
+  FLOW_MODULE_OWL = 6;
+  FLOW_MODULE_BAG = 7;
+  FLOW_MODULE_TASK = 10;
+  FLOW_MODULE_PET = 13;
+  FLOW_MODULE_BATTLE = 16;
+  FLOW_MODULE_SYSTEM = 17;
+  FLOW_MODULE_MAIL = 18;
+  FLOW_MODULE_BATTLE_PASS = 19;
+  FLOW_MODULE_ACTIVITY = 20;
+  FLOW_MODULE_BOOKSHELF = 21;
+  FLOW_MODULE_INTERACT_RESULT = 22;
+  FLOW_MODULE_IDIP = 23;
+  FLOW_MODULE_HOME = 24;
+  FLOW_MODULE_SCENE = 25;
+  FLOW_MODULE_FASHION = 26;
+  FLOW_MODULE_GIFT = 27;
+  FLOW_MODULE_STAR_LIGHT = 28;
+  FLOW_MODULE_EXCHANGE = 29;
+  FLOW_MODULE_LOTTERY_REWARD = 30;
+  FLOW_MODULE_SEASON_ADV = 31;
+}
+
+enum FlowReason {
+  FLOW_REASON_NORMAL = 0;
+  FLOW_REASON_RT_GIFT = 1;
+  FLOW_REASON_RT_DROP = 2;
+  FLOW_REASON_TASK_REWARD = 3;
+  FLOW_REASON_MAIL_REWARD = 4;
+  FLOW_REASON_MALL_BUY = 5;
+  FLOW_REASON_BAG_USE = 6;
+  FLOW_REASON_BAG_SELL = 7;
+  FLOW_REASON_BAG_COMPOSE = 8;
+  FLOW_REASON_PET_RELEASE = 9;
+  FLOW_REASON_BATTLE_SETTLEMENT = 10;
+  FLOW_REASON_PET_CATCH = 11;
+  FLOW_REASON_REGISTER = 12;
+  FLOW_REASON_LEVEL_REWARD = 13;
+  FLOW_REASON_THROW_USE = 14;
+  FLOW_REASON_HANDBOOK_REWARD = 15;
+  FLOW_REASON_CARRYON_REMOVE = 16;
+  FLOW_REASON_CARRYON_ADD = 17;
+  FLOW_REASON_EXCHANGE = 18;
+  FLOW_REASON_THROW = 19;
+  FLOW_REASON_THROW_ROLLBACK = 20;
+  FLOW_REASON_CAMP_LEVEL_UP = 21;
+  FLOW_REASON_CAMP_LEVEL_UP_ROLLBACK = 22;
+  FLOW_REASON_CARRYON_RESONANCE = 23;
+  FLOW_REASON_MINIGAME = 24;
+  FLOW_REASON_SUBMIT_PET = 25;
+  FLOW_REASON_MIRACLE_CHANGE = 26;
+  FLOW_REASON_BE_MIRACLE_CHANGE = 27;
+  FLOW_REASON_MIRACLE_CHANGE_TIMEOUT = 28;
+  FLOW_REASON_SEND_MIRACLE_CHANGE = 29;
+  FLOW_REASON_CHOOSE_TREASURE = 30;
+  FLOW_REASON_FAILED_MAIL_REWARD_RESEND = 31;
+  FLOW_REASON_BATTLE_PASS_FREE_REWARD = 32;
+  FLOW_REASON_BATTLE_PASS_PAID_REWARD = 33;
+  FLOW_REASON_PET_HABIT_UNLOCK_CONSUME = 34;
+  FLOW_REASON_ADVENTURE_CHAPTER = 35;
+  FLOW_REASON_PET_EGG_HATCH_COMPLETE = 36;
+  FLOW_REASON_PET_EVOLVE = 37;
+  FLOW_REASON_PET_BREAKTHROUGH = 38;
+  FLOW_REASON_CONSTRUCT_ROLE = 40;
+  FLOW_REASON_PET_TRAVEL_REWARD = 41;
+  FLOW_CATCH_BALL_REWARD = 42;
+  FLOW_REASON_EXPIRE_BAGITEM = 43;
+  FLOW_REASON_ENTER_DUNGEON = 44;
+  FLOW_REASON_SUBMIT_BAGITEM = 45;
+  FLOW_REASON_TOKEN_DRAW = 46;
+  FLOW_REASON_BLOOD_PET_FIGHT = 47;
+  FLOW_REASON_INVEST = 48;
+  FLOW_REASON_OWL_SANCTUARY_LEVEL_UP = 49;
+  FLOW_REASON_OWL_SANCTUARY_LEVEL_UP_ROLLBACK = 50;
+  FLOW_REASON_BEAST_PET_FIGHT = 51;
+  FLOW_REASON_ACTIVITY_PART = 52;
+  FLOW_REASON_ACTIVITY_STAGE = 53;
+  FLOW_REASON_BATTLE_CATCH_PET = 54;
+  FLOW_REASON_SCENE_CATCH_PET = 55;
+  FLOW_REASON_TEAM_BATTLE_CATCH_PET = 56;
+  FLOW_REASON_LEGENDARY_BATTLE_CATCH_PET = 57;
+  FLOW_REASON_LEADER_FIGHT = 58;
+  FLOW_REASON_PVP = 59;
+  FLOW_REASON_OWL_SANCTUARY_FRUIT = 60;
+  FLOW_REASON_PET_GROW = 61;
+  FLOW_REASON_BOOK_BLOOD_MAGIC = 62;
+  FLOW_REASON_PET_MEDAL_ADD = 63;
+  FLOW_REASON_PET_MEDAL_REMOVE = 64;
+  FLOW_REASON_ACTIVITY_PET_CATCH = 65;
+  FLOW_REASON_ACTIVITY_LIMITED_FLOWER_SEED = 66;
+  FLOW_REASON_ACTIVITY_SHINY_PET_DAY = 67;
+  FLOW_REASON_LEADER_FIGHT_EXTRA_REWARD = 68;
+  FLOW_REASON_MONTH_CARD = 69;
+  FLOW_REASON_MONTH_CARD_SIG = 70;
+  FLOW_REASON_TASK_ACTION = 71;
+  FLOW_REASON_MOBILE_BINDING = 72;
+  FLOW_REASON_AWARD_USE_STAR = 75;
+  FLOW_REASON_MALL_TOTAL_CONSUMPTION_REWARD = 76;
+  FLOW_REASON_GP_CONTEST_REWARD = 77;
+  FLOW_REASON_COUPON_PRESENT = 78;
+  FLOW_REASON_COUPON_ADD_BY_MIDAS = 79;
+  FLOW_REASON_TREASURE_HUNT = 80;
+  FLOW_REASON_ACTIVITY_CONDITION = 81;
+  FLOW_REASON_ACTIVITY_CHALLENGE = 82;
+  FLOW_REASON_BATTLE_PASS_BUY = 83;
+  FLOW_REASON_TASK_MARK = 84;
+  FLOW_REASON_COLLECT = 85;
+  FLOW_REASON_EGG_TRADE = 86;
+  FLOW_REASON_TALENT_WITHDRAW = 87;
+  FLOW_REASON_IDIP = 88;
+  FLOW_REASON_GM = 89;
+  FLOW_REASON_INVESTTASK = 90;
+  FLOW_REASON_TASK_CLEAN_ATTR = 91;
+  FLOW_REASON_BATTLE_PASS_THEME_SELECT = 92;
+  FLOW_REASON_TEACH_READED = 93;
+  FLOW_REASON_INTERACT_ACT = 94;
+  FLOW_REASON_RECOVER = 95;
+  FLOW_REASON_SVR_RECOVER_STAR = 96;
+  FLOW_REASON_PET_COLLECTION = 97;
+  FLOW_REASON_AI_PVE_PET = 98;
+  FLOW_REASON_HOME_PLANT = 99;
+  FLOW_REASON_HOME_PLANT_GOOD_YIELD = 100;
+  FLOW_REASON_HOME_PLANT_SEED_GOOD_YIELD = 101;
+  FLOW_REASON_HOME_PLANT_STEAL = 102;
+  FLOW_REASON_HOME_ROOM_EXPANDTION = 110;
+  FLOW_REASON_HOME_SAVE_LAYOUT = 111;
+  FLOW_REASON_HOME_LEVEUP_REWARD = 112;
+  FLOW_REASON_ACTION_UNLOCK_NPC = 113;
+  FLOW_REASON_ACTION_THROW_CATCH = 114;
+  FLOW_REASON_ACTION_PET_CREATE_FRUIT = 115;
+  FLOW_REASON_ACTION_TOKEN_DRAW = 116;
+  FLOW_REASON_ACTION_RECEIVE_CAMP_PET_REPORT_BONUS = 117;
+  FLOW_REASON_ACTION_MAGIC_SUBMIT_ITEM = 118;
+  FLOW_REASON_ACTION_AWARD_PANEL = 119;
+  FLOW_REASON_ACTION_BONDGIFT = 120;
+  FLOW_REASON_ACTION_WIND_GRASS = 121;
+  FLOW_REASON_ACTION_SUBMIT_PET_REWARD = 122;
+  FLOW_REASON_PENDANT_COMP = 123;
+  FLOW_REASON_THROWER_WILL_LEAVE = 124;
+  FLOW_REASON_THROWER_BACK_ITEM = 125;
+  FLOW_REASON_SCENE_MAGIC_OBJECT_AWARD = 126;
+  FLOW_REASON_ACTION_RELEASE_ITEM_STORAGE = 127;
+  FLOW_REASON_CHECK_ITEM = 128;
+  FLOW_REASON_ACTION_ACT_AWARD = 129;
+  FLOW_REASON_ACT_STORAGE_ITEM_TO_NPC = 130;
+  FLOW_REASON_UNLOCK_RELATION_SUB_DIAMOND = 131;
+  FLOW_REASON_SUITS_LEVEL_UP = 132;
+  FLOW_REASON_GIFT_GIVING = 133;
+  FLOW_REASON_GIFT_RECEIVING = 134;
+  FLOW_REASON_GIFT_EXPIRED = 135;
+  FLOW_REASON_ADD_NEW_PET = 136;
+  FLOW_REASON_SHARE = 137;
+  FLOW_REASON_BEE_GLOBAL_USE_INTEGRAL = 138;
+  FLOW_REASON_INTERACTIONTREE_CHECK_INF = 139;
+  FLOW_REASON_INTERACTIONTREE_BLESSING = 140;
+  FLOW_REASON_ACTIVITY_DROP = 141;
+  FLOW_REASON_ACTIVITY_SEASON_CHECKIN = 142;
+  FLOW_REASON_SPECIAL_TEAM_BATTLE_CATCH_PET = 143;
+  FLOW_REASON_ACTIVITY_CO_CREATION = 144;
+  FLOW_REASON_ACTIVITY_CONDITION_GROUP = 145;
+  FLOW_REASON_PET_UNLOCK_BOX = 146;
+  FLOW_REASON_HOME_NAME = 195;
+  FLOW_REASON_HOME_NORMAL = 196;
+  FLOW_REASON_HOME_EXP = 197;
+  FLOW_REASON_HOME_LEVEL = 198;
+  FLOW_REASON_HOME_ROOM_LEVEL = 199;
+  FLOW_REASON_HOME_PET_FEED = 200;
+  FLOW_REASON_HOME_PET_FETCH_AWARD = 201;
+  FLOW_REASON_HOME_PET_LOAD_FOOD = 202;
+  FLOW_REASON_HOME_PET_REPLACE_FOOD = 203;
+  FLOW_REASON_HOME_PET_UNLOAD_FOOD = 204;
+  FLOW_REASON_HOME_PET_STEAL = 205;
+  FLOW_REASON_FEED_HAND_WRITING_ENHANCE = 206;
+  FLOW_REASON_FEED_HAND_WRITING_ENHANCE_ROLLBACK = 207;
+  FLOW_REASON_HOME_PUT_AWAY_FURNITURE = 208;
+  FLOW_REASON_HOME_PLACE_FURNITURE = 209;
+  FLOW_REASON_CLEAR_TALENT_POINT = 210;
+  FLOW_REASON_SET_TALENT_POINT = 211;
+  FLOW_REASON_SHOP_EXCHANGE = 212;
+  FLOW_REASON_START_UP_PRIVILEGE = 213;
+  FLOW_REASON_EXPIRE_EXCHANGE_GOODS = 214;
+  FLOW_REASON_INTERACT_OPTION_TOGETHER_AWARD = 215;
+  FLOW_REASON_INTERACT_OPTION_SUBMIT_FREE = 216;
+  FLOW_REASON_THROW_CATCH_BOTTLE_REWARD = 217;
+  FLOW_REASON_HOME_PET_SURPRISE_REWARD = 218;
+  FLOW_REASON_SEASON_ADVENTURE_REWARD = 219;
+  FLOW_REASON_THROW_CATCH_TOGETHER_AWARD = 220;
+  FLOW_REASON_TEACH_REWARD = 221;
+  FLOW_REASON_PET_BACKTRACK_REWARD = 222;
+  FLOW_REASON_PET_HOME_LAY = 223;
+  FLOW_REASON_ACTIVITY_SEASON_PREHEAT = 224;
+  FLOW_REASON_ACTIVITY_MIX = 225;
+  FLOW_REASON_ACTIVITY_PET_PARTNER = 226;
+  FLOW_REASON_DISTRIBUTE_REWARD = 227;
+  FLOW_REASON_PET_INSPIRE = 228;
+  FLOW_REASON_ACTIVITY_PET_CERTI = 229;
+  FLOW_REASON_ACTIVITY_PET_PHOTO = 230;
+  FLOW_REASON_FEED_VIDEO_CREATE = 231;
+  FLOW_REASON_ACTIVITY_FINISH_DELETE = 232;
+  FLOW_REASON_CLAIM_COLOR_SUIT = 233;
+  FLOW_REASON_CREATE_ROLE = 234;
+  FLOW_REASON_SEASON_ADVENTURE_BADGE_REWARD = 235;
+  FLOW_REASON_DUPLICATE_COMPENSATION = 239;
+  FLOW_REASON_PET_CUSTOM_EGG = 245;
+  FLOW_REASON_PET_CUSTOM_EGG_HATCH = 246;
+  FLOW_REASON_PET_GLASS_EGG_HATCH_COMPLETE = 247;
+}
+
+enum PlayerBanType {
+  PBT_Rename = 0;
+  PBT_SetSignature = 1;
+  PBT_RenamePet = 2;
+  PBT_AddFriend = 3;
+  PBT_SearchPlayer = 4;
+  PBT_Visit = 5;
+  PBT_TeamBattle = 6;
+  PBT_GiftingEgg = 7;
+  PBT_DoubleTogether = 8;
+  PBT_FeedCreate = 9;
+  PBT_FeedComment = 10;
+  PBT_Recover = 11;
+  PBT_DoubleAction = 12;
+  PBT_SharePet = 13;
+  PBT_Fight = 14;
+  PBT_PhotoAlbum = 15;
+  PBT_BusinessCard = 16;
+  PBT_BPGiving = 17;
+  PBT_BPReceiving = 18;
+  PBT_FunctionEntrance = 19;
+  PBT_FeedVideoCreate = 44;
+  PBT_FeedVideoComment = 45;
+}
+
+enum SecondaryPasswordStatus {
+  SPS_None = 0;
+  SPS_Unset = 1;
+  SPS_Set = 2;
+  SPS_Passed = 3;
+  SPS_Waiting = 4;
+  SPS_Free = 5;
+  SPS_Disable = 6;
+}
+
+message ClientDevInfo {
+  bytes device_info = 1;
+  uint32 plat_id = 2;
+  bytes system_software = 3;
+  bytes system_hardware = 4;
+  bytes telecom_oper = 5;
+  bytes network = 6;
+  int32 screen_width = 7;
+  int32 screen_hight = 8;
+  bytes density = 9;
+  bytes channel = 10;
+  bytes cpu_hardware = 11;
+  bytes memory = 12;
+  bytes gl_render = 13;
+  bytes gl_version = 14;
+  bytes device_id = 15;
+  bytes language = 16;
+  int32 ping = 17;
+  bytes area = 18;
+  bytes appstore = 19;
+  bytes package_channel = 20;
+  bytes aid = 21;
+  bytes user_agent = 22;
+  bytes old_caid = 23;
+  int32 is_gamematrix = 24;
+}
+
+message ClientVerInfo {
+  uint32 cli_version = 1;
+  uint32 cli_res_version = 2;
+  uint32 cli_cfg_version = 3;
+  string app_version = 4;
+  string res_version = 5;
+}
+
+message ClientTokenInfo {
+  uint32 auth_type = 1;
+  bytes access_token = 2;
+  bytes pay_token = 3;
+  bytes pf = 4;
+  bytes tpns_token = 5;
+}
+
+message ClientExtInfo {
+  uint32 bag_item_use_page = 1;
+}
+
+message ClientInfo {
+  Next.ClientVerInfo ver_info = 1;
+  Next.ClientDevInfo dev_info = 2;
+  Next.ClientTokenInfo token_info = 3;
+  Next.ClientExtInfo ext_info = 4;
+}
+
+message DeviceInfo {
+  string device = 1;
+  string lod_level = 2;
+  string ext = 3;
+  int32 screen_scale = 4;
+  int32 fps = 5;
+  int32 forbid = 6;
+}
+
+message PlayerNpcRefreshBanInfo {
+  uint64 ban_time = 1;
+  uint32 ban_probability = 2;
+}
+
+message PlayerBanItem {
+  uint32 permission_date = 2;
+  bytes reason = 3;
+}
+
+message PlayerFuncBanItem {
+  uint32 func_id = 1;
+  uint32 permission_date = 2;
+  bytes reason = 3;
+}
+
+message PlayerBanInfo {
+  repeated Next.PlayerBanItem ban_items = 1;
+  Next.PlayerNpcRefreshBanInfo npc_refresh_ban_info = 2;
+  repeated Next.PlayerFuncBanItem func_ban_items = 3;
+}
+
+message WebGamePlayerInfo {
+  uint64 uin = 1;
+  bytes nick_name = 2;
+  uint32 last_access_time = 3;
+  uint32 player_level = 4;
+  uint32 pet_id = 5;
+  uint32 pet_get_time = 6;
+  uint32 pet_nature = 7;
+  uint32 pet_level = 8;
+  uint32 reg_time = 9;
+}
+
+message PlayerTitleLBSInfo {
+  uint32 province = 1;
+  uint32 rank = 2;
+}
+
+message PlayerTitleExtendInfo {
+  Next.PlayerTitleLBSInfo lbs_info = 1;
+  uint32 effect_begin_time = 2;
+}
+
+message KickoutType {
+  enum ENUM {
+    InactiveTimeout = 1;
+    IllegalPackageSequence = 2;
+    ServerRestart = 3;
+    ServerMaintain = 4;
+    ConflictLogin = 5;
+    GMKickout = 6;
+    ServerInternalError = 7;
+    VisitTeleportFail = 8;
+    ClientResVersionTooLow = 9;
+    ClientResVersionTooHigh = 10;
+    CSMsgLimitFrequency = 11;
+  }
+}
+
+message KickoutSubType {
+  enum ENUM {
+    Default = 0;
+    GMKickout_Ban = 1;
+    GMKickout_BatchKickout = 2;
+    GMKickout_PreventAddiction = 3;
+    Kickout_CrossSvrTeleportFail = 4;
+    Kickout_IllegalRequest = 51;
+  }
+}
+
+message LangType {
+  enum ENUM {
+    zh_CN = 1;
+    zh_TW = 2;
+    Ja = 21;
+    Ko = 41;
+    En = 61;
+    Ar = 81;
+    Es = 101;
+  }
+}
+
+message MultiLangPb {
+  message Lang {
+    int32 lang_type = 1;
+    string lang = 2;
+  }
+  repeated Next.MultiLangPb.Lang langs = 1;
+}
+
+message SnsAuthInfo {
+  string openid = 1;
+  string access_token = 2;
+  uint32 cli_login_channel = 3;
+  uint32 world_id = 4;
+}
+
+message SafetyContentID {
+  string id_type = 1;
+  repeated string id_list = 2;
+}
+
+message SafetyBusinessInfo {
+  enum ReportCategory {
+    RPTCAT_VIOLATING_CONTENT = 1;
+    RPTCAT_MALICIOUS_GAMING_BEHAVIOR = 2;
+    RPTCAT_USE_CHEATING_TOOLS = 3;
+    RPTCAT_ORGANIZATION_INFORMATION = 7;
+    RPTCAT_PERSONAL_INFORMATION = 9;
+  }
+  enum ReportReason {
+    RPTRS_INSULT_AND_ABUSE = 101;
+    RPTRS_TRAFFIC_ADVERTISING = 102;
+    RPTRS_PORNOGRAPHIC_AND_VULGAR = 103;
+    RPTRS_CONTENT_INVOLVES_POLITICS = 104;
+    RPTRS_HARASSMENT = 105;
+    RPTRS_VIOLENCE_AND_BLOODSHED = 106;
+    RPTRS_FRAUDULENT_INFORMATION = 108;
+    RPTRS_NICKNAME_VIOLATION = 901;
+    RPTRS_CHAT_OTHER = 199;
+    RPTRS_PLAYER_BUSINESS_CARD = 903;
+    RPTRS_SIGNATURE_VIOLATION = 904;
+    RPTRS_PERSONAL_INFO_OTHERS = 999;
+    RPTRS_MODIFICATION_VALUE_CHEAT = 398;
+    RPTRS_EXPLOITING_BUG = 205;
+    RPTRS_AFK_RUNNING_AWAY = 206;
+    RPTRS_NEGATIVE_MATCH = 211;
+    RPTRS_GAME_SCENSE_OTHERS = 399;
+    RPTRS_ROOM_NAME_INVALID_701 = 701;
+    RPTRS_PORNOGRAPHIC_AND_VULGAR_703 = 703;
+    RPTRS_CONTENT_INVOLVES_POLITICS_704 = 704;
+    RPTRS_INSULT_AND_ABUSE_705 = 705;
+    RPTRS_FRAUDULENT_INFORMATION_706 = 706;
+    RPTRS_OTHER_799 = 799;
+  }
+  enum ReportScense {
+    RPTSS_CONVERSATION_SPEAKING_SCENE = 1;
+    RPTSS_PERSONAL_INFORMATION_SCENE = 2;
+    RPTSS_GAME_MATCH_SCENE = 3;
+    RPTSS_DYNAMIC_POSTS_SCENE = 4;
+    RPTSS_COMMENT_AND_MESSAGE_SCENE = 5;
+    RPTSS_ORGANIZATION_INFORMATION_SCENE = 8;
+  }
+  Next.SafetyBusinessInfo.ReportCategory report_category = 1;
+  repeated Next.SafetyBusinessInfo.ReportReason report_reason = 2;
+  Next.SafetyBusinessInfo.ReportScense report_scene = 3;
+  string reported_profile_url = 4;
+  string report_battle_id = 5;
+  int32 report_battle_time = 6;
+  string report_desc = 7;
+  string report_content = 8;
+  repeated string pic_url_array = 9;
+  repeated string video_url_array = 10;
+  repeated string voice_url_array = 11;
+  string report_group_id = 12;
+  string report_group_name = 13;
+  int32 language_id = 14;
+  string callback = 15;
+  Next.SafetyContentID content_id = 16;
+  int32 report_entrance = 17;
+}
+
+message HopeInstruction {
+  uint32 type = 1;
+  bytes openid = 2;
+  uint32 uin = 3;
+  bytes title = 4;
+  bytes msg = 5;
+  bytes url = 6;
+  int32 modal = 7;
+  bytes rule_name = 8;
+  int32 logout_type = 9;
+  bytes trace_id = 10;
+  uint32 logout_time = 11;
+}
+
+message HopeInstructionReportData {
+  bytes openid = 1;
+  bytes rule_name = 2;
+  bytes instruction_trace_id = 3;
+  uint32 exec_time = 4;
+}
+
+message PlayerHopeData {
+  uint32 last_report_time = 1;
+  Next.HopeInstruction instruction = 2;
+  uint32 pvp_match_banned_timestamp = 3;
+}
+
+message OpenIdList {
+  repeated bytes openid = 1;
+}
+
+message WhitelistTagList {
+  repeated dataconfig.WhitelistTagType tags = 1;
+  bytes ori_key = 2;
+  bytes wx = 3;
+  bytes comment = 4;
+}
+
+message PlayerSecInfo {
+  uint32 score = 1;
+  uint32 tag_black = 2;
+  uint32 tag_ugc = 3;
+  int64 last_update_time = 4;
+}
+
+message CreditScoreLimitInfo {
+  message GroupEntry {
+    int32 group_id = 1;
+    int32 threshold_lo = 2;
+    int32 threshold_hi = 3;
+    int32 is_tag_used = 4;
+    string tag_type = 5;
+    int32 tag_hi = 6;
+    int32 tag_lo = 7;
+  }
+  message SceneEntry {
+    string scene_id = 1;
+    repeated Next.CreditScoreLimitInfo.GroupEntry group_entry_list = 2;
+  }
+  repeated Next.CreditScoreLimitInfo.SceneEntry scene_entry_list = 1;
+}
+
+message SceneIdipActionNpcInfo {
+  uint32 type = 1;
+  uint32 is_finish = 2;
+  uint32 param1 = 3;
+  uint32 param2 = 4;
+  uint32 task_id = 5;
+  uint32 time = 6;
+  uint32 seq = 7;
+}
+
+message SceneIdipActionNpcList {
+  repeated Next.SceneIdipActionNpcInfo idip_actions = 1;
+  uint32 max_seq = 2;
+  uint32 finish_seq = 3;
+}

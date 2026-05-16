@@ -1,0 +1,81 @@
+package Next;
+
+message OssReason {
+  int32 reason = 1;
+  int32 sub_reason1 = 2;
+  int32 sub_reason2 = 3;
+  int32 sub_reason3 = 4;
+}
+
+message MidasFailRetryPresentInfo {
+  uint64 charge_val = 1;
+  uint64 billno = 2;
+  uint64 try_times = 3;
+  Next.OssReason reason = 4;
+  bytes bill_no = 5;
+  uint32 is_finish = 6;
+}
+
+message MidasFailRetryPresentList {
+  repeated Next.MidasFailRetryPresentInfo fails = 1;
+  uint32 try_last_time = 2;
+}
+
+message MidasDistriBillInfo {
+  bytes billno = 1;
+  uint32 update_time = 2;
+}
+
+message MidasDistriBillList {
+  repeated Next.MidasDistriBillInfo billnos = 1;
+}
+
+message ChargeInfo {
+  uint32 money_num = 1;
+  uint64 charge_times = 2;
+  uint64 last_update_time = 3;
+}
+
+message ChargeInfoList {
+  repeated Next.ChargeInfo charges = 1;
+}
+
+message MidasFailfo {
+  uint64 charge_val = 1;
+  uint64 billno = 2;
+  uint64 try_times = 3;
+  Next.OssReason reason = 4;
+  bytes bill_no = 5;
+  uint32 is_finish = 6;
+  uint32 last_try_time = 7;
+  uint32 type = 8;
+}
+
+message MidasFailRetryList {
+  repeated Next.MidasFailfo fails = 1;
+}
+
+message MidasMoneyInfo {
+  uint32 last_recharge_points_num = 1;
+  uint64 last_recharge_points_time = 2;
+  uint64 midas_balance = 4;
+  uint64 midas_save_amt = 5;
+  Next.MidasFailRetryPresentList fail_data_nouse = 6;
+  uint64 out_game_buy_num = 10;
+  Next.ChargeInfoList charge_data = 11;
+  uint64 last_update_time = 12;
+  uint64 free_balance = 13;
+  uint64 use_charge_points_num = 14;
+  uint64 pay_points_num = 15;
+  uint64 last_charge_money_num = 16;
+  uint64 last_charge_time = 17;
+  uint64 last_usecharge_money_num = 18;
+  uint64 last_usecharge_time = 19;
+  uint64 gid = 20;
+  uint64 midas_gen_save_amt = 21;
+  uint64 distribute_amt = 22;
+  uint64 total_test_amt = 23;
+  bool is_calc_test_amt = 24;
+  Next.MidasFailRetryList fail_data = 25;
+  uint32 last_try_time = 26;
+}

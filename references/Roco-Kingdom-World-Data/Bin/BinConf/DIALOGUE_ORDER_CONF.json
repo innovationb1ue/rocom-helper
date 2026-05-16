@@ -1,0 +1,124 @@
+{
+    "Name": "DIALOGUE_ORDER_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "first_level_area_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "first_level_area_name_rank",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "journey_plot_id",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "journey_plot_id_rank",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "journey_plot_name",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "journey_area_name",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "journey_area_name_rank",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "main_plot_id_export",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "main_plot_id",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_plot_id_rank",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "main_plot_name",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_area_name",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_area_name_rank",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "second_level_area_name",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "second_level_area_name_rank",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "third_level_area_name",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "third_level_area_name_rank",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        }
+    ]
+}

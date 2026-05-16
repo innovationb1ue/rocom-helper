@@ -1,0 +1,86 @@
+{
+    "Name": "GUIDE_DRAG_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "simulate_drag",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "start_type",
+            "Type": "EUint32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "start_ui_path",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "start_screen",
+            "Type": "EFloat",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "start_offset",
+            "Type": "EFloat",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "end_type",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "end_ui_path",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "end_screen",
+            "Type": "EFloat",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "end_offset",
+            "Type": "EFloat",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

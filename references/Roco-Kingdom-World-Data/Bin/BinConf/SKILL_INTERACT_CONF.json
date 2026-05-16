@@ -1,0 +1,49 @@
+{
+    "Name": "SKILL_INTERACT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "behavior_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "RPbehavior_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "interact_skill_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "skip_pet_back",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "face_to_face",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "keep_origin_size",
+            "Type": "EBool",
+            "Offset": 18,
+            "Size": 1
+        }
+    ]
+}

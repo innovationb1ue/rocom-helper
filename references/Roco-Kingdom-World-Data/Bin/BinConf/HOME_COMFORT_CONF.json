@@ -1,0 +1,31 @@
+{
+    "Name": "HOME_COMFORT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "coordinate",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "furniture_coin_ratio",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "home_exp_ratio",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

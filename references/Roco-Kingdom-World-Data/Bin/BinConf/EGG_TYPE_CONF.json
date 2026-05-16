@@ -1,0 +1,53 @@
+{
+    "Name": "EGG_TYPE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "ID",
+    "Properties": [
+        {
+            "Name": "ID",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "display_order",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "precious_egg_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "cant_give_away",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "ball_range",
+            "Type": "EInt32",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "small_icon",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

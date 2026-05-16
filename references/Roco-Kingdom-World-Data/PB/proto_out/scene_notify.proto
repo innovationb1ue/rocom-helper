@@ -1,0 +1,234 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_gm.proto";
+import "com_relation.proto";
+import "xls_enum.proto";
+
+enum DEBUG_DRAW_CALL_TYPE {
+  POINT = 1;
+  LINE = 2;
+  SPHERE = 3;
+  BOX = 4;
+  CAPSULE = 5;
+  MESH = 6;
+  WIRE_FRAME = 7;
+  POINT_SET = 8;
+  NAV_MESH = 9;
+  CYLINDER = 10;
+  CIRCLE = 11;
+  TEXT = 12;
+}
+
+enum STAMINA_CHANGE_REASON {
+  SCR_NONE = 0;
+  SCR_MINIGAME = 1;
+  SCR_RIDE_COLLECT = 2;
+  SCR_DUGEON = 3;
+  SCR_SWITCH_MAGIC = 4;
+}
+
+enum RELATION_INTERACT_NOTIFY_TYPE {
+  RINT_NONE = 0;
+  RINT_INVITE = 1;
+  RINT_ACCEPT = 2;
+  RINT_INTERRUPT = 3;
+  RINT_END = 4;
+  RINT_CHANGE = 5;
+}
+
+enum RELATION_INTERACT_NOTIFY_REASON {
+  RINR_NONE = 0;
+  RINR_LEAVE_VISIT = 1;
+  RINR_STATE_CHANGE = 2;
+  RINR_WAIT_TIMEOUT = 3;
+  RINR_DIS_TOO_FAR = 4;
+  RINR_RECOVER_FAIL = 5;
+  RINR_ENTER_VISIT_FAIL = 6;
+  RINR_OUT_AIRWALL = 7;
+}
+
+enum FRIEND_NOTIFY_REASON {
+  FNR_NONE = 0;
+  FNR_RECYCLE = 1;
+  FNR_LEAVE_VISIBLE_AREA = 2;
+  FNR_LEAVE_VISIT = 3;
+  FNR_ENTER_BATTLE = 4;
+  FNR_DIE = 5;
+}
+
+enum CommonTipsSource {
+  CTS_COMBINE_NPC = 1;
+  CTS_CCC_CHECKER = 2;
+}
+
+message ZoneSceneReviveTeleportNotify {
+  int32 teleport_id = 1;
+  int32 teleport_reason = 2;
+}
+
+message DebugDrawRotator {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  float w = 4;
+}
+
+message DebugDrawPointData {
+  Next.Position point_pos = 1;
+  int32 point_size = 2;
+  Next.DebugDrawColor color = 3;
+  float show_time = 4;
+}
+
+message DebugDrawLineData {
+  Next.Position start_pos = 1;
+  Next.Position end_pos = 2;
+  Next.DebugDrawColor color = 3;
+  float show_time = 4;
+  int32 thickness = 5;
+  int32 arrow_size = 6;
+}
+
+message DebugDrawSphereData {
+  Next.Position center = 1;
+  int32 radius = 2;
+  int32 segments = 3;
+  Next.DebugDrawColor color = 4;
+  float show_time = 5;
+  int32 thickness = 6;
+}
+
+message DebugDrawBoxData {
+  Next.Position center = 1;
+  Next.Position extent = 2;
+  Next.DebugDrawColor color = 3;
+  Next.DebugDrawRotator rotator = 4;
+  float show_time = 5;
+  int32 thickness = 6;
+}
+
+message DebugDrawCapsuleData {
+  Next.Position center = 1;
+  float half_height = 2;
+  float radius = 3;
+  Next.DebugDrawRotator rotator = 4;
+  Next.DebugDrawColor color = 5;
+  float show_time = 6;
+  int32 thickness = 7;
+}
+
+message DebugDrawMeshData {
+  repeated Next.Position verts = 1;
+  repeated int32 indices = 2;
+  Next.DebugDrawColor color = 3;
+  float show_time = 4;
+}
+
+message DebugDrawWireFrame {
+  Next.Position start_pos = 1;
+  Next.Position end_pos = 2;
+}
+
+message DebugDrawWireFrameData {
+  repeated Next.DebugDrawWireFrame lines = 1;
+  Next.DebugDrawColor color = 2;
+  float show_time = 3;
+  int32 thickness = 4;
+  int32 arrow_size = 5;
+}
+
+message DebugDrawPointSetData {
+  repeated Next.Position verts = 1;
+  int32 point_size = 2;
+  Next.DebugDrawColor color = 3;
+  float show_time = 4;
+}
+
+message DebugDrawNavMeshData {
+  Next.NavMeshDebugDraw raw_data = 1;
+  int32 inner_line_thickness = 2;
+  int32 outer_line_thickness = 3;
+  float show_time = 4;
+}
+
+message DebugDrawCylinderData {
+  Next.Position center_pos = 1;
+  int32 half_height = 2;
+  int32 radius = 3;
+  int32 segments = 4;
+  Next.DebugDrawColor color = 5;
+  float show_time = 6;
+  int32 thickness = 7;
+}
+
+message DebugDrawCircleData {
+  Next.Position center_pos = 1;
+  int32 radius = 2;
+  int32 segments = 3;
+  Next.DebugDrawColor color = 4;
+  float show_time = 5;
+  int32 thickness = 6;
+}
+
+message DebugDrawTextData {
+  Next.Position pos = 1;
+  bytes text = 2;
+  Next.DebugDrawColor color = 3;
+  float show_time = 4;
+}
+
+message SceneGmDebugDrawCall {
+  Next.DEBUG_DRAW_CALL_TYPE type = 1;
+  Next.DebugDrawPointData point_data = 2;
+  Next.DebugDrawLineData line_data = 3;
+  Next.DebugDrawSphereData sphere_data = 4;
+  Next.DebugDrawBoxData box_data = 5;
+  Next.DebugDrawCapsuleData capsule_data = 6;
+  Next.DebugDrawMeshData mesh_data = 7;
+  Next.DebugDrawWireFrameData wire_frame_data = 8;
+  Next.DebugDrawPointSetData point_set_data = 9;
+  Next.DebugDrawNavMeshData nav_mesh_data = 10;
+  Next.DebugDrawCylinderData cylinder_data = 11;
+  Next.DebugDrawCircleData circle_data = 12;
+  Next.DebugDrawTextData text_data = 13;
+}
+
+message ZoneSceneGmDebugDrawCall {
+  repeated Next.SceneGmDebugDrawCall draws = 1;
+}
+
+message ZoneSceneStaminaChangeNotify {
+  Next.STAMINA_CHANGE_REASON change_reason = 1;
+  int32 stamina_change = 2;
+  bool ban_stamina = 3;
+}
+
+message ZoneSceneMovePathCheckNotify {
+}
+
+message ZoneSceneBossChallengeFailNotify {
+  int32 teleport_reason = 1;
+}
+
+message ZoneSceneRelationInteractNotify {
+  Next.RELATION_INTERACT_NOTIFY_TYPE notify_type = 1;
+  uint32 target_uin = 2;
+  int32 interact_type = 3;
+  Next.InteractParam interact_param = 4;
+  uint32 uin1 = 5;
+  uint32 uin2 = 6;
+  int32 interact_sub_type = 7;
+  Next.RELATION_INTERACT_NOTIFY_REASON notify_reason = 8;
+}
+
+message ZoneSceneFriendRideNotify {
+  uint32 friend_uin = 1;
+  int32 pet_gid = 2;
+  Next.FRIEND_NOTIFY_REASON reason = 3;
+}
+
+message ZoneSceneCommonTipsNotify {
+  string localization_id = 1;
+  Next.CommonTipsSource source = 2;
+}

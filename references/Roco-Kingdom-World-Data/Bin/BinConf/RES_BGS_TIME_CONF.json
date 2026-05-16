@@ -1,0 +1,25 @@
+{
+    "Name": "RES_BGS_TIME_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "bgs",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "buff_time",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

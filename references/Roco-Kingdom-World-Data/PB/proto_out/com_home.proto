@@ -1,0 +1,384 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_pet.proto";
+import "com_pet_skill.proto";
+import "com_player_data.proto";
+import "com_goods.proto";
+
+enum HomeInfoChangeType {
+  HICT_NONE = 0;
+  HICT_HOME_NAME = 1;
+  HICT_HOME_LEVEL = 2;
+  HICT_HOME_EXP = 3;
+  HICT_HOME_COMFORT_LEVEL = 4;
+  HICT_ROOM_LEVEL = 5;
+  HICT_ROOM_EXPANSION = 6;
+  HICT_ROOM_LAYOUT = 7;
+  HICT_HOME_REJECT_REASON = 8;
+  HICT_HOME_ACCESS_INFO = 9;
+  HICT_REMOVE_FURNITURE = 10;
+  HICT_HOME_PLACE_PET_CHANGE = 11;
+}
+
+enum HomeOwnerOnlineStatus {
+  HOME_OWNER_ONLINE_STATUS_OUT_HOME = 0;
+  HOME_OWNER_ONLINE_STATUS_IN_HOME = 1;
+  HOME_OWNER_ONLINE_STATUS_IN_PLANT = 2;
+}
+
+enum HomePetGuardOpType {
+  HOME_PET_GUARD_DISPATCH = 1;
+  HOME_PET_GUARD_CANCEL = 2;
+}
+
+enum HomeTeamType {
+  HOME_TEAM_TYPE_NONE = 0;
+  HOME_TEAM_TYPE_VISIT = 1;
+  HOME_TEAM_TYPE_HOME = 2;
+  HOME_TEAM_TYPE_PLANT = 3;
+}
+
+enum HomeTeamStatus {
+  HOME_TEAM_STATUS_NONE = 0;
+  HOME_TEAM_STATUS_FORMING = 1;
+  HOME_TEAM_STATUS_ENTERING = 2;
+  HOME_TEAM_STATUS_IN_HOME = 3;
+  HOME_TEAM_STATUS_DISBAND = 4;
+}
+
+enum HomeTeamMemberStatus {
+  HOME_TEAM_MEMBER_STATUS_NONE = 0;
+  HOME_TEAM_MEMBER_STATUS_INVITED = 1;
+  HOME_TEAM_MEMBER_STATUS_ACCEPT = 2;
+  HOME_TEAM_MEMBER_STATUS_DECLINED = 3;
+  HOME_TEAM_MEMBER_STATUS_ENTERING = 4;
+  HOME_TEAM_MEMBER_STATUS_OFFLINE = 5;
+}
+
+enum HomeTeamRespondType {
+  HOME_TEAM_RESPOND_TYPE_REJECT = 0;
+  HOME_TEAM_RESPOND_TYPE_ACCEPT = 1;
+}
+
+message CellPassDataHome {
+  bytes home_name = 1;
+  bool owner_is_online = 2;
+}
+
+message CellPassDataPb {
+  Next.CellPassDataHome home_data = 1;
+}
+
+message HomeInfo {
+  bytes home_name = 1;
+  uint32 home_owner_id = 2;
+  uint32 home_experience = 3;
+  uint32 home_level = 4;
+  uint32 room_level = 5;
+  uint32 home_comfort_level = 6;
+  Next.HomeAccessInfo access_info = 10;
+  Next.RoomLayoutInfo room_layout = 20;
+  Next.RoomExpansionInfo room_expansion_info = 21;
+  Next.HomeLayEggCoupleInfo lay_egg_couple = 22;
+}
+
+message HomeRareLayEggBanInfo {
+  uint64 lay_egg_ban_time = 1;
+  uint32 lay_egg_ban_probability = 2;
+}
+
+message HomeBanInfo {
+  bool is_banned = 1;
+  uint32 begin_time = 2;
+  uint32 end_time = 3;
+  bytes ban_reason = 4;
+}
+
+message HomeViolationInfo {
+  bool is_violation = 1;
+  uint32 begin_time = 2;
+}
+
+message HomeAccessInfo {
+  Next.HomeBanInfo ban_info = 1;
+  Next.HomeViolationInfo violation_info = 2;
+}
+
+message RoomFurnitureDetails {
+  uint64 furniture_guid = 1;
+  uint64 parent_furniture_guid = 2;
+  uint32 item_gid = 4;
+  uint32 config_id = 5;
+  Next.Point position = 6;
+  uint64 npc_id = 7;
+}
+
+message RoomPlacementPlane {
+  string plane_guid = 1;
+  repeated Next.RoomFurnitureDetails furniture_list = 20;
+}
+
+message RoomDecorationDetails {
+  uint32 config_id = 1;
+  uint32 item_gid = 2;
+}
+
+message RoomDetails {
+  uint32 room_id = 1;
+  bytes room_name = 2;
+  repeated Next.RoomPlacementPlane room_plane_list = 20;
+  repeated Next.RoomDecorationDetails decoration_list = 21;
+}
+
+message RoomLayoutInfo {
+  repeated Next.RoomDetails rooms = 1;
+}
+
+message HomeLayEggCoupleOne {
+  uint64 female_obj_id = 1;
+  repeated uint64 male_obj_id = 2;
+}
+
+message HomeLayEggCoupleInfo {
+  repeated Next.HomeLayEggCoupleOne female_couple = 1;
+}
+
+message HomeDynamic {
+  enum HomeDynamicType {
+    UNKNOWN_DYNAMIC_TYPE = 0;
+    STEAL_INSPIRATION = 1;
+    STEAL_INSPIRATION_REPELLED = 2;
+    WATER_PLANT = 3;
+    FERTILIZE_PLANT = 4;
+    STEAL_PLANT = 5;
+    STEAL_PLANT_REPELLED = 6;
+    VISIT_HOME = 7;
+  }
+  Next.HomeDynamic.HomeDynamicType type = 1;
+  uint32 value = 2;
+}
+
+message HomeVisitRecord {
+  uint32 visitor_uin = 1;
+  uint32 visit_timestamp = 2;
+  uint32 visitor_icon = 3;
+  bytes visitor_name = 4;
+  bool is_friend = 5;
+  repeated Next.HomeDynamic home_dynamics = 6;
+}
+
+message HomeVisitorInfo {
+  enum VisitorTag {
+    VISITOR_TAG_NORMAL = 0;
+    VISITOR_TAG_TEAM = 1;
+    VISITOR_TAG_PENDING_TEAM = 2;
+    VISITOR_TAG_PREOCCUPY = 3;
+  }
+  uint32 uin = 1;
+  uint32 network_latency_ms = 2;
+  repeated Next.HomeVisitorInfo.VisitorTag tags = 3;
+}
+
+message HomeVisitHistoryInfo {
+  repeated Next.HomeVisitRecord visit_records = 1;
+}
+
+message HomeLevelRewardInfo {
+  repeated Next.RewardState reward_states = 3;
+}
+
+message HomeUnlockedHandBookList {
+  repeated Next.FurnitureHandBook unlock_list = 1;
+}
+
+message HomeUnlockedFurnitureIdList {
+  repeated int32 id_list = 1;
+}
+
+message HomeRecommendedFurnitureInfo {
+  repeated int32 recommended_id_list = 1;
+  uint64 next_update_timestamp = 2;
+}
+
+message CraftableFurnitureList {
+  repeated Next.UnlockedFurniture unlocked_furniture_list = 1;
+  repeated int32 recommended_id_list = 2;
+}
+
+message HomeCraftableFurnitureFriendInfo {
+  uint32 uin = 1;
+  bytes name = 2;
+  Next.PlayerOnlineState.ENUM online_state = 3;
+  uint32 logout_time = 4;
+  uint32 card_icon_selected = 5;
+  bytes note = 6;
+  uint32 home_level = 7;
+  bool is_recommended = 8;
+}
+
+message HomePetFoodInfo {
+  uint32 bag_item_id = 1;
+  uint32 num = 2;
+}
+
+message HomePetFeedInfo {
+  Next.HomePetFoodInfo food_info = 1;
+  uint64 begin_time = 2;
+  uint64 time_cost = 3;
+}
+
+message HomePetGoodsInfo {
+  int32 goods_type = 1;
+  int32 goods_id = 2;
+  int32 goods_num = 3;
+  int32 goods_total_num = 4;
+  int32 goods_award_type = 5;
+}
+
+message HomePetAwardInfo {
+  repeated Next.HomePetGoodsInfo goods_infos = 1;
+}
+
+message HomePetOption {
+  repeated uint32 option_cfg_id = 1;
+}
+
+message HomePetDisplayInfo {
+  uint32 base_conf_id = 3;
+  uint32 gender = 4;
+  bytes name = 5;
+  uint32 level = 6;
+  uint32 mutation_type = 7;
+  uint32 energy = 9;
+  uint32 blood_id = 10;
+  Next.PetAdditionalNewAttrList attribute_new_info = 11;
+  Next.PetAttributeInfo attribute_info = 12;
+  Next.PetSkillInfo skill = 13;
+  uint32 nature = 14;
+  uint32 changed_nature_neg_attr_type = 15;
+  uint32 changed_nature_pos_attr_type = 16;
+  uint32 speciality_id = 17;
+  Next.GlassInfo glass_info = 18;
+  uint32 last_breakthrough_lv = 19;
+}
+
+message HomePetGainData {
+  int32 furni_coin = 1;
+  int32 home_exp = 2;
+  int32 furni_prob = 3;
+  int32 special_furni_prob = 4;
+  int32 steal_furni_coin = 5;
+}
+
+message HomePetData {
+  uint32 gid = 1;
+  uint32 base_conf_id = 2;
+  uint32 nature = 3;
+  Next.PetAttributeInfo attribute_info = 4;
+  uint32 mutation_type = 5;
+  Next.GlassInfo glass_info = 6;
+  uint32 blood_id = 7;
+  uint32 height = 8;
+  uint32 weight = 9;
+  uint32 gender = 10;
+  bytes name = 11;
+  uint32 level = 12;
+  uint32 energy = 13;
+  Next.PetAdditionalNewAttrList attribute_new_info = 14;
+  Next.PetSkillInfo skill = 16;
+  uint32 changed_nature_neg_attr_type = 17;
+  uint32 changed_nature_pos_attr_type = 18;
+  uint32 speciality_id = 19;
+  uint32 last_breakthrough_lv = 20;
+  int32 voice = 21;
+  uint32 home_pet_npc_cfg_id = 23;
+  repeated uint32 real_speciality_ids = 24;
+  Next.HomePetGainData gain_data = 25;
+}
+
+message HomePetInfo {
+  uint32 pet_gid = 1;
+  uint32 pet_cfg_id = 2;
+  uint64 furniture_guid = 3;
+  Next.HomePetFeedInfo feed_info = 6;
+  Next.HomePetAwardInfo awards_info = 7;
+  uint32 status = 8;
+  uint32 speciality_id = 9;
+  repeated uint32 real_speciality_ids = 10;
+  bytes name = 11;
+  uint32 feed_round = 12;
+  Next.Position pos = 13;
+}
+
+message HomePetBriefInfo {
+  Next.HomePetInfo home_pet_info = 1;
+  Next.HomePetDisplayInfo display_info = 2;
+  bool can_steal = 3;
+  bool have_egg = 4;
+}
+
+message HomePlant_PlantBriefInfo {
+  int32 plant_id = 1;
+  int32 plant_state = 3;
+  int32 plant_seed_id = 4;
+  int64 plant_rip_time = 6;
+  int32 plant_harvest_num = 10;
+  int64 plant_tab_id = 15;
+  repeated uint32 plant_steal_players = 40;
+  uint32 plant_steal_account = 41;
+  uint32 plant_can_steal_account = 42;
+}
+
+message HomePlant_LandBriefInfo {
+  repeated Next.HomePlant_PlantBriefInfo home_plant_list = 3;
+}
+
+message HomePlant_BriefInfo {
+  repeated Next.HomePlant_LandBriefInfo home_plant_land_list = 1;
+  bool unlock = 3;
+}
+
+message CellHomeBriefInfo {
+  uint32 uin = 1;
+  Next.HomePlant_BriefInfo home_plant_info = 30;
+  repeated Next.HomePetBriefInfo home_pets = 40;
+}
+
+message HomeTeamInfo {
+  Next.HomeTeamType team_type = 1;
+  uint32 team_leader_uin = 2;
+  Next.HomeTeamStatus status = 3;
+  repeated Next.HomeTeamMemberInfo members = 4;
+}
+
+message HomeTeamMemberInfo {
+  uint32 uin = 1;
+  string name = 2;
+  uint32 card_icon = 3;
+  uint32 role_level = 4;
+  uint32 world_level = 5;
+  Next.HomeTeamMemberStatus status = 10;
+}
+
+message ZoneSceneHomeTeamUpdateNotify {
+  Next.HomeTeamInfo team_info = 1;
+}
+
+message ZoneSceneHomeTeamInviteNotify {
+  uint32 team_leader_uin = 1;
+  Next.HomeTeamStatus status = 2;
+  Next.HomeTeamMemberInfo team_leader = 3;
+  Next.HomeTeamType team_type = 4;
+}
+
+message ZoneSceneHomeTeamEnterNotify {
+  uint32 home_owner_id = 1;
+  Next.HomeTeamType team_type = 2;
+}
+
+message ZoneSceneHomeTeamEnterCheckResultNotify {
+  uint32 home_owner_id = 1;
+  Next.HomeTeamType team_type = 2;
+  int32 error_code = 3;
+}

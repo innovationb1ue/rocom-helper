@@ -1,0 +1,64 @@
+{
+    "Name": "PET_CLOSE_LEVEL_EFFECT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "close_level",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "effect_group",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "PET_CLOSE_LEVEL_EFFECT_CONF.effect_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "skill_buff_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "buff_trigger_probability",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "localization_id",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "friend_close_level_fix_value",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "stranger_close_level_fix_valu",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        }
+    ]
+}

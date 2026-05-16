@@ -1,0 +1,214 @@
+{
+    "Name": "ACTIVITY_PREHEAT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "pre_unlock_task",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "option_txt",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "final_task_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "final_task_title",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "final_task_text",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_page",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_title",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_title_1",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_1",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_title_2",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_2",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_title_3",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_3",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_title_4",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_4",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_title_5",
+            "Type": "EString",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "newspaper_txt_5",
+            "Type": "EString",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward_group",
+            "Type": "EStruct",
+            "Offset": 76,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "ACTIVITY_PREHEAT_CONF.reward_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "unlock_time",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_task_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "unlock_picture",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "show_picture",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_text_1",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_text_2",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_text_3",
+                        "Type": "EString",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_text_4",
+                        "Type": "EString",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "manuscript_text_5",
+                        "Type": "EString",
+                        "Offset": 32,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

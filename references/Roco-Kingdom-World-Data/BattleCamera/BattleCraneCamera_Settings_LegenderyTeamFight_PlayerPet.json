@@ -1,0 +1,78 @@
+{
+	"Desc": "神兽团体战——技能的摄像机位置",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -5,
+		"Z": -30
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 130,
+		"Z": 50
+	},
+	"SprintArmLength": 950,
+	"CameraFov": 75,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 100
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 0,
+			"EffectType": 0,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 0
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 0,
+			"EffectType": 0,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 0
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 0,
+			"EffectType": 0,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 0
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 0,
+			"EffectType": 0,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 0
+			},
+			"Desc": ""
+		}
+	]
+}

@@ -1,0 +1,61 @@
+{
+    "Name": "NRC_AI_BB_INSTANCE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "blackboard_override",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 50,
+            "Struct": {
+                "Name": "NRC_AI_BB_INSTANCE_CONF.blackboard_override",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "identifier",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "blackboard_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "data",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "additional_para",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "addition_str",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

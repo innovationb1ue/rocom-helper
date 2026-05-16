@@ -1,0 +1,29 @@
+{
+  "length": 8,
+  "actions":
+  [
+    {
+      "Name": "show_ui",
+      "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+      "StartTime": 0.0
+    },
+    {
+      "Name": "hide_ui",
+      "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineHideUIEvent",
+      "StartTime": 7.0
+    },
+    {
+      "Name": "black",
+      "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineBlackScreenState",
+      "StartTime": 2.0,
+      "EndTime": 4.0
+    },
+    {
+      "Name": "user_anim_action",
+      "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCAnimAction",
+      "StartTime": 0.0,
+      "ActorID": 64091,
+      "Action": "Hello1"
+    }
+  ]
+}

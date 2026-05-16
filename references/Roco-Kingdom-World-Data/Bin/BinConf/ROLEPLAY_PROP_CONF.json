@@ -1,0 +1,261 @@
+{
+    "Name": "ROLEPLAY_PROP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name_text",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_initial_unlock",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "interactive_prop_chat_message_type",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "message_group",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "icon_path",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "prop_server_radius",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "prop_eqs_box_custom",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "lift_box",
+            "Type": "EInt32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "prop_recycle_distance",
+            "Type": "EInt32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "flash_sit_1",
+            "Type": "EBool",
+            "Offset": 37,
+            "Size": 1
+        },
+        {
+            "Name": "flash_sit_specialeffect_1",
+            "Type": "EBool",
+            "Offset": 38,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_1",
+            "Type": "EBool",
+            "Offset": 39,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_specialeffect_1",
+            "Type": "EBool",
+            "Offset": 40,
+            "Size": 1
+        },
+        {
+            "Name": "special_pos_1",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "loop_idle_1_m",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "loop_idle_1_w",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "flash_sit_2",
+            "Type": "EBool",
+            "Offset": 53,
+            "Size": 1
+        },
+        {
+            "Name": "flash_sit_specialeffect_2",
+            "Type": "EBool",
+            "Offset": 54,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_2",
+            "Type": "EBool",
+            "Offset": 55,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_specialeffect_2",
+            "Type": "EBool",
+            "Offset": 56,
+            "Size": 1
+        },
+        {
+            "Name": "special_pos_2",
+            "Type": "EString",
+            "Offset": 57,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "loop_idle_2_m",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "loop_idle_2_w",
+            "Type": "EInt32",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "flash_sit_3",
+            "Type": "EBool",
+            "Offset": 69,
+            "Size": 1
+        },
+        {
+            "Name": "flash_sit_specialeffect_3",
+            "Type": "EBool",
+            "Offset": 70,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_3",
+            "Type": "EBool",
+            "Offset": 71,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_specialeffect_3",
+            "Type": "EBool",
+            "Offset": 72,
+            "Size": 1
+        },
+        {
+            "Name": "special_pos_3",
+            "Type": "EString",
+            "Offset": 73,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "loop_idle_3_m",
+            "Type": "EInt32",
+            "Offset": 77,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "loop_idle_3_w",
+            "Type": "EInt32",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "flash_sit_4",
+            "Type": "EBool",
+            "Offset": 85,
+            "Size": 1
+        },
+        {
+            "Name": "flash_sit_specialeffect_4",
+            "Type": "EBool",
+            "Offset": 86,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_4",
+            "Type": "EBool",
+            "Offset": 87,
+            "Size": 1
+        },
+        {
+            "Name": "flash_stand_specialeffect_4",
+            "Type": "EBool",
+            "Offset": 88,
+            "Size": 1
+        },
+        {
+            "Name": "special_pos_4",
+            "Type": "EString",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "loop_idle_4_m",
+            "Type": "EInt32",
+            "Offset": 93,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "loop_idle_4_w",
+            "Type": "EInt32",
+            "Offset": 97,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

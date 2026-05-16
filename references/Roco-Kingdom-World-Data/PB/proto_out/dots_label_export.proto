@@ -1,0 +1,24 @@
+package Next;
+
+message DotsLabelTag {
+  int32 type = 1;
+  int32 value = 2;
+}
+
+message DotsLabelMeshGrid {
+  int32 x = 1;
+  int32 y = 2;
+  repeated Next.DotsLabelTag tag_list = 3;
+}
+
+message DotsLabelTile {
+  int32 x = 1;
+  int32 y = 2;
+  repeated Next.DotsLabelMeshGrid grid_list = 3;
+}
+
+message DotsLabelExport {
+  int32 tile_x = 1;
+  int32 tile_y = 2;
+  repeated Next.DotsLabelTile tile_list = 3;
+}

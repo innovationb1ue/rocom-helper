@@ -1,0 +1,37 @@
+{
+    "Name": "MARK_MESSAGE_LIFE_TIME_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "attitude_count",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "magic_message_add_time",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "per_attitude_count",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "magic_message_per_add_time",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        }
+    ]
+}

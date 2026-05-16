@@ -1,0 +1,234 @@
+{
+    "Name": "SEASON_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "season_slogan",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "part_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "end_time",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "s_icon",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "s_title_icon",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "lobby_icon",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "s_title",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "s_title_subtitle",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "umg_part",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bgm_state",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "kv_type",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "param_kv_common",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "param_kv_male",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "param_kv_felmale",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pv_id",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "popup_path",
+            "Type": "EString",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "popup_text",
+            "Type": "EString",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "season_pve_id",
+            "Type": "EUint32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "season_tips_id",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "season_adventure",
+            "Type": "EUint32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "season_start_task",
+            "Type": "EUint32",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "season_task_paragraph",
+            "Type": "EUint32",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "focus_group",
+            "Type": "EStruct",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "SEASON_CONF.focus_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "focus_img_path",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "option_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "option_skip_type",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "jump_param",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param1",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param2",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param3",
+                        "Type": "EString",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

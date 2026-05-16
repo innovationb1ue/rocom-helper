@@ -1,0 +1,235 @@
+package Next;
+
+import "com_pet.proto";
+import "com_handbook.proto";
+import "com_pet_egg.proto";
+import "com_pet_team.proto";
+import "com_pet_medal.proto";
+import "com_activity.proto";
+import "com_account.proto";
+import "xls_enum.proto";
+
+enum BagItemFlag {
+  EQUIPPED = 1;
+  FREQUENTLY_USE = 2;
+  NEW = 4;
+  SELECTED = 8;
+  SEED_EQUIPPED = 16;
+  HOMEPET_FOOD_EQUIPPED = 32;
+}
+
+enum GoodsDsiplayTag {
+  NARMAL_SHOW = 0;
+  DELAY_SHOW = 1;
+}
+
+enum GoodsTransCallBackType {
+  GOODS_TRANS_CB_TYPE_NONE = 0;
+  GOODS_TRANS_CB_TYPE_TEST = 1;
+}
+
+message RewardState {
+  enum RewardStateType {
+    REWARD_STATE_TYPE_NONE = 0;
+    REWARD_STATE_TYPE_CAN_GET = 1;
+    REWARD_STATE_TYPE_GOT = 2;
+  }
+  uint32 id = 1;
+  Next.RewardState.RewardStateType state = 2;
+}
+
+message GoodsReward {
+  repeated Next.GoodsItem rewards = 1;
+}
+
+message BagItem {
+  uint32 gid = 1;
+  uint32 id = 2;
+  uint64 num = 3;
+  uint32 update_time = 4;
+  uint32 expire_time = 5;
+  bool can_charge = 6;
+  uint32 remain_use_cnt = 7;
+  uint32 max_use_cnt = 8;
+  uint32 effect_value = 9;
+  bool can_in_battle = 10;
+  uint32 bag_item_flags = 11;
+  uint32 level = 12;
+  uint32 stage = 13;
+  uint32 type = 14;
+  Next.PetEggBrief egg_data = 15;
+  uint32 fruit_active_timestamp = 16;
+  Next.PetMedalData medal_data = 17;
+  uint64 liabilities_num = 18;
+  repeated Next.FinishFactionItem finished_faction = 19;
+}
+
+message BagItemTypeList {
+  dataconfig.BagItemType type = 1;
+  repeated Next.BagItem items = 2;
+  dataconfig.Sequence sort_type = 3;
+  uint64 total_num = 4;
+  uint64 total_num_last_update_time = 5;
+}
+
+message BagItemMaskList {
+  dataconfig.BagItemType type = 1;
+  repeated uint32 id = 2;
+}
+
+message GoodsItem {
+  dataconfig.GoodsType type = 1;
+  uint32 id = 2;
+  uint32 num = 3;
+  uint32 tag = 4;
+  dataconfig.GoodsType src_type = 5;
+  uint32 src_id = 6;
+  bool first_get = 7;
+  Next.PetData pet_data = 8;
+  uint32 reward_reason = 9;
+  int32 monster_level = 10;
+  int32 ball_id = 11;
+  bool is_ambush = 12;
+  bool is_correct_use = 13;
+  bool is_from_battle = 14;
+  bool is_ext_info = 15;
+  uint32 param = 16;
+  int64 coro_id = 17;
+  bool is_together_catch_gift = 18;
+  Next.PetEggBrief egg_info = 19;
+  Next.PetEggCore egg_core = 20;
+  repeated uint32 gids = 21;
+}
+
+message GoodsChangeItem {
+  dataconfig.GoodsType type = 1;
+  dataconfig.OpType op = 2;
+  uint32 num = 3;
+  Next.BagItem bag_item = 4;
+  uint32 id = 5;
+  Next.PetData pet_data = 6;
+  dataconfig.GoodsType src_type = 7;
+  uint32 src_id = 8;
+  Next.HandbookRecord handbook_record = 9;
+  Next.PetTeamInfo team_info = 10;
+  uint32 change_reason = 11;
+  Next.PetBackpackInfo backpack_info = 12;
+  Next.BagBackpackInfo bag_backpack_info = 13;
+  uint32 gid = 14;
+  int64 coro_id = 15;
+  Next.PetMedal medal = 16;
+  Next.PetBox box_info = 17;
+  Next.PetBoxPetChange box_pet_change = 18;
+}
+
+message GoodsChange {
+  repeated Next.GoodsChangeItem changes = 1;
+  uint64 pet_data_vesion = 2;
+  uint64 bag_data_vesion = 3;
+  uint64 mail_data_vesion = 4;
+}
+
+message HadItemInfo {
+  uint32 item_gid = 1;
+  uint32 item_cfg_id = 2;
+  int32 total_num = 3;
+}
+
+message HadItemList {
+  dataconfig.BagItemType type = 1;
+  repeated Next.HadItemInfo had_item_info = 6;
+}
+
+message BackpackInfo {
+  uint32 gid = 1;
+  uint32 idx = 2;
+}
+
+message BagBackpackInfo {
+  repeated Next.BackpackInfo ball_list = 1;
+  repeated Next.BackpackInfo magic_list = 2;
+  uint32 ball_max_size = 3;
+  uint32 magic_max_size = 4;
+}
+
+message StorageGoodsInfo {
+  int32 npc_cfg_id = 1;
+  int32 type = 2;
+  int32 id = 3;
+  int32 num = 4;
+}
+
+message GiftData {
+  enum ReceiveState {
+    RS_NONE = 0;
+    RS_RECEIVED = 1;
+    RS_RETURNED = 2;
+  }
+  dataconfig.GoodsType goods_type = 1;
+  int32 goods_id = 2;
+  int32 goods_num = 3;
+  uint32 expire_time = 4;
+  Next.GiftData.ReceiveState receive_state = 5;
+  uint64 gift_unique_id = 6;
+  Next.PetData pet_data = 7;
+  bool forbid_expire_time = 8;
+}
+
+message GiftGivingData {
+  uint32 receiver_uin = 1;
+  uint64 gift_unique_id = 2;
+  uint32 expire_time = 3;
+  dataconfig.GoodsType goods_type = 4;
+  int32 goods_id = 5;
+  int32 goods_num = 6;
+  Next.PetData pet_data = 7;
+  bool forbid_expire_time = 8;
+}
+
+message GoodsTransCBTestInfo {
+  int32 id = 3;
+  int32 num = 4;
+}
+
+message GoodsTransItem {
+  dataconfig.GoodsType type = 1;
+  dataconfig.OpType op = 2;
+  int32 id = 3;
+  int32 num = 4;
+  uint32 param = 5;
+  uint32 goods_param_nouse = 6;
+  uint32 buff_id = 7;
+  uint32 buff_value = 8;
+  uint32 gid = 9;
+}
+
+message GoodsModifyMsg {
+  bool need_check_befor_add = 1;
+  repeated Next.GoodsItem goods_list = 2;
+  Next.FlowReason flow_reason = 3;
+  bool need_notify = 4;
+  bool is_not_merge = 5;
+  repeated uint32 add_goods_params = 6;
+  int32 display_tag = 7;
+  uint32 tlog_param = 8;
+}
+
+message GoodsModifyTransInfo {
+  uint64 seq = 1;
+  uint32 finish = 2;
+  uint32 type = 3;
+  Next.GoodsModifyMsg goods_modify_msg = 4;
+  Next.GoodsTransCBTestInfo test_info = 11;
+}
+
+message GoodsModifyTransAllInfo {
+  uint64 gid = 2;
+  uint64 ack = 3;
+  repeated Next.GoodsModifyTransInfo goods_tran_msg_list = 4;
+  uint64 last_update_time = 5;
+  repeated Next.GoodsModifyTransInfo bak_goods_tran_msg_list = 6;
+  uint64 last_sync_time = 8;
+  uint32 last_tick_time = 11;
+  uint64 last_scenesvr_id = 13;
+  uint64 last_ack_time = 14;
+}

@@ -1,0 +1,70 @@
+{
+    "Name": "MAGE_INFO_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "belong_to",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_param",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "show_tips",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "text",
+            "Type": "ELocalizedString",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "lock_res",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_res",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sp_res",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        }
+    ]
+}

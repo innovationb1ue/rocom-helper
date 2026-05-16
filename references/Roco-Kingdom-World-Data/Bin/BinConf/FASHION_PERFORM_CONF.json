@@ -1,0 +1,136 @@
+{
+    "Name": "FASHION_PERFORM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "petbase3_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "suiteffect3_rest_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect3_rest_skill",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "suiteffect3_callout_name",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect3_callout_skill",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "suiteffect3_win_name",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect3_win_skill",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "petbase2_id",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "suiteffect2_callout_name",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect2_callout_skill",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "petbase1_id",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "suiteffect1_callout_name",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect1_callout_skill",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "petbase4_id",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "suiteffect4_callout_name",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect4_callout_skill",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "suiteffect4_win_name",
+            "Type": "EString",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suiteffect4_win_skill",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4
+        }
+    ]
+}

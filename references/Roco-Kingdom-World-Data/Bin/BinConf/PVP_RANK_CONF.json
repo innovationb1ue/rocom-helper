@@ -1,0 +1,109 @@
+{
+    "Name": "PVP_RANK_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "name_only",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "number",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_mini",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "star_num",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "star_total",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "reset",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "robot",
+            "Type": "EBool",
+            "Offset": 36,
+            "Size": 1
+        },
+        {
+            "Name": "win_streak",
+            "Type": "EBool",
+            "Offset": 37,
+            "Size": 1
+        },
+        {
+            "Name": "rank_unchanged",
+            "Type": "EBool",
+            "Offset": 38,
+            "Size": 1
+        },
+        {
+            "Name": "rank_up_add",
+            "Type": "EUint32",
+            "Offset": 39,
+            "Size": 4
+        },
+        {
+            "Name": "rank_up",
+            "Type": "EUint32",
+            "Offset": 43,
+            "Size": 4
+        },
+        {
+            "Name": "is_show_enemy_pet",
+            "Type": "EBool",
+            "Offset": 47,
+            "Size": 1
+        },
+        {
+            "Name": "rank_effect",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

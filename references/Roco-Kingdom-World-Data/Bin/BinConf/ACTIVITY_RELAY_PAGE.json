@@ -1,0 +1,86 @@
+{
+    "Name": "ACTIVITY_RELAY_PAGE",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "select_des",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "relay_part_group",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "ACTIVITY_RELAY_PAGE.relay_part_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "img",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "unlock_time",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "faction_unlock_tips",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "option_id",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reward_show",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "spec_battle_ui_id",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "faction_type",
+                        "Type": "EInt32",
+                        "Offset": 28,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

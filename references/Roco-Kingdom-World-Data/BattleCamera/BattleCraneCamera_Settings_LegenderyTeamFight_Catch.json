@@ -1,0 +1,45 @@
+{
+	"Desc": "神兽团体战——捕捉机位",
+	"TargetA": 3,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -5,
+		"Z": -26
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 150,
+		"Z": 0
+	},
+	"SprintArmLength": 1000,
+	"CameraFov": 80,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 2
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": -10
+			},
+			"Desc": ""
+		}
+	]
+}

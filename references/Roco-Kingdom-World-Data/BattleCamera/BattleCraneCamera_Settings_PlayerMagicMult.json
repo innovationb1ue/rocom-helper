@@ -1,0 +1,34 @@
+{
+	"Desc": "主角魔法选择——多精灵",
+	"TargetA": 3,
+	"TargetB": 1,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -11,
+		"Z": -10
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": -20,
+		"Z": -40
+	},
+	"SprintArmLength": 380,
+	"CameraFov": 78,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 20,
+				"Y": -20
+			},
+			"Desc": ""
+		}
+	]
+}

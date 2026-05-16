@@ -1,0 +1,56 @@
+{
+	"Desc": "B1最终战P3——技能表演",
+"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": -38
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 160,
+		"Z": 10
+	},
+	"SprintArmLength": 1000,
+	"CameraFov": 80,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 100
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 3,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 150
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 4
+			},
+			"Desc": ""
+		}
+	]
+}

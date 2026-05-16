@@ -1,0 +1,87 @@
+{
+    "Name": "CAMP_PET_REPORT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "is_valid",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "report_story",
+            "Type": "EString",
+            "Offset": 5,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "report_target",
+            "Type": "EString",
+            "Offset": 9,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "rank",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "desc1",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "desc2",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "condition",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "num",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "dialogue",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

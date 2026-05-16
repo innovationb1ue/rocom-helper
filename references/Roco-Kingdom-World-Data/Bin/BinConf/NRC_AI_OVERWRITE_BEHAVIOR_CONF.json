@@ -1,0 +1,90 @@
+{
+    "Name": "NRC_AI_OVERWRITE_BEHAVIOR_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "behavior_group",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 16,
+            "Struct": {
+                "Name": "NRC_AI_OVERWRITE_BEHAVIOR_CONF.behavior_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "editor_name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "state_in_cond_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "overwrite_state",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "behavior_id",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "state_out_cond_id",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "state_out_return_type",
+                        "Type": "EInt32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "state_out_return_num",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "overwrite_priority",
+                        "Type": "EInt32",
+                        "Offset": 28,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "overwrite_group_behavior",
+                        "Type": "EBool",
+                        "Offset": 32,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "be_interrupted_by_same_prio",
+                        "Type": "EBool",
+                        "Offset": 33,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

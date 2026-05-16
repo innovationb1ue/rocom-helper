@@ -1,0 +1,13 @@
+package Next;
+
+message ZonePlayerStoryFlagChangeNotify {
+  int32 change_type = 1;
+  int32 change_val = 2;
+  int32 version = 3;
+}
+
+message ZonePlayerMultiStoryFlagChangeNotify {
+  int32 change_type = 1;
+  repeated int32 change_val = 2;
+  int32 version = 3;
+}

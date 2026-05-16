@@ -1,0 +1,805 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle_enum.proto";
+import "com_match.proto";
+import "com_appearance.proto";
+import "com_player_data.proto";
+import "com_pet.proto";
+import "com_monster.proto";
+import "com_pet_skill.proto";
+import "com_misc.proto";
+import "xls_enum.proto";
+import "rpc_options.proto";
+import "com_scene.proto";
+import "com_activity.proto";
+
+enum BATTLE_RESULT_TYPE {
+  TRUE_BATTLE_RESULT_NULL = 0;
+  TRUE_BATTLE_RESULT_WIN = 2;
+  TRUE_BATTLE_RESULT_LOSE = 4;
+  TRUE_BATTLE_RESULT_MONSTER_RUNAWAY = 10;
+  TRUE_BATTLE_RESULT_RUNAWAY = 12;
+  TRUE_BATTLE_RESULT_RUNAWAY_ROLE_MAGIC = 260;
+  TRUE_BATTLE_RESULT_WIN_DEFEAT = 18;
+  TRUE_BATTLE_RESULT_WIN_CATCH = 34;
+  TRUE_BATTLE_RESULT_WIN_HP = 66;
+  TRUE_BATTLE_RESULT_LOSE_HP = 68;
+  TRUE_BATTLE_RESULT_MONSTER_ESCAPE = 132;
+  TRUE_BATTLE_RESULT_MONSTER_ESCAPE2 = 516;
+}
+
+enum BATTLE_MONSTER_RESULT_TYPE {
+  BATTLE_MONSTER_DEFEATED = 0;
+  BATTLE_MONSTER_CATCHED = 1;
+  BATTLE_MONSTER_RUNAWAY = 2;
+  BATTLE_MONSTER_ALIVE = 3;
+}
+
+enum EClientBattleSourceType {
+  ECBST_NONE = 0;
+  ECBST_CLIMB_CHAPTER = 1;
+  ECBST_NPC_CHALLENGE = 2;
+  ECBST_BOSS_CHALLENGE = 3;
+  ECBST_WEEKLY_CHALLENGE = 4;
+}
+
+enum PlayerPkState {
+  PPS_NONE = 0;
+  PPS_THINKING = 1;
+  PPS_READY = 2;
+}
+
+message BattleBuffBrefInfo {
+  int32 buff_id = 1;
+  int32 stack = 2;
+}
+
+message TerritoryTrialPetInfo {
+  uint32 defeat_point = 1;
+  repeated uint32 guard_entrys = 2;
+  bool is_boss = 3;
+}
+
+message MonsterCreateInfo {
+  uint32 conf_id = 1;
+  uint32 ball_id = 2;
+  uint32 success_catch_cnt = 3;
+  uint32 battler_id = 4;
+  uint32 handbook_threshold = 5;
+  uint32 handbook_prob_add = 7;
+  int64 last_catch_time = 8;
+  int32 catch_guarantee_rate = 9;
+  uint64 npc_obj_id = 10;
+  Next.CheerMonsterInitInfo cheer_info = 6;
+  repeated Next.BattleBuffBrefInfo buff_infos = 11;
+  uint32 belong_camp = 12;
+  Next.TerritoryTrialPetInfo trial_pet_info = 13;
+}
+
+message BattleNpcInfo {
+  uint64 npc_obj_id = 1;
+  int64 last_catch_time = 2;
+  int32 catch_guarantee_rate = 3;
+  repeated Next.BattleBuffBrefInfo buff_info = 4;
+  uint32 belong_camp = 5;
+  uint64 creater_uin = 6;
+  bool is_continous_catch_bonus = 7;
+  repeated uint64 create_visiting_uins = 8;
+}
+
+message KillPetRoundData {
+  int32 cur_round = 1;
+  int32 cast_skill_count = 2;
+}
+
+message PetMedalConditionData {
+  repeated Next.KillPetRoundData kill_pet_round_list = 1;
+  int32 cast_skill_count = 2;
+  repeated int32 kill_pet_role_hp_list = 3;
+  int32 continuous_counter_count = 4;
+  int32 continuous_no_counter_count = 5;
+  int32 continuous_restraint_count = 6;
+  int32 continuous_resist_count = 7;
+  int32 kill_pet_up_evo = 8;
+  int32 kill_pet_same_evo = 9;
+  repeated uint32 killed_evolution_chains = 10;
+  int32 win_energy = 11;
+  int32 win_hp_percent = 12;
+  bool win_with_inverse_restraint = 13;
+  int32 win_caster_role_hp = 14;
+  int32 win_enemy_role_hp = 15;
+  bool win_in_battle = 16;
+  int32 continuous_counter_cur_count = 17;
+  int32 continuous_no_counter_cur_count = 18;
+  int32 continuous_restraint_cur_count = 19;
+  int32 continuous_resist_cur_count = 20;
+}
+
+message BattleMedalInfo {
+  uint32 medal_id = 1;
+  uint32 param = 2;
+}
+
+message BattleMonsterInfo {
+  Next.BATTLE_MONSTER_RESULT_TYPE state = 2;
+  uint32 level = 3;
+  uint32 pet_gid = 4;
+  uint32 catched_uin = 5;
+  Next.PetData caught_monster = 6;
+  uint32 killed_uin = 7;
+  bool sleep = 8;
+  bool world_hide = 9;
+  bool battled = 10;
+  uint32 conf_id = 11;
+  uint32 petbase_id = 12;
+  uint32 uin = 13;
+  bool ori_back_of_head = 14;
+  uint64 ori_ai_status = 15;
+  uint64 npc_obj_id = 16;
+  uint32 killed_pet_gid = 17;
+  repeated uint32 killed_pet_type = 18;
+  uint32 remain_hp = 19;
+  uint32 max_hp = 20;
+  int64 last_catch_time = 21;
+  int32 catch_guarantee_rate = 22;
+  repeated Next.BattleBuffBrefInfo remain_buff_infos = 23;
+  int32 damage_out = 24;
+  int32 raw_skill_damage_taken = 25;
+  bytes pet_owner_name = 26;
+  bytes pet_name = 27;
+  uint32 mutation_type = 28;
+  int32 lowest_hp = 29;
+  repeated Next.PetSkillRecord skill_records = 30;
+  int32 killed_seq = 31;
+  int32 side = 32;
+  repeated uint32 caught_with_uins = 33;
+  repeated Next.BattleMedalInfo medal_cond_complete = 34;
+  repeated int32 kill_new_evo_chain = 35;
+  bool in_battle_when_finish = 36;
+  Next.PetMedalConditionData pet_medal_cond_data = 37;
+  Next.GlassInfo glass_info = 38;
+  uint32 pet_id = 39;
+}
+
+message PvpNpcInfo {
+  uint32 conf_id = 1;
+  bytes name = 2;
+  uint32 sex = 3;
+  repeated uint32 fashion = 4;
+  int32 icon = 5;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 6;
+}
+
+message PvpModeCtl {
+  uint32 mode = 1;
+  bool matched = 3;
+  uint32 pvp_id = 4;
+  repeated Next.MatchSuccInfo match_infos = 5;
+  int32 pkagain_cnt = 6;
+  repeated Next.PetData welfare_team = 7;
+  int32 welfare_team_role_magic_id = 8;
+  int32 welfare_enemy_pvp_rank_star = 9;
+  int32 welfare_enemy_pvp_rank_order = 10;
+  string welfare_enemy_pvp_rank_name = 11;
+  bool show_enemy_pet = 12;
+}
+
+message PvpFightHis_PetInfo {
+  uint32 pet_base_id = 1;
+  uint32 mutation_type = 2;
+  uint32 pet_level = 3;
+  Next.PetTypeInfo type = 4;
+}
+
+message PvpFightHis {
+  Next.PlayerBriefInfo enemy = 1;
+  Next.BattleFashionInfo enemy_fashion = 2;
+  Next.PvpNpcInfo npc_enemy = 3;
+  int32 pvp_rank_star = 4;
+  int32 pvp_rank_order = 6;
+  int32 result = 5;
+  repeated Next.PvpFightHis_PetInfo pet_info = 8;
+  repeated Next.PvpFightHis_PetInfo pet_info_self = 9;
+  int32 pvp_rank_star_self = 10;
+  int32 pvp_rank_order_self = 11;
+  int32 start_time = 12;
+}
+
+message PvpRecord_RedPointHistory {
+  int32 week_win_count = 1;
+  int32 pvp_rank_star = 2;
+}
+
+message EffectRecord {
+  uint32 uin = 1;
+  uint32 effect_id = 2;
+  uint32 result0 = 3;
+  uint32 result1 = 4;
+  uint32 result2 = 5;
+}
+
+message BattlerSettleInfo {
+  uint32 id = 1;
+  uint32 conf_id = 2;
+  uint32 original_hp = 4;
+  uint32 hp = 5;
+  int32 mod_hp = 6;
+  uint32 last_damage_pet = 7;
+  uint32 last_damage_pet_gid = 8;
+  uint32 settle_hp_loss = 9;
+}
+
+message BattlerUinBrief {
+  int32 mate_num = 1;
+  int32 mate_human_num = 2;
+  int32 mate_fri_num = 3;
+  int32 enemy_num = 4;
+  int32 enemy_human_num = 5;
+  int32 enemy_fri_num = 6;
+  repeated uint32 mate_uins = 7;
+  repeated uint32 enemy_uins = 8;
+  int32 his_observer_num = 9;
+}
+
+message BattleAiStats {
+  int64 battle_role_hp = 1;
+  repeated uint32 pet_ids = 2;
+  repeated uint32 pet_isalive = 3;
+  uint32 num_restraint = 4;
+  uint32 num_berestraint = 5;
+  uint32 num_resist = 6;
+  uint32 num_beresist = 7;
+  uint32 num_counter = 8;
+  uint32 num_becounter = 9;
+  repeated uint32 total_damage_hp = 10;
+  repeated uint32 total_bedamage_hp = 11;
+  repeated uint32 extra_energy_buffs = 12;
+  repeated uint32 extra_energy_buff_sum = 13;
+  repeated uint32 extra_energy_debuffs = 14;
+  repeated uint32 extra_energy_debuff_sum = 15;
+  repeated uint32 num_in_battle = 16;
+}
+
+message CostlyReward {
+  uint32 reward_id = 1;
+  uint32 costly_id = 2;
+}
+
+message FightMemberInfo {
+  uint32 uin = 1;
+  uint32 pet_gid = 2;
+  uint32 npc_id = 3;
+  uint32 pet_conf_id = 4;
+  uint32 pet_level = 5;
+  uint32 help_conf_id = 6;
+  uint32 team_idx = 7;
+  repeated uint32 pet_conf_ids = 8;
+}
+
+message BloodPetFight {
+  repeated Next.FightMemberInfo member_info = 1;
+  uint32 blood_pet_base_id = 2;
+  uint32 flower_npc_level = 3;
+  bool is_glass = 4;
+  Next.GlassInfo glass_info = 22;
+  bool is_shiny = 19;
+  uint32 blood = 5;
+  uint32 flower_catch_vitem = 6;
+  uint32 battle_npc_lv = 7;
+  uint32 battle_npc_hp_talent = 8;
+  uint32 battle_npc_attack_talent = 9;
+  uint32 battle_npc_special_attack_talent = 10;
+  uint32 battle_npc_defense_talent = 11;
+  uint32 battle_npc_special_defense_talent = 12;
+  uint32 battle_npc_speed_talent = 13;
+  uint32 battle_npc_gender = 14;
+  uint32 battle_npc_nature = 15;
+  uint32 catch_vitem_quantity = 16;
+  uint32 spec_flower_seed_id = 17;
+  uint32 activity_id = 18;
+  bool is_first_catch = 21;
+  uint32 star = 20;
+  int32 cli_startup_channel = 23;
+  repeated Next.InnerBattleTask battle_tasks = 24;
+  uint32 bind_pet_gid = 25;
+  uint32 owner_uin = 26;
+  uint32 medal_id = 27;
+}
+
+message PlayerZoneId {
+  uint32 uin = 1;
+  uint64 zone_inst_id = 2;
+  uint32 npc_id = 3;
+}
+
+message CreateBattleInfo_DoubleInteract {
+  int32 type = 1;
+  repeated uint32 mate_uins = 2;
+}
+
+message BadgeChallengeInfo {
+  repeated uint32 upgrade_ids = 1;
+  uint32 pet_level = 2;
+  uint32 incident_type = 3;
+  uint32 battle_pet_num = 4;
+  uint32 defend_pet_num = 5;
+}
+
+message GmBattleNpc {
+  uint32 npc_cfg_id = 1;
+  repeated uint32 monster_ids = 2;
+}
+
+message WorldCombatExtraReward {
+  uint32 uin = 1;
+  repeated int32 extra_reward_types = 2;
+}
+
+message CreateBattleInfo {
+  uint32 battle_conf_id = 1;
+  int32 option_id = 2;
+  int32 battle_type = 3;
+  repeated Next.PlayerZoneId attackers = 4;
+  repeated Next.PlayerZoneId defenders = 5;
+  Next.Point avatar_pt = 6;
+  Next.Point npc_pt = 7;
+  repeated uint64 npc_obj_id = 8;
+  uint32 npc_conf_id = 9;
+  uint64 npc_logic_id = 10;
+  uint32 npc_refresh_conf_id = 11;
+  uint32 npc_level = 12;
+  Next.Position npc_pos = 13;
+  Next.Position npc_born_pos = 14;
+  uint64 ai_status = 15;
+  uint32 sleeping = 16;
+  bool back_of_head = 17;
+  uint32 new_skill = 18;
+  uint32 pre_act_tag = 19;
+  uint32 pre_act_param = 20;
+  uint32 rand_num = 21;
+  uint32 water_battle_type = 22;
+  Next.PvpModeCtl pvp_mode = 23;
+  Next.Position battle_center = 24;
+  uint32 enter_battle_type = 25;
+  uint32 tod = 26;
+  repeated Next.BattleNpcInfo npc_infos = 27;
+  Next.MonsterDiffInfo monster_diff_info = 28;
+  repeated Next.OnlookerNpcInfo onlooker_npcs = 29;
+  repeated Next.CheerMonsterInitInfo cheer_npc_info = 30;
+  repeated uint32 monster_leader_conf_id = 31;
+  Next.BloodPetFight blood_pet_fight = 32;
+  Next.BeastPetFight beast_pet_fight = 33;
+  Next.WorldLeaderFight world_leader_fight = 34;
+  Next.BattlePveInfo pve_add_info = 35;
+  repeated Next.WorldCombatExtraReward world_combat_extra_reward_types = 36;
+  bool is_in_dungeon = 38;
+  Next.CreateBattleInfo_DoubleInteract double_interact = 39;
+  bool del_npc_aft_win = 40;
+  int32 battle_radius = 41;
+  int32 battle_difficult_id = 42;
+  uint32 uin = 100;
+  uint64 bfid = 101;
+  uint64 replay_bfid = 102;
+  uint32 role_level = 103;
+  repeated Next.MonsterCreateInfo monster_info = 104;
+  uint32 creater_world_lv = 105;
+  int32 rotate = 106;
+  repeated Next.PvpNpcInfo pvp_npcs = 107;
+  dataconfig.PlayerTeamType team_type = 109;
+  Next.BadgeChallengeInfo badge_challenge = 110;
+  repeated Next.GmBattleNpc dynamic_pve_npcs = 111;
+  Next.PveSeasonInfo pve_season_info = 112;
+  uint32 battle_game_time = 113;
+  int32 start_time = 114;
+  int32 final_battle_summon_time = 115;
+  bool disable_hp_dec = 116;
+  bool disable_anti_cheat = 117;
+  bool ai_training = 118;
+  bool guide_battle = 119;
+  repeated uint32 monster_pet_base_id_list = 200;
+}
+
+message BattleTaskInfo {
+  uint32 task_id = 1;
+  int32 task_state = 2;
+  uint32 uin = 3;
+}
+
+message BattlePveInfo {
+  repeated Next.BattleTaskInfo task_infos = 1;
+  int32 challenge_level_id = 2;
+  uint32 npc_id = 3;
+  repeated Next.BattleAppearanceInfo appearance_info = 4;
+  repeated uint32 rule_ids = 5;
+  uint32 buff_id = 6;
+  uint32 activity_id = 7;
+  repeated uint32 pre_level_ids = 8;
+  bool is_unfinish = 9;
+  uint32 round = 10;
+  uint32 priority_pet_gid = 11;
+  uint32 battler_remain_hp = 12;
+  uint32 weakness_attack_count = 13;
+  repeated uint32 enter_battle_pet_gids = 14;
+  uint32 cheer_point = 15;
+  uint32 cheer_point_this_week = 16;
+  bool can_take_photo = 17;
+  int32 guide_id = 18;
+}
+
+message BattleSettleInfo_DoubleInteract {
+  int32 type = 1;
+  uint32 mate_uin = 2;
+  string mate_name = 3;
+  uint64 zone_inst_id = 4;
+  bool is_mate_creater = 5;
+  uint32 mate_level = 6;
+}
+
+message TerritoryTrialSettleInfo {
+  int32 total_point = 1;
+  int32 defeat_num = 2;
+  int32 defeat_point = 3;
+  int32 remain_round = 4;
+  int32 round_point = 5;
+  int32 used_round = 6;
+}
+
+message MagicUsedInfo {
+  uint32 player_skill_id = 1;
+  uint32 use_times = 2;
+}
+
+message BattleSettleInfo {
+  uint32 battle_conf_type = 1;
+  uint32 battle_opposite_type = 2;
+  uint32 real_pve = 3;
+  uint32 real_pvp = 4;
+  Next.PvpModeCtl pvp_mode = 5;
+  uint32 flower_npc_level = 17;
+  Next.BATTLE_RESULT_TYPE result = 6;
+  uint32 battle_conf_id = 7;
+  repeated Next.BattleMonsterInfo monster_info = 8;
+  uint64 interact_npc_id = 9;
+  uint32 escape_style = 10;
+  repeated Next.SkillRecord skill_records = 11;
+  repeated Next.EffectRecord effect_records = 12;
+  int32 mod_hp = 13;
+  bool is_surrender = 14;
+  uint64 battle_id = 19;
+  repeated Next.BattlerSettleInfo battler_info = 16;
+  Next.BattlerUinBrief uin_brief = 30;
+  int32 battle_refresh_content = 20;
+  int32 guide_type = 21;
+  int32 kill_pet_num = 22;
+  Next.BattleAiStats ai_stats_info = 23;
+  repeated Next.CostlyReward costly_reward = 24;
+  bool is_reward = 25;
+  bytes visit_owner_name = 26;
+  bool is_in_dungeon = 27;
+  Next.BattlePveInfo pve_add_info = 28;
+  uint32 interact_npc_content_id = 29;
+  bool pk_again = 31;
+  bool is_badge_challenge = 32;
+  bool is_first_settle = 33;
+  uint32 retreat_pet_cnt = 34;
+  repeated Next.MagicUsedInfo magic_used = 35;
+  int32 side = 36;
+  int32 rounds = 37;
+  int32 seconds = 38;
+  uint32 ride_id = 40;
+  repeated Next.PetCatchInfo catch_info = 41;
+  Next.BattleSettleInfo_DoubleInteract double_interact = 42;
+  bool daily_pvp_first_win = 43;
+  repeated Next.InnerBattleTask battle_tasks = 44;
+  int32 battle_difficult_id = 45;
+  Next.TerritoryTrialSettleInfo trial_settle_info = 46;
+  uint32 enter_battle_time = 47;
+}
+
+message InnerBattlePetDisplay {
+  uint64 owner_obj_id = 1;
+  uint32 conf_id = 2;
+  uint32 nature = 3;
+  uint32 base_conf_id = 4;
+  uint32 height = 5;
+  uint32 weight = 6;
+  uint32 mutation_type = 7;
+  Next.GlassInfo glass_info = 8;
+  uint64 npc_obj_id = 9;
+  uint32 battle_pet_id = 10;
+}
+
+message InnerBattleInfo {
+  Next.PlayerBattleState battle_state = 1;
+  uint64 world_npc_obj_id = 2;
+  repeated Next.InnerBattlePetDisplay side_a_pets = 3;
+  repeated Next.InnerBattlePetDisplay side_b_pets = 4;
+  uint64 bfd_id = 5;
+  int32 battle_conf_id = 6;
+}
+
+message BattlerNumInfo {
+  int32 mate_num = 1;
+  int32 mate_human_num = 2;
+  int32 mate_fri_num = 3;
+  int32 enemy_num = 4;
+  int32 enemy_human_num = 5;
+  int32 enemy_fri_num = 6;
+}
+
+message SourceData {
+  Next.EClientBattleSourceType source_type = 1;
+  uint32 chapter_id = 2;
+  uint32 stage_id = 3;
+  int32 activity_id = 4;
+  int32 challenge_module_id = 5;
+  int32 challenge_level_id = 6;
+}
+
+message BeastPetFight {
+  repeated Next.FightMemberInfo member_info = 1;
+  int32 star = 2;
+  int32 battle_cfg_id = 3;
+  bool re_entrant = 4;
+  int32 ball_num = 5;
+  uint32 boss_shiny = 6;
+  Next.PetData boss = 7;
+  int32 last_state = 8;
+  uint64 last_catch_time = 10;
+  uint32 prev_guarantee_rate = 11;
+  bool is_perform = 12;
+  uint32 activity_id = 13;
+  Next.GlassInfo glass_info = 14;
+  bool is_season_battle = 15;
+  repeated Next.BeastResonanceInfo resonance_infos = 16;
+}
+
+message BattleOnlookerMonster {
+  uint32 base_conf_id = 1;
+  uint32 nature = 2;
+  uint32 mutation_type = 3;
+  Next.GlassInfo glass_info = 4;
+}
+
+message OnlookerNpcInfo {
+  uint32 npc_conf_id = 1;
+  uint64 npc_obj_id = 2;
+  uint64 npc_logic_id = 3;
+  Next.BattleOnlookerMonster monster = 4;
+}
+
+message BattleFinishPetInfo {
+  uint32 pet_gid = 1;
+  uint32 remain_hp = 2;
+  uint32 remain_energy = 3;
+  int32 mod_energy = 4;
+  int32 battle_max_hp = 5;
+  uint64 uin = 6;
+}
+
+message WorldLeaderFight {
+  uint32 npc_hp = 1;
+  int32 npc_hp_max = 2;
+  int32 stun_buff_remain_time = 3;
+  repeated dataconfig.WorldcombatDoubleBuff gain_expose = 4;
+  int32 npc_lowest_hp = 5;
+  int32 round = 6;
+  int32 visitor_num = 7;
+  int32 world_owner_level = 8;
+  int32 world_owner_world_lv = 9;
+  dataconfig.WorldcombatDoubleBuff cur_gain_expose = 10;
+  repeated Next.BattleFinishPetInfo finish_pet_infos = 11;
+}
+
+message PveSeasonInfo {
+  repeated uint32 boss_rule_ids = 1;
+  repeated uint32 player_buffs = 2;
+  repeated uint32 player_feature_skill = 3;
+  repeated uint32 player_attribute_add = 4;
+  repeated uint32 bag_buffs = 5;
+  repeated uint32 player_pet_add = 6;
+  uint32 season_battle_id = 7;
+}
+
+message BattleWeatherChangeInfo {
+  repeated uint32 type = 1;
+  repeated uint32 layer = 2;
+}
+
+message BeastCatchResult {
+  bool waiting_catch = 1;
+  uint32 start_resonance_time = 2;
+  uint32 high_select_star = 3;
+}
+
+message MonsterCatchGuaranteeInfo {
+  uint64 npc_obj_id = 1;
+  int64 last_catch_time = 2;
+  int32 catch_guarantee_rate = 3;
+}
+
+message BossNpcInfos {
+  message BossNpcInfo {
+    uint32 npc_cfg_id = 1;
+    uint32 star = 2;
+    uint32 blood = 3;
+    uint32 battle_petbase_id = 5;
+    uint64 npc_logic_id = 6;
+    uint64 npc_obj_id = 7;
+    uint32 content_cfg_id = 8;
+    int32 mutation_type = 9;
+    uint32 end_timestamp = 10;
+    uint32 spec_flower_seed_id = 11;
+    uint32 activity_id = 12;
+    int32 camp_cfg_id = 13;
+    Next.Position pos = 14;
+    int32 level = 15;
+    int32 status = 16;
+    uint32 next_refresh_time = 17;
+    uint32 world_map_cfg_id = 18;
+    bool is_camp_unlock = 19;
+    repeated uint32 season_battle_rules = 20;
+    bool is_world_boss_defeated = 21;
+    repeated Next.InnerBattleTask battle_tasks = 22;
+    repeated Next.FlowerSeedBossData visit_flower_seed_boss_datas = 23;
+    uint32 select_flower_owner_id = 24;
+  }
+  repeated Next.BossNpcInfos.BossNpcInfo boss_npcs = 1;
+  uint32 remain_time = 2;
+  uint32 available_challenge_num_via_star = 3;
+}
+
+message PkPetData {
+  bool adjusted = 1;
+  Next.PetData pet_data = 2;
+  uint32 base_conf_id = 3;
+}
+
+message PlayerPkInfo_EnemyPetInfo {
+  uint32 level = 3;
+  uint32 petbase_id = 12;
+  uint32 mutation_type = 28;
+  bytes name = 29;
+  repeated dataconfig.SkillDamType skill_dam_type = 31;
+  uint32 last_breakthrough_lv = 32;
+  uint32 feature_skill = 33;
+  Next.GlassInfo glass_info = 34;
+  Next.PetTypeInfo type = 35;
+  uint32 gid = 36;
+  uint32 hp_max = 37;
+}
+
+message PlayerPkInfo {
+  enum PK_FLAG {
+    PKF_IS_LAUNCHER = 1;
+    PKF_TELEPORT_ING = 2;
+    PKF_NEED_SCENE_BACK = 4;
+    PKF_WAIT_BATTLE_LAUNCH = 8;
+    PKF_CREATE_BATTLE_ING = 16;
+    PKF_WAIT_PK_AGAIN = 32;
+  }
+  Next.PlayerPkState self_state = 1;
+  Next.PlayerBriefInfo enemy = 2;
+  Next.PlayerPkState enemy_state = 3;
+  uint32 start_time = 4;
+  uint32 end_time = 5;
+  uint32 first_pet_gid = 6;
+  repeated Next.PkPetData pets = 7;
+  uint32 self_hp = 8;
+  uint32 enemy_hp = 9;
+  bool self_cancel = 10;
+  bool enemy_cancel = 11;
+  Next.BattleFashionInfo enemy_fashion = 12;
+  uint32 flag = 14;
+  uint32 pvp_id = 15;
+  repeated Next.MatchSuccInfo match_infos = 16;
+  int32 pkagain_cnt = 17;
+  Next.PvpNpcInfo npc_enemy = 18;
+  uint32 npc_confirm_ut = 19;
+  uint64 seq_num = 20;
+  int32 enemy_pvp_rank_star = 21;
+  int32 enemy_pvp_rank_order = 28;
+  repeated Next.PetData welfare_team = 22;
+  int32 pve_battle_conf_id = 27;
+  int32 battle_cfg_id = 23;
+  Next.PlayerSceneInfo battle_center = 24;
+  Next.PlayerSceneInfo backup_scene = 25;
+  bool online = 26;
+  repeated Next.PlayerPkInfo_EnemyPetInfo enemy_pets = 29;
+  bool show_enemy_pet = 30;
+  int32 teleport_back_cnt = 31;
+  int32 role_magic_gid = 32;
+  int32 welfare_team_role_magic_id = 33;
+  bool is_mirror = 34;
+  bool mirror_magic_id = 35;
+  uint64 bfid = 36;
+  int32 rotate = 37;
+}
+
+message PvpRecord {
+  uint32 pvp_id = 1;
+  uint32 team_type = 6;
+  int32 k = 2;
+  double r = 103;
+  int32 rd = 4;
+  double vol = 5;
+  int32 pvp_score = 10;
+  uint32 next_refresh_time = 12;
+  int32 battle_count = 20;
+  int32 win_count = 21;
+  int32 lose_count = 22;
+  int32 draw_count = 23;
+  uint32 freq_base_id = 24;
+  int32 kill_pet_num = 25;
+  int32 win_streak = 32;
+  int32 lose_streak = 33;
+  repeated Next.PvpFightHis fight_his = 34;
+  int32 week_win_count = 35;
+  uint32 week_refresh_ut = 36;
+  repeated int32 received_season_awards = 37;
+  repeated int32 received_week_awards = 38;
+  uint32 rank_season_id = 39;
+  Next.PvpRecord_RedPointHistory rd_history = 40;
+  Next.TrialPet trial_pet = 41;
+  repeated uint32 matched_uins = 42;
+  repeated uint32 his_rts = 43;
+  int32 season_max_rank_star = 44;
+  int32 last_warm_pvp_time = 45;
+  int32 prof_score = 46;
+  uint32 last_finish_game_time = 47;
+  repeated Next.MagicUsedInfo magic_used = 48;
+  uint32 season_battle_count = 49;
+  uint32 season_win_count = 50;
+  uint32 season_max_win_streak = 51;
+  int32 prev_season_star = 52;
+  int32 pvp_win_or_lose_streak = 53;
+}
+
+message PlayerPvpData_BaseId2Cnt {
+  uint32 base_id = 1;
+  uint32 cnt = 2;
+}
+
+message RankSeasonInfo {
+  uint32 season_id = 1;
+  uint32 battle_cnt = 2;
+  uint32 win_count = 3;
+  uint32 max_win_streak = 4;
+  repeated Next.RankSeasonPetUseInfo pet_use_info = 5;
+  repeated Next.MagicUsedInfo magic_used = 6;
+  uint32 rank_star = 7;
+}
+
+message PvpPetDamageInfo {
+  uint32 idx = 1;
+  uint32 damage_out = 2;
+}
+
+message TopMasterRankInfo {
+  uint32 last_query_time = 1;
+  uint32 top_master_order = 2;
+  uint32 last_display_type = 3;
+}
+
+message PlayerPvpData {
+  Next.PlayerPvpHisCli pvp_his_cli = 1;
+  repeated Next.PlayerPvpData_BaseId2Cnt pet_base_id2cnt = 2;
+  repeated Next.PvpRecord records = 3;
+  int32 pvp_score = 8;
+  uint32 next_refresh_time = 9;
+  repeated int32 received_awards = 7;
+  Next.PlayerPkInfo pk_info = 10;
+  uint32 daily_pvp_first_win_time = 11;
+  string last_pvp_battle_ai_desc = 12;
+  int32 last_battle_pvp_type = 13;
+  repeated Next.RankSeasonInfo rank_season_infos = 14;
+  int32 last_warm_pvp_time = 15;
+  Next.TopMasterRankInfo top_master_rank_info = 16;
+  repeated Next.PvpPetDamageInfo pet_damage_info = 17;
+}
+
+message SpecBattleDifficultyInfo {
+  int32 battle_difficulty_id = 1;
+  repeated int32 won_battle_cfg_ids = 2;
+}

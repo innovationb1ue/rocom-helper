@@ -1,0 +1,78 @@
+{
+    "Name": "PET_CARRYON_ITEM",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "can_cost",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "carryon_effect",
+            "Type": "EStruct",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "PET_CARRYON_ITEM.carryon_effect",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "sequence_desc",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "carryon_skill_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "skill",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6
+        },
+        {
+            "Name": "upgrade_cost",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        }
+    ]
+}

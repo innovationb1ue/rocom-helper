@@ -1,0 +1,128 @@
+{
+    "Name": "NATURE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_player_pet_nature",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "positive_effect",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "positive_effect_proportion",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "positive_effect_grow",
+            "Type": "EUint32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "negative_effect",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "negative_effect_proportion",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "prob",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "relative_emotion",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "random_desc",
+            "Type": "EStruct",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "NATURE_CONF.random_desc",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "nature_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "nature_desc",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "random_weight",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "morph_target_data",
+            "Type": "EStruct",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 8,
+            "Struct": {
+                "Name": "NATURE_CONF.morph_target_data",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "morph_target_name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "morph_target_value",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

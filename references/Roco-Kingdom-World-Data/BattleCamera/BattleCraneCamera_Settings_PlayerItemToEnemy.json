@@ -1,0 +1,31 @@
+{
+  "Desc": "道具对敌机位",
+  "TargetA": 3,
+  "TargetB": 3,
+  "SpringArmRotation": {
+    "X": 0,
+    "Y": -20,
+    "Z": -10
+  },
+  "SpringArmOffset": {
+    "X": 0,
+    "Y": 0,
+    "Z": 0
+  },
+  "SprintArmLength": 500,
+  "CameraFov": 75,
+  "EnableDepthOfField": false,
+  "DepthOfFieldScale":0,
+  "ControllerArray": [
+    {
+      "IsEnable": true,
+      "InputType": 1,
+      "EffectType": 1,
+      "Interval": {
+        "X": 0,
+        "Y": 15
+      },
+      "Desc": "none"
+    }
+  ]
+}

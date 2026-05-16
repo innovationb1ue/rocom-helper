@@ -1,0 +1,186 @@
+package Next;
+
+import "com_base_types.proto";
+
+enum SceneSvrAIDebugType {
+  SSADT_NONE = 0;
+  SSADT_OPEN_AI_DEBUG = 1;
+  SSADT_OPEN_CLOSE_DEBUG = 2;
+}
+
+enum SceneGmType {
+  SGT_NONE = 0;
+  SGT_STORAGE = 1;
+  SGT_REFRESH_TIME = 2;
+  SGT_WEATHER = 3;
+  SGT_WEATHER_TIME = 4;
+  SGT_BODYTEMP = 5;
+  SGT_GAMETIME = 6;
+  SGT_NPC_LV = 7;
+  SGT_RESET_NPC = 8;
+  SGT_TRIGGER_CONTENT = 9;
+  SGT_ACTIVE_BONFIRE = 10;
+  SGT_DUNGEON = 11;
+  SGT_INTERACTION_QUANTITY = 12;
+  SGT_PET_INTERACTION_COUNT = 14;
+  SGT_SET_PET_INTERACTION_BOND_TYPE = 15;
+  SGT_QUERY_TEMP = 16;
+  SGT_ATTR = 17;
+  SGT_DEBUG_DRAW = 18;
+  SGT_DEBUG_RAYCAST = 19;
+  SGT_DEBUG_OVERLAP = 20;
+  SGT_COMMIT_ACTION = 21;
+  SGT_TASK_DIALOGUE = 22;
+  SGT_DIALOGUE = 23;
+  SGT_PVP_MATCH = 24;
+  SGT_RESET_OWL_SANCTUARY_LAST_FRUIT_TAKE_OUT_TIME = 25;
+  SGT_SVR_AI_DEBUG = 26;
+  SGT_SVR_AI_VISUALIZATION = 27;
+  SGT_SVR_AI_CLEAR_PERCEP = 28;
+  SGT_RESET_MINIGAME = 29;
+  SGT_GEN_AI_GROUP = 30;
+  SGT_GEN_NAV_FIND_PATH = 31;
+  SGT_RESET_APPEARANCE_DATA = 32;
+  SGT_CREATE_NPC_BY_CFG = 33;
+  SGT_CREATE_NPC_BY_AREA = 34;
+  SGT_DEBUG_SHOW_NAV_TILE = 35;
+  SGT_CHANGE_BOSS_BARRIER_BUFF_VAL = 36;
+  SGT_SVR_NPC_BLACK_BOARD = 37;
+  SGT_FIRE_TRIGGER = 38;
+  SGT_DEBUG_DRAW_NPC_REFRESH_POINS = 39;
+  SGT_LOGIC_STATE = 41;
+  SGT_SET_STAMINA_MAX = 42;
+  SGT_DOTS_SKILL_MD5 = 43;
+  SGT_OPTION_OP = 44;
+  SGT_NPC_LOGIC_STATUS = 45;
+  SGT_RESET_COMBINATION = 46;
+  SGT_AI_SKIP_CD_RAND_CHECK = 47;
+  SGT_EXIT_WORLD_COMBAT = 48;
+  SGT_PLAY_ACTS_COMBINE_INTERVAL = 49;
+  SGT_PLAY_ACTS_COMBINE_TYPE_OP = 50;
+  SGT_QUERY_AOI_RELATIONSHIP = 51;
+  SGT_QUERY_ALL_FLOWER_SEED_INFO = 52;
+  SGT_REFRESH_FLOWER_SEED = 53;
+  SGT_SET_NIGHT_MODE_TIME = 54;
+}
+
+enum SceneGmOpType {
+  SGOT_NONE = 0;
+  SGOT_QUERY = 1;
+  SGOT_SET = 2;
+  SGTOT_DEL = 3;
+  SGOT_ADD = 4;
+}
+
+enum ServerDebugDrawType {
+  DRAW_MOVE_POS = 0;
+  DRAW_WORLD_COMBAT_SKILL_HIT_BOX = 1;
+  DRAW_DOTS_LABEL = 2;
+  DRAW_BATTLE_FIELD = 3;
+  DRAW_NAV_MESH = 4;
+  DRAW_ANTI_CHEATING = 5;
+  DRAW_AIR_WALL = 6;
+  DRAW_PERCEPTION = 7;
+  DRAW_MFBT_TASK_NODE = 8;
+  DRAW_SELECT_POINT = 9;
+  DRAW_MOVER = 10;
+  DRAW_GM = 11;
+  DRAW_FIX_POS = 12;
+  DRAW_RANDOM_POS = 13;
+  DRAW_TELEPORT_POS = 14;
+  DRAW_STAND_POS = 15;
+  DRAW_MAP_MARK = 16;
+}
+
+message AutoParam {
+  string key = 1;
+  bool require = 2;
+  int32 type = 3;
+  string param_name = 4;
+  string param_desc = 5;
+  repeated string param_str = 7;
+}
+
+message CommGmCmd {
+  string cmd_id = 1;
+  string cmd_name = 2;
+  string cmd_desc = 3;
+  repeated Next.AutoParam params = 4;
+  string cmd_belong = 5;
+}
+
+message GmNpcInfo {
+  bytes obj_id = 1;
+  uint32 npc_cfg_id = 2;
+  bytes npc_detail_type = 3;
+  bytes name = 4;
+  uint32 content_cfg_id = 5;
+  Next.Position pos = 6;
+  bool view = 7;
+  bool advance_npc = 8;
+  uint32 weight = 9;
+  uint32 distance = 10;
+}
+
+message GmNpcBlackboard {
+  uint64 actor_id = 1;
+  bytes blackboard_str = 2;
+}
+
+message DotsServerAIInfo {
+  uint64 actor_id = 1;
+  Next.Point pt = 2;
+  int32 lod_type = 3;
+  uint64 owner_id = 4;
+}
+
+message DotsServerAIOwnerPlayerInfo {
+  uint64 player_id = 1;
+  Next.Point pt = 2;
+}
+
+message DotsServerAIVisualizationInfo {
+  repeated Next.DotsServerAIInfo ai_list = 1;
+  repeated Next.DotsServerAIOwnerPlayerInfo player_list = 2;
+  int32 total_ai_count = 3;
+  int32 total_rsp_num = 4;
+  int32 cur_rsp_index = 5;
+}
+
+message NavFindPathInfo {
+  repeated Next.Position pos = 1;
+}
+
+message DebugDrawColor {
+  uint32 R = 1;
+  uint32 G = 2;
+  uint32 B = 3;
+  uint32 A = 4;
+}
+
+message NavMeshDebugDraw {
+  message NavMeshBoundary {
+    Next.Position begin_pos = 1;
+    Next.Position end_pos = 2;
+  }
+  message NavMeshPoly {
+    int32 flag = 1;
+    Next.DebugDrawColor color = 2;
+    repeated Next.Position verts = 3;
+  }
+  message NavMeshTile {
+    repeated Next.NavMeshDebugDraw.NavMeshPoly polys = 1;
+    repeated Next.NavMeshDebugDraw.NavMeshBoundary inner_boundaries = 2;
+    Next.DebugDrawColor inner_color = 3;
+    repeated Next.NavMeshDebugDraw.NavMeshBoundary outer_boundaries = 4;
+    Next.DebugDrawColor outer_color = 5;
+  }
+  repeated Next.NavMeshDebugDraw.NavMeshTile tiles = 1;
+}
+
+message HomePetGmStealInfo {
+  uint32 pet_gid = 1;
+  bytes name = 2;
+  int32 goods_num = 3;
+  int32 goods_total_num = 4;
+}

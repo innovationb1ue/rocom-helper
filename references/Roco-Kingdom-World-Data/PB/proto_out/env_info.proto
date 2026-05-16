@@ -1,0 +1,20 @@
+package Next;
+
+message EnvInfoCell {
+  int32 z = 1;
+  repeated int32 tag_list = 2;
+}
+
+message EnvInfoGrid {
+  repeated Next.EnvInfoCell cell_list = 1;
+}
+
+message EnvInfoTile {
+  int32 x = 1;
+  int32 y = 2;
+  repeated Next.EnvInfoGrid grid_list = 3;
+}
+
+message EnvInfo {
+  repeated Next.EnvInfoTile tile_list = 1;
+}

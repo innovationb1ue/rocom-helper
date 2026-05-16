@@ -1,0 +1,66 @@
+{
+    "Name": "UI_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EString",
+            "Offset": 0,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "id_num",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "umg_path",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "module",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "layer",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "no_close_behind",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "no_loading_modal",
+            "Type": "EBool",
+            "Offset": 21,
+            "Size": 1
+        },
+        {
+            "Name": "cache_mode",
+            "Type": "EInt32",
+            "Offset": 22,
+            "Size": 4
+        },
+        {
+            "Name": "parameters",
+            "Type": "EString",
+            "Offset": 26,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

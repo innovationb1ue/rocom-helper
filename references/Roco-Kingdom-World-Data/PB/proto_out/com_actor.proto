@@ -1,0 +1,137 @@
+package Next;
+
+import "com_base_types.proto";
+
+enum ClientCreatePetReason {
+  CCPR_NONE = 0;
+  CCPR_THROW = 1;
+  CCPR_PERCEPTION = 2;
+  CCPR_RIDE = 3;
+}
+
+enum ActorBornReason {
+  ABR_NONE = 0;
+  ABR_THROW = 1;
+  ABR_PERCEPTION = 2;
+  ABR_RIDE = 3;
+}
+
+enum ActorDieReason {
+  ACTOR_DIE_REASON_DESTROY = 0;
+  ACTOR_DIE_REASON_FALLING = 1;
+  ACTOR_DIE_REASON_SWIMMING = 2;
+  ACTOR_DIE_REASON_AI_ATTACKING = 3;
+  ACTOR_DIE_REASON_SLIDING = 4;
+  ACTOR_DIE_REASON_BATTLE = 5;
+  ACTOR_DIE_REASON_TEMPERATURE = 6;
+  ACTOR_DIE_REASON_BRAMBLES = 7;
+  ACTOR_DIE_REASON_STRONG_STORM = 8;
+  ACTOR_DIE_REASON_BATTLE_SURRENDER = 9;
+  ACTOR_DIE_REASON_AVATAR_PICKUP = 10;
+  ACTOR_DIE_REASON_NPC_PICKUP = 11;
+  ACTOR_DIE_REASON_NONE = 12;
+  ACTOR_DIE_REASON_HROW_BALL_AUTO_RECLYCLE = 13;
+  ACTOR_DIE_REASON_HROW_BALL_BROKEN = 14;
+  ACTOR_DIE_REASON_HROW_BALL_CATCH = 15;
+  ACTOR_DIE_REASON_HROW_BALL_RELEASE_PET = 16;
+  ACTOR_DIE_REASON_HROW_BALL_BATTLE = 17;
+  ACTOR_DIE_REASON_HROW_BALL_CATCH_FAIL = 18;
+  ACTOR_DIE_REASON_WORLD_COMBAT_ATTACKING = 19;
+  ACTOR_DIE_REASON_RECYCLE_PET_PASSIVELY = 20;
+  ACTOR_DIE_REASON_CATCHED = 21;
+  ACTOR_DIE_REASON_BATTLE_REWARD = 22;
+  ACTOR_DIE_REASON_RECYCLE_FRIEND_RIDE_PET = 23;
+}
+
+enum PendantItemStatus {
+  PIS_NONE = 0;
+  PIS_DISABLE = 1;
+  PIS_ENABLE = 2;
+  PIS_TRANSPARENT = 3;
+}
+
+enum SetNpcPosType {
+  SNPT_NONE = 0;
+  SNPT_ITEM_DROP = 1;
+  SNPT_AI_MOVE = 2;
+  SNPT_AI_PET_FOLLOW = 3;
+  SNPT_AI_TELEPORT = 4;
+}
+
+enum ControllableNpcOpType {
+  CNOT_NONE = 0;
+  CNOT_CREATE = 1;
+  CNOT_DELETE = 2;
+  CNOT_CHANGE_DIR = 3;
+  CNOT_ACTION = 4;
+}
+
+enum RemoveAuraReason {
+  DAR_NONE = 0;
+  DAR_TIMEOUT = 1;
+  DAR_MUTEX = 2;
+  DAR_AREA_TAG = 3;
+  DAR_WEATHER = 4;
+  DAR_OVERSIZE = 5;
+}
+
+enum ShareAuraReason {
+  SAR_NONE = 0;
+  SAR_SEAT = 1;
+}
+
+message LogicStatusOpInfo {
+  uint32 op_type = 1;
+  uint32 status = 2;
+}
+
+message SetNpcPosItem {
+  uint64 npc_id = 1;
+  Next.Point pt = 2;
+  uint64 npc_logic_id = 3;
+  Next.SetNpcPosType op_type = 4;
+}
+
+message AreaTrigInfo {
+  uint32 area_trig_id = 1;
+  int32 option_stage = 2;
+  bool is_done = 3;
+}
+
+message NpcTraceInfo {
+  uint32 content_id = 1;
+  uint64 npc_obj_id = 2;
+  uint64 npc_logic_id = 3;
+  Next.Point pt = 4;
+  int32 pet_base_id = 5;
+  int32 npc_cfg_id = 6;
+}
+
+message AffectNavDynamicNpcData {
+  uint32 npc_point_id = 1;
+  int32 result_id = 2;
+}
+
+message AddAuraResult {
+  bool has_added = 1;
+  int64 gen_aura_id = 2;
+  int32 reason = 3;
+  int32 fail_param = 4;
+}
+
+message CreateAuraInfo {
+  int32 conf_id = 10;
+  Next.Point pt = 11;
+  uint64 create_actor_id = 12;
+}
+
+message RemoveAuraInfo {
+  int64 aura_id = 1;
+  Next.RemoveAuraReason reason = 2;
+  repeated int64 mutex_aura_id = 3;
+  Next.CreateAuraInfo create_info = 10;
+}
+
+message SelfActorAdjustData {
+  uint64 platform_actor_id = 1;
+}

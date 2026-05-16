@@ -1,0 +1,152 @@
+{
+    "Name": "NRC_AI_GAMEPLAY_STATE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "native_class",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "script_path",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "val_param",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "str_param",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "server_requestable",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "server_removeable",
+            "Type": "EBool",
+            "Offset": 25,
+            "Size": 1
+        },
+        {
+            "Name": "client_requestable",
+            "Type": "EBool",
+            "Offset": 26,
+            "Size": 1
+        },
+        {
+            "Name": "client_removeable",
+            "Type": "EBool",
+            "Offset": 27,
+            "Size": 1
+        },
+        {
+            "Name": "priority",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "provides_tags",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "cancel_state_with_tags",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "block_state_with_tags",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "required_tags_to_apply",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "excluded_tags_to_apply",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "required_tags_to_remove",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "excluded_tags_to_remove",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "immune_by_states",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "mutex_states",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

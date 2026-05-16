@@ -1,0 +1,13 @@
+{
+    "Name": "PVP_RANK_ROBOT_CARD_ICON_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        }
+    ]
+}

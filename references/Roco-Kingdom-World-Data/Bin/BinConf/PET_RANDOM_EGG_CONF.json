@@ -1,0 +1,108 @@
+{
+    "Name": "PET_RANDOM_EGG_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "mutation_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "pet_info_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "model_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "known_unit_type",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "known_mutation",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "model_mutation_mat",
+            "Type": "EString",
+            "Offset": 18,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "model_mark_tex",
+            "Type": "EString",
+            "Offset": 22,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_mutation_mat",
+            "Type": "EString",
+            "Offset": 26,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_mark_mat",
+            "Type": "EString",
+            "Offset": 30,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "glass_switch",
+            "Type": "EBool",
+            "Offset": 34,
+            "Size": 1
+        },
+        {
+            "Name": "is_precious",
+            "Type": "EBool",
+            "Offset": 35,
+            "Size": 1
+        },
+        {
+            "Name": "precious_egg_type",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "OpenFlowRamp",
+            "Type": "EBool",
+            "Offset": 40,
+            "Size": 1
+        },
+        {
+            "Name": "RradientSpeed",
+            "Type": "EFloat",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "icon_mutation_safety_mat",
+            "Type": "EString",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

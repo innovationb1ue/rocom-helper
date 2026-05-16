@@ -1,0 +1,108 @@
+package Next;
+
+import "xls_enum.proto";
+
+message PetMedalExt {
+  uint32 num_1 = 1;
+  uint32 num_2 = 2;
+  uint32 num_3 = 3;
+  bytes str_1 = 4;
+}
+
+message PetMedalDetail {
+  uint32 owner_id = 2;
+  uint32 add_time = 3;
+  bool is_wear = 4;
+  uint32 complete_cnt = 5;
+  uint32 obtain_pet_gid = 6;
+  bytes obtain_pet_name = 7;
+  uint32 wear_pet_gid = 8;
+  Next.PetMedalExt ext_data = 9;
+}
+
+message PetMedalBucket {
+  uint32 hash_id = 1;
+  repeated Next.PetMedalDetail detail_list = 2;
+}
+
+message PetMedal {
+  uint32 conf_id = 1;
+  uint32 hash_id = 2;
+  Next.PetMedalDetail detail = 3;
+}
+
+message PetMedalRecord {
+  uint32 medal_conf_id = 1;
+  int32 medal_type = 2;
+  repeated Next.PetMedalBucket buckets = 3;
+}
+
+message PetMedalCondTask {
+  uint32 id = 1;
+  uint32 count = 2;
+}
+
+message PetMedalContext {
+  uint32 owner_id = 1;
+  repeated Next.PetMedalCondTask tasks = 2;
+  Next.PetMedalExt ext_data = 3;
+  repeated int32 kill_pet_chain_list = 4;
+}
+
+message PetMedalAddi {
+  uint32 medal_conf_id = 1;
+  int32 medal_type = 2;
+  repeated Next.PetMedalContext context_list = 3;
+}
+
+message PetMedalData {
+  uint32 conf_id = 1;
+  int32 medal_type = 2;
+  bool is_wear = 3;
+  uint32 complete_cnt = 5;
+  uint32 obtain_pet_gid = 7;
+  bytes obtain_pet_name = 8;
+  uint32 owner_id = 9;
+  uint32 wear_pet_gid = 10;
+  Next.PetMedalExt ext_data = 11;
+}
+
+message PetMedalOwnerTaskInfo {
+  uint32 task_id = 1;
+  uint32 task_complete_cnt = 2;
+}
+
+message PetMedalTaskInfo_TaskInfo {
+  uint32 task_complete_cnt = 3;
+  uint32 medal_gid = 4;
+  uint32 owner_id = 5;
+  Next.PetMedalExt medal_ext = 6;
+}
+
+message PetMedalOwnerInfo {
+  uint32 owner_id = 1;
+  uint32 medal_gid = 2;
+  repeated Next.PetMedalOwnerTaskInfo task_infos = 3;
+  uint32 complete_cnt = 4;
+  Next.PetMedalExt medal_ext = 5;
+}
+
+message PetMedalInfo {
+  uint32 medal_conf_id = 1;
+  int32 medal_type = 2;
+  repeated Next.PetMedalOwnerInfo owner_infos = 3;
+}
+
+message PetMedalTaskInfo {
+  uint32 medal_conf_id = 1;
+  repeated Next.PetMedalTaskInfo_TaskInfo task_info = 2;
+  int32 medal_type = 3;
+}
+
+message H5PlayerInfo {
+  string openid = 1;
+  int32 callback = 2;
+  uint32 time = 3;
+  int32 pet_nature = 4;
+  int32 pet_level = 5;
+}

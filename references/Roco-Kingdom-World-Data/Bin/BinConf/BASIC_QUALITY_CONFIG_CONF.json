@@ -1,0 +1,125 @@
+{
+    "Name": "BASIC_QUALITY_CONFIG_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "name",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "group",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cvar",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "valueType",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Qualities_PC",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "BASIC_QUALITY_CONFIG_CONF.Qualities_PC",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "QualityPriority",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "Qualities_IOS",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "BASIC_QUALITY_CONFIG_CONF.Qualities_IOS",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "QualityPriority",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "Qualities_Android",
+            "Type": "EStruct",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "BASIC_QUALITY_CONFIG_CONF.Qualities_Android",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "QualityPriority",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "Qualities_OpenHarmony",
+            "Type": "EStruct",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 7,
+            "Struct": {
+                "Name": "BASIC_QUALITY_CONFIG_CONF.Qualities_OpenHarmony",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "QualityPriority",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

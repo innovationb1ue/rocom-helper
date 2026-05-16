@@ -1,0 +1,92 @@
+{
+    "Name": "ROGUE_LEVEL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "difficulty",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "topic",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "initial_coin",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "monster_level",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "monster_level_growth",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "event",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "node",
+            "Type": "EStruct",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 30,
+            "Struct": {
+                "Name": "ROGUE_LEVEL_CONF.node",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "node_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "hide",
+                        "Type": "EBool",
+                        "Offset": 4,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "event_id",
+                        "Type": "EUint32",
+                        "Offset": 5,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "level",
+                        "Type": "EUint32",
+                        "Offset": 9,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

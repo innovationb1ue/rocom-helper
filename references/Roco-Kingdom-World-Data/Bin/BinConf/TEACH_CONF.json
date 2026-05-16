@@ -1,0 +1,187 @@
+{
+    "Name": "TEACH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "list_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "teach_platform",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "list_des",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "guide_struct",
+            "Type": "EStruct",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "TEACH_CONF.guide_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "bg",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "title",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "cmd",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "bg_PC",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "title_PC",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "text_PC",
+                        "Type": "EString",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "cmd_PC",
+                        "Type": "EString",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "unlock_conditions",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 12,
+            "Struct": {
+                "Name": "TEACH_CONF.unlock_conditions",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "unlock_condition",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "unlock_condition_parameter",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "unlock_group",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "priority",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "is_review",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "unlock_icon",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_text_main",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_text_sub",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_remind",
+            "Type": "EBool",
+            "Offset": 37,
+            "Size": 1
+        },
+        {
+            "Name": "unlock_remind_priority",
+            "Type": "EUint32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 42,
+            "Size": 4
+        }
+    ]
+}

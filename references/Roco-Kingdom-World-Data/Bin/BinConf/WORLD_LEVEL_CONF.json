@@ -1,0 +1,235 @@
+{
+    "Name": "WORLD_LEVEL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "world_level",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "title",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "update_grade_level",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "update_task_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "is_auto_accept_task",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "not_broadcast_tips",
+            "Type": "EBool",
+            "Offset": 21,
+            "Size": 1
+        },
+        {
+            "Name": "pet_top_level",
+            "Type": "EUint32",
+            "Offset": 22,
+            "Size": 4
+        },
+        {
+            "Name": "pet_level_limit",
+            "Type": "EUint32",
+            "Offset": 26,
+            "Size": 4
+        },
+        {
+            "Name": "pet_team_quantity",
+            "Type": "EUint32",
+            "Offset": 30,
+            "Size": 4
+        },
+        {
+            "Name": "pet_bag_space_quantity",
+            "Type": "EUint32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "pet_settled_basic_amplify",
+            "Type": "EUint32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "promote_desc",
+            "Type": "EStruct",
+            "Offset": 42,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "WORLD_LEVEL_CONF.promote_desc",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "icon",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "promote_text",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "value",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "update_task_des",
+            "Type": "EString",
+            "Offset": 46,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "revival_desc",
+            "Type": "EStruct",
+            "Offset": 50,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "WORLD_LEVEL_CONF.revival_desc",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "up_icon",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "desc",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "upvalue",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "reward",
+            "Type": "EStruct",
+            "Offset": 54,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "WORLD_LEVEL_CONF.reward",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "level_reward_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "level_reward_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "level_reward_count",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "level_reward_show",
+            "Type": "EUint32",
+            "Offset": 58,
+            "Size": 4
+        },
+        {
+            "Name": "team_battle",
+            "Type": "EStruct",
+            "Offset": 62,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "WORLD_LEVEL_CONF.team_battle",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "battle_star_rule",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "battle_star",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "create_weight",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "daily_task_reward",
+            "Type": "EUint32",
+            "Offset": 66,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

@@ -1,0 +1,499 @@
+{
+    "Name": "DIALOGUE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "opt_dia_relate",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_set_first_dialogue",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "is_auto_commit",
+            "Type": "EBool",
+            "Offset": 13,
+            "Size": 1
+        },
+        {
+            "Name": "speaker",
+            "Type": "EInt64",
+            "Offset": 14,
+            "Size": 8
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 22,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "title",
+            "Type": "EString",
+            "Offset": 26,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "text",
+            "Type": "EString",
+            "Offset": 30,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "translate_end_string",
+            "Type": "EUint32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "Column1",
+            "Type": "EFloat",
+            "Offset": 38,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "dialogue_sound_id",
+            "Type": "EUint32",
+            "Offset": 42,
+            "Size": 4
+        },
+        {
+            "Name": "speed",
+            "Type": "EUint32",
+            "Offset": 46,
+            "Size": 4
+        },
+        {
+            "Name": "text_once",
+            "Type": "EInt32",
+            "Offset": 50,
+            "Size": 4
+        },
+        {
+            "Name": "ui_source",
+            "Type": "EString",
+            "Offset": 54,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ui_source_type",
+            "Type": "EInt32",
+            "Offset": 58,
+            "Size": 4
+        },
+        {
+            "Name": "ui_source_type_param1",
+            "Type": "EInt32",
+            "Offset": 62,
+            "Size": 4
+        },
+        {
+            "Name": "show_baseboard",
+            "Type": "EBool",
+            "Offset": 66,
+            "Size": 1
+        },
+        {
+            "Name": "source_param",
+            "Type": "EString",
+            "Offset": 67,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "timeout",
+            "Type": "EUint32",
+            "Offset": 71,
+            "Size": 4
+        },
+        {
+            "Name": "type_sound",
+            "Type": "EString",
+            "Offset": 75,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "timeline_asset_path",
+            "Type": "EString",
+            "Offset": 79,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "camera_switch_type",
+            "Type": "EInt32",
+            "Offset": 83,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera_type",
+            "Type": "EInt32",
+            "Offset": 87,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera_param1",
+            "Type": "EString",
+            "Offset": 91,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "interact_camera_param2",
+            "Type": "EFloat",
+            "Offset": 95,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera_param3",
+            "Type": "EFloat",
+            "Offset": 99,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera_param4",
+            "Type": "EString",
+            "Offset": 103,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unskippable_duration",
+            "Type": "EFloat",
+            "Offset": 107,
+            "Size": 4
+        },
+        {
+            "Name": "camera_motion_type",
+            "Type": "EInt32",
+            "Offset": 111,
+            "Size": 4
+        },
+        {
+            "Name": "camera_motion_direction",
+            "Type": "EString",
+            "Offset": 115,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "camera_motion_distance",
+            "Type": "EFloat",
+            "Offset": 119,
+            "Size": 4
+        },
+        {
+            "Name": "camera_motion_time",
+            "Type": "EFloat",
+            "Offset": 123,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera_type_2",
+            "Type": "EInt32",
+            "Offset": 127,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera2_param1",
+            "Type": "EString",
+            "Offset": 131,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "interact_camera2_param2",
+            "Type": "EFloat",
+            "Offset": 135,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera2_param3",
+            "Type": "EFloat",
+            "Offset": 139,
+            "Size": 4
+        },
+        {
+            "Name": "interact_camera2_param4",
+            "Type": "EString",
+            "Offset": 143,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unskippable_duration2",
+            "Type": "EFloat",
+            "Offset": 147,
+            "Size": 4
+        },
+        {
+            "Name": "camera2_motion_type",
+            "Type": "EInt32",
+            "Offset": 151,
+            "Size": 4
+        },
+        {
+            "Name": "camera2_motion_direction",
+            "Type": "EString",
+            "Offset": 155,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "camera2_motion_distance",
+            "Type": "EFloat",
+            "Offset": 159,
+            "Size": 4
+        },
+        {
+            "Name": "camera2_motion_time",
+            "Type": "EFloat",
+            "Offset": 163,
+            "Size": 4
+        },
+        {
+            "Name": "dialogue_sound",
+            "Type": "EString",
+            "Offset": 167,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "actor_perform",
+            "Type": "EStruct",
+            "Offset": 171,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "DIALOGUE_CONF.actor_perform",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "actor",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "transform",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "move_action",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "body_turn_to",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "turn_to",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "eye_turn_to",
+                        "Type": "EInt32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action",
+                        "Type": "EString",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "emotion",
+                        "Type": "EInt32",
+                        "Offset": 28,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "shakehead",
+                        "Type": "EInt32",
+                        "Offset": 32,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "hidden_switch",
+                        "Type": "EInt32",
+                        "Offset": 36,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "reveal_switch",
+                        "Type": "EInt32",
+                        "Offset": 40,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "next_dialog_id",
+            "Type": "EUint32",
+            "Offset": 175,
+            "Size": 4
+        },
+        {
+            "Name": "select_ids",
+            "Type": "EUint32",
+            "Offset": 179,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "select_auto_on",
+            "Type": "EBool",
+            "Offset": 183,
+            "Size": 1
+        },
+        {
+            "Name": "dia_skip",
+            "Type": "EInt32",
+            "Offset": 184,
+            "Size": 4
+        },
+        {
+            "Name": "dia_skip_text",
+            "Type": "EString",
+            "Offset": 188,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "action",
+            "Type": "EStruct",
+            "Offset": 192,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "DIALOGUE_CONF.action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "action_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action_param1",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param2",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param3",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param4",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "success_dialogue",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "failure_dialogue",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "dialoguePreset",
+            "Type": "EInt32",
+            "Offset": 196,
+            "Size": 4
+        },
+        {
+            "Name": "task_id",
+            "Type": "EUint32",
+            "Offset": 200,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "specified_task_id",
+            "Type": "EUint32",
+            "Offset": 204,
+            "Size": 4
+        },
+        {
+            "Name": "reaction_dia_relate",
+            "Type": "EUint32",
+            "Offset": 208,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "submit_free_text",
+            "Type": "EString",
+            "Offset": 212,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

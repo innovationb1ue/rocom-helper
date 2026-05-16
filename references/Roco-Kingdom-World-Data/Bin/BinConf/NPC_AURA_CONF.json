@@ -1,0 +1,152 @@
+{
+    "Name": "NPC_AURA_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "aura_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "leader_battle_distance",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "leader_battle_delay",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "aura_area_type",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "aura_distance",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "aura_target_type",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "aura_target",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "time_last",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "next_aura_id",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "aura_effect",
+            "Type": "EStruct",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "NPC_AURA_CONF.aura_effect",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "aura_effect_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "params",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "max_count",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "bound_create_actor",
+            "Type": "EBool",
+            "Offset": 52,
+            "Size": 1
+        },
+        {
+            "Name": "remove_aura_distance",
+            "Type": "EInt32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "delete_aura_effect",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "result_area",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "area_reject_tip",
+            "Type": "EString",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "weather_reject_tip",
+            "Type": "EString",
+            "Offset": 69,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

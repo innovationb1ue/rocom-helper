@@ -1,0 +1,47 @@
+package Next;
+
+enum ObserveBattleMode {
+  OBM_MODE_1 = 0;
+  OBM_MODE_2 = 1;
+}
+
+message ObserveBattle {
+  bool deny = 1;
+  Next.ObserveBattleMode mode = 2;
+}
+
+message PlayerSettings_Pvp {
+  Next.ObserveBattle observe_battle = 1;
+  bool open_rank = 2;
+}
+
+message PlayerSettings_Friendship {
+  bool can_be_searched = 1;
+  bool can_be_sugguested = 2;
+  bool can_be_add_friend = 3;
+  bool can_stranger_visit = 4;
+}
+
+message PlayerSettings_UserSubscribe {
+  bool hatch_egg = 2;
+  bool travel = 3;
+  bool debris_full = 4;
+  bool new_activity = 5;
+  bool friend_battle = 6;
+  bool exchange_egg = 7;
+  bool friend_visit = 8;
+}
+
+message PlayerSettings_PersonalizedRecommendations {
+  bool friend_pr = 1;
+}
+
+message PlayerSettings {
+  Next.ObserveBattle observe_battle = 1;
+  Next.PlayerSettings_Friendship friendship = 2;
+  int32 quality = 3;
+  bool is_hide_unlock_skill = 4;
+  Next.PlayerSettings_UserSubscribe user_subsribe = 5;
+  Next.PlayerSettings_Pvp pvp = 6;
+  Next.PlayerSettings_PersonalizedRecommendations recommendations = 7;
+}

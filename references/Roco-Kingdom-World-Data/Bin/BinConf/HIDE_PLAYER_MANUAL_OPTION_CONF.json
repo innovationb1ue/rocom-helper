@@ -1,0 +1,55 @@
+{
+    "Name": "HIDE_PLAYER_MANUAL_OPTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "type",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "allowed_list",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "banned_list",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "allow_list",
+            "Type": "EStruct",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 30,
+            "Struct": {
+                "Name": "HIDE_PLAYER_MANUAL_OPTION_CONF.allow_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "allowed_list",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

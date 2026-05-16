@@ -1,0 +1,63 @@
+package Next;
+
+import "xls_enum.proto";
+
+message Position {
+  int32 x = 1;
+  int32 y = 2;
+  int32 z = 3;
+}
+
+message Position2D {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Point {
+  Next.Position pos = 1;
+  Next.Position dir = 2;
+}
+
+message Rect {
+  Next.Position beg = 1;
+  Next.Position size = 2;
+}
+
+message Rect2D {
+  Next.Position2D beg = 1;
+  Next.Position2D size = 2;
+}
+
+message GlassInfo {
+  dataconfig.GlassType glass_type = 1;
+  int32 glass_value = 2;
+}
+
+message RecordItem {
+  string cmd = 1;
+  uint32 cmd_val = 2;
+  bytes content = 3;
+  bytes write_time = 4;
+}
+
+message RecordItemList {
+  repeated Next.RecordItem item_list = 1;
+}
+
+message RecordFileData {
+  string battle_id = 1;
+  string uin = 2;
+  Next.RecordItemList battle_data = 5;
+}
+
+message PlayerSceneInfo {
+  uint64 cell_id = 1;
+  Next.Point pt = 2;
+  uint32 belong_camp = 3;
+  bool entered_cell_in_last_login_progress = 4;
+  int32 kickout_type_when_scenesvr_recovering = 5;
+  repeated uint64 destroy_failed_cellsvr_buspp_inst_ids = 11;
+  int32 time_of_day = 12;
+  int32 weather_type = 13;
+  int64 curr_time = 14;
+}

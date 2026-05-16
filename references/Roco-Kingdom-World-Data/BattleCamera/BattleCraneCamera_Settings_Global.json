@@ -1,0 +1,44 @@
+{
+	"Slope":
+	{
+		"X": -20,
+		"Y": 20
+	},
+	"TeamPetHeight":
+	{
+		"X": 20,
+		"Y": 150
+	},
+	"EnemyPetHeight":
+	{
+		"X": 20,
+		"Y": 350
+	},
+	"PetHeightRatio":
+	{
+		"X": 0.10000000000000001,
+		"Y": 1.8999999999999999
+	},
+	"DirectPitchAngle":
+	{
+		"X": 0,
+		"Y": 90
+	},
+	"PitchX": 60,
+	"PitchY": 60,
+	"YawX": 1800,
+	"YawY": 1800,
+	"XSpeed": 192,
+	"YSpeed": 42,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0.25,
+	"DepthOfFieldNear": 500,
+	"DepthOfFieldFar": 5000,
+	"DefaultBlendDuration": 0.29999999999999999,
+	"CameraRotationGradientMapping_left1": 10,
+	"CameraRotationGradientMapping_left2": 70,
+	"CameraRotationGradientMapping_right1": 10,
+	"CameraRotationGradientMapping_right2": 70,
+	"RotationTargetValue": 0,
+	"Length_Battle_Zoom_Rate": 200
+}

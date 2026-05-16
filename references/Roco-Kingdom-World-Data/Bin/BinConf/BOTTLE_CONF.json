@@ -1,0 +1,49 @@
+{
+    "Name": "BOTTLE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "battle_weather",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "battle_ai_status",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "battle_flash",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "probability",
+            "Type": "EInt32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "battle_deduct",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "battle_increase",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        }
+    ]
+}

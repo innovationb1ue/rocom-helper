@@ -1,0 +1,158 @@
+{
+    "Name": "PVP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "sequence",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "des",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "npcid",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "npc_icon",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "banner",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_color",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ticket_stub",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "award",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3
+        },
+        {
+            "Name": "time",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "battle_config",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "team_type",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "match_type",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "air_wall",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "hide_npc_area",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "teleport",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "is_show",
+            "Type": "EBool",
+            "Offset": 72,
+            "Size": 1
+        },
+        {
+            "Name": "team_num",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "pvp_rank_is_open_limit_fantastic",
+            "Type": "EUint32",
+            "Offset": 77,
+            "Size": 4
+        },
+        {
+            "Name": "mappoint",
+            "Type": "EString",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4
+        },
+        {
+            "Name": "daily_first_win_award",
+            "Type": "EUint32",
+            "Offset": 85,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3
+        }
+    ]
+}

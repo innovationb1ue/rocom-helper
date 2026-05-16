@@ -1,0 +1,210 @@
+{
+    "Name": "PET_INFO_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "ball_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "exp",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "shining_prob",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "chaos_prob",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "glass_prob",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "custom_glass",
+            "Type": "EStruct",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "PET_INFO_CONF.custom_glass",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "glass_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "glass_param_1",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "glass_param_2",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "height_percent",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "weight_percent",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "voice_percent",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pet_talent_rate",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "gender",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "nature_id",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "blood_id",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "talent_rand_value",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "hp_max_talent",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "phy_attack_talent",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "spe_attack_talent",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "phy_defence_talent",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "spe_defence_talent",
+            "Type": "EUint32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "speed_talent",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "learn_skill_id",
+            "Type": "EUint32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "is_unlock_all_machine_skill",
+            "Type": "EBool",
+            "Offset": 88,
+            "Size": 1
+        },
+        {
+            "Name": "pet_grow_times",
+            "Type": "EUint32",
+            "Offset": 89,
+            "Size": 4
+        },
+        {
+            "Name": "pet_break_times",
+            "Type": "EUint32",
+            "Offset": 93,
+            "Size": 4
+        },
+        {
+            "Name": "pet_inspire_time",
+            "Type": "EUint32",
+            "Offset": 97,
+            "Size": 4
+        },
+        {
+            "Name": "blood_skill",
+            "Type": "EUint32",
+            "Offset": 101,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "talent_id",
+            "Type": "EUint32",
+            "Offset": 105,
+            "Size": 4
+        }
+    ]
+}

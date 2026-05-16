@@ -1,0 +1,131 @@
+{
+    "Name": "SCENE_ABILITY_SLIDING_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "allow_long_press",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "speed_curve",
+            "Type": "EString",
+            "Offset": 5,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "slide_accelerate",
+            "Type": "EUint32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "vitality_cost_curve",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "acc_curve",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "deacc_curve",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "vitality_id",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "slide_start_vitality_cost",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "slide_cooldown",
+            "Type": "EFloat",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "slide_rotate_speed",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "slide_required_speed",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "slide_start_speed",
+            "Type": "EFloat",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "slide_joystick_sensity",
+            "Type": "EFloat",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "slide_trigger_delay",
+            "Type": "EFloat",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "slide_ability_maintain_time",
+            "Type": "EFloat",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "slide_ability_cooldown_time",
+            "Type": "EFloat",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "slide_min_angle",
+            "Type": "EFloat",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "slide_max_angle",
+            "Type": "EFloat",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "maintain_press_time",
+            "Type": "EFloat",
+            "Offset": 73,
+            "Size": 4
+        }
+    ]
+}

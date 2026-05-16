@@ -1,0 +1,13 @@
+{
+    "Name": "FUNCTION_BAN_SPECIAL_NPC_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        }
+    ]
+}

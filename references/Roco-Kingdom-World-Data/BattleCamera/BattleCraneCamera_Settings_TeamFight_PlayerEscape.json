@@ -1,0 +1,34 @@
+{
+	"Desc": "团体战——玩家逃跑机位",
+	"TargetA": 3,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -8,
+		"Z": -35
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 220,
+		"Z": 75
+	},
+	"SprintArmLength": 1020,
+	"CameraFov": 70,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 1,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": -2,
+				"Y": 2
+			},
+			"Desc": "none"
+		}
+	]
+}

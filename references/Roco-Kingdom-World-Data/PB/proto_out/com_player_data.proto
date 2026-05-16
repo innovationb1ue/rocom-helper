@@ -1,0 +1,286 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_appearance.proto";
+import "xls_enum.proto";
+
+enum FriendPositionDisplayType {
+  FPDT_NONE = 0;
+  FPDT_SCENE_NAME = 1;
+  FPDT_CAMP_NAME = 2;
+}
+
+message PlayerOnlineState {
+  enum ENUM {
+    Logouted = 0;
+    Logining = 1;
+    Logined = 2;
+    EnteringCell = 3;
+    EnteredCell = 4;
+    SwitchingCell = 5;
+  }
+}
+
+message PlayerMobileBindData {
+  string mobile_num = 1;
+  uint32 sms_code_time = 2;
+  string sms_request_id = 3;
+  uint32 reward_time = 4;
+  string auth_token = 5;
+}
+
+message PlayerBattleBriefInfo {
+  int32 battle_state = 2;
+  uint64 battlesvr_buspp_inst_id = 3;
+  uint64 bfd_id = 4;
+  uint32 battle_conf_id = 1;
+}
+
+message FriendPositionInfo {
+  Next.FriendPositionDisplayType display_type = 1;
+  int32 scene_res_cfg_id = 2;
+  int32 camp_id = 3;
+}
+
+message FriendVisitInfo {
+  int32 visitor_num = 1;
+}
+
+message PlayerCardBriefInfo_FavoritePetInfo {
+  dataconfig.SkillDamType skill_dam_type = 1;
+  uint32 pet_base_id = 2;
+  uint32 last_shown_timestamp = 3;
+  dataconfig.MutationDiffType mutation_diff_type = 4;
+}
+
+message PlayerCardBriefInfo_CollectPetInfo {
+  dataconfig.SkillDamType skill_dam_type = 1;
+  uint32 pet_base_id = 2;
+  dataconfig.MutationDiffType mutation_diff_type = 3;
+  uint32 index = 4;
+}
+
+message PlayerCardBriefInfo_CollectFashionInfo {
+  int32 fashion_bond_id = 1;
+  uint32 index = 2;
+}
+
+message PlayerCardBriefInfo_CollectInfo {
+  repeated Next.PlayerCardBriefInfo_CollectPetInfo card_module_pet_infos = 1;
+  repeated Next.PlayerCardBriefInfo_CollectFashionInfo card_module_fashion_infos = 2;
+}
+
+message PlayerCardBriefInfo_AppearanceInfo {
+  repeated uint32 fashion_wear_id = 1;
+  uint32 pose_selected = 2;
+  uint32 pose_frame_id = 3;
+  uint32 card_skin_selected = 4;
+  repeated Next.SalonItemWearData salon_item_data = 5;
+}
+
+message PlayerBusinessCardInfo {
+  string cur_card = 1;
+  string cur_card_url = 2;
+  uint32 apply_change_time = 3;
+  string last_card = 4;
+  string last_card_url = 5;
+  uint32 apply_daily_changes = 6;
+  uint32 photo_upload_time = 7;
+  uint32 photo_upload_counts = 8;
+}
+
+message PlayerCardBriefInfo {
+  uint32 card_icon_selected = 1;
+  uint32 card_label_first_selected = 3;
+  uint32 card_label_last_selected = 4;
+  bytes card_signature = 5;
+  uint32 card_handbook_collect_num = 6;
+  repeated Next.PlayerCardBriefInfo_FavoritePetInfo card_favorite_pet_info = 7;
+  Next.PlayerCardBriefInfo_AppearanceInfo card_appearance_info = 8;
+  uint32 card_music_id = 9;
+  Next.PlayerCardBriefInfo_CollectInfo card_collect_info = 10;
+  Next.PlayerBusinessCardInfo business_card_info = 11;
+  uint32 card_fashion_bond_collect_num = 12;
+}
+
+message PlayerStartUpPrivilegeInfo {
+  int64 cli_startup_day = 1;
+  int32 cli_startup_channel = 2;
+}
+
+message PlayerAdditionalData {
+  int32 world_level = 2;
+  Next.PlayerCardBriefInfo card_brief_info = 3;
+  uint32 total_recharge = 4;
+  int32 total_pet_count = 5;
+  int32 area_mail_flag = 6;
+  int32 total_handbook_count = 7;
+  Next.PlayerMobileBindData mobile_bind_info = 11;
+  Next.PlayerSettingBriefInfo setting_brief_info = 13;
+  Next.PlayerDeletionInfo deletion_info = 14;
+  uint64 online_state_update_times = 15;
+  Next.PlayerBattlePassBriefInfo battle_pass_brief_info = 16;
+  bytes reg_game_channel = 18;
+  Next.PlayerStartUpPrivilegeInfo start_up_privilege_info = 19;
+}
+
+message PlayerBattlePassBriefInfo {
+  dataconfig.BattlePassGiftGrade gift_grade = 1;
+}
+
+message PlayerDeletionInfo {
+  bool finished = 1;
+}
+
+message PlayerSettingBriefInfo {
+  bool can_be_searched = 1;
+  bool can_be_sugguested = 2;
+  bool can_be_add_friend = 3;
+  bool can_stranger_visit = 4;
+}
+
+message PlayerBriefInfo {
+  uint32 uin = 1;
+  bytes openid = 2;
+  bytes name = 3;
+  uint32 sex = 4;
+  uint32 role_level = 5;
+  uint32 world_level = 6;
+  Next.PlayerCoreAdditionalBriefInfo core_additional_brief_info = 7;
+  bytes plat_nick_name = 8;
+  bytes plat_avatar_url = 9;
+  uint32 register_time = 31;
+  uint32 login_time = 32;
+  uint32 logout_time = 33;
+  uint32 login_times = 34;
+  uint32 enter_cell_time = 35;
+  uint32 leave_cell_time = 36;
+  uint32 enter_cell_times = 37;
+  uint32 daily_online_time = 51;
+  uint32 total_online_time = 52;
+  uint32 last_sync_time = 53;
+  Next.PlayerOnlineState.ENUM online_state = 71;
+  uint32 online_state_update_time = 72;
+  uint64 online_state_addi_data = 73;
+  uint64 zonesvr_buspp_inst_id = 74;
+  uint64 cellsvr_buspp_inst_id = 75;
+  uint64 battlesvr_buspp_inst_id = 76;
+  int32 match_state = 82;
+  Next.PlayerBattleBriefInfo battle_brief = 83;
+  uint32 permission = 91;
+  Next.PlayerAdditionalData additional_data = 92;
+  Next.PlayerVItemInfo vitem_info = 93;
+  Next.PlatInfo plat_info = 19;
+  Next.PlayerHomeBriefInfo home_brief_info = 20;
+  Next.PlayerHomeTeamInfo home_team_info = 21;
+}
+
+message PlayerVItemInfo {
+  repeated uint32 vitem_list_nouse = 1;
+  repeated uint32 liabilities_num_nouse = 2;
+  repeated uint64 vitem_list = 3;
+  repeated uint64 liabilities_num = 4;
+  bool is_finish_data_copy = 5;
+}
+
+message PlatInfo {
+  uint32 plat_id = 1;
+  uint32 world_id = 2;
+  uint32 cli_login_channel = 3;
+  int32 cli_startup_channel = 4;
+  bytes reg_channel = 5;
+  bytes reg_game_channel = 6;
+}
+
+message PlayerBriefSecInfo {
+  uint32 score = 1;
+  uint32 tag_black = 2;
+  uint32 tag_ugc = 3;
+}
+
+message PlayerCoreAdditionalBriefInfo {
+  Next.PlayerBriefSecInfo brief_sec_info = 1;
+}
+
+message PlayerHomeBriefInfo {
+  bytes home_name = 1;
+  uint32 home_experience = 2;
+  uint32 home_level = 3;
+  uint32 room_level = 4;
+  uint32 home_comfort_level = 5;
+  Next.RoomExpansionInfo room_expansion_info = 10;
+  repeated Next.UnlockedFurniture unlocked_furniture_list = 40;
+}
+
+message PlayerHomeTeamInfo {
+  uint32 leader_uin = 1;
+  bool marked = 2;
+  uint32 mark_timestamp = 3;
+  Next.Position restore_visit_pos = 4;
+  uint32 restore_visit_scene_cfg_id = 5;
+  uint32 team_init_timestamp = 6;
+  repeated uint32 team_member_uins = 7;
+}
+
+message RoomExpansionInfo {
+  uint32 room_level = 1;
+  uint32 expansion_start_timestamp = 2;
+}
+
+message UnlockedFurniture {
+  int32 furniture_id = 1;
+  uint32 unlock_timestamp = 2;
+}
+
+message FurnitureHandBook {
+  int32 handbook_id = 1;
+  uint32 unlock_timestamp = 2;
+  bool reward_received = 3;
+}
+
+message HomeUnlockedFurnitureInfo {
+  repeated Next.UnlockedFurniture unlocked_furniture_list = 1;
+  repeated Next.FurnitureHandBook handbook_list = 2;
+}
+
+message PlayerHomeFurnitureInfo {
+  repeated Next.UnlockedFurniture unlocked_furniture_list = 1;
+  Next.HomeUnlockedFurnitureInfo hufi_change = 2;
+}
+
+message PlayerLotteryRewardConfirmItem {
+  int32 lottery_item = 1;
+  uint64 trans_id = 2;
+  uint32 lottery_result = 3;
+}
+
+message PlayerLotteryRewardConfirmBagInfo {
+  repeated Next.PlayerLotteryRewardConfirmItem item_list = 1;
+}
+
+message PlayerLotteryRewardItemBagInfo {
+  Next.PlayerLotteryRewardConfirmBagInfo lottery_confirm = 3;
+}
+
+message PlayerPvpHisCli {
+  uint32 win_count = 1;
+  uint32 lose_count = 2;
+  uint32 draw_count = 3;
+  uint32 freq_base_id = 4;
+}
+
+message PlayerSecLightFeatureData {
+  string feature_name = 1;
+  string feature_data = 2;
+  uint32 data_len = 3;
+  uint32 data_crc = 4;
+}
+
+message InvitedUser {
+  uint32 uin = 1;
+  bytes name = 2;
+  uint32 icon = 3;
+  uint32 role_level = 4;
+  uint32 register_time = 5;
+  bytes plat_nick_name = 6;
+}

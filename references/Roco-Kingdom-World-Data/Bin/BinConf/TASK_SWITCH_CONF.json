@@ -1,0 +1,63 @@
+{
+    "Name": "TASK_SWITCH_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "switch_group_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "switch_initialstate",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "switch_type",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "begintask",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "switch_condition",
+            "Type": "EStruct",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "TASK_SWITCH_CONF.switch_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "condition_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,156 @@
+{
+	"Desc": "盟友助战——选择技能",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -10,
+		"Z": -25
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 85,
+		"Z": 20
+	},
+	"SprintArmLength": 800,
+	"CameraFov": 80,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CurvesArray": [
+		{
+			"IsEnable": true,
+			"TargetCameraId": 28,
+			"Duration": 0.5,
+			"CameraName": "盟友助战——使用道具",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 29,
+			"Duration": 0.5,
+			"CameraName": "盟友助战——技能表演",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 27,
+			"Duration": 0.5,
+			"CameraName": "盟友助战——更换精灵",
+			"CurveId": 4
+		}
+	],
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": -2,
+				"Y": 5
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -20,
+				"Y": 100
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -30,
+				"Y": 30
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 1,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": -20,
+				"Y": 20
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": -3,
+				"Y": 5
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 1,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 2,
+				"Y": -2
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": -5,
+				"Y": 5
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": -70
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 2,
+				"Y": -7
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 3,
+			"Interval":
+			{
+				"X": -20,
+				"Y": -20
+			},
+			"Desc": ""
+		}
+	]
+}

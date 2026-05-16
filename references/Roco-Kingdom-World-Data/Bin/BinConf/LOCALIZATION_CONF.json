@@ -1,0 +1,28 @@
+{
+    "Name": "LOCALIZATION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EString",
+            "Offset": 0,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "msg",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

@@ -1,0 +1,45 @@
+package Next;
+
+enum AvatarReviveStatus {
+  ARS_None = 0;
+  ARS_WaitingConfirmation = 1;
+  ARS_Teleporting = 2;
+  ARS_TeleportSuccess = 3;
+  ARS_TeleportFail = 4;
+}
+
+enum RoleHpReduceReason {
+  HP_REDUCE_REASON_FALLING = 1;
+  HP_REDUCE_REASON_SWIMMING = 2;
+  HP_REDUCE_REASON_AI_ATTACKING = 3;
+  HP_REDUCE_REASON_SLIDING = 4;
+  HP_REDUCE_REASON_BATTLE = 5;
+  HP_REDUCE_REASON_TEMPERATURE = 6;
+  HP_REDUCE_REASON_BRAMBLES = 7;
+  HP_REDUCE_REASON_ENV_WIND = 8;
+  HP_REDUCE_REASON_STEAL_PREVENT = 9;
+  HP_REDUCE_REASON_STEAL_INSPIRATION = 10;
+}
+
+enum RoleHpAddReason {
+  HP_ADD_REASON_FEED_FLOWER_PICKUP = 1;
+}
+
+message VisibleAvatarInfo {
+  enum RelationShip {
+    NONE = 0;
+    BLACK = 1;
+    ONLINE_VISITOR = 2;
+    FRIEND = 3;
+  }
+  uint32 uin = 1;
+  bytes name = 2;
+  int32 credit_score = 3;
+  Next.VisibleAvatarInfo.RelationShip relation = 4;
+}
+
+message VisiblePlanInfo {
+  uint32 area_id = 1;
+  uint64 plan_id = 2;
+  repeated Next.VisibleAvatarInfo avatar_list = 3;
+}

@@ -1,0 +1,122 @@
+{
+    "Name": "ROLEPLAY_BEHAVIOR_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name_text",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "behavior_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "RPbehavior_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "range",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "star",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "call_action_speed",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "toast_text",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ui_order",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "is_initial_unlock",
+            "Type": "EBool",
+            "Offset": 36,
+            "Size": 1
+        },
+        {
+            "Name": "male_skill_id",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "female_skill_id",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "icon_path",
+            "Type": "EString",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "card_pose_resource_path",
+            "Type": "EString",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pose_get_ways",
+            "Type": "EString",
+            "Offset": 53,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ai_type",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "is_movable",
+            "Type": "EBool",
+            "Offset": 61,
+            "Size": 1
+        },
+        {
+            "Name": "is_loop",
+            "Type": "EBool",
+            "Offset": 62,
+            "Size": 1
+        }
+    ]
+}

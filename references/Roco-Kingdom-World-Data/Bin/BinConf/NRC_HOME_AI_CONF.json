@@ -1,0 +1,172 @@
+{
+    "Name": "NRC_HOME_AI_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ai_disable_event_switch",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "filter_domain_type",
+            "Type": "EInt32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "filter_domain_param",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "cell_ai_group_param",
+            "Type": "EStruct",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "NRC_HOME_AI_CONF.cell_ai_group_param",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "activation_condition",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "activation_condition_parameter",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "number",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "comparison_symbols",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "operand",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "delta_indent",
+                        "Type": "EInt32",
+                        "Offset": 20,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "detecting_cd",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "detecting_cd_float",
+            "Type": "EInt32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "successful_detection_cd",
+            "Type": "EInt32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "successful_cd_float_detection",
+            "Type": "EInt32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "cd_group",
+            "Type": "EInt32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "group_npc_id",
+            "Type": "EInt32",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "initiator_role_id",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "initiator_relationship_type",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "initiator_relationship_role_count",
+            "Type": "EInt32",
+            "Offset": 53,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "fn_role_id",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "group_configuration_id",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "group_event_id",
+            "Type": "EInt32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "group_initiator_role_type",
+            "Type": "EInt32",
+            "Offset": 69,
+            "Size": 4
+        }
+    ]
+}

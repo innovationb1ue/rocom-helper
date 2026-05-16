@@ -1,0 +1,99 @@
+{
+    "Name": "PET_SHARE_ITEM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "share_pattern",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "is_initial_unlock",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "limited_time",
+            "Type": "EString",
+            "Offset": 9,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "allowed_petbase",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "item_name",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_icon",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_description",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "extra_description",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "item_quality",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "is_show_unlock",
+            "Type": "EBool",
+            "Offset": 37,
+            "Size": 1
+        },
+        {
+            "Name": "ban_tips",
+            "Type": "EString",
+            "Offset": 38,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "card_pet_img",
+            "Type": "EString",
+            "Offset": 42,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "card_shiny_pet_img",
+            "Type": "EString",
+            "Offset": 46,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

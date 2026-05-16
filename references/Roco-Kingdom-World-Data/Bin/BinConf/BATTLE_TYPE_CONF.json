@@ -1,0 +1,74 @@
+{
+    "Name": "BATTLE_TYPE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "ID",
+    "Properties": [
+        {
+            "Name": "ID",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "battle_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "player_team_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_open_uncommand",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "is_open_enjoy_hate",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "record_defeat_pet_batle_type",
+            "Type": "EBool",
+            "Offset": 18,
+            "Size": 1
+        },
+        {
+            "Name": "is_watch_battle",
+            "Type": "EBool",
+            "Offset": 19,
+            "Size": 1
+        },
+        {
+            "Name": "is_show_information",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "is_full_battle_performance",
+            "Type": "EBool",
+            "Offset": 21,
+            "Size": 1
+        },
+        {
+            "Name": "is_show_battle_type",
+            "Type": "EBool",
+            "Offset": 22,
+            "Size": 1
+        }
+    ]
+}

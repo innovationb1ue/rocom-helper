@@ -1,0 +1,101 @@
+package Next;
+
+import "xls_enum.proto";
+import "com_base_types.proto";
+
+message SalonItemWearData {
+  int32 item_wear_id = 1;
+  int32 color_wear_id = 2;
+}
+
+message GlassTintChange {
+  int32 fashion_item_id = 1;
+  Next.GlassInfo glass = 2;
+}
+
+message PlayerAppearanceInfo_FashionInfo_WardrobeData {
+  repeated int32 item_wear_id = 1;
+  string name = 2;
+  repeated int32 salon_item_wear_id = 3;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 4;
+}
+
+message PlayerAppearanceInfo_FashionInfo_WardrobeItem {
+  int32 wearing_item_id = 1;
+  Next.GlassInfo wearing_glass = 2;
+}
+
+message PlayerAppearanceInfo_FashionInfo_InitRole {
+  int32 fashion_item_id = 1;
+  int32 fashion_suit_id = 2;
+}
+
+message PlayerAppearanceInfo_FashionInfo_ItemInfo {
+  int32 item_id = 1;
+  repeated Next.GlassInfo unlocked_glass = 2;
+  repeated Next.GlassInfo claimable_glass = 3;
+  Next.GlassInfo default_glass = 4;
+}
+
+message PlayerAppearanceInfo_FashionInfo_SuitInfo {
+  int32 suit_id = 1;
+  int32 petbase_pvp_win_num = 2;
+  int32 level = 3;
+  repeated int32 components_is_worn = 4;
+  repeated int32 components_is_owned = 5;
+}
+
+message PlayerAppearanceInfo_FashionInfo {
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeData wardrobe_data = 1;
+  int32 current_wardrobe_index = 2;
+  repeated int32 item_owned_id = 3;
+  int32 suit_id = 4;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_SuitInfo suit_info = 5;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_ItemInfo owned_item_info = 6;
+  Next.PlayerAppearanceInfo_FashionInfo_InitRole init_role_info = 7;
+}
+
+message PlayerAppearanceInfo_SalonInfo {
+  repeated int32 item_owned_id = 1;
+  repeated Next.SalonItemWearData item_wear_data = 2;
+}
+
+message FashionBondItem {
+  int32 id = 1;
+  int64 get_time = 2;
+  bool pet_tree_interacted = 3;
+  dataconfig.FashionBondColorSuitState color_suit_state = 5;
+}
+
+message PlayerAppearanceInfo_BondInfo {
+  repeated Next.FashionBondItem fashion_bond_item = 1;
+}
+
+message PlayerAppearanceInfo {
+  Next.PlayerAppearanceInfo_FashionInfo fashion_info = 1;
+  Next.PlayerAppearanceInfo_SalonInfo salon_info = 2;
+  Next.PlayerAppearanceInfo_BondInfo fashion_bond_info = 3;
+}
+
+message BattleAppearanceInfo {
+  uint32 sex = 1;
+  repeated Next.SalonItemWearData salon_item_data = 2;
+  repeated uint32 fashion_wear_id = 3;
+  uint32 uid = 4;
+  string sign = 5;
+  uint32 level_id = 6;
+  string name = 7;
+  uint32 card_label_first_selected = 8;
+  uint32 card_label_last_selected = 9;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 10;
+}
+
+message BattleFashionInfo {
+  repeated uint32 fashion_id = 1;
+  repeated Next.SalonItemWearData salon_item_data = 2;
+  uint32 card_label_first_selected = 3;
+  uint32 card_label_last_selected = 4;
+  Next.PlayerAppearanceInfo_BondInfo bond_info = 5;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 6;
+  string npc_title = 7;
+}

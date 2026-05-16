@@ -1,0 +1,154 @@
+{
+    "Name": "ACTIVITY_MIX_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "must_do_faction_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "go_faction_option_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "must_do_task",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "must_do_task_judg",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "go_task_option_name",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unlock_tips",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "slot_group",
+            "Type": "EStruct",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "ACTIVITY_MIX_CONF.slot_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "slot",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "slot_des",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "initial_unlock",
+                        "Type": "EBool",
+                        "Offset": 8,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "option_id",
+                        "Type": "EUint32",
+                        "Offset": 9,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "slot_function_type",
+                        "Type": "EInt32",
+                        "Offset": 13,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param",
+                        "Type": "EUint32",
+                        "Offset": 17,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "red_point_id",
+                        "Type": "EUint32",
+                        "Offset": 21,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "red_point_rule",
+                        "Type": "EString",
+                        "Offset": 25,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "shop_id",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "progress_vitem_show",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "progress_vitem_name",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "progress_title",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "spec_battle_ui_id",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

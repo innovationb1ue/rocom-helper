@@ -1,0 +1,195 @@
+# RKPP Update Log
+
+## Ver2.0 - Notzeit
+
+Base Version: Ver1.3 - Erneuerung  
+Date: 2026-04-23
+
+本文档记录 Roco-Kingdom-Protocol-Parser 从 Ver1.3 到 Ver2.0 的正式更新内容。Ver1.3 已完成项目命名统一、本地离线 Data bundle、schema-driven 解码主路和 live-decode 外层协议修复；Ver2.0 在此基础上重点完成协议解析模块拆分、TGCP 控制帧结构化、业务帧布局识别增强、战斗语义 schema-first 后处理、边界条件收敛以及发布包内容清理。
+
+---
+
+## 1. 版本定位
+
+Ver2.0 的核心目标是将 Ver1.3 中已验证可用的解析链路整理为更稳定、可维护、可发布的 2.0 版本：
+
+- 保持 `RKPP / rkpp_*` 命名体系不变。
+- 保持本地 `Data/` 离线索引作为运行时数据源。
+- 保持 schema-driven 解码作为主路，语义提取作为高价值后处理。
+- 将旧版集中式协议解析文件拆分为核心解析层与战斗语义层。
+- 将 TGCP 控制帧纳入统一输出与 relay 摘要链路。
+- 强化异常输入、错误 key、非法 relay 参数、坏 JSON bundle 等边界条件处理。
+- 扩展回归测试集，覆盖 Ver2.0 新增的主要稳定性约束。
+
+---
+
+## 2. 协议解析架构调整
+
+Ver1.3 中 `rkpp_proto.py` 同时承担传输层解析、protobuf field-tree 解析、战斗语义提取与辅助工具职责，文件体量较大。Ver2.0 将其拆分为：
+
+- `rkpp_proto_core.py`：负责 TGCP / outer record 布局识别、TSF4G 尾部处理、protobuf field-tree 原语、控制帧解析、通用状态 wrapper 与基础元数据附加。
+- `rkpp_proto_battle.py`：负责战斗相关 opcode 的语义提取、技能/行动/结算/回合状态后处理。
+- `rkpp_proto.py`：保留为兼容门面，对外继续导出既有解析函数，降低调用方迁移成本。
+
+本次拆分不改变外部模块继续 `import rkpp_proto` 的使用方式，但显著降低了后续维护和定位问题的复杂度。
+
+---
+
+## 3. TGCP 与 outer record 解析增强
+
+Ver2.0 对 TGCP 层输出做了结构化补强：
+
+- 新增 `parse_tgcp_control_packet()`，不再将所有非 `0x4013` 帧简单视为不可解析控制帧。
+- 新增 TGCP command 名称映射，覆盖 `SYN`、`ACK`、`AUTH_REQ`、`AUTH_RSP`、`DATA`、`SSTOP`、`BINGO`、`HEARTBEAT`。
+- 对 `0x1002 ACK` 提取 `session_key_hex`，在可打印 ASCII 情况下同步输出 `session_key_ascii`。
+- 对 `0x5002 SSTOP` 解析 code、code_name、tconnd_ip、tconnd_port、tconnd_id 等字段。
+- Analyzer 新增 `tgcp_control` summary，控制帧现在可以进入 `record_json`、`summary_json` 和 relay 事件流。
+
+业务帧布局识别也进一步明确：
+
+- 新增 `tgcp_4013_v14` 布局识别，解析 `transport_seq`、`record_len`、`session_id`、`sub_id`、`req_seq` 等字段。
+- 保留并规范化 live s2c、live c2s、c2s short heartbeat 三类现场布局。
+- 对 c2s `0x0001xxxx` 原始 opcode 继续归一为低 16 位 opcode，同时保留 `raw_opcode` 与 `raw_opcode_hex`。
+- 输出 `transport_kind`、`transport_layout`、`record_len`、`session_id_hex`、`sub_id_hex` 等字段，便于后续抓包审查。
+- 对无法识别的 c2s 布局只记录 debug 信息，避免回退到不可靠的伪解析路径。
+
+---
+
+## 4. schema-first 战斗语义后处理
+
+Ver2.0 将部分战斗语义提取从纯 field-number 启发式推进到 schema-first 后处理：
+
+- `0x1316 ZoneBattleEnterNotify` 优先使用 schema 解码结果提取 battle_mode、round、npc_id、battle_cfg_id、battle_state 等字段。
+- `0x131A ZoneBattleRoundStartNotify` 优先使用 schema 解码结果提取 state_type、battle_id、round、npc_escape、perform_cmd 摘要。
+- `0x132C ZoneBattleFinishNotify` 优先使用 schema 解码结果提取 result、settle_info、ret_info、seen_monster_id、pet_info 等结算信息。
+- `0x1312 ZoneBattleRoundFlowNotify` 在 schema 可用时直接保留命名字段；schema 缺失时回落到 raw field dump，并继续附加 wrappers。
+- 新增 `parse_quality` 与 `semantic_level` 标记，用于区分 `schema_postprocess` 与 `raw_field_postprocess`。
+- `0x1324` 行动结算改为复用 `_extract_perform_cmd()`，与 `0x13FC`、`0x13F3` 共用 perform 解析逻辑，减少重复实现。
+
+该调整使战斗摘要对 protobuf schema 的利用更加直接，同时仍保留 Ver1.3 的 raw field fallback，避免 schema 缺失时丢失基础可观测信息。
+
+---
+
+## 5. Data bundle 与 schema 修正
+
+Ver2.0 保持 Ver1.3 的本地离线 Data bundle 设计，主数据索引文件整体延续：
+
+- `attr_map.json`
+- `skill_map.json`
+- `buff_map.json`
+- `buffbase_map.json`
+- `pet_map.json`
+- `monster_map.json`
+- `pet_skill_map.json`
+- `monster_skillbank_map.json`
+- `special_move_map.json`
+- `opcode_pb_map.json`
+- `pb_message_index.json`
+- `data_manifest.json`
+
+本次版本对数据访问层做了稳定性增强：
+
+- `_read_json_dict()` 对文件读取、编码错误、JSON 解析错误返回空字典，并记录 warning，避免单个损坏索引导致程序崩溃。
+- 元数据查询逻辑统一为 `_get_bundle_meta()` 与 `_get_name_from_meta_or_map()`，减少宠物、技能、属性、Buff 等查询路径中的重复分支。
+- 技能 ID 继续支持 `x100` 形式归一化查询。
+- 宠物名称查询继续兼容 `pet_meta` 与 `monster_meta` 双来源。
+- `proto_schema.json` 补充 `BattleBloodPetSkill.SkillPkInfo` 与 `BattleBloodPetSkill.SkillInfo` 嵌套消息定义，修复该结构无法完整 schema 解码的问题。
+
+---
+
+## 6. CSV、relay 与运行行为调整
+
+Ver2.0 的输出链路做了以下调整：
+
+- `decoded_packets.csv` 增加 TGCP / outer record 审查字段，包括 `tgcp_cmd_name`、`transport_kind`、`transport_layout`、`transport_seq`、`record_len`、`session_id_hex`、`sub_id_hex`。
+- Analyzer 将 record 字段写入逻辑收敛为 `_update_row_from_record()`，减少字段遗漏和重复赋值。
+- `decoded_json` 与 `root_json` 优先输出 schema 解码结果，缺失时再回落到 field-number 结构。
+- `CsvSink` 与 `MoveCsvSink` 共用 `_BufferedCsvWriter`，统一写入、flush 与 close 行为。
+- relay 事件构造提取 `_base_event_fields()` 与 `_vector_payload()`，减少普通 opcode 事件与 move 事件之间的重复逻辑。
+- `/latest?limit=` 对非法 limit 返回 HTTP 400，避免服务端抛出未处理异常。
+- `opencode-server` 继续支持默认端口不可用时自动顺延尝试后续端口。
+
+---
+
+## 7. CLI 与退出码语义
+
+Ver2.0 明确了运行命令的退出语义：
+
+- `capture-key` 找到 key 时返回 `0`，未找到 key 时返回 `1`。
+- 在用户显式提供 key 的 `live-decode` / `battle-analyze` / `opencode-server` 场景下，如果观察到业务帧但全部无法解析，返回 `2`。
+- 该失败场景会记录状态日志：`provided key produced no parsable business records`。
+- 会话结束时统一通过 `_close_optional()` 关闭 pcap writer、CSV sink、move CSV sink、relay 与 session logger。
+- 交互式命令选择改为 `_INTERACTIVE_COMMANDS` 表驱动，减少分支重复。
+
+该调整主要用于区分“正常未捕获”“用户 key 无效或不匹配”“运行成功但流量有限”等不同运行结果。
+
+---
+
+## 8. 边界条件与状态修复
+
+Ver2.0 针对实用过程中的边界问题做了收敛：
+
+- `parse_key_text()` 对 16 字符非 ASCII 输入明确报错，避免误判为 16 字节 key。
+- `load_key_from_file()` 会跳过无法解析的 `key_ascii` / `key_hex` 行，而不是因单行坏值提前失败。
+- `field_groups()` 对消息分组结果进行缓存，降低重复语义提取时的遍历成本。
+- `BattleConsoleReporter` 新增 `_reset_battle_state()`，战斗完成与强制结束时统一清理 opening pair、opening 1316、opening 131A 和双方 active slot。
+- malformed JSON bundle、非法 relay limit、错误 key 退出码、战斗状态重置均已有对应回归测试覆盖。
+
+---
+
+## 9. 发布包与文档整理
+
+Ver2.0 对发布内容进行了清理：
+
+- 删除旧版 `Opencode.md`。
+- 删除旧版大型静态清单 `opencodelist.md`。
+- 删除旧版 `tools/build_data_bundle.py`，当前发布包以已生成的本地 `Data/` bundle 为准。
+- `README.md` 重写为更正式、简洁的 2.0 项目说明，明确当前能力、运行依赖、快速开始、使用边界与 AGPL-3.0-only 许可。
+- `Server.md` 更新为 Ver2.0 server 使用说明，补充新增 CSV 字段、端口回退和 relay 事件格式。
+- `.gitignore` 增加运行产物、抓包、CSV、key、临时审查目录等忽略规则，同时保留 `Update.log` 与 `Data/*.csv`。
+
+---
+
+## 10. 测试与验证
+
+Ver1.3 测试集为 24 项；Ver2.0 当前单元测试扩展到 46 项，覆盖：
+
+- Data bundle 加载与 schema enrich。
+- `BattleBloodPetSkill` 嵌套 schema 解码。
+- TSF4G 变长尾部处理。
+- c2s opcode 归一化。
+- 二进制心跳 `0x013D / 0x013F` 解码。
+- `tgcp_4013_v14`、live s2c、live c2s、c2s short heartbeat 布局识别。
+- TGCP `ACK` session key 提取。
+- TGCP `SSTOP` 结构化解析。
+- 非 ASCII key 与坏 key 文件行处理。
+- malformed JSON bundle 容错。
+- relay 非法 limit 返回 HTTP 400。
+- CLI 错误 key 退出码。
+- battle reporter 状态重置。
+
+验证命令：
+
+```powershell
+python -m unittest discover -s tests
+```
+
+运行结果：
+
+- `Ran 46 tests`
+- `OK`
+
+说明：测试过程中 malformed JSON bundle 用例会触发一条预期 warning 日志，该日志属于容错行为验证，不代表测试失败。
+
+---
+
+## 11. 相比 Ver1.3 的核心结论
+
+Ver1.3 解决了命名统一、离线数据落地和 live-decode 主链路可用性问题；Ver2.0 的重点是将该链路整理为更正式的工程版本：
+
+- 协议解析模块职责更清晰，后续维护成本更低。
+- TGCP 控制帧和业务帧 outer record 信息更完整，审查字段更充分。
+- 战斗语义提取开始系统性使用 schema 结果，摘要质量更稳定。
+- CLI、relay、Data bundle 和 reporter 的边界行为更可预测。
+- 发布包移除旧版大型静态资料和构建辅助脚本，保留运行所需的离线索引数据。
+- 回归测试数量与覆盖范围显著增加，当前 Ver2.0 已通过 46 项测试验证。

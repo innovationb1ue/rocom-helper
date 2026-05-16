@@ -1,0 +1,334 @@
+{
+    "Name": "NORMAL_SHOP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "shop_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "goods_name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "enable",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "unlock_type",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_param",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "unlock_param1",
+            "Type": "EInt32",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "goods_group_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "shop_pos",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "gender",
+            "Type": "EInt32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "Type",
+            "Type": "EInt32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "item_id",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "item_num",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "price_goods_type",
+            "Type": "EInt32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "price_goods_id",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "buy_access",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "origin_price",
+            "Type": "EInt32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "price",
+            "Type": "EInt32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "goods_list",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "gift_list",
+            "Type": "EUint32",
+            "Offset": 77,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "buy_cond_type",
+            "Type": "EInt32",
+            "Offset": 81,
+            "Size": 4
+        },
+        {
+            "Name": "buy_cond_param",
+            "Type": "EInt32",
+            "Offset": 85,
+            "Size": 4
+        },
+        {
+            "Name": "buy_cond_param1",
+            "Type": "EInt32",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "buy_limit_num",
+            "Type": "EInt32",
+            "Offset": 93,
+            "Size": 4
+        },
+        {
+            "Name": "shop_reset_type",
+            "Type": "EInt32",
+            "Offset": 97,
+            "Size": 4
+        },
+        {
+            "Name": "enable_time",
+            "Type": "EString",
+            "Offset": 101,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disable_time",
+            "Type": "EString",
+            "Offset": 105,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_special_good",
+            "Type": "EBool",
+            "Offset": 109,
+            "Size": 1
+        },
+        {
+            "Name": "reset_type",
+            "Type": "EInt32",
+            "Offset": 110,
+            "Size": 4
+        },
+        {
+            "Name": "reset_param1",
+            "Type": "EString",
+            "Offset": 114,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reset_param2",
+            "Type": "EString",
+            "Offset": 118,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 122,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "background",
+            "Type": "EString",
+            "Offset": 126,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "promotion_type",
+            "Type": "EInt32",
+            "Offset": 130,
+            "Size": 4
+        },
+        {
+            "Name": "type_param",
+            "Type": "EString",
+            "Offset": 134,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "id_midas",
+            "Type": "EString",
+            "Offset": 138,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "MidasPay_type",
+            "Type": "EInt32",
+            "Offset": 142,
+            "Size": 4
+        },
+        {
+            "Name": "hidden_after_purchase",
+            "Type": "EBool",
+            "Offset": 146,
+            "Size": 1
+        },
+        {
+            "Name": "add_red_point",
+            "Type": "EInt32",
+            "Offset": 147,
+            "Size": 4
+        },
+        {
+            "Name": "fashion_random_shop",
+            "Type": "EStruct",
+            "Offset": 151,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NORMAL_SHOP_CONF.fashion_random_shop",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "enable",
+                        "Type": "EBool",
+                        "Offset": 0,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "price_goods_type",
+                        "Type": "EInt32",
+                        "Offset": 1,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "price_goods_id",
+                        "Type": "EUint32",
+                        "Offset": 5,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "origin_price",
+                        "Type": "EInt32",
+                        "Offset": 9,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "price",
+                        "Type": "EInt32",
+                        "Offset": 13,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "enable_time",
+                        "Type": "EString",
+                        "Offset": 17,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "disable_time",
+                        "Type": "EString",
+                        "Offset": 21,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "weight",
+                        "Type": "EInt32",
+                        "Offset": 25,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "show_details",
+            "Type": "EBool",
+            "Offset": 155,
+            "Size": 1
+        }
+    ]
+}

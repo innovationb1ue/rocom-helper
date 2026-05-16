@@ -1,0 +1,61 @@
+{
+    "Name": "FURNITURE_CLASSIFICATION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "tab_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_first_tab",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "tab_icon",
+            "Type": "EString",
+            "Offset": 9,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sec_tab_array",
+            "Type": "EInt32",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "visual_angle",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "tab_icon_build_1",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tab_icon_build_2",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

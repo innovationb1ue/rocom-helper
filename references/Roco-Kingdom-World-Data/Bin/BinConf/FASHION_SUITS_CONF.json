@@ -1,0 +1,266 @@
+{
+    "Name": "FASHION_SUITS_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gender",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "suits_original_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "color_suits_launch",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "season_id",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "package_id",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "item_id",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "effect_item_id",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "suits_icon",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suits_icon_big",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "grade_name",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "suit_grade",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "petbase_id",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "flavor_text",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "fashion_bond_band",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "display_suit",
+            "Type": "EBool",
+            "Offset": 68,
+            "Size": 1
+        },
+        {
+            "Name": "privilege_effect",
+            "Type": "EInt32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "privilege_id",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "ai_effect",
+            "Type": "EInt32",
+            "Offset": 77,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "bond_id",
+            "Type": "EUint32",
+            "Offset": 81,
+            "Size": 4
+        },
+        {
+            "Name": "perform_id",
+            "Type": "EUint32",
+            "Offset": 85,
+            "Size": 4
+        },
+        {
+            "Name": "suit_effect_tips",
+            "Type": "EStruct",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "FASHION_SUITS_CONF.suit_effect_tips",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "tips_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "tips_image",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "acquire_struct",
+            "Type": "EStruct",
+            "Offset": 93,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "FASHION_SUITS_CONF.acquire_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "acquire_way_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "behavior_id",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "lv_up_closet",
+            "Type": "EStruct",
+            "Offset": 97,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "FASHION_SUITS_CONF.lv_up_closet",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "goods_ui_text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "goods_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "lv_item_type",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "lv_item_id",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "lv_cost_type",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "lv_cost_price",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

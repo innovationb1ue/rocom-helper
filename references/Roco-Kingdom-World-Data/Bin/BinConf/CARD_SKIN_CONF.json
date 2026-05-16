@@ -1,0 +1,91 @@
+{
+    "Name": "CARD_SKIN_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "skin_resource_path",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "skin_resource_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_initial_unlock",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "item_description",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "bottom_description",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "card_quality",
+            "Type": "EUint32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "skin_get_ways",
+            "Type": "EString",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_default",
+            "Type": "EBool",
+            "Offset": 29,
+            "Size": 1
+        },
+        {
+            "Name": "bagitem_id",
+            "Type": "EUint32",
+            "Offset": 30,
+            "Size": 4
+        },
+        {
+            "Name": "level_up_cost",
+            "Type": "EUint32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "level_up_card",
+            "Type": "EUint32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "level_icon",
+            "Type": "EString",
+            "Offset": 42,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

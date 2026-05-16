@@ -1,0 +1,32 @@
+{
+    "Name": "SKILL_TIME_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "skill_path",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "skill_time",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "skill_pre_end",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

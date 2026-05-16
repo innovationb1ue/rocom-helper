@@ -1,0 +1,145 @@
+{
+    "Name": "REACALL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "reacall_title_name",
+            "Type": "ELocalizedString",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "jump_target",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "data1",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "data2",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "data3",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "data4",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "data5",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "data6",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "data7",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "data8",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "data9",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "data10",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "data11",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "data12",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "data13",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "data14",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "data15",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "data16",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "data17",
+            "Type": "EUint32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "data18",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "data19",
+            "Type": "EUint32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "data20",
+            "Type": "EUint32",
+            "Offset": 88,
+            "Size": 4
+        }
+    ]
+}

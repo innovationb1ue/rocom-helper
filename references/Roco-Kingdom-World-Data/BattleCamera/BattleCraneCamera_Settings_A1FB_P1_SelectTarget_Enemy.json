@@ -1,0 +1,22 @@
+{
+	"Desc": "A1最终战——选择友方目标",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -10,
+		"Z": -15
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": 0
+	},
+	"SprintArmLength": 900,
+	"CameraFov": 90,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": []
+}

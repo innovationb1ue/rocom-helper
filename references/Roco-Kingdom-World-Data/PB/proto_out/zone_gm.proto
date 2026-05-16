@@ -1,0 +1,1216 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle.proto";
+import "com_gm.proto";
+import "com_misc.proto";
+import "com_rpc.proto";
+import "com_pet.proto";
+import "com_appearance.proto";
+import "com_player.proto";
+import "com_task.proto";
+import "com_actor.proto";
+import "xls_enum.proto";
+import "battle_data.proto";
+import "com_player_data.proto";
+
+enum RestfulOp {
+  RESEFUL_OP_NONE = 0;
+  RESEFUL_OP_GET = 1;
+  RESEFUL_OP_POST = 2;
+  RESEFUL_OP_PUT = 3;
+  RESEFUL_OP_DELETE = 4;
+}
+
+enum ResetStageType {
+  RST_CLEAR = 0;
+  RST_RESET = 1;
+}
+
+message ZoneSceneGmReq {
+  uint32 gm_type = 1;
+  uint32 gm_op_type = 2;
+  uint32 uin = 3;
+  uint64 param1 = 4;
+  uint64 param2 = 5;
+  repeated uint64 rpt_params = 6;
+}
+
+message ZoneSceneGmRsp {
+  Next.RetInfo ret_info = 1;
+  bytes ret_value = 2;
+}
+
+message ZoneSceneGmTeleportReq {
+  int32 to_scene_cfg_id = 1;
+  int32 to_scene_inst_id = 2;
+  Next.Point to_point = 3;
+}
+
+message ZoneSceneGmTeleportRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmOpenDungeonReq {
+  int32 dungeon_cfg_id = 1;
+}
+
+message ZoneGmOpenDungeonRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPlayerInvincibleManageReq {
+  uint32 uin = 1;
+  uint32 open_or_close = 2;
+}
+
+message ZoneGmPlayerInvincibleManageRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneGmOperateStaminaReq {
+  enum OpType {
+    OT_GET = 0;
+    OT_FORIBID = 1;
+  }
+  Next.ZoneSceneGmOperateStaminaReq.OpType op_type = 1;
+}
+
+message ZoneSceneGmOperateStaminaRsp {
+  Next.RetInfo ret_info = 1;
+  int32 stamina = 2;
+  int32 stamina_low = 3;
+  int32 stamina_up = 4;
+  int32 stamina_status = 5;
+  repeated int32 status = 6;
+  repeated int32 cost = 7;
+}
+
+message ZoneGmScenesvrErrEchoReq {
+  uint32 uin = 1;
+  bool status = 2;
+}
+
+message ZoneGmScenesvrErrEchoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneGmQueryNpcBlackboardReq {
+  repeated uint64 actor_list = 1;
+}
+
+message ZoneSceneGmQueryNpcBlackboardRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.GmNpcBlackboard blackboard_infos = 2;
+}
+
+message ZoneGmGetDungeonCurStageReq {
+}
+
+message ZoneGmGetDungeonCurStageRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 cur_stage = 2;
+}
+
+message ZoneSceneGmAutoEnterVisitReq {
+  uint32 owner_uin = 1;
+}
+
+message ZoneSceneGmAutoEnterVisitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmCreateNpcReq {
+  bool only_test = 4;
+  int32 npc_type = 1;
+  Next.Point npc_pos = 2;
+  uint32 content_cfg_id = 3;
+  bool is_nightmare_elite = 5;
+}
+
+message ZoneGmCreateNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmForbidCreateNpcReq {
+  uint32 uin = 1;
+}
+
+message ZoneGmForbidCreateNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUnlockWorldMapStaticNpcReq {
+  int32 npc_refresh_cfg_id = 1;
+  bool exclude_dungeon = 2;
+}
+
+message ZoneGmUnlockWorldMapStaticNpcRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmExploreAllAreaNpcsReq {
+}
+
+message ZoneGmExploreAllAreaNpcsRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSwitchClientAiToServerReq {
+  repeated uint64 actor_list = 1;
+  repeated Next.DotsComponentData comp_data_list = 2;
+  repeated Next.Point point_list = 3;
+  bool isBatchSwitch = 4;
+}
+
+message ZoneGmSwitchClientAiToServerRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint64 success_list = 2;
+}
+
+message ZoneGmSwitchServerAiToClientReq {
+  repeated uint64 actor_list = 1;
+  bool isBatchSwitch = 2;
+}
+
+message ZoneGmSwitchServerAiToClientRsp {
+  Next.RetInfo ret_info = 1;
+  repeated uint64 success_list = 2;
+}
+
+message ZoneGmUnlockAllActivityReq {
+}
+
+message ZoneGmUnlockAllActivityRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneGmSetNpcPosReq {
+  repeated Next.SetNpcPosItem npc_list = 1;
+}
+
+message ZoneSceneGmSetNpcPosRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddAllPetExpReq {
+  uint32 uin = 1;
+  int32 exp = 2;
+}
+
+message ZoneGmAddAllPetExpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmCreateBattleReq {
+  uint32 battle_conf_id = 1;
+  uint32 npc_conf_id = 2;
+  uint32 npc_level = 3;
+  uint64 npc_obj_id = 4;
+  Next.Point avatar_pt = 5;
+  Next.Point npc_pt = 6;
+  repeated uint32 friend_uins = 9;
+  repeated uint32 enemy_uins = 10;
+  repeated uint64 enemy_zone_ids = 12;
+  Next.PvpModeCtl pvp_mode = 11;
+  repeated Next.GmBattleNpc dynamic_npcs = 15;
+  bool disable_anti_cheat = 16;
+  bool skill_tool_mode = 17;
+  uint32 ai_type = 13;
+  uint32 first_pet = 14;
+  uint64 replay_bfid = 18;
+}
+
+message ZoneGmQueryBattleFieldReq {
+  uint32 battle_conf_id = 1;
+  int32 full_station = 2;
+  Next.Position avatar_pt = 3;
+  Next.Position npc_pt = 4;
+}
+
+message ZoneGmCreateBattleRsp {
+  enum BattleFieldStatus {
+    BATTLE_FIELD_STATUS_SUCCESS = 0;
+    BATTLE_FIELD_STATUS_LOCAL = 1;
+    BATTLE_FIELD_STATUS_NOT_FOUND = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  Next.ZoneGmCreateBattleRsp.BattleFieldStatus status = 2;
+  Next.Position query_pos = 3;
+  Next.Position result_pos = 4;
+  bool is_full_station = 5;
+  int32 data_layer = 6;
+  int32 battle_id = 7;
+}
+
+message ZoneGmBattleBotInviteReq {
+  uint32 player_uin = 1;
+  uint64 zone_inst_id = 2;
+  uint32 uin = 3;
+}
+
+message ZoneGmBattleBotInviteRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmBattleBotInviteNotify {
+  uint32 player_uin = 1;
+  uint64 zone_inst_id = 2;
+}
+
+message ZoneGmCreateAiPetReq {
+  uint32 pet_conf_id = 1;
+  uint32 blood_id = 2;
+  repeated uint32 skill_ids = 3;
+  uint32 nature = 4;
+  uint32 height = 5;
+  uint32 weight = 6;
+  uint32 gender = 7;
+  uint32 breakthrough_cnt = 8;
+  uint32 hp_max_talent = 9;
+  uint32 phy_attack_talent = 10;
+  uint32 spe_attack_talent = 11;
+  uint32 phy_defence_talent = 12;
+  uint32 spe_defence_talent = 13;
+  uint32 speed_talent = 14;
+  uint32 battle_conf_id = 15;
+  uint32 world_lv = 16;
+  uint32 role_lv = 17;
+  uint32 npc_lv = 18;
+}
+
+message ZoneGmCreateAiPetRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PetData pet_data = 2;
+}
+
+message ZoneGmMatchStartReq {
+  uint32 pvp_id = 1;
+}
+
+message ZoneGmMatchStartRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleGmReq {
+  enum BATTLE_GM_TYPE {
+    B_GM_TYPE_BUFF = 1;
+    B_GM_TYPE_ATTR = 2;
+    B_GM_TYPE_SKILL = 3;
+    B_GM_TYPE_SPECIAL = 4;
+    B_GM_TYPE_AI = 5;
+    B_GM_TYPE_COMBO = 6;
+    B_GM_TYPE_ZONE = 7;
+    B_GM_TYPE_QUERY = 8;
+    B_GM_DUMP_BFD = 9;
+  }
+  uint32 gm_type = 1;
+  uint32 gm_op_type = 2;
+  uint32 uin = 3;
+  int32 param1 = 4;
+  int32 param2 = 5;
+  int32 param3 = 6;
+  int32 param4 = 7;
+  int32 param5 = 8;
+  int32 param6 = 9;
+  string str_param = 10;
+  uint32 side = 11;
+  uint32 pos = 12;
+}
+
+message ZoneBattleGmRsp {
+  Next.RetInfo ret_info = 1;
+  bytes ret_value = 2;
+  repeated Next.BattlePetInfo pets = 3;
+}
+
+message ZoneGmPkReq {
+  uint32 uin = 1;
+}
+
+message ZoneGmPkRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmBattleEndReq {
+  uint32 battle_result = 1;
+}
+
+message ZoneGmBattleEndRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmBindMageHelpReq {
+  uint64 battle_id = 1;
+  uint32 helper1 = 2;
+  uint32 helper2 = 3;
+  uint32 helper3 = 4;
+  uint32 uin = 5;
+}
+
+message ZoneGmBindMageHelpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmBindMageCampReq {
+  uint32 camp_id = 1;
+  uint32 rest_conf_id = 2;
+  uint32 uin = 3;
+}
+
+message ZoneGmBindMageCampRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUnlockCampPetsReq {
+  uint32 uin = 1;
+  uint32 camp_id = 2;
+}
+
+message ZoneGmUnlockCampPetsRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetGenderReq {
+  dataconfig.ESexValue gender = 1;
+}
+
+message ZoneGmSetGenderRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmOpenAdventureChapterReq {
+  uint32 uin = 1;
+  uint32 chapter_id = 2;
+}
+
+message ZoneGmOpenAdventureChapterRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSelectAdventurePetReq {
+  uint32 uin = 1;
+  uint32 pet_conf_id = 2;
+}
+
+message ZoneGmSelectAdventurePetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmTaskAddReq {
+  uint32 uin = 1;
+  uint32 task_id = 2;
+  repeated uint32 extra_task_ids = 3;
+}
+
+message ZoneGmTaskAddRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmTaskRemoveReq {
+  uint32 uin = 1;
+  uint32 task_id = 2;
+  repeated uint32 extra_task_ids = 3;
+}
+
+message ZoneGmTaskRemoveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmTaskModifyProgressReq {
+  uint32 uin = 1;
+  uint32 task_id = 2;
+  repeated uint32 extra_task_ids = 4;
+  uint32 task_progress = 3;
+}
+
+message ZoneGmTaskModifyProgressRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmTaskDoneReq {
+  uint32 uin = 1;
+  uint32 task_id = 2;
+  repeated uint32 extra_task_ids = 3;
+}
+
+message ZoneGmTaskDoneRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmTaskClearReq {
+}
+
+message ZoneGmTaskClearRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientTaskFinishReq {
+  uint32 task_id = 1;
+}
+
+message ZoneGmClientTaskFinishRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientTaskClearReq {
+  uint32 task_id = 1;
+}
+
+message ZoneGmClientTaskClearRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientTaskTktDoneReq {
+  uint32 num = 1;
+}
+
+message ZoneGmClientTaskTktDoneRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientQueryTaskStateReq {
+  uint32 task_id = 1;
+}
+
+message ZoneGmClientQueryTaskStateRsp {
+  Next.RetInfo ret_info = 1;
+  Next.EMTaskState state = 2;
+}
+
+message ZoneGmPetBreakThroughReq {
+  uint32 uin = 1;
+  uint32 level = 2;
+}
+
+message ZoneGmPetBreakThroughRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPetHabitLevelReq {
+  uint32 uin = 1;
+  uint32 level = 2;
+  repeated uint32 habit_list = 3;
+}
+
+message ZoneGmPetHabitLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClearPetReq {
+  uint32 uin = 1;
+  repeated uint32 pet_gids = 2;
+}
+
+message ZoneGmClearPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetPetLevelReq {
+  uint32 pet_level = 1;
+  uint32 pet_gid = 2;
+}
+
+message ZoneGmSetPetLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUpdatePlayerPetReq {
+  uint32 uin = 1;
+  uint32 type = 2;
+}
+
+message ZoneGmUpdatePlayerPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetEggHatchCompleteReq {
+  uint32 egg_gid = 1;
+}
+
+message ZoneGmSetEggHatchCompleteRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetBpExpReq {
+  uint32 uin = 1;
+  int32 exp = 2;
+}
+
+message ZoneGmSetBpExpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetPetTravelCompleteReq {
+  repeated uint32 pet_gid = 1;
+}
+
+message ZoneGmSetPetTravelCompleteRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetHandbookReq {
+}
+
+message ZoneGmResetHandbookRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddPetClosenessReq {
+  uint32 pet_gid = 1;
+  uint32 add_exp = 2;
+}
+
+message ZoneGmAddPetClosenessRsp {
+  Next.RetInfo ret_info = 1;
+  int32 closeness_lv = 2;
+  int32 closeness_exp = 3;
+}
+
+message ZoneGmQueryPetClosenessReq {
+  uint32 pet_gid = 1;
+}
+
+message ZoneGmQueryPetClosenessRsp {
+  Next.RetInfo ret_info = 1;
+  int32 closeness_lv = 2;
+  int32 closeness_exp = 3;
+}
+
+message ZoneGmFriendOperReq {
+  uint32 uin = 1;
+  uint32 type = 2;
+  string name_prefix = 3;
+  uint32 num = 4;
+}
+
+message ZoneGmFriendOperRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 success_count = 2;
+}
+
+message ZoneGmBatchSendChatMsgReq {
+  uint32 send_uin = 1;
+  uint32 recv_uin = 2;
+  string chat_msg = 3;
+  uint32 repeated_count = 4;
+}
+
+message ZoneGmBatchSendChatMsgRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddFriendReq {
+  uint32 player_uin = 1;
+}
+
+message ZoneGmAddFriendRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddTestPlatFriendReq {
+  uint32 uin = 1;
+  uint32 restful_op = 2;
+  string openid_prefix = 3;
+  string ranges = 4;
+}
+
+message ZoneGmAddTestPlatFriendRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmOperateItemReq {
+  int32 item_type = 1;
+  int32 item_id = 2;
+  int32 op_type = 3;
+  int32 item_num = 4;
+  int32 together_gift_uin = 5;
+}
+
+message ZoneGmOperateItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientAddItemReq {
+  uint32 item_id = 1;
+  uint32 num = 2;
+}
+
+message ZoneGmClientAddItemRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientAddPetReq {
+  uint32 pet_conf_id = 1;
+  uint32 num = 2;
+}
+
+message ZoneGmClientAddPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientAddTaskTokenReq {
+  uint32 task_token_id = 1;
+  uint32 num = 2;
+}
+
+message ZoneGmClientAddTaskTokenRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientAddRewardReq {
+  uint32 reward_id = 1;
+  uint32 num = 2;
+}
+
+message ZoneGmClientAddRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetShopGoodsBuyNumReq {
+  uint32 shop_id = 1;
+  repeated uint32 goods_id = 2;
+}
+
+message ZoneGmResetShopGoodsBuyNumRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUpdatePlayerRedPointReq {
+  uint32 uin = 1;
+  uint32 op_type = 2;
+  repeated Next.RedPointGroup rp_group = 3;
+}
+
+message ZoneGmUpdatePlayerRedPointRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetPlayerWorldLevelReq {
+  uint32 uin = 1;
+  uint32 world_level = 2;
+}
+
+message ZoneGmSetPlayerWorldLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetPlayerLevelReq {
+  uint32 uin = 1;
+  uint32 level = 2;
+}
+
+message ZoneGmSetPlayerLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddMailReq {
+  uint32 uin = 1;
+  uint32 mail_id = 2;
+  bool rand_mail = 3;
+  uint32 mail_num = 4;
+}
+
+message ZoneGmAddMailRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmGetSvrInfoReq {
+}
+
+message ZoneGmGetSvrInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated string svr_info = 2;
+}
+
+message ZoneGmQuerySceneAssetSvnVersionReq {
+  int32 scene_res_logic_id = 1;
+  int32 asset_type = 2;
+  Next.Position pos = 3;
+}
+
+message ZoneGmQuerySceneAssetSvnVersionRsp {
+  Next.RetInfo ret_info = 1;
+  int32 scene_res_logic_id = 2;
+  int32 asset_type = 3;
+  string svn_version = 4;
+}
+
+message ZoneGmKickoutReq {
+  uint32 uin = 1;
+  string open_id = 2;
+  int32 kickout_type = 6;
+  int32 kickout_sub_type = 7;
+  string kickout_txt_id = 8;
+}
+
+message ZoneGmKickoutRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientSetPlayerLevelReq {
+  uint32 level = 1;
+}
+
+message ZoneGmClientSetPlayerLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientSetWorldLevelReq {
+  uint32 level = 1;
+}
+
+message ZoneGmClientSetWorldLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClientUnlockAllCampReq {
+}
+
+message ZoneGmClientUnlockAllCampRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPlayerMoveCheckModifyReq {
+  bool cancel_check_pos = 1;
+  bool open_airwall_dead = 2;
+  bool enable_tips = 3;
+}
+
+message ZoneGmPlayerMoveCheckModifyRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetPlayerActivityStageRewardReq {
+  int32 reset_type = 1;
+  uint32 uin = 2;
+}
+
+message ZoneGmResetPlayerActivityStageRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmOpenStageActivityReq {
+  uint32 uin = 1;
+  uint32 activity_id = 2;
+}
+
+message ZoneGmOpenStageActivityRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetPlayerActivityPartRewardReq {
+}
+
+message ZoneGmResetPlayerActivityPartRewardRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPlayerActivityOptReq {
+  enum OptType {
+    OPT_NONE = 0;
+    OPT_RESET_ACT_BY_ID = 1;
+    OPT_UNLOCK_ACT = 2;
+  }
+  uint32 uin = 1;
+  uint32 activity_id = 2;
+  Next.ZoneGmPlayerActivityOptReq.OptType opt_type = 3;
+}
+
+message ZoneGmPlayerActivityOptRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDelActivityDataReq {
+  uint32 uin = 1;
+  uint32 activity_id = 2;
+}
+
+message ZoneGmDelActivityDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetBattlePassReq {
+}
+
+message ZoneGmResetBattlePassRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPlayerStoryFlagModifyReq {
+  int32 story_flag = 1;
+  repeated int32 extra_story_flags = 3;
+  bool is_add = 2;
+}
+
+message ZoneGmPlayerStoryFlagModifyRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmShowNavBoundReq {
+  Next.Position avatar_pos = 1;
+}
+
+message ZoneGmShowNavBoundRsp {
+  Next.RetInfo ret_info = 1;
+  Next.Position pos = 2;
+  Next.Position extent = 3;
+}
+
+message ZoneGmClearAppearanceInfoReq {
+}
+
+message ZoneGmClearAppearanceInfoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClearPetMedalReq {
+  uint32 medal_gid = 1;
+  uint32 medal_conf_id = 2;
+  uint32 pet_gid = 3;
+}
+
+message ZoneGmClearPetMedalRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUnlockAppearanceInfoReq {
+  uint32 uin = 1;
+}
+
+message ZoneGmUnlockAppearanceInfoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmRefreshRandomShopReq {
+  uint32 uin = 1;
+  uint32 shop_id = 2;
+}
+
+message ZoneGmRefreshRandomShopRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAdventureSettingReq {
+  uint32 uin = 1;
+  uint32 chapter_id = 2;
+}
+
+message ZoneGmAdventureSettingRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSeasonAdventureSettingReq {
+  uint32 uin = 1;
+  uint32 chapter_id = 2;
+  uint32 operate_type = 3;
+  uint32 badge_lvl = 4;
+}
+
+message ZoneGmSeasonAdventureSettingRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmPvpRankReq {
+  enum PVP_RANK_GM_OP {
+    PVP_RANK_GM_OP_SET_STAR = 1;
+    PVP_RANK_GM_OP_SET_STAR_REWARD_STATUS = 2;
+    PVP_RANK_GM_OP_SET_WEEK_WIN_COUNT = 3;
+    PVP_RANK_GM_OP_SET_WEEK_TASK_REWARD_STATUS = 4;
+    PVP_RANK_GM_OP_SET_MASTER_SCORE = 5;
+    PVP_RANK_GM_OP_REPORT_SCORE = 6;
+    PVP_RANK_GM_OP_REMOVE_FROM_RANK = 7;
+    PVP_RANK_GM_OP_CLEAR_RANK_LIST = 8;
+    PVP_RANK_GM_OP_RESET_DAILY_FIRST_WIN_TIME = 9;
+    PVP_RANK_CM_OP_RESET_PVP_SCORE = 10;
+    PVP_RANK_GM_OP_UNLOCK_REWARDS = 1001;
+    PVP_RANK_GM_OP_RESET_REWARDS = 1002;
+    PVP_RANK_GM_OP_UNLOCK_STAR_REWARDS = 1003;
+    PVP_RANK_GM_OP_RESET_STAR_REWARDS = 1004;
+    PVP_RANK_GM_OP_UNLOCK_WEEK_TASK_REWARDS = 1005;
+    PVP_RANK_GM_OP_RESET_WEEK_TASK_REWARDS = 1006;
+  }
+  Next.ZoneGmPvpRankReq.PVP_RANK_GM_OP gm_op = 1;
+  int32 param1 = 2;
+  int32 param2 = 3;
+}
+
+message ZoneGmPvpRankRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClearGuideReq {
+  uint32 group_id = 1;
+  repeated uint32 index = 2;
+}
+
+message ZoneGmClearGuideRsp {
+  Next.RetInfo ret_info = 1;
+  Next.GuideGroup sync_group = 2;
+}
+
+message ZoneSceneHomeGmAddExpReq {
+  uint32 exp = 1;
+}
+
+message ZoneSceneHomeGmAddExpRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeGmModifyRoomLevelReq {
+  uint32 level = 1;
+}
+
+message ZoneSceneHomeGmModifyRoomLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeGmSkipExpandWaitReq {
+  uint32 remain_wait_secs = 1;
+}
+
+message ZoneSceneHomeGmSkipExpandWaitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomePlantGmResetReq {
+}
+
+message ZoneSceneHomePlantGmResetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomePlantGmRipeReq {
+}
+
+message ZoneSceneHomePlantGmRipeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomePlantGmReapReq {
+  int32 land_id = 1;
+  int32 reap = 2;
+}
+
+message ZoneSceneHomePlantGmReapRsp {
+  Next.RetInfo ret_info = 1;
+  int32 reap = 2;
+}
+
+message ZoneSceneHomePlantGmStealLimitReq {
+  int32 limit = 1;
+}
+
+message ZoneSceneHomePlantGmStealLimitRsp {
+  Next.RetInfo ret_info = 1;
+  int32 limit = 2;
+}
+
+message ZoneSceneHomePetGmStealReq {
+  uint32 uin = 1;
+  bool is_get = 2;
+  repeated Next.HomePetGmStealInfo steal_info = 3;
+}
+
+message ZoneSceneHomePetGmStealRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.HomePetGmStealInfo steal_info = 2;
+}
+
+message ZoneHomePetGmHarvestReq {
+}
+
+message ZoneHomePetGmHarvestRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneHomeGmResetHomeLevelReq {
+}
+
+message ZoneSceneHomeGmResetHomeLevelRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneHomeGmDecomposeAllFurnitureReq {
+}
+
+message ZoneHomeGmDecomposeAllFurnitureRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmFeedGridPosReq {
+  uint32 reserve = 1;
+}
+
+message ZoneGmFeedGridPosRsp {
+  message GridPos {
+    uint64 grid_id = 1;
+    repeated Next.Position pos = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.ZoneGmFeedGridPosRsp.GridPos grid_pos = 2;
+}
+
+message ZoneGmShowTipsNotify {
+  string tips_str = 1;
+}
+
+message ZoneGmDotsSkillCastByAssetReq {
+  uint64 actor_id = 1;
+  int32 skill_id = 2;
+  bytes skill_asset_content = 3;
+}
+
+message ZoneGmDotsSkillCastByAssetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDotsSkillCastReq {
+  uint64 actor_id = 1;
+  int32 skill_id = 2;
+}
+
+message ZoneGmDotsSkillCastRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDotsSkillStopReq {
+  uint64 actor_id = 1;
+  int32 skill_id = 2;
+}
+
+message ZoneGmDotsSkillStopRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDotsSkillSnapshotReq {
+  uint64 actor_id = 1;
+}
+
+message ZoneGmDotsSkillSnapshotRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDotsMfbtCastReq {
+  uint64 actor_id = 1;
+  int32 behavior_id = 2;
+  int32 perform_group_id = 3;
+}
+
+message ZoneGmDotsMfbtCastRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmDotsMfbtCastByAssetReq {
+  uint64 actor_id = 1;
+  int32 behavior_id = 2;
+  bytes behavior_tree_asset_content = 3;
+}
+
+message ZoneGmDotsMfbtCastByAssetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmAddStarLightReq {
+  int32 add_num = 1;
+}
+
+message ZoneGmAddStarLightRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmClearStarLightInfoReq {
+}
+
+message ZoneGmClearStarLightInfoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmSetFashionSuitReq {
+  uint32 suit_id = 1;
+}
+
+message ZoneGmSetFashionSuitRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerAppearanceInfo_FashionInfo fashion_info = 2;
+}
+
+message ZoneGmTestRandomShopResultReq {
+  uint32 shop_id = 1;
+  int32 random_count = 2;
+}
+
+message ZoneGmTestRandomShopResultRsp {
+  message GoodsStat {
+    uint32 goods_id = 1;
+    int32 count = 2;
+    string goods_name = 3;
+  }
+  Next.RetInfo ret_info = 1;
+  uint32 shop_id = 2;
+  repeated Next.ZoneGmTestRandomShopResultRsp.GoodsStat goods_stats = 3;
+}
+
+message ZoneGmDeleteRedPointDataReq {
+  repeated int32 redpoint_reason = 1;
+}
+
+message ZoneGmDeleteRedPointDataRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmGetCommGmCmdsReq {
+}
+
+message ZoneGmGetCommGmCmdsRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.CommGmCmd cmds = 2;
+}
+
+message ZoneGmExecCommGmCmdReq {
+  Next.CommGmCmd cmd = 1;
+}
+
+message ZoneGmExecCommGmCmdRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmGetPlayerBriefInfoReq {
+  uint32 uin = 1;
+}
+
+message ZoneGmGetPlayerBriefInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PlayerBriefInfo brief_info = 2;
+}
+
+message ZoneGmBatchGetPlayerBriefInfoReq {
+  repeated uint32 uin_list = 1;
+  repeated Next.PlayerBriefInfoGroup groups = 2;
+}
+
+message ZoneGmBatchGetPlayerBriefInfoRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.PlayerBriefInfo brief_list = 2;
+}
+
+message ZoneGmStopPosCheckReq {
+}
+
+message ZoneGmStopPosCheckRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmResetTeachingTabRewardsReq {
+}
+
+message ZoneGmResetTeachingTabRewardsRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneGmUnlockAllTeachingTabReq {
+}
+
+message ZoneGmUnlockAllTeachingTabRsp {
+  Next.RetInfo ret_info = 1;
+}

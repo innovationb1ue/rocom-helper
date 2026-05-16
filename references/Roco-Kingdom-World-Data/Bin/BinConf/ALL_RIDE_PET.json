@@ -1,0 +1,242 @@
+{
+    "Name": "ALL_RIDE_PET",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "animation_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ride_unlock_level",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "basic_movement_list",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "passive_skill",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "active_skill_unlock_level",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "active_skill_list",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "second_active_skill__list",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "model_scale",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "capsule_half_height",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "capsule_radius",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "mesh_offset_x",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "mesh_offset_y",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "mesh_offset_z",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "not_use_for_ride",
+            "Type": "EBool",
+            "Offset": 60,
+            "Size": 1
+        },
+        {
+            "Name": "climb_mesh_offset",
+            "Type": "EString",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_swim_water_depth",
+            "Type": "EInt32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "max_step_height",
+            "Type": "EInt32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "takephoto_ban_switch",
+            "Type": "EBool",
+            "Offset": 73,
+            "Size": 1
+        },
+        {
+            "Name": "throw_switch",
+            "Type": "EBool",
+            "Offset": 74,
+            "Size": 1
+        },
+        {
+            "Name": "ride_throw_camera_offset_x",
+            "Type": "EInt32",
+            "Offset": 75,
+            "Size": 4
+        },
+        {
+            "Name": "ride_throw_camera_offset_y",
+            "Type": "EInt32",
+            "Offset": 79,
+            "Size": 4
+        },
+        {
+            "Name": "ride_throw_camera_offset_z",
+            "Type": "EInt32",
+            "Offset": 83,
+            "Size": 4
+        },
+        {
+            "Name": "ride_foot_num",
+            "Type": "EInt32",
+            "Offset": 87,
+            "Size": 4
+        },
+        {
+            "Name": "use_custom_camera",
+            "Type": "EBool",
+            "Offset": 91,
+            "Size": 1
+        },
+        {
+            "Name": "custom_camera_x",
+            "Type": "EInt32",
+            "Offset": 92,
+            "Size": 4
+        },
+        {
+            "Name": "custom_camera_y",
+            "Type": "EInt32",
+            "Offset": 96,
+            "Size": 4
+        },
+        {
+            "Name": "custom_camera_z",
+            "Type": "EInt32",
+            "Offset": 100,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_x",
+            "Type": "EInt32",
+            "Offset": 104,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_y",
+            "Type": "EInt32",
+            "Offset": 108,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_z",
+            "Type": "EInt32",
+            "Offset": 112,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_2p_x",
+            "Type": "EInt32",
+            "Offset": 116,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_2p_y",
+            "Type": "EInt32",
+            "Offset": 120,
+            "Size": 4
+        },
+        {
+            "Name": "eyes_view_point_offset_2p_z",
+            "Type": "EInt32",
+            "Offset": 124,
+            "Size": 4
+        },
+        {
+            "Name": "selfie_takephoto_params",
+            "Type": "EString",
+            "Offset": 128,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "selfie2p_takephoto_params",
+            "Type": "EString",
+            "Offset": 132,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

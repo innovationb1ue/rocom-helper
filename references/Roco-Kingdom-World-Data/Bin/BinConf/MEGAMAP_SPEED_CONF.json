@@ -1,0 +1,19 @@
+{
+    "Name": "MEGAMAP_SPEED_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "speed",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        }
+    ]
+}

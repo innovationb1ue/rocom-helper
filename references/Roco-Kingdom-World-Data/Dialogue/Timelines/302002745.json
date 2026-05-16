@@ -1,0 +1,36 @@
+{
+    "length": 3.0,
+    "dialogue_id": 302002745,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 42503,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineNPCSayState",
+            "Name": "\u89d2\u8272\u8bf4\u8bdd",
+            "OwnerActorID": 0,
+            "StartTime": 0.0,
+            "EndTime": 1.0,
+            "MinimalDuration": 0.1,
+            "PlayFacialAnim": true
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelinePlaySoundAction",
+            "Name": "\u64ad\u653e\u58f0\u97f3\u4e8b\u4ef6",
+            "OwnerActorID": -1,
+            "StartTime": 0.0,
+            "EndTime": 2.6,
+            "MinimalDuration": 0.1,
+            "SoundEvent": "UI_World_Camera_Loop",
+            "StopType": 1
+        }
+    ]
+}

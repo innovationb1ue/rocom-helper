@@ -1,0 +1,33 @@
+package Next;
+
+import "com_base_types.proto";
+
+enum MonsterSettleStatus {
+  MONSTER_SETTLE_NONE = 0;
+  BATTLE_DEFEAT = 1;
+  BATTLE_CAPTURE = 2;
+  SCENE_CAPTURE = 3;
+}
+
+message MonsterDiffInfo {
+  int32 height = 1;
+  int32 weight = 2;
+  int32 nature = 3;
+  int32 mutation_type = 4;
+  uint32 blood_mix_skill_dam_type = 5;
+  Next.GlassInfo glass_info = 7;
+  int32 voice = 8;
+  int32 gender = 9;
+}
+
+message CheerMonsterInitInfo {
+  uint32 conf_id = 1;
+  uint64 sid = 2;
+  uint32 tag = 3;
+  uint32 enter_index = 4;
+  uint32 level = 5;
+  uint64 ai_status = 6;
+  int32 pre_act_tag = 7;
+  int32 pre_act_param = 8;
+  Next.MonsterDiffInfo monster_diff_info = 9;
+}

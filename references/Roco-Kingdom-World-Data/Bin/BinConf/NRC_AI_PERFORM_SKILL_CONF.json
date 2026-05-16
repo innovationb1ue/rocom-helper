@@ -1,0 +1,46 @@
+{
+    "Name": "NRC_AI_PERFORM_SKILL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "parallel_playback",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "interrupt_when_stop_ai",
+            "Type": "EBool",
+            "Offset": 9,
+            "Size": 1
+        },
+        {
+            "Name": "editor_note",
+            "Type": "EString",
+            "Offset": 10,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "skill_ref",
+            "Type": "EString",
+            "Offset": 14,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

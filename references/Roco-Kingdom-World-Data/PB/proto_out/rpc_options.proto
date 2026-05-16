@@ -1,0 +1,15 @@
+
+import "google/protobuf/descriptor.proto";
+
+enum RealTypeOfInt {
+  RT_UINT8 = 1;
+  RT_INT8 = 2;
+  RT_UINT16 = 3;
+  RT_INT16 = 4;
+}
+
+message NullRequest {
+}
+
+message NullResponse {
+}

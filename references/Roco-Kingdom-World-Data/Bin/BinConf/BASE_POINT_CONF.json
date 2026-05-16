@@ -1,0 +1,71 @@
+{
+    "Name": "BASE_POINT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "base_point",
+            "Type": "EStruct",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "BASE_POINT_CONF.base_point",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "pet_type_crystal_type",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "pet_type_crystal_number",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "need_item",
+                        "Type": "EStruct",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "ArrayDim": 2,
+                        "Struct": {
+                            "Name": "BASE_POINT_CONF.base_point.need_item",
+                            "Type": "EStruct",
+                            "Properties": [
+                                {
+                                    "Name": "item_id",
+                                    "Type": "EUint32",
+                                    "Offset": 0,
+                                    "Size": 4
+                                },
+                                {
+                                    "Name": "item_number",
+                                    "Type": "EUint32",
+                                    "Offset": 4,
+                                    "Size": 4
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

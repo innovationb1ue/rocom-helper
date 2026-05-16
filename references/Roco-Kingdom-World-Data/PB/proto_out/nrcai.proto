@@ -1,0 +1,166 @@
+package nrcai;
+
+import "battle_data.proto";
+
+enum PlayerType {
+  model = 0;
+  bt = 1;
+  human = 2;
+}
+
+enum InputAction {
+  cast_skill = 1;
+  change_pet = 2;
+  use_magic = 3;
+  escape = 4;
+  pick_pet = 5;
+  pick_magic_skill = 6;
+  start_battle = 7;
+}
+
+enum PetNature {
+  GuPi = 1;
+  GuZhi = 2;
+  TiaoPi = 3;
+  YongGan = 4;
+  TanShuai = 5;
+  DaDan = 6;
+  TaoQi = 7;
+  LanSan = 8;
+  YouXian = 9;
+  HaiXiu = 10;
+  BaoShou = 11;
+  WenZhong = 12;
+  MaHu = 13;
+  LengJing = 14;
+  RenZhen = 15;
+  ChenZhuo = 16;
+  WenShun = 17;
+  ShenZhong = 18;
+  KuangWang = 19;
+  ShiGan = 20;
+  DanXiao = 21;
+  JiZao = 22;
+  KaiLang = 23;
+  TianZhen = 24;
+  FuZao = 25;
+  ChenMo = 26;
+  LiZhi = 27;
+  PingHe = 28;
+  YouYu = 29;
+  JinZhang = 30;
+}
+
+enum BattleResult {
+  Win = 0;
+  Lose = 1;
+  Escape = 2;
+  ForceEnd = 3;
+}
+
+message EventRspData {
+  nrcai.PlayerType p1_player_type = 1;
+  nrcai.PlayerType p2_player_type = 2;
+}
+
+message AIModelWarmControl {
+  bool warm_control_enable = 1;
+  bool warm_control_restraint_pet = 2;
+  float warm_control_attack_ratio = 3;
+  float warm_action_probs_threshold = 4;
+  uint32 warm_control_energy_thr = 5;
+  uint32 warm_control_attack_thr = 6;
+  uint32 warm_control_hurt_thr = 7;
+}
+
+message AgentStartReqData {
+  string ai_type = 1;
+  string game_settings_path = 2;
+  string model_path = 3;
+  nrcai.AIModelWarmControl warm_control = 4;
+}
+
+message BattleExtraRoleInfo {
+  Next.BattleOpHistory op_history = 1;
+  uint32 skill_results = 2;
+}
+
+message ExtraBattleStateInfo {
+  repeated nrcai.InputAction request_actions = 1;
+  nrcai.BattleExtraRoleInfo player_team = 2;
+  nrcai.BattleExtraRoleInfo enemy_team = 3;
+}
+
+message UpdateReqData {
+  Next.BattleStateInfo battle_state_info = 1;
+  nrcai.ExtraBattleStateInfo extra_battle_state_info = 2;
+}
+
+message PetStartArg {
+  uint32 pet_id = 1;
+  uint32 blood_id = 2;
+  repeated uint32 skills = 3;
+  uint32 enter_index = 4;
+  uint32 nature = 5;
+  uint32 height = 6;
+  uint32 weight = 7;
+  uint32 gender = 8;
+  uint32 breakthrough_cnt = 9;
+  uint32 hp_max_talent = 10;
+  uint32 phy_attack_talent = 11;
+  uint32 spe_attack_talent = 12;
+  uint32 phy_defence_talent = 13;
+  uint32 spe_defence_talent = 14;
+  uint32 speed_talent = 15;
+}
+
+message StartArg {
+  repeated nrcai.PetStartArg pets = 1;
+  repeated uint32 magic_skills = 2;
+}
+
+message PVEStartArg {
+  uint32 pve_battle_id = 1;
+  uint32 player_level = 2;
+}
+
+message BattleStartArg {
+  uint32 start_battle_type = 1;
+  nrcai.PVEStartArg pve_start_arg = 2;
+  nrcai.PlayerType player_type = 3;
+  uint32 is_main_agent = 4;
+  uint32 start_arg_num_pets = 5;
+}
+
+message UpdateRspData {
+  nrcai.InputAction action = 1;
+  uint32 arg = 2;
+  nrcai.StartArg start_args = 3;
+  nrcai.BattleStartArg battle_start_arg = 4;
+}
+
+message BattleStats {
+  int64 battle_role_hp = 1;
+  repeated uint32 pet_ids = 2;
+  repeated uint32 pet_isalive = 3;
+  uint32 num_restraint = 4;
+  uint32 num_berestraint = 5;
+  uint32 num_resist = 6;
+  uint32 num_beresist = 7;
+  uint32 num_counter = 8;
+  uint32 num_becounter = 9;
+  repeated uint32 total_damage_hp = 10;
+  repeated uint32 total_bedamage_hp = 11;
+  repeated uint32 extra_energy_buffs = 12;
+  repeated uint32 extra_energy_buff_sum = 13;
+  repeated uint32 extra_energy_debuffs = 14;
+  repeated uint32 extra_energy_debuff_sum = 15;
+  repeated uint32 num_in_battle = 16;
+}
+
+message AgentEndData {
+  nrcai.BattleResult battle_result = 1;
+  nrcai.BattleStats stats = 2;
+  nrcai.StartArg start_args = 3;
+  nrcai.BattleStartArg battle_start_arg = 4;
+}

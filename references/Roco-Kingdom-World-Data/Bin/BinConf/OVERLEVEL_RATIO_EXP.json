@@ -1,0 +1,19 @@
+{
+    "Name": "OVERLEVEL_RATIO_EXP",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "ratio_gain_exp",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        }
+    ]
+}

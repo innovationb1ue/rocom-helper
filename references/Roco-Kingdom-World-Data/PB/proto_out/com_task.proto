@@ -1,0 +1,353 @@
+package Next;
+
+import "com_appearance.proto";
+import "xls_enum.proto";
+
+enum TaskRecoverMsgType {
+  TRMT_TYPE_TASK = 0;
+  TRMT_TYPE_STATA = 1;
+  TRMT_TYPE_IDIP = 2;
+}
+
+enum EMTaskState {
+  EM_TASK_STATE_INIT = 1;
+  EM_TASK_STATE_OPEN_PLAY = 2;
+  EM_TASK_STATE_OPEN = 4;
+  EM_TASK_STATE_WAITING = 6;
+  EM_TASK_STATE_WAIT = 8;
+  EM_TASK_STATE_DONE_PLAY = 16;
+  EM_TASK_STATE_DONEING = 24;
+  EM_TASK_STATE_DONE = 32;
+  EM_TASK_STATE_CLOSEING = 48;
+  EM_TASK_STATE_CLOSED = 64;
+  EM_TASK_STATE_EXPIRE = 128;
+}
+
+enum WorldLevelTaskState {
+  WLTS_UNABLE_TO_UNLOCK = 1;
+  WLTS_ENABLE_TO_UNLOCK = 2;
+  WLTS_IS_OPENED = 3;
+  WLTS_IS_WAITED = 4;
+  WLTS_IS_DONE = 5;
+}
+
+message TaskTypeInfo_ParagraphInfo {
+  int32 paragraph = 1;
+  uint32 time = 2;
+  bool is_hide = 3;
+}
+
+message TaskTypeInfo {
+  int32 task_type = 1;
+  bool open = 2;
+  repeated Next.TaskTypeInfo_ParagraphInfo open_paragraph = 3;
+  repeated Next.TaskTypeInfo_ParagraphInfo done_paragraph = 4;
+  repeated int32 will_paragraph = 5;
+  int32 task_num = 6;
+}
+
+message SceneTaskActionParaInfo {
+  uint64 action_param_id = 1;
+  uint32 is_finish = 2;
+  uint64 npc_obj_id = 4;
+}
+
+message SceneTaskActionNpcDelayInfo {
+  uint64 npc_content_id = 1;
+  uint32 is_finish = 2;
+  uint64 npc_obj_id = 4;
+  uint64 task_id = 5;
+  uint64 task_state = 6;
+  dataconfig.TaskStateChangeActionType action_type = 7;
+  uint32 option_id = 8;
+}
+
+message SceneTaskActionNpcDelayList {
+  repeated Next.SceneTaskActionNpcDelayInfo actions = 2;
+}
+
+message SceneTaskActionInfo {
+  uint32 param = 1;
+  dataconfig.TaskStateChangeActionType action_type = 2;
+  string str_param = 4;
+  repeated Next.SceneTaskActionParaInfo action_parainfo_list = 5;
+  int32 is_all_finish = 6;
+  int32 is_retry_after_npc_create = 7;
+}
+
+message SceneTaskActionList {
+  uint32 task_id = 2;
+  repeated Next.SceneTaskActionInfo action_info = 1;
+  uint32 task_state = 3;
+}
+
+message TaskSummaryInfo {
+  uint32 pos_x = 1;
+  uint32 pos_y = 2;
+  uint32 pos_z = 3;
+  uint32 summary_id = 4;
+  uint32 tod = 5;
+  uint32 weather1 = 6;
+  Next.BattleFashionInfo fashion = 12;
+  uint32 create_time = 7;
+  uint32 task_id = 8;
+  uint32 weather2 = 9;
+}
+
+message TaskStoryFlagItem {
+  uint32 story_id = 1;
+  uint32 is_del = 2;
+  uint32 last_update_task = 3;
+  uint32 last_update_seq = 4;
+}
+
+message TaskStoryFlagInfo {
+  repeated Next.TaskStoryFlagItem items = 1;
+}
+
+message TaskContentOptionItem {
+  uint32 option_id = 1;
+  uint32 is_show = 2;
+  uint32 is_add = 3;
+}
+
+message TaskContentOptionList {
+  repeated Next.TaskContentOptionItem items = 1;
+}
+
+message TaskUnlockWorldMapItem {
+  uint32 world_id = 1;
+  uint32 last_update_task = 4;
+  uint32 last_update_seq = 5;
+}
+
+message TaskUnlockWorldMapList {
+  repeated Next.TaskUnlockWorldMapItem items = 1;
+}
+
+message TaskContentItem {
+  uint32 npc_content_id = 1;
+  uint32 is_hide = 2;
+  uint32 is_del = 3;
+  uint32 last_update_task = 4;
+  uint32 last_update_seq = 5;
+  Next.TaskContentOptionList options = 6;
+  uint32 sale_lock = 7;
+  uint32 is_openorclose = 8;
+}
+
+message TaskNpcOptionItem {
+  uint32 npc_cfg_id = 1;
+  uint32 option_id = 2;
+  uint32 is_del = 3;
+  uint32 last_update_task = 4;
+  uint32 last_update_seq = 5;
+}
+
+message TaskScenesvrStateList {
+  uint32 type = 1;
+  repeated Next.TaskContentItem content_items = 2;
+  repeated Next.TaskNpcOptionItem npc_option_items = 3;
+}
+
+message TaskScenesvrStateItem {
+  uint32 type = 1;
+  repeated Next.TaskContentItem content_items = 2;
+}
+
+message TaskContentStateList {
+  int32 scenecfg_id = 1;
+  repeated Next.TaskScenesvrStateItem items = 2;
+  uint32 last_sync_time = 3;
+}
+
+message TaskScenesvrStateData {
+  Next.TaskUnlockWorldMapList unlock_worlds = 1;
+  repeated Next.TaskScenesvrStateList npc_state_data = 2;
+  uint32 last_excute_time = 4;
+  uint32 last_recove_time = 5;
+  uint64 last_update_seq = 6;
+  uint32 is_need_recove = 7;
+  Next.TaskStoryFlagInfo story_flag_infos = 8;
+  uint64 last_login_times = 9;
+  repeated Next.TaskContentStateList content_state_data = 10;
+  uint32 last_login_time = 11;
+}
+
+message TaskProgressItem {
+  uint32 task_id = 1;
+  uint32 task_tkt_id = 2;
+  uint32 val = 3;
+  uint64 last_update_seq = 8;
+  uint64 gid = 9;
+}
+
+message TaskProgressList {
+  uint32 type = 1;
+  repeated Next.TaskProgressItem items = 2;
+}
+
+message TaskProgressData {
+  repeated Next.TaskProgressList progress_data = 2;
+  uint64 gid = 3;
+  uint64 ack = 4;
+  uint64 last_scenesvr_id = 13;
+  uint64 last_ack_time = 14;
+}
+
+message BadgeChallengeReward {
+  uint32 level_reward_value = 1;
+  uint32 coin_reward_value = 2;
+  uint32 hp_recover_value = 3;
+  bool pet_recover = 4;
+  repeated uint32 upgrade_reward = 5;
+}
+
+message ChallengeEventCardInfo {
+  repeated uint32 event_ids = 1;
+  bool is_used = 2;
+  bool is_fixed = 3;
+  Next.BadgeChallengeReward reward = 4;
+  repeated uint32 incident_type = 5;
+  repeated uint32 param1s = 6;
+  repeated uint32 param2s = 7;
+  uint32 gid = 8;
+  bool is_selected = 9;
+  uint32 num_1 = 10;
+  uint32 num_2 = 11;
+  uint32 upgrade_select_num = 12;
+}
+
+message BadgeChallengePetInfo {
+  uint32 pet_gid = 1;
+  uint32 remain_hp = 2;
+  uint32 remain_energy = 3;
+  uint32 level = 4;
+  uint32 max_hp = 5;
+  uint32 conf_id = 6;
+}
+
+message BadgeChallengeLevelInfo {
+  Next.ChallengeEventCardInfo card_info = 1;
+  uint32 level = 2;
+}
+
+message BadgeChallengeData {
+  int32 level_id = 1;
+  Next.ChallengeEventCardInfo cur_event = 2;
+  uint32 remain_coin = 3;
+  repeated uint32 chosen_upgrade_id = 4;
+  repeated Next.BadgeChallengePetInfo pet_info = 5;
+  repeated uint32 pet_gids = 6;
+  uint32 cur_node_index = 7;
+  repeated Next.ChallengeEventCardInfo available_event_cards = 8;
+  repeated Next.ChallengeEventCardInfo hands_cards = 9;
+  uint32 refresh_need_coin = 10;
+  uint32 hands_cards_num = 11;
+  uint32 show_buff_num = 12;
+  uint32 reroll_cost_add = 13;
+  Next.ChallengeEventCardInfo new_card = 14;
+  repeated uint32 available_upgrade_ids = 15;
+  repeated Next.BadgeChallengeLevelInfo level_infos = 16;
+  uint32 last_gid = 17;
+  repeated uint32 used_cards_gid = 18;
+  uint32 cur_pet_level = 19;
+}
+
+message PlayerSubTaskInfo_OngoingSubTaskInfo_TaskTokenInfo {
+  enum TaskTokenState {
+    TTS_UNLOCK = 0;
+    TTS_LOCK = 1;
+  }
+  uint32 task_token_id = 1;
+  uint32 task_token_get_time = 2;
+  Next.PlayerSubTaskInfo_OngoingSubTaskInfo_TaskTokenInfo.TaskTokenState task_token_state = 3;
+}
+
+message PlayerSubTaskInfo_OngoingSubTaskInfo {
+  uint32 sub_task_id = 1;
+  repeated Next.PlayerSubTaskInfo_OngoingSubTaskInfo_TaskTokenInfo task_token_info = 2;
+}
+
+message PlayerSubTaskInfo_TaskTokenOwnedInfo {
+  uint32 task_token_id = 1;
+  uint32 task_token_get_time = 2;
+}
+
+message PlayerSubTaskInfo_SubTaskTokenGrantInfo {
+  uint32 sub_task_id = 1;
+  uint32 grant_times = 2;
+}
+
+message PlayerSubTaskInfo_SubTaskTokenTriggeredTaskInfo {
+  uint32 triggered_task_id = 1;
+  uint32 triggered_sub_task_token_id = 2;
+}
+
+message PlayerSubTaskInfo {
+  uint32 last_refresh_time = 1;
+  repeated uint32 random_sub_task_id = 2;
+  repeated Next.PlayerSubTaskInfo_OngoingSubTaskInfo ongoing_sub_task_info = 3;
+  uint32 last_notify_time = 4;
+  uint32 last_get_time = 5;
+  repeated Next.PlayerSubTaskInfo_TaskTokenOwnedInfo task_token_owned_info = 6;
+  repeated Next.PlayerSubTaskInfo_SubTaskTokenGrantInfo sub_task_token_grant_info = 7;
+  uint32 sub_task_finished_times = 8;
+  repeated uint32 sub_task_finished_queue = 9;
+  uint32 sub_task_bonus_num = 10;
+  repeated Next.PlayerSubTaskInfo_SubTaskTokenTriggeredTaskInfo sub_task_token_triggered_task_info = 11;
+}
+
+message PlayerTaskInfo {
+  uint32 id = 1;
+  Next.EMTaskState state = 2;
+  uint32 open_time = 3;
+  uint32 done_time = 4;
+  repeated int32 task_target_list = 5;
+  uint32 done_count = 6;
+  bool is_trace = 7;
+  bool state_change = 8;
+  bool is_track = 9;
+  uint32 pet_gid = 10;
+  bool new_task = 11;
+  bool hide = 12;
+}
+
+message TaskSummaryList {
+  repeated Next.TaskSummaryInfo summary_data = 1;
+}
+
+message TaskSwitchConditionInfo {
+  uint32 type = 1;
+  uint32 data1 = 2;
+  uint32 data2 = 3;
+  uint32 switch_id = 4;
+}
+
+message TaskSwitchConditionList {
+  repeated Next.TaskSwitchConditionInfo condition_data = 3;
+}
+
+message PlayerTaskSwitchInfo {
+  uint32 switch_id = 1;
+  uint32 switch_times = 2;
+  uint32 last_switch_update_time = 4;
+}
+
+message PlayerTaskSwitchGroupInfo {
+  uint32 group_id = 1;
+  uint32 enable_swich_id = 2;
+  repeated Next.PlayerTaskSwitchInfo task_switch_data = 3;
+}
+
+message PlayerTaskSwitchData {
+  repeated Next.PlayerTaskSwitchGroupInfo task_switch_info = 1;
+  Next.TaskSwitchConditionList conditions = 5;
+}
+
+message PlayerInvestTaskData {
+  uint32 invest_task_rand_time = 1;
+  repeated uint32 topic_task_list = 2;
+  uint32 special_reward_item = 3;
+  repeated uint32 clue_task_list = 4;
+}

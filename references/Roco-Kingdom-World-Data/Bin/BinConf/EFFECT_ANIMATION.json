@@ -1,0 +1,13 @@
+{
+    "Name": "EFFECT_ANIMATION",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        }
+    ]
+}

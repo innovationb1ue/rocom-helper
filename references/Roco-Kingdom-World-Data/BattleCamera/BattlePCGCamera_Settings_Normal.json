@@ -1,0 +1,161 @@
+[
+    {
+        "MinDist": 550,
+        "Height": 10,
+        "XOffset": 0,
+        "Degrees": 25,
+        "Use": 1,
+        "ScreenDist": 0.5,
+        "FOV": 75,
+        "Type": "捕捉",
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "Height": 10,
+        "XOffset": 0,
+        "Degrees": 15,
+        "Use": 1,
+        "ScreenDist": 0.5,
+        "FOV": 75,
+		"Type": "逃跑",
+        "YOffset": 0
+    },
+    {
+        "MinDist": 500,
+        "Height": 20,
+        "XOffset": 0,
+        "Degrees": 20,
+        "Use": 1,
+        "ScreenDist": 0.5,
+        "FOV": 75,
+		"Type": "道具",
+        "YOffset": 0
+    },
+    {
+        "MinDist": 325,
+        "Height": 20,
+        "XOffset": 0,
+        "Degrees": 35,
+        "Use": 1,
+        "ScreenDist": 0.6,
+        "FOV": 75,
+		"Type": "换宠",
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "BodyTypeOverride": {
+            "Smaller": {
+                "Height": 15,
+                "FOV": 70,
+                "Degrees": 40
+            },
+            "Larger": {
+                "Height": 10,
+                "FOV": 80,
+                "Degrees": 40
+            }
+        },
+        "ScreenDist": 0.55,
+        "FOV": 80,
+		"Type": "选招",
+        "Height": 3,
+        "Degrees": 40,
+        "Use": 1,
+        "Time": 0.3,
+        "XOffset": 0,
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "BodyTypeOverride": {
+            "Smaller": {
+                "Height": 15,
+                "FOV": 60,
+                "Degrees": 65
+            },
+            "Larger": {
+                "Height": 15,
+                "FOV": 75,
+                "Degrees": 65
+            }
+        },
+        "ScreenDist": 0.55,
+        "FOV": 60,
+		"Type": "1号宠物选招",
+        "Height": 15,
+        "Degrees": 65,
+        "Use": 1,
+        "Time": 0.3,
+        "XOffset": 0,
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "BodyTypeOverride": {
+            "Smaller": {
+                "Height": 20,
+                "FOV": 70,
+                "Degrees": 10
+            },
+            "Larger": {
+                "Height": 20,
+                "FOV": 90,
+                "Degrees": 10
+            }
+        },
+        "ScreenDist": 0.55,
+        "FOV": 75,
+		"Type": "2号宠物选招",
+        "Height": 20,
+        "Degrees": 20,
+        "Use": 1,
+        "Time": 0.3,
+        "XOffset": 0,
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "BodyTypeOverride": {
+            "Smaller": {
+                "Height": 15,
+                "FOV": 70,
+                "Degrees": 45
+            },
+            "Larger": {
+                "Height": 10,
+                "FOV": 80,
+                "Degrees": 48
+            }
+        },
+        "ScreenDist": 0.55,
+        "FOV": 80,
+		"Type": "技能表演",
+        "Height": 3,
+        "Degrees": 48,
+        "Use": 1,
+        "Time": 0.3,
+        "XOffset": 0,
+        "YOffset": 0
+    },
+    {
+        "MinDist": 550,
+        "ScreenDist": 0.35,
+        "FOV": 75,
+		"Type": "技能表演2v2",
+        "Height": 20,
+        "Degrees": 45,
+        "Use": 1,
+        "Time": 0.3,
+        "XOffset": 0,
+        "YOffset": 0
+    },
+    {
+        "EnemyFocusDist": 0.9,
+        "SelfFocusDist": 0.7,
+        "FOV": 90,
+        "XOffset": 0,
+        "YOffset": 0
+    }
+]

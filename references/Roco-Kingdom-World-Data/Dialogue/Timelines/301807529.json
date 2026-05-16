@@ -1,0 +1,41 @@
+{
+    "length": 3.0,
+    "dialogue_id": 301807329,
+    "wait_user_click_at_end": true,
+    "play_dialogue_sound_when_show_ui_if_no_say_action": true,
+    "play_dialogue_sound_when_say_action_without_data": true,
+    "black_switch_in": false,
+    "cached_dialogue_npc_id": 530020,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI",
+            "OwnerActorID": -100,
+            "StartTime": 0.0
+        },
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineCameraDOFEvent",
+            "Name": "\u76f8\u673a\u666f\u6df1\u4e8b\u4ef6",
+            "OwnerActorID": -101,
+            "StartTime": 0.0,
+            "KeepLast": false,
+            "Stop": false,
+            "Scale": 2.0,
+            "FocalActorID0": -2,
+            "FocalActorID1": 0,
+            "FocalActorID2": 0,
+            "FocalRegionMargin": 10.0,
+            "OutFocalActorID0": 0,
+            "OutFocalActorID1": 0,
+            "OutFocalActorID2": 0,
+            "OutFocalActorID3": 0,
+            "OutFocalActorID4": 0,
+            "OutFocalActorID5": 0,
+            "OutFocalRegionMargin": 10.0,
+            "CustomFocalDistance": 0.0,
+            "CustomFocalRegion": 0.0,
+            "CustomNearTransitionRegion": 0.0,
+            "CustomFarTransitionRegion": 0.0
+        }
+    ]
+}

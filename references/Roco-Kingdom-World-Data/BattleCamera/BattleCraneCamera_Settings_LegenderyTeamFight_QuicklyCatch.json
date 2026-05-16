@@ -1,0 +1,22 @@
+{
+	"Desc": "神兽团体战——捕捉机位",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": 0
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": -50
+	},
+	"SprintArmLength": 200,
+	"CameraFov": 80,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": []
+}

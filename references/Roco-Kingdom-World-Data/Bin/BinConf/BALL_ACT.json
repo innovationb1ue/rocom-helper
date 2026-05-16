@@ -1,0 +1,158 @@
+{
+    "Name": "BALL_ACT",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Strength",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "Gravity",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "projectile_bounciness",
+            "Type": "EFloat",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "projectile_bounciness_disturb",
+            "Type": "EFloat",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "projectile_friction",
+            "Type": "EFloat",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "projectile_friction_disturb",
+            "Type": "EFloat",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "ball_fly_distance_min",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "can_dive",
+            "Type": "EBool",
+            "Offset": 36,
+            "Size": 1
+        },
+        {
+            "Name": "dive_speed_attenuation",
+            "Type": "EFloat",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "default_sneak_modify",
+            "Type": "EInt32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "sneak_modify",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "beyond_fly_distance",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "fly_growth_coefficient",
+            "Type": "EInt32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "fly_growth_max",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "ball_catch_speed_min",
+            "Type": "EUint32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "ball_return_speed_min",
+            "Type": "EUint32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "speed_min_overdue_recycling",
+            "Type": "EUint32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "overdue_recycling",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "ball_raise_angle",
+            "Type": "EFloat",
+            "Offset": 77,
+            "Size": 4
+        },
+        {
+            "Name": "Max_Auto_Find_Target_Distance",
+            "Type": "EUint32",
+            "Offset": 81,
+            "Size": 4
+        },
+        {
+            "Name": "Max_Auto_Find_Target_Angle",
+            "Type": "EUint32",
+            "Offset": 85,
+            "Size": 4
+        },
+        {
+            "Name": "Ball_Breaking_Distance_Min",
+            "Type": "EInt32",
+            "Offset": 89,
+            "Size": 4
+        },
+        {
+            "Name": "Ball_Breaking_Distance_Max",
+            "Type": "EInt32",
+            "Offset": 93,
+            "Size": 4
+        }
+    ]
+}

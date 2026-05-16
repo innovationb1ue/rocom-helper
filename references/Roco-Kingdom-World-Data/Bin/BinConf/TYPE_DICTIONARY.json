@@ -1,0 +1,244 @@
+{
+    "Name": "TYPE_DICTIONARY",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint1",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint2",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint3",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint4",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint5",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint6",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint7",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint8",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint9",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint10",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint11",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint12",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint13",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint14",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint15",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint16",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint17",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint18",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint19",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint20",
+            "Type": "EInt32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "type_restraint99",
+            "Type": "EInt32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "type_name",
+            "Type": "EString",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "short_name",
+            "Type": "EString",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_icon",
+            "Type": "EString",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "evo_bg_path",
+            "Type": "EString",
+            "Offset": 100,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "evo_banding_color",
+            "Type": "EString",
+            "Offset": 104,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "field_res",
+            "Type": "EString",
+            "Offset": 108,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "synchron_petbag_icon",
+            "Type": "EString",
+            "Offset": 112,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "synchron_banner_res",
+            "Type": "EString",
+            "Offset": 116,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "hint_res",
+            "Type": "EString",
+            "Offset": 120,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tips_res",
+            "Type": "EString",
+            "Offset": 124,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tips_base_icon",
+            "Type": "EString",
+            "Offset": 128,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_immunity",
+            "Type": "EInt32",
+            "Offset": 132,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "rolecard_favorite_pets_icon",
+            "Type": "EString",
+            "Offset": 136,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "rolecard_favorite_pets_colour",
+            "Type": "EString",
+            "Offset": 140,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "rolecard_favorite_pets_sequence",
+            "Type": "EInt32",
+            "Offset": 144,
+            "Size": 4
+        }
+    ]
+}

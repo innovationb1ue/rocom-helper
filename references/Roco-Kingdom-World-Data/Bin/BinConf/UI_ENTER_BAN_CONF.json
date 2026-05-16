@@ -1,0 +1,101 @@
+{
+    "Name": "UI_ENTER_BAN_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "function_entrance",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "function_Ban_Type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "is_hide_entrance",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "change_reason",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "unlock_cond_list",
+            "Type": "EStruct",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "UI_ENTER_BAN_CONF.unlock_cond_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "unlock_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "unlock_param",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ban_text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "auto_perform",
+            "Type": "EBool",
+            "Offset": 25,
+            "Size": 1
+        },
+        {
+            "Name": "func_name",
+            "Type": "EString",
+            "Offset": 26,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "img_path",
+            "Type": "EString",
+            "Offset": 30,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

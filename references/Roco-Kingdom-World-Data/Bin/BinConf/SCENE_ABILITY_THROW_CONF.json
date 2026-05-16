@@ -1,0 +1,61 @@
+{
+    "Name": "SCENE_ABILITY_THROW_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "throw_type",
+    "Properties": [
+        {
+            "Name": "throw_type",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "limit_pitch",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        },
+        {
+            "Name": "pitch_max",
+            "Type": "EFloat",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "pitch_min",
+            "Type": "EFloat",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "limit_yaw",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "yaw_max",
+            "Type": "EFloat",
+            "Offset": 18,
+            "Size": 4
+        },
+        {
+            "Name": "yaw_min",
+            "Type": "EFloat",
+            "Offset": 22,
+            "Size": 4
+        },
+        {
+            "Name": "rideaim_pet_turn_speed",
+            "Type": "EFloat",
+            "Offset": 26,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,849 @@
+{
+    "Name": "TASK_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "story_bgm_id",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "influence_area_func_id",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_class",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "paragraph_id",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "res_id",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "belong_place",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_des",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_structure_type",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "task_special_structure_area",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "rewrite",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_gameplay1",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_gameplay2",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "open",
+            "Type": "EInt32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "show",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "new_task",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "is_para_start",
+            "Type": "EBool",
+            "Offset": 68,
+            "Size": 1
+        },
+        {
+            "Name": "track_icon",
+            "Type": "EString",
+            "Offset": 69,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_track",
+            "Type": "EBool",
+            "Offset": 73,
+            "Size": 1
+        },
+        {
+            "Name": "accept_condition",
+            "Type": "EStruct",
+            "Offset": 74,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "TASK_CONF.accept_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "available_time",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "group_id",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "next_task_type",
+            "Type": "EInt32",
+            "Offset": 78,
+            "Size": 4
+        },
+        {
+            "Name": "next_task",
+            "Type": "EUint32",
+            "Offset": 82,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "token_next_task",
+            "Type": "EStruct",
+            "Offset": 86,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "TASK_CONF.token_next_task",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "next_task",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "token_required",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "extra_des",
+            "Type": "EString",
+            "Offset": 90,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_reset_cycle",
+            "Type": "EInt32",
+            "Offset": 94,
+            "Size": 4
+        },
+        {
+            "Name": "open_num",
+            "Type": "EInt32",
+            "Offset": 98,
+            "Size": 4
+        },
+        {
+            "Name": "accept_guide",
+            "Type": "EStruct",
+            "Offset": 102,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "TASK_CONF.accept_guide",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "advance_finish_data",
+            "Type": "EInt32",
+            "Offset": 106,
+            "Size": 4
+        },
+        {
+            "Name": "task_condition",
+            "Type": "EStruct",
+            "Offset": 110,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "TASK_CONF.task_condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "des_text",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "done_text",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data3",
+                        "Type": "EInt32",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data4",
+                        "Type": "EString",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "data5",
+                        "Type": "EString",
+                        "Offset": 32,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "data6",
+                        "Type": "EInt32",
+                        "Offset": 36,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "count",
+                        "Type": "EInt32",
+                        "Offset": 40,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "count_operate",
+                        "Type": "EInt32",
+                        "Offset": 44,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "count_reset_cycle",
+                        "Type": "EInt32",
+                        "Offset": 48,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "key_content_id",
+            "Type": "EInt32",
+            "Offset": 114,
+            "Size": 4
+        },
+        {
+            "Name": "go_guide",
+            "Type": "EStruct",
+            "Offset": 118,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 4,
+            "Struct": {
+                "Name": "TASK_CONF.go_guide",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "disable_force_track",
+                        "Type": "EBool",
+                        "Offset": 12,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 13,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "args",
+                        "Type": "EString",
+                        "Offset": 17,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "args2",
+                        "Type": "EString",
+                        "Offset": 21,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "show_text",
+                        "Type": "ELocalizedString",
+                        "Offset": 25,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "image_combination",
+            "Type": "EInt32",
+            "Offset": 122,
+            "Size": 4
+        },
+        {
+            "Name": "task_image",
+            "Type": "EString",
+            "Offset": 126,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "auto_finish",
+            "Type": "EInt32",
+            "Offset": 130,
+            "Size": 4
+        },
+        {
+            "Name": "Reward",
+            "Type": "EUint32",
+            "Offset": 134,
+            "Size": 4
+        },
+        {
+            "Name": "reward_state",
+            "Type": "EInt32",
+            "Offset": 138,
+            "Size": 4
+        },
+        {
+            "Name": "message_id",
+            "Type": "EInt32",
+            "Offset": 142,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_content",
+            "Type": "EInt32",
+            "Offset": 146,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "npc_option",
+            "Type": "EStruct",
+            "Offset": 150,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "TASK_CONF.npc_option",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "option_id",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "npc_cfg_id",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "accept_action",
+            "Type": "EStruct",
+            "Offset": 154,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 18,
+            "Struct": {
+                "Name": "TASK_CONF.accept_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "finish_action",
+            "Type": "EStruct",
+            "Offset": 158,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 18,
+            "Struct": {
+                "Name": "TASK_CONF.finish_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "reward_action",
+            "Type": "EStruct",
+            "Offset": 162,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "TASK_CONF.reward_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "battle_ability",
+            "Type": "EInt32",
+            "Offset": 166,
+            "Size": 4
+        },
+        {
+            "Name": "revive_point",
+            "Type": "EInt32",
+            "Offset": 170,
+            "Size": 4
+        },
+        {
+            "Name": "peer_available",
+            "Type": "EBool",
+            "Offset": 174,
+            "Size": 1
+        },
+        {
+            "Name": "online_forbid",
+            "Type": "EBool",
+            "Offset": 175,
+            "Size": 1
+        },
+        {
+            "Name": "online_process",
+            "Type": "EInt32",
+            "Offset": 176,
+            "Size": 4
+        },
+        {
+            "Name": "online_forbid_receive_task",
+            "Type": "EBool",
+            "Offset": 180,
+            "Size": 1
+        },
+        {
+            "Name": "task_flag",
+            "Type": "EUint32",
+            "Offset": 181,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "map_avatar",
+            "Type": "EString",
+            "Offset": 185,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_break_task",
+            "Type": "EBool",
+            "Offset": 189,
+            "Size": 1
+        },
+        {
+            "Name": "is_para_done",
+            "Type": "EBool",
+            "Offset": 190,
+            "Size": 1
+        },
+        {
+            "Name": "receive_des",
+            "Type": "EString",
+            "Offset": 191,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "task_system_item",
+            "Type": "EUint32",
+            "Offset": 195,
+            "Size": 4
+        },
+        {
+            "Name": "task_system_cmd",
+            "Type": "EString",
+            "Offset": 199,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "taskswitch_id",
+            "Type": "EInt32",
+            "Offset": 203,
+            "Size": 4
+        },
+        {
+            "Name": "accept_condition_record",
+            "Type": "EInt32",
+            "Offset": 207,
+            "Size": 4
+        },
+        {
+            "Name": "failed_action",
+            "Type": "EStruct",
+            "Offset": 211,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "TASK_CONF.failed_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "data1",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "data2",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "text",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "expire_time_type",
+            "Type": "EInt32",
+            "Offset": 215,
+            "Size": 4
+        },
+        {
+            "Name": "expire_time_param",
+            "Type": "EUint32",
+            "Offset": 219,
+            "Size": 4
+        },
+        {
+            "Name": "auto_done_when_expired",
+            "Type": "EBool",
+            "Offset": 223,
+            "Size": 1
+        },
+        {
+            "Name": "clear_data_when_expired",
+            "Type": "EBool",
+            "Offset": 224,
+            "Size": 1
+        },
+        {
+            "Name": "time_out_auto_finish",
+            "Type": "EUint32",
+            "Offset": 225,
+            "Size": 4
+        }
+    ]
+}

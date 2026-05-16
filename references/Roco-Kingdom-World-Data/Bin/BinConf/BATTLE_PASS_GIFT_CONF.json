@@ -1,0 +1,201 @@
+{
+    "Name": "BATTLE_PASS_GIFT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_gender",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gender",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "bp_id",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "bp_theme",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "bp_grade",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "gift_goods_id",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "gift_goods_name",
+            "Type": "EString",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_effect_text",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_effect_icon",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gift_goods_sub_id",
+            "Type": "EUint32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "gift_goods_sub_name",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gift_goods_couple_id",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "gift_goods_couple_name",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "couple_effect_text",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "couple_effect_icon",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gift_rewards_id",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "gift_item_main_id",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "gift_item_main_name",
+            "Type": "EString",
+            "Offset": 76,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "gift",
+            "Type": "EStruct",
+            "Offset": 80,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 20,
+            "Struct": {
+                "Name": "BATTLE_PASS_GIFT_CONF.gift",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "name",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "Type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "item_id",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "item_num",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 84,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Type",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4
+        },
+        {
+            "Name": "item_id",
+            "Type": "EUint32",
+            "Offset": 92,
+            "Size": 4
+        },
+        {
+            "Name": "item_num",
+            "Type": "EUint32",
+            "Offset": 96,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,411 @@
+{
+    "Name": "ACTIVITY_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "activity_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "base_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "type_param",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "activity_name",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "tab_id",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "prompt_text",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "activity_txt",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "activity_special_txt",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "appear_time",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disappear_time",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "daily_clear_time",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "world_level_required",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "role_level_required",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "task_required",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "recommend_task_id",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "unfinished_tips",
+            "Type": "EString",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "get_activity_task",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "delete_activity_task",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "save_activity_task",
+            "Type": "EBool",
+            "Offset": 76,
+            "Size": 1
+        },
+        {
+            "Name": "open_visible_area",
+            "Type": "EUint32",
+            "Offset": 77,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "close_visible_area",
+            "Type": "EUint32",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "login_channel",
+            "Type": "EInt32",
+            "Offset": 85,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "login_plat",
+            "Type": "EInt32",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "channel_source",
+            "Type": "EUint32",
+            "Offset": 93,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "account_registration_time",
+            "Type": "EString",
+            "Offset": 97,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "activity_whitelist",
+            "Type": "EInt32",
+            "Offset": 101,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "if_hide",
+            "Type": "EBool",
+            "Offset": 105,
+            "Size": 1
+        },
+        {
+            "Name": "if_appear",
+            "Type": "EBool",
+            "Offset": 106,
+            "Size": 1
+        },
+        {
+            "Name": "ban_text",
+            "Type": "EString",
+            "Offset": 107,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "success_if_disappear",
+            "Type": "EBool",
+            "Offset": 111,
+            "Size": 1
+        },
+        {
+            "Name": "delete_bagitem",
+            "Type": "EUint32",
+            "Offset": 112,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "success_mail",
+            "Type": "EUint32",
+            "Offset": 116,
+            "Size": 4
+        },
+        {
+            "Name": "save_past_data",
+            "Type": "EBool",
+            "Offset": 120,
+            "Size": 1
+        },
+        {
+            "Name": "maintab_id",
+            "Type": "EUint32",
+            "Offset": 121,
+            "Size": 4
+        },
+        {
+            "Name": "belong_system",
+            "Type": "EInt32",
+            "Offset": 125,
+            "Size": 4
+        },
+        {
+            "Name": "priority",
+            "Type": "EUint32",
+            "Offset": 129,
+            "Size": 4
+        },
+        {
+            "Name": "bgm",
+            "Type": "EString",
+            "Offset": 133,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "umg_path",
+            "Type": "EString",
+            "Offset": 137,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "image_path",
+            "Type": "EString",
+            "Offset": 141,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 145,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon_select",
+            "Type": "EString",
+            "Offset": 149,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "title_icon",
+            "Type": "EString",
+            "Offset": 153,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "title_icon_text",
+            "Type": "EString",
+            "Offset": 157,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ae_start",
+            "Type": "EString",
+            "Offset": 161,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ae_loop",
+            "Type": "EString",
+            "Offset": 165,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ae_end",
+            "Type": "EString",
+            "Offset": 169,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "popup_path",
+            "Type": "EString",
+            "Offset": 173,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "popup_text",
+            "Type": "EString",
+            "Offset": 177,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mail_id",
+            "Type": "EUint32",
+            "Offset": 181,
+            "Size": 4
+        },
+        {
+            "Name": "marquee_id",
+            "Type": "EString",
+            "Offset": 185,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "refresh_event_group",
+            "Type": "EStruct",
+            "Offset": 189,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "ACTIVITY_CONF.refresh_event_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "refresh_content",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "start_time",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "delete_content",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "end_time",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "world_level_end_required",
+            "Type": "EUint32",
+            "Offset": 193,
+            "Size": 4
+        }
+    ]
+}

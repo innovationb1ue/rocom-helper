@@ -1,0 +1,209 @@
+{
+    "Name": "ACTIVITY_WEBSITE_PART_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "part_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "note",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "end_time",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "required_group",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 5,
+            "Struct": {
+                "Name": "ACTIVITY_WEBSITE_PART_CONF.required_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "required_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "required_param",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "is_questionnaire",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "questionnaire_duration",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "interactive_before_txt",
+            "Type": "EString",
+            "Offset": 29,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "website_path",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "special",
+            "Type": "EInt32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "special_param1",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "special_param2",
+            "Type": "EString",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ban_login_status",
+            "Type": "EBool",
+            "Offset": 49,
+            "Size": 1
+        },
+        {
+            "Name": "check_app",
+            "Type": "EInt32",
+            "Offset": 50,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "unsuccess_skip_txt",
+            "Type": "EString",
+            "Offset": 54,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "if_icon_change",
+            "Type": "EInt32",
+            "Offset": 58,
+            "Size": 4
+        },
+        {
+            "Name": "callback",
+            "Type": "EUint32",
+            "Offset": 62,
+            "Size": 4
+        },
+        {
+            "Name": "interactive_after_txt",
+            "Type": "EString",
+            "Offset": 66,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 70,
+            "Size": 4
+        },
+        {
+            "Name": "reward_award_way",
+            "Type": "EInt32",
+            "Offset": 74,
+            "Size": 4
+        },
+        {
+            "Name": "option_recover",
+            "Type": "EBool",
+            "Offset": 78,
+            "Size": 1
+        },
+        {
+            "Name": "success_if_disappear",
+            "Type": "EBool",
+            "Offset": 79,
+            "Size": 1
+        },
+        {
+            "Name": "is_redpoint_notify",
+            "Type": "EBool",
+            "Offset": 80,
+            "Size": 1
+        },
+        {
+            "Name": "mail_id",
+            "Type": "EUint32",
+            "Offset": 81,
+            "Size": 4
+        },
+        {
+            "Name": "need_main_activity_disappear",
+            "Type": "EBool",
+            "Offset": 85,
+            "Size": 1
+        },
+        {
+            "Name": "flag_num_join",
+            "Type": "EString",
+            "Offset": 86,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "flag_num_finish",
+            "Type": "EString",
+            "Offset": 90,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

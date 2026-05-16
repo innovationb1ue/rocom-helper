@@ -1,0 +1,10 @@
+{
+    "length": 3.0,
+    "dialogue_id": 0,
+    "actions": [
+        {
+            "ClassPath": "NewRoco.Modules.System.Dialogue.Action.Timeline.DialogueTimelineShowUIEvent",
+            "Name": "\u663e\u793a\u5bf9\u8bddUI"
+        }
+    ]
+}

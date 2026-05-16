@@ -1,0 +1,56 @@
+{
+	"Desc": "A1最终战——使用道具",
+	"TargetA": 3,
+	"TargetB": 1,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -2,
+		"Z": -7
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": -15,
+		"Z": -50
+	},
+	"SprintArmLength": 750,
+	"CameraFov": 82,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": -2,
+				"Y": 2
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -20,
+				"Y": 20
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 30,
+				"Y": -30
+			},
+			"Desc": ""
+		}
+	]
+}

@@ -1,0 +1,187 @@
+{
+    "Name": "BATTLE_PASS_THEME_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "theme_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "theme_desc",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "theme_petbase_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "is_alter",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "theme_pet_title",
+            "Type": "EString",
+            "Offset": 17,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "theme_art_set",
+            "Type": "EString",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "special_skills",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "reward_set_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "free_reward_name",
+            "Type": "EString",
+            "Offset": 33,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "free_reward_icon",
+            "Type": "EString",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "paid_reward_name",
+            "Type": "EString",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "paid_reward_icon",
+            "Type": "EString",
+            "Offset": 45,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "paid_reward_name_color",
+            "Type": "EString",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward_highlight_color",
+            "Type": "EString",
+            "Offset": 53,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "male_normal_gift_id",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "male_normal_gift_name",
+            "Type": "EString",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "male_collection_gift_id",
+            "Type": "EUint32",
+            "Offset": 65,
+            "Size": 4
+        },
+        {
+            "Name": "male_collection_gift_name",
+            "Type": "EString",
+            "Offset": 69,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "male_spread_gift_id",
+            "Type": "EUint32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "female_normal_gift_id",
+            "Type": "EUint32",
+            "Offset": 77,
+            "Size": 4
+        },
+        {
+            "Name": "female_normal_gift_name",
+            "Type": "EString",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "female_collection_gift_id",
+            "Type": "EUint32",
+            "Offset": 85,
+            "Size": 4
+        },
+        {
+            "Name": "female_collection_gift_name",
+            "Type": "EString",
+            "Offset": 89,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "female_spread_gift_id",
+            "Type": "EUint32",
+            "Offset": 93,
+            "Size": 4
+        },
+        {
+            "Name": "spine_atlas",
+            "Type": "EString",
+            "Offset": 97,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "spine_skeletondata",
+            "Type": "EString",
+            "Offset": 101,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

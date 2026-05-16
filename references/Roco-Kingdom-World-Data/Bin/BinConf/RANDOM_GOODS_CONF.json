@@ -1,0 +1,138 @@
+{
+    "Name": "RANDOM_GOODS_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "goods_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "package_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "goods_group_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "enable",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "gender",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "Type",
+            "Type": "EInt32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "item_id",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "item_num",
+            "Type": "EInt32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "price_goods_type",
+            "Type": "EInt32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "price_goods_id",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "origin_price",
+            "Type": "EInt32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "price",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "buy_cond_type",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "buy_cond_param",
+            "Type": "EInt32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "buy_cond_param1",
+            "Type": "EInt32",
+            "Offset": 57,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "buy_limit_num",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "enable_time",
+            "Type": "EString",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "disable_time",
+            "Type": "EString",
+            "Offset": 69,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "weight",
+            "Type": "EInt32",
+            "Offset": 73,
+            "Size": 4
+        },
+        {
+            "Name": "is_special_good",
+            "Type": "EBool",
+            "Offset": 77,
+            "Size": 1
+        }
+    ]
+}

@@ -1,0 +1,94 @@
+{
+    "Name": "AREA_VISIBLE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name1",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "visible_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_density",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "visible_area_default_close",
+            "Type": "EBool",
+            "Offset": 20,
+            "Size": 1
+        },
+        {
+            "Name": "area_visible_player_num",
+            "Type": "EUint32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_merge_num",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_priority",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_player_online_num",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_player_friend_num",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "buffer_dist",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_special_rule",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "area_visible_special_rule_param1",
+            "Type": "EString",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

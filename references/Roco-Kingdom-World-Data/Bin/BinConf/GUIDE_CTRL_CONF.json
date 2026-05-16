@@ -1,0 +1,274 @@
+{
+    "Name": "GUIDE_CTRL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "guide_group_id",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "sub_guide_id",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "pc_show",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "mobile_show",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "guide_group_priority",
+            "Type": "EInt32",
+            "Offset": 18,
+            "Size": 4
+        },
+        {
+            "Name": "can_interrupt_other",
+            "Type": "EBool",
+            "Offset": 22,
+            "Size": 1
+        },
+        {
+            "Name": "cond_type",
+            "Type": "EString",
+            "Offset": 23,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type1",
+            "Type": "EString",
+            "Offset": 27,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type1_data_1",
+            "Type": "EUint32",
+            "Offset": 31,
+            "Size": 4
+        },
+        {
+            "Name": "type1_data_2",
+            "Type": "EUint32",
+            "Offset": 35,
+            "Size": 4
+        },
+        {
+            "Name": "type2",
+            "Type": "EString",
+            "Offset": 39,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type2_data_1",
+            "Type": "EUint32",
+            "Offset": 43,
+            "Size": 4
+        },
+        {
+            "Name": "type2_data_2",
+            "Type": "EUint32",
+            "Offset": 47,
+            "Size": 4
+        },
+        {
+            "Name": "res_scene_id",
+            "Type": "EUint32",
+            "Offset": 51,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "delay_time",
+            "Type": "EUint32",
+            "Offset": 55,
+            "Size": 4
+        },
+        {
+            "Name": "open",
+            "Type": "EInt32",
+            "Offset": 59,
+            "Size": 4
+        },
+        {
+            "Name": "finish_button_showtime",
+            "Type": "EUint32",
+            "Offset": 63,
+            "Size": 4
+        },
+        {
+            "Name": "finish_overtime",
+            "Type": "EUint32",
+            "Offset": 67,
+            "Size": 4
+        },
+        {
+            "Name": "reconnect",
+            "Type": "EBool",
+            "Offset": 71,
+            "Size": 1
+        },
+        {
+            "Name": "reset_step",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "is_local",
+            "Type": "EBool",
+            "Offset": 76,
+            "Size": 1
+        },
+        {
+            "Name": "strong_guide",
+            "Type": "EBool",
+            "Offset": 77,
+            "Size": 1
+        },
+        {
+            "Name": "is_inbattle",
+            "Type": "EBool",
+            "Offset": 78,
+            "Size": 1
+        },
+        {
+            "Name": "transparence",
+            "Type": "EUint32",
+            "Offset": 79,
+            "Size": 4
+        },
+        {
+            "Name": "active_ia_watch",
+            "Type": "EUint32",
+            "Offset": 83,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "style_type",
+            "Type": "EString",
+            "Offset": 87,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type_id",
+            "Type": "EUint32",
+            "Offset": 91,
+            "Size": 4
+        },
+        {
+            "Name": "finish_type",
+            "Type": "EString",
+            "Offset": 95,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "finish_data1",
+            "Type": "EUint32",
+            "Offset": 99,
+            "Size": 4
+        },
+        {
+            "Name": "finish_data2",
+            "Type": "EUint32",
+            "Offset": 103,
+            "Size": 4
+        },
+        {
+            "Name": "cond_type_done",
+            "Type": "EString",
+            "Offset": 107,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "done_type",
+            "Type": "EString",
+            "Offset": 111,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "done_type_data1",
+            "Type": "EUint32",
+            "Offset": 115,
+            "Size": 4
+        },
+        {
+            "Name": "done_type_data2",
+            "Type": "EUint32",
+            "Offset": 119,
+            "Size": 4
+        },
+        {
+            "Name": "done_type2",
+            "Type": "EString",
+            "Offset": 123,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "done_type2_data1",
+            "Type": "EUint32",
+            "Offset": 127,
+            "Size": 4
+        },
+        {
+            "Name": "done_type2_data2",
+            "Type": "EUint32",
+            "Offset": 131,
+            "Size": 4
+        },
+        {
+            "Name": "func_ban_id",
+            "Type": "EUint32",
+            "Offset": 135,
+            "Size": 4
+        },
+        {
+            "Name": "setting_type",
+            "Type": "EInt32",
+            "Offset": 139,
+            "Size": 4
+        },
+        {
+            "Name": "setting_data",
+            "Type": "EInt32",
+            "Offset": 143,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

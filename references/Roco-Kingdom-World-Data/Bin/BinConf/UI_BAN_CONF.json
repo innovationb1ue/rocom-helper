@@ -1,0 +1,26 @@
+{
+    "Name": "UI_BAN_CONF",
+    "Type": "EStruct",
+    "Properties": [
+        {
+            "Name": "ui_ban_id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "function_ban_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "ui_ban_icon",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

@@ -1,0 +1,219 @@
+{
+    "Name": "OPERATION_MAIL",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "mail_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "mail_platform",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "server_id",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mail_condition",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "start_time",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "end_time",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "version",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "level_type",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "level",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "validity",
+            "Type": "EInt32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "expire_at",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mail_title",
+            "Type": "EString",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mail_sender",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "mail_content",
+            "Type": "EString",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "use_svr_data",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "whitelist",
+            "Type": "EInt64",
+            "Offset": 72,
+            "Size": 8
+        },
+        {
+            "Name": "denylist",
+            "Type": "EInt64",
+            "Offset": 80,
+            "Size": 8
+        },
+        {
+            "Name": "reg_from_date",
+            "Type": "EString",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reg_to_date",
+            "Type": "EString",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "min_client_version",
+            "Type": "EString",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "max_client_version",
+            "Type": "EString",
+            "Offset": 100,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ban_client_version",
+            "Type": "EString",
+            "Offset": 104,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "redirect_website",
+            "Type": "EString",
+            "Offset": 108,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "unable_resend_mail",
+            "Type": "EInt32",
+            "Offset": 112,
+            "Size": 4
+        },
+        {
+            "Name": "reward_group",
+            "Type": "EStruct",
+            "Offset": 116,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "OPERATION_MAIL.reward_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "goods_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "goods_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "goods_count",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

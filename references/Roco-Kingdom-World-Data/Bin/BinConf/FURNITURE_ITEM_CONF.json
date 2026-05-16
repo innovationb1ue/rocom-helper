@@ -1,0 +1,160 @@
+{
+    "Name": "FURNITURE_ITEM_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "tab_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "model",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cell_length",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "cell_width",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "is_placeable",
+            "Type": "EBool",
+            "Offset": 32,
+            "Size": 1
+        },
+        {
+            "Name": "place_cell_length",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "place_cell_width",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "comfort",
+            "Type": "EUint32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "classification",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "interact_type",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "furniture_npc_content_id",
+            "Type": "EUint32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "furniture_version",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "furniture_weight",
+            "Type": "EUint32",
+            "Offset": 61,
+            "Size": 4
+        },
+        {
+            "Name": "pet_evolution_id",
+            "Type": "EUint32",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "Furniture_reward",
+            "Type": "EUint32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "Ban_Recycle",
+            "Type": "EBool",
+            "Offset": 73,
+            "Size": 1
+        },
+        {
+            "Name": "Funiture_ui_percentage",
+            "Type": "EUint32",
+            "Offset": 74,
+            "Size": 4
+        },
+        {
+            "Name": "Funiture_ui_init_location",
+            "Type": "EString",
+            "Offset": 78,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "Funiture_ui_init_rotation",
+            "Type": "EString",
+            "Offset": 82,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "furniture_interface_camera",
+            "Type": "EInt32",
+            "Offset": 86,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

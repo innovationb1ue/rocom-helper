@@ -1,0 +1,258 @@
+{
+    "Name": "NPC_REFRESH_RULE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3
+        },
+        {
+            "Name": "trigger_type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "class_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "class_type_param1",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "class_type_param2",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "content_reset_type",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "content_reset_param",
+            "Type": "EString",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "available_time_enum",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "available_weather_enum",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "condition",
+            "Type": "EStruct",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "NPC_REFRESH_RULE_CONF.condition",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "condition_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "condition_param",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "refresh_quantity",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "refresh_gap",
+            "Type": "EInt32",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "storage_reset_type",
+            "Type": "EInt32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "storage_reset_param",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "delete_quantity",
+            "Type": "EInt32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "delete_gap",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "evolution_lv_filter",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "condition_refresh",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "exclusive_type",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "PlayTrigger",
+            "Type": "EStruct",
+            "Offset": 80,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NPC_REFRESH_RULE_CONF.PlayTrigger",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "PlayTriggerType",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "play_param",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "rand_type",
+            "Type": "EInt32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "rand_param",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4
+        },
+        {
+            "Name": "rand_param2",
+            "Type": "EInt32",
+            "Offset": 92,
+            "Size": 4
+        },
+        {
+            "Name": "rand_reset_type",
+            "Type": "EInt32",
+            "Offset": 96,
+            "Size": 4
+        },
+        {
+            "Name": "reset_param",
+            "Type": "EString",
+            "Offset": 100,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_rand_result_share",
+            "Type": "EBool",
+            "Offset": 104,
+            "Size": 1
+        },
+        {
+            "Name": "contents",
+            "Type": "EStruct",
+            "Offset": 105,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 50,
+            "Struct": {
+                "Name": "NPC_REFRESH_RULE_CONF.contents",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "refresh_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "content_id",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "prob",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

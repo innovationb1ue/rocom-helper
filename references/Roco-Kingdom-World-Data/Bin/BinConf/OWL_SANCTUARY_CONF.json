@@ -1,0 +1,157 @@
+{
+    "Name": "OWL_SANCTUARY_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "camp_content_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "first_area_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "second_area_name",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "owl_sanctuary_order",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "owl_sanctuary_type",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "init_level",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "level_max",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "slot_num",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "owl_npc_pet_habitat_group_id",
+            "Type": "EInt32",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "mix_blood",
+            "Type": "EBool",
+            "Offset": 40,
+            "Size": 1
+        },
+        {
+            "Name": "cost_item_id",
+            "Type": "EInt32",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "levelup_cost_num",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "owl_area_group",
+            "Type": "EUint32",
+            "Offset": 49,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "reward_id",
+            "Type": "EUint32",
+            "Offset": 53,
+            "Size": 4
+        },
+        {
+            "Name": "increase_glass_prob",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4
+        },
+        {
+            "Name": "advantage_type",
+            "Type": "EInt32",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pet_form_factor_tag",
+            "Type": "EInt32",
+            "Offset": 65,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "manage_area_func",
+            "Type": "EUint32",
+            "Offset": 69,
+            "Size": 4
+        },
+        {
+            "Name": "init_fruit_id",
+            "Type": "EInt32",
+            "Offset": 73,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "visit_owl_refresh_polygon",
+            "Type": "EUint32",
+            "Offset": 77,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "visit_water_owl_refresh_polygon",
+            "Type": "EUint32",
+            "Offset": 81,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+package Next;
+
+import "xls_enum.proto";
+
+message BookData_NightmareData {
+  bool done = 1;
+}
+
+message BookData_BloodMagicData {
+  bool done = 1;
+  bool reward = 2;
+}
+
+message BookData_NotebookKeliData_Clew {
+  uint32 stage = 1;
+  bool is_new = 2;
+  uint32 unlock = 3;
+}
+
+message BookData_NotebookKeliData {
+  repeated bool to_do_done = 1;
+  repeated Next.BookData_NotebookKeliData_Clew clews = 2;
+  Next.BookData_NotebookKeliData_Clew black_text = 3;
+  uint32 medal_state = 4;
+}
+
+message BookData {
+  dataconfig.TaleTaskType book_type = 1;
+  uint32 book_id = 2;
+  bool unlock = 3;
+  uint32 unlock_timestamp = 7;
+  Next.BookData_NightmareData nightmare_data = 4;
+  Next.BookData_BloodMagicData blood_magic_data = 5;
+  Next.BookData_NotebookKeliData notebook_keli_data = 6;
+}

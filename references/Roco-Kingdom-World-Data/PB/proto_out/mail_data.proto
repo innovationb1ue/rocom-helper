@@ -1,0 +1,109 @@
+package Next;
+
+import "com_goods.proto";
+import "com_recharge.proto";
+import "com_mail.proto";
+import "com_rpc.proto";
+import "xls_enum.proto";
+import "game_data.proto";
+
+enum MailSrcType {
+  MST_TYPE_SYSTEM = 1;
+  MST_TYPE_MESSAGE = 2;
+  MST_TYPE_FRIEND_INVITE = 3;
+  MST_TYPE_FRIEND_INVITERSP = 4;
+  MST_TYPE_FRIEND_SEND = 5;
+  MST_TYPE_ASKFOR = 6;
+  MST_TYPE_FRIEND_SEND_COIN = 7;
+  MST_TYPE_IDIP_ADD = 8;
+  MST_TYPE_IDIP_SUB = 9;
+  MST_TYPE_IDIP_CHAT_BAN = 10;
+  MST_TYPE_IDIP_CHAT_LIFT = 11;
+  MST_TYPE_CREDIT_PT_ADD = 12;
+  MST_TYPE_CREDIT_PT_DEC = 13;
+  MST_TYPE_CREDIT_REPORT_RT = 14;
+  MST_TYPE_CREDIT_SUSPEND_ST = 15;
+  MST_TYPE_CREDIT_LIKE = 16;
+  MST_TYPE_IDIP_GAME_BAN = 17;
+  MST_TYPE_IDIP_GAME_LIFT = 18;
+  MST_TYPE_RANK_EXPIRE = 19;
+  MST_TYPE_IDIP_ELO_ADD = 20;
+  MST_TYPE_IDIP_ELO_SUB = 21;
+  MST_TYPE_IDIP_BAN_RANKLIST = 22;
+  MST_TYPE_IDIP_PLATINFO_NAME = 23;
+  MST_TYPE_IDIP_PLATINFO_ICON = 24;
+  MST_TYPE_GAME_RANKING = 25;
+  MST_TYPE_CLAN_INVITE = 26;
+  MST_TYPE_MIDAS_BUY_ITEM = 27;
+  MST_TYPE_IDIP_GM_FLAG = 28;
+  MST_TYPE_IDIP_ACTIVITY_FRIEND_INVITE = 29;
+  MST_TYPE_IDIP_SET = 30;
+  MST_TYPE_MIDAS_BUY_GOODS_DELIVERY = 31;
+}
+
+enum MailStatusType {
+  MAIL_STATUS_UNREAD = 0;
+  MAIL_STATUS_READ = 1;
+}
+
+enum MailRecvStatusType {
+  MAIL_RECV_STATUS_NO = 0;
+  MAIL_RECV_STATUS_YES = 1;
+}
+
+message MailUserData {
+}
+
+message MailExcelHistory {
+  repeated uint32 history = 1;
+}
+
+message MailSrc {
+  uint32 uin = 2;
+  bytes name = 3;
+  Next.OssReason oss_reason = 4;
+  bool has_jump = 6;
+}
+
+message MailInfo {
+  int64 mail_gid = 1;
+  Next.MailSrc src = 2;
+  bytes title = 3;
+  bytes contents = 4;
+  uint32 add_time = 6;
+  uint32 expire_time = 7;
+  Next.MailRecvStatusType recv_status = 8;
+  Next.MailStatusType mail_status = 9;
+  uint32 mail_conf_id = 10;
+  Next.MailParamList params = 11;
+  Next.GoodsReward reward = 12;
+  bool use_svr_data = 13;
+  uint32 plat_type = 14;
+  uint32 cond_type = 15;
+  uint32 reward_id = 16;
+  uint32 guard_id = 17;
+  uint64 mail_serial_num = 18;
+}
+
+message MailInfoList {
+  uint32 uin = 1;
+  repeated Next.MailInfo mails = 2;
+  repeated bytes byte_mails = 3;
+}
+
+message IdipInfo {
+  int32 source = 1;
+  bytes serial = 2;
+}
+
+message MailNotify {
+  Next.RetInfo ret_info = 1;
+  Next.MailInfo mail_info_no_use = 2;
+  Next.MailInfoList mail_list = 3;
+}
+
+message AreaMailInfo {
+  uint32 uid = 1;
+  uint32 send_time = 3;
+  Next.MailRecvBrief mail_recv_brief = 4;
+}

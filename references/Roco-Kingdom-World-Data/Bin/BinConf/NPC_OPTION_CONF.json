@@ -1,0 +1,668 @@
+{
+    "Name": "NPC_OPTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "npc_aim_display",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "online_process",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "online_process_same_time",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "online_hidden_forbid_options",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "IgnoreTaskVisitRules",
+            "Type": "EBool",
+            "Offset": 24,
+            "Size": 1
+        },
+        {
+            "Name": "initial_state",
+            "Type": "EBool",
+            "Offset": 25,
+            "Size": 1
+        },
+        {
+            "Name": "scene_res_whitelist",
+            "Type": "EInt32",
+            "Offset": 26,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "scene_res_blacklist",
+            "Type": "EInt32",
+            "Offset": 30,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "option_priority",
+            "Type": "EInt32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "option_auto",
+            "Type": "EInt32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "option_skip",
+            "Type": "EInt32",
+            "Offset": 42,
+            "Size": 4
+        },
+        {
+            "Name": "dialogue_transmission_2P",
+            "Type": "EBool",
+            "Offset": 46,
+            "Size": 1
+        },
+        {
+            "Name": "excute_delay",
+            "Type": "EInt32",
+            "Offset": 47,
+            "Size": 4
+        },
+        {
+            "Name": "logic_status_whitelist",
+            "Type": "EInt32",
+            "Offset": 51,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "logic_status_require_num",
+            "Type": "EInt32",
+            "Offset": 55,
+            "Size": 4
+        },
+        {
+            "Name": "logic_status_blacklist",
+            "Type": "EInt32",
+            "Offset": 59,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "use_vistor_story_flags",
+            "Type": "EBool",
+            "Offset": 63,
+            "Size": 1
+        },
+        {
+            "Name": "story_flag_whitelist",
+            "Type": "EInt32",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "story_flag_require_num",
+            "Type": "EInt32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "story_flag_blacklist",
+            "Type": "EInt32",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "option_sequence",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "stamina_cost",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "pet_interact_radius",
+            "Type": "EInt32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "pet_fight_radius",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4
+        },
+        {
+            "Name": "npc_interaction_show_distance",
+            "Type": "EUint32",
+            "Offset": 92,
+            "Size": 4
+        },
+        {
+            "Name": "option_radius",
+            "Type": "EInt32",
+            "Offset": 96,
+            "Size": 4
+        },
+        {
+            "Name": "cancel_option_radius",
+            "Type": "EInt32",
+            "Offset": 100,
+            "Size": 4
+        },
+        {
+            "Name": "vision_range",
+            "Type": "EInt32",
+            "Offset": 104,
+            "Size": 4
+        },
+        {
+            "Name": "option_hight",
+            "Type": "EInt32",
+            "Offset": 108,
+            "Size": 4
+        },
+        {
+            "Name": "vision_range_npc",
+            "Type": "EInt32",
+            "Offset": 112,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "vision_Z_range_npc",
+            "Type": "EInt32",
+            "Offset": 116,
+            "Size": 4
+        },
+        {
+            "Name": "option_effective_angle",
+            "Type": "EInt32",
+            "Offset": 120,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "option_Z_effective_angle",
+            "Type": "EInt32",
+            "Offset": 124,
+            "Size": 4
+        },
+        {
+            "Name": "option_area",
+            "Type": "EUint32",
+            "Offset": 128,
+            "Size": 4
+        },
+        {
+            "Name": "option_enable_condition",
+            "Type": "EInt32",
+            "Offset": 132,
+            "Size": 4
+        },
+        {
+            "Name": "option_enable_condition_param",
+            "Type": "EString",
+            "Offset": 136,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "npc_interact_condition",
+            "Type": "EInt32",
+            "Offset": 140,
+            "Size": 4
+        },
+        {
+            "Name": "npc_interact_condition_param",
+            "Type": "EUint32",
+            "Offset": 144,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "npc_seat_id",
+            "Type": "EInt32",
+            "Offset": 148,
+            "Size": 4
+        },
+        {
+            "Name": "pet_ride_type",
+            "Type": "EInt32",
+            "Offset": 152,
+            "Size": 4
+        },
+        {
+            "Name": "npc_interact_type",
+            "Type": "EInt32",
+            "Offset": 156,
+            "Size": 4
+        },
+        {
+            "Name": "interact_param1",
+            "Type": "EString",
+            "Offset": 160,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_icon",
+            "Type": "EString",
+            "Offset": 164,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "button_text",
+            "Type": "EString",
+            "Offset": 168,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "show_option_rotation",
+            "Type": "EFloat",
+            "Offset": 172,
+            "Size": 4
+        },
+        {
+            "Name": "button_type",
+            "Type": "EInt32",
+            "Offset": 176,
+            "Size": 4
+        },
+        {
+            "Name": "enablefix_angle",
+            "Type": "EUint32",
+            "Offset": 180,
+            "Size": 4
+        },
+        {
+            "Name": "enablefix_distance",
+            "Type": "EUint32",
+            "Offset": 184,
+            "Size": 4
+        },
+        {
+            "Name": "fix_distance",
+            "Type": "EFloat",
+            "Offset": 188,
+            "Size": 4
+        },
+        {
+            "Name": "fix_rotation",
+            "Type": "EFloat",
+            "Offset": 192,
+            "Size": 4
+        },
+        {
+            "Name": "unmount_type",
+            "Type": "EInt32",
+            "Offset": 196,
+            "Size": 4
+        },
+        {
+            "Name": "break_holdhands",
+            "Type": "EBool",
+            "Offset": 200,
+            "Size": 1
+        },
+        {
+            "Name": "action",
+            "Type": "EStruct",
+            "Offset": 201,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NPC_OPTION_CONF.action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "action_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action_param1",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param2",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param3",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param4",
+                        "Type": "EString",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param5",
+                        "Type": "EString",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "online_process_pet",
+            "Type": "EInt32",
+            "Offset": 205,
+            "Size": 4
+        },
+        {
+            "Name": "pet_action",
+            "Type": "EStruct",
+            "Offset": 209,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NPC_OPTION_CONF.pet_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "action_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action_param1",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param2",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param3",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "pet_power_dash_action",
+            "Type": "EStruct",
+            "Offset": 213,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NPC_OPTION_CONF.pet_power_dash_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "action_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action_param1",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param2",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param3",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "online_process_magic",
+            "Type": "EInt32",
+            "Offset": 217,
+            "Size": 4
+        },
+        {
+            "Name": "wild_action",
+            "Type": "EStruct",
+            "Offset": 221,
+            "Size": 4,
+            "CompressedSize": 4,
+            "Struct": {
+                "Name": "NPC_OPTION_CONF.wild_action",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "action_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "action_param1",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param2",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "action_param3",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "magic_interact_id",
+            "Type": "EInt32",
+            "Offset": 225,
+            "Size": 4
+        },
+        {
+            "Name": "option_times",
+            "Type": "EInt32",
+            "Offset": 229,
+            "Size": 4
+        },
+        {
+            "Name": "times_decrease_cond",
+            "Type": "EInt32",
+            "Offset": 233,
+            "Size": 4
+        },
+        {
+            "Name": "times_decrease_cond_params",
+            "Type": "EString",
+            "Offset": 237,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "reset_type",
+            "Type": "EInt32",
+            "Offset": 241,
+            "Size": 4
+        },
+        {
+            "Name": "reset_time",
+            "Type": "EString",
+            "Offset": 245,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "option_deletnpc",
+            "Type": "EInt32",
+            "Offset": 249,
+            "Size": 4
+        },
+        {
+            "Name": "delete_content",
+            "Type": "EBool",
+            "Offset": 253,
+            "Size": 1
+        },
+        {
+            "Name": "option_deleteself",
+            "Type": "EInt32",
+            "Offset": 254,
+            "Size": 4
+        },
+        {
+            "Name": "option_deletnpc_times",
+            "Type": "EInt32",
+            "Offset": 258,
+            "Size": 4
+        },
+        {
+            "Name": "option_tiems_done",
+            "Type": "EInt32",
+            "Offset": 262,
+            "Size": 4
+        },
+        {
+            "Name": "option_changestatus",
+            "Type": "EInt32",
+            "Offset": 266,
+            "Size": 4
+        },
+        {
+            "Name": "option_restart_dialogue",
+            "Type": "EBool",
+            "Offset": 270,
+            "Size": 1
+        },
+        {
+            "Name": "exp_reward_type",
+            "Type": "EUint32",
+            "Offset": 271,
+            "Size": 4
+        },
+        {
+            "Name": "exp_reward_value",
+            "Type": "EUint32",
+            "Offset": 275,
+            "Size": 4
+        },
+        {
+            "Name": "ignore_reset",
+            "Type": "EUint32",
+            "Offset": 279,
+            "Size": 4
+        },
+        {
+            "Name": "trigger_guide",
+            "Type": "EUint32",
+            "Offset": 283,
+            "Size": 4
+        },
+        {
+            "Name": "is_collect_option",
+            "Type": "EBool",
+            "Offset": 287,
+            "Size": 1
+        },
+        {
+            "Name": "touch_battle_cd",
+            "Type": "EUint32",
+            "Offset": 288,
+            "Size": 4
+        },
+        {
+            "Name": "LocationTag",
+            "Type": "EInt32",
+            "Offset": 292,
+            "Size": 4
+        },
+        {
+            "Name": "system_control_id",
+            "Type": "EUint32",
+            "Offset": 296,
+            "Size": 4
+        }
+    ]
+}

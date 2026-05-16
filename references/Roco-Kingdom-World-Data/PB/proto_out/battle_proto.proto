@@ -1,0 +1,407 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle.proto";
+import "com_goods.proto";
+import "com_rpc.proto";
+import "com_pet.proto";
+import "com_pet_skill.proto";
+import "com_appearance.proto";
+import "battle_data.proto";
+import "rpc_options.proto";
+import "space_data.proto";
+
+message ZoneBattleLoadFinishReq {
+  repeated Next.PetPosition pos_info = 1;
+  Next.Position battle_center = 2;
+  uint32 battle_radius = 3;
+  repeated uint32 observe_available_pos = 4;
+}
+
+message ZoneBattleLoadFinishRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleSupplyPetReq {
+  repeated uint32 pet_id = 1;
+  repeated uint32 pet_pos = 2;
+}
+
+message ZoneBattleSupplyPetRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleEmojiReq {
+  uint32 emoji = 1;
+  uint32 aim_uin = 2;
+}
+
+message ZoneBattleEmojiRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleEmojiNotify {
+  uint32 emoji = 1;
+  uint32 aim_uin = 2;
+  uint32 src_uin = 3;
+}
+
+message ZoneBattleCmdPopbackReq {
+  uint32 pet_id = 1;
+  bool role_magic_op = 2;
+}
+
+message ZoneBattleCmdPopbackRsp {
+  Next.RetInfo ret_info = 1;
+  Next.BattleSyncData sync_data = 2;
+  Next.BattleRoundFlowReq req = 3;
+  int32 round = 30;
+}
+
+message ZoneBattlePlayerRunawayReq {
+}
+
+message ZoneBattlePlayerRunawayRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattlePlayerExitReq {
+}
+
+message ZoneBattlePlayerExitRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleCmdPushbackReq {
+  uint32 req_type = 1;
+  repeated Next.BattleRoundFlowReq req = 2;
+  bool is_confirm = 4;
+  int32 wl_req_id = 5;
+  int32 max_err_req_id = 6;
+  string feature_data = 7;
+}
+
+message ZoneBattleCmdPushbackRsp {
+  Next.RetInfo ret_info = 1;
+  bool is_caught = 2;
+  uint32 catch_probability = 4;
+  repeated Next.Inner_FriendTypeInfo fri_type_list = 5;
+  bool has_npc_delay = 7;
+  uint32 state_ret_code = 9;
+  Next.BattleSyncData sync_data = 10;
+  Next.BattleRoundFlowReq req = 11;
+  Next.BattleRoleMagicOpInfo magic_op_info = 12;
+  uint32 combo_skill_idx = 20;
+  uint32 wl_req_id = 21;
+  uint32 max_err_req_id = 22;
+  bool ignored = 23;
+  int32 round = 30;
+}
+
+message ZoneBattleRoundFlowFinishReq {
+  repeated Next.PetPosition pos_info = 1;
+  Next.Position battle_center = 2;
+  uint32 battle_radius = 3;
+  Next.BATTLEFIELD_STATE state = 4;
+  uint32 seq_num = 5;
+}
+
+message ZoneBattleRoundFlowFinishRsp {
+  Next.RetInfo ret_info = 1;
+  bool is_finish = 2;
+}
+
+message ZoneBattleEnterNotify {
+  uint32 battle_mode = 1;
+  int32 round = 2;
+  uint32 series_index = 3;
+  uint64 round_time = 4;
+  Next.BattleInitInfo init_info = 6;
+  Next.Point avatar_pt = 7;
+  Next.Point npc_pt = 8;
+  repeated uint64 npc_id = 9;
+  bool is_reconnect = 10;
+  uint32 enter_battle_type = 11;
+  Next.Position battle_center = 12;
+  uint32 weather_id = 13;
+  uint32 weather_expire_round = 19;
+  uint32 water_battle_type = 14;
+  int32 max_round = 15;
+  int32 rotate = 16;
+  uint32 creater_uin = 17;
+  uint32 data_seq_num = 18;
+}
+
+message ZoneBattlePrePlayNotify {
+  Next.BattlePerformCmd perform_cmd = 1;
+  Next.BattleRoundSettleInfo settle_info = 2;
+}
+
+message ZoneBattleRoundStartNotify {
+  Next.BATTLE_STATE_NOTIFY_TYPE state_type = 1;
+  Next.BattleStateInfo state_info = 2;
+  Next.BattlePerformCmd perform_cmd = 3;
+  Next.AiExtraData ai_extra_data = 4;
+  bool has_npc_delay = 5;
+  int32 guide_id = 6;
+}
+
+message ZoneBattleInstantPerformNotify {
+  Next.BattlePerformCmd perform_cmd = 1;
+  Next.BattleRoundSettleInfo settle_info = 2;
+  bool has_npc_delay = 3;
+}
+
+message ZoneBattleCmdSyncNotify {
+  uint32 player_uin = 1;
+  Next.BattleRoundFlowReq req = 2;
+}
+
+message ZoneBattleRoleLeaveNotify {
+  enum LeaveType {
+    NORMAL_LEAVE = 1;
+    HIGH_VALUE_OWNER_LEAVE = 2;
+  }
+  uint32 player_uin = 1;
+  Next.ZoneBattleRoleLeaveNotify.LeaveType reason = 2;
+  uint32 seq_num = 3;
+}
+
+message ZoneBattlePerformStartNotify {
+  Next.BattlePerformCmd perform_cmd = 1;
+  Next.BattleRoundSettleInfo settle_info = 2;
+  Next.RetInfo ret_info = 3;
+}
+
+message ZoneBattlePvpPerformStartNotify {
+  Next.BattlePerformCmd perform_cmd = 1;
+  Next.RetInfo ret_info = 2;
+}
+
+message BattleFinishBagInfo {
+  uint32 bag_gid = 1;
+  bool is_charge = 2;
+  int32 num = 3;
+  int32 remain_use_cnt = 4;
+  int32 used_num = 5;
+  uint32 item_conf_id = 6;
+}
+
+message PvpScoreRecord {
+  uint32 attack_uin = 1;
+  uint32 attack_conf_id = 2;
+  int32 score = 3;
+  uint32 attack_pet_id = 4;
+  uint32 attack_pet_gid = 5;
+  Next.PetTypeInfo attack_pet_type = 6;
+  uint32 defend_uin = 8;
+  uint32 defend_conf_id = 9;
+  uint32 defend_pet_id = 10;
+  bool is_defend_runaway = 11;
+  uint32 mutation_type = 12;
+  uint32 blood = 13;
+  bool carry_fantastic_skill = 14;
+  Next.PetTypeInfo type = 15;
+  uint32 defend_pet_gid = 16;
+}
+
+message ObserverPvpScoreRecord {
+  uint32 uin = 1;
+  uint32 score = 2;
+  uint32 watch_duration = 3;
+}
+
+message BattleFinishObtainMedalInfo {
+  uint32 pet_gid = 1;
+  uint32 petbase_id = 2;
+}
+
+message BattlePvpScoreInfo {
+  enum ExtraPvpScoreSource {
+    RANDOM_PET = 1;
+    WEEKEND_WELFARE = 2;
+  }
+  uint32 extra_obtain_pvp_score_source = 1;
+}
+
+message ZoneBattleFinishNotify {
+  Next.BattleSettleInfo settle_info = 1;
+  repeated uint32 seen_monster_id = 3;
+  Next.RetInfo ret_info = 4;
+  Next.GoodsReward reward = 5;
+  bool evolution_complete = 7;
+  repeated Next.BattleFinishPetInfo pet_info = 8;
+  repeated Next.BattleFinishBagInfo bag_info = 9;
+  bool will_leave_visit = 10;
+  repeated Next.PetCarryonInfo consumed_carryons = 12;
+  repeated Next.PvpScoreRecord pvp_score_records = 13;
+  int32 pvp_score = 14;
+  Next.PlayerAppearanceInfo_FashionInfo_SuitInfo fashion_suit_info = 15;
+  int32 total_pvp_score = 17;
+  int32 max_pvp_score = 18;
+  repeated int32 world_nums = 19;
+  repeated Next.CliSimpleBattlePet simple_pets = 21;
+  Next.PvpRankSettleInfo pvp_rank_settle_info = 22;
+  int32 create_battle_ret = 23;
+  int32 cli_startup_channel = 24;
+  int32 last_pvp_battle_type = 25;
+  string last_pvp_battle_ai_desc = 26;
+  repeated Next.ObserverPvpScoreRecord observer_pvp_score_records = 27;
+  Next.BattleFinishObtainMedalInfo obtain_medal_info = 28;
+  Next.BattlePvpScoreInfo battle_pvp_score = 29;
+}
+
+message PvpRankSettleInfo {
+  int32 old_pvp_rank_star = 1;
+  int32 new_pvp_rank_star = 2;
+  int32 old_pvp_rank_order = 3;
+  int32 new_pvp_rank_order = 4;
+  int32 old_pvp_rank_master_score = 5;
+  int32 new_pvp_rank_master_score = 6;
+  int32 win_streak_addtional_rank_star = 7;
+  int32 random_pet_addtional_rank_star = 8;
+}
+
+message ZoneBattleForceFinishNotify {
+  uint32 reason = 1;
+}
+
+message BattleCatchPetRecord {
+  uint32 player_uin = 1;
+  uint32 ball_id = 2;
+  uint32 probability = 3;
+  uint32 random_number = 4;
+}
+
+message BattleDamageRecord {
+  uint32 player_uin = 1;
+  uint32 damage_type = 2;
+  uint32 skill_id = 3;
+  float random_number = 4;
+}
+
+message BattleInfoChangeReq {
+  uint32 info_type = 1;
+  Next.BattleWeatherChangeInfo weather_info = 2;
+  Next.EnvEnergyInfo env_info = 3;
+}
+
+message BattleInfoChangeRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleAiSelectSkillNotify {
+  uint32 pet_id = 1;
+  Next.BattleAISelectSkillInfo skill_info = 2;
+}
+
+message ZoneBattleRoundOpQueryReq {
+}
+
+message ZoneBattleRoundOpQueryRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.BattleOpRecord items = 2;
+  repeated Next.CliSimpleBattlePet simple_pets = 3;
+}
+
+message ZoneBattleNpcEscapeConfirmReq {
+  uint32 npc_uin = 1;
+  uint32 agree = 2;
+}
+
+message ZoneBattleNpcEscapeConfirmRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleCatchConfirmReq {
+  int32 ticket_id = 1;
+  int32 num = 2;
+}
+
+message ZoneBattleCatchConfirmRsp {
+  Next.RetInfo ret_info = 1;
+  int32 base_ball_num = 2;
+  repeated Next.BeastBattleAchieves achieves = 3;
+  uint32 boss_shiny = 4;
+  repeated Next.BattleItemInfo items = 5;
+  uint32 degenerated_boss_base_id = 6;
+  Next.PetData boss_data = 7;
+}
+
+message ZoneBattleTempLeaveBeastReq {
+}
+
+message ZoneBattleTempLeaveBeastRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattlePkAgainReq {
+  bool pk_again = 1;
+}
+
+message ZoneBattlePkAgainRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattlePkAgainNotify {
+  uint32 uin = 1;
+  bool pk_again = 2;
+}
+
+message ZoneBattleFinalBattleP2SummonReq {
+  bytes name = 1;
+  int32 confirmed = 2;
+  Next.PetData pet = 3;
+}
+
+message ZoneBattleFinalBattleP2SummonRsp {
+  Next.RetInfo ret_info = 1;
+  Next.PetData pet = 2;
+  Next.BattlePerformCmd perform_cmd = 4;
+}
+
+message ZoneBattleCommentTriggerReq {
+  Next.BattlerCommentData comment_data = 1;
+}
+
+message ZoneBattleCommentTriggerRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleObserverJoinReq {
+  uint32 battler_uin = 1;
+}
+
+message ZoneBattleObserverJoinRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleObserverLeaveReq {
+}
+
+message ZoneBattleObserverLeaveRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleKickOutObserverReq {
+  uint32 uin = 1;
+}
+
+message ZoneBattleKickOutObserverRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneBattleObserverChangeNotify {
+  int32 observer_num = 1;
+  repeated Next.ObserverBrief leave_observer = 2;
+  repeated Next.ObserverBrief enter_observer = 3;
+  repeated Next.ObserverFashionInfo observer_appearance_info = 4;
+}
+
+message ZoneBattleObserverKickedOutNotify {
+  uint32 watch_duration = 1;
+}
+
+message ZoneBattleUpdateItemReq {
+  repeated Next.BattleItemInfo item_list = 1;
+}

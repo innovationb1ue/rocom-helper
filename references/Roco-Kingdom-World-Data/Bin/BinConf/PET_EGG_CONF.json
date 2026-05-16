@@ -1,0 +1,165 @@
+{
+    "Name": "PET_EGG_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "pet_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "form",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "model_id",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "weight_low",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "weight_high",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "height_low",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "height_high",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "hatch_data",
+            "Type": "EUint32",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "voice_percent",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "precious_egg_type",
+            "Type": "EInt32",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "egg_base_glass_prob_array",
+            "Type": "EUint32",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "egg_add_glass_prob_array",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_contact_add_glass_prob",
+            "Type": "EBool",
+            "Offset": 56,
+            "Size": 1
+        },
+        {
+            "Name": "egg_base_shining_prob_array",
+            "Type": "EUint32",
+            "Offset": 57,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "egg_add_shining_prob_array",
+            "Type": "EUint32",
+            "Offset": 61,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_contact_add_shining_prob",
+            "Type": "EBool",
+            "Offset": 65,
+            "Size": 1
+        },
+        {
+            "Name": "close_level",
+            "Type": "EUint32",
+            "Offset": 66,
+            "Size": 4
+        },
+        {
+            "Name": "pet_bond_name",
+            "Type": "EUint32",
+            "Offset": 70,
+            "Size": 4
+        },
+        {
+            "Name": "random_eggs_group",
+            "Type": "EStruct",
+            "Offset": 74,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 10,
+            "Struct": {
+                "Name": "PET_EGG_CONF.random_eggs_group",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "effect",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "random_weight",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

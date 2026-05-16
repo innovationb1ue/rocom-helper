@@ -1,0 +1,25 @@
+{
+    "Name": "SEAT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "seat_num",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "is_home_lie",
+            "Type": "EBool",
+            "Offset": 8,
+            "Size": 1
+        }
+    ]
+}

@@ -1,0 +1,97 @@
+package Next;
+
+import "com_base_types.proto";
+
+message HandbookCoverInfo {
+  uint32 handbook_id = 1;
+  int32 rotate_angle = 2;
+}
+
+message AreaHandbookInfo {
+  uint32 area_hb_type = 1;
+  uint32 found_coll_num = 2;
+  uint32 collect_coll_num = 3;
+  int32 hb_award_idx = 4;
+  repeated bool award_get_list = 5;
+  repeated Next.HandbookCoverInfo area_covers = 6;
+  repeated int32 cover_candidate_data = 7;
+  repeated uint32 topic_rp = 8;
+}
+
+message PetHandbook {
+  repeated Next.HandbookRecordCollection record_collection = 2;
+  repeated int32 cover_candidate_data = 9;
+  repeated Next.AreaHandbookInfo area_hb_infos = 10;
+  int32 topic_version = 11;
+}
+
+message HandbookStatistics_StatInfo {
+  int32 data = 1;
+  int32 ratio = 2;
+}
+
+message HandbookStatistics_TopStatInfo {
+  repeated int32 top_ids = 6;
+  repeated int32 top_ratios = 7;
+}
+
+message HandbookStatistics {
+  int32 team_type = 1;
+  repeated Next.HandbookStatistics_StatInfo top_six_nature = 2;
+  repeated Next.HandbookStatistics_StatInfo top_six_talent = 3;
+  repeated Next.HandbookStatistics_StatInfo top_six_blood = 4;
+  repeated Next.HandbookStatistics_StatInfo top_six_skill = 5;
+  Next.HandbookStatistics_TopStatInfo top_nature = 6;
+  Next.HandbookStatistics_TopStatInfo top_talent = 7;
+  Next.HandbookStatistics_TopStatInfo top_blood = 8;
+  Next.HandbookStatistics_TopStatInfo top_skill = 9;
+}
+
+message HandbookRecordCollection {
+  uint32 handbook_id = 1;
+  repeated Next.HandbookRecord record = 2;
+  repeated Next.HandbookTopicInfo topic_list = 3;
+  uint32 complete_node_num = 4;
+  uint32 tot_node_num = 5;
+  repeated bool get_topic_award = 6;
+  uint32 status = 7;
+  uint32 catch_prob_add = 8;
+  uint32 catch_thres_add = 9;
+  repeated Next.HandbookStatistics statistics = 10;
+}
+
+message HandbookRecord {
+  uint32 pet_base_id = 1;
+  bool is_boss = 2;
+  uint32 height_min = 4;
+  uint32 height_max = 5;
+  uint32 weight_min = 6;
+  uint32 weight_max = 7;
+  uint32 catch_thres_add = 10;
+  uint32 add_time = 11;
+  uint32 status = 16;
+  repeated uint32 caught_camp = 12;
+  uint32 mutation_type = 13;
+  bool had_normal_form = 15;
+  repeated uint32 other_boss_base_ids = 18;
+  repeated Next.HandbookStatistics statistics = 19;
+  repeated Next.GlassInfo glass_infos = 20;
+  repeated Next.GlassInfo shine_glass_infos = 21;
+  repeated Next.BossRecordStatus boss_status = 22;
+  uint32 form_group = 23;
+  repeated uint32 catch_mutation = 24;
+}
+
+message HandbookTopicInfo {
+  uint32 finish_cnt = 1;
+  uint32 node_num = 2;
+  uint32 topic_type = 3;
+  uint32 topic_idx = 4;
+  uint32 topic_id = 5;
+  bool get_award = 6;
+}
+
+message BossRecordStatus {
+  uint32 boss_base_id = 1;
+  uint32 status = 2;
+}

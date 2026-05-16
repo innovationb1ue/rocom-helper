@@ -1,0 +1,253 @@
+{
+    "Name": "HIDDEN_GLASS_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "active_season",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "weight",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "season_pet",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "main_tex",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "glass_color_1",
+            "Type": "EFloat",
+            "Offset": 28,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "glass_color_2",
+            "Type": "EFloat",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "Effect_Amount",
+            "Type": "EFloat",
+            "Offset": 36,
+            "Size": 4
+        },
+        {
+            "Name": "star_intensity",
+            "Type": "EUint32",
+            "Offset": 40,
+            "Size": 4
+        },
+        {
+            "Name": "global_refraction",
+            "Type": "EFloat",
+            "Offset": 44,
+            "Size": 4
+        },
+        {
+            "Name": "tex_flow_speed_x",
+            "Type": "EFloat",
+            "Offset": 48,
+            "Size": 4
+        },
+        {
+            "Name": "tex_flow_speed_y",
+            "Type": "EFloat",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "particle",
+            "Type": "EString",
+            "Offset": 56,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "particle_color_1",
+            "Type": "EFloat",
+            "Offset": 60,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "particle_color_2",
+            "Type": "EFloat",
+            "Offset": 64,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "particle_color_3",
+            "Type": "EFloat",
+            "Offset": 68,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "particle_color_4",
+            "Type": "EFloat",
+            "Offset": 72,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "ball_fx",
+            "Type": "EString",
+            "Offset": 76,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "ball_fx_path",
+            "Type": "EUint32",
+            "Offset": 80,
+            "Size": 4
+        },
+        {
+            "Name": "hatch_fx",
+            "Type": "EString",
+            "Offset": 84,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "icon",
+            "Type": "EString",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "long_icon",
+            "Type": "EString",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "stroke_icon",
+            "Type": "EString",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "stroke_small_icon",
+            "Type": "EString",
+            "Offset": 100,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "glass_tips_pic",
+            "Type": "EString",
+            "Offset": 104,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "particle_small_icon",
+            "Type": "EString",
+            "Offset": 108,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "yise_icon",
+            "Type": "EString",
+            "Offset": 112,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "yise_long_icon",
+            "Type": "EString",
+            "Offset": 116,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "yise_stroke_icon",
+            "Type": "EString",
+            "Offset": 120,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "yise_stroke_small_icon",
+            "Type": "EString",
+            "Offset": 124,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "headicon_mat_path",
+            "Type": "EString",
+            "Offset": 128,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "pet_art_mat_path",
+            "Type": "EString",
+            "Offset": 132,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "main_ui_tips_mat_path",
+            "Type": "EString",
+            "Offset": 136,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "global_depth",
+            "Type": "EUint32",
+            "Offset": 140,
+            "Size": 4
+        }
+    ]
+}

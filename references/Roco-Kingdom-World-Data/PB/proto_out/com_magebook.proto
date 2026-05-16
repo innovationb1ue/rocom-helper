@@ -1,0 +1,32 @@
+package Next;
+
+message MageNpcItem {
+  uint32 id = 1;
+  bool unlocked = 2;
+  bool awarded = 3;
+}
+
+message MageNpcInfo {
+  uint32 id = 1;
+  repeated Next.MageNpcItem items = 2;
+  bool unlocked = 3;
+  bool disabled_in_camp = 4;
+  uint32 assist_times = 5;
+}
+
+message MageNpcAssignInfo {
+  uint64 id = 1;
+  uint32 type = 2;
+  repeated uint32 npcs = 3;
+}
+
+message MageCampAssignInfo {
+  uint32 id = 1;
+  uint32 rest_conf_id = 2;
+}
+
+message MageNpcCampInfo {
+  uint32 id = 1;
+  bool task_finish = 2;
+  bool disabled = 3;
+}

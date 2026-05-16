@@ -1,0 +1,124 @@
+package Next;
+
+import "com_account.proto";
+import "battle_data.proto";
+
+enum MatchPVPType {
+  MATCH_PVPTYPE_SINGLE = 1;
+  MATCH_PVPTYPE_1v1 = 2;
+  MATCH_PVPTYPE_2v2 = 4;
+  MATCH_PVPTYPE_3v3 = 6;
+  MATCH_PVPTYPE_5v5 = 10;
+  MATCH_PVPTYPE_RANK = 11;
+}
+
+enum GameSettleState {
+  GAME_SETTLE_WAIT = 0;
+  GAME_SETTLE_DONE = 1;
+  GAME_SETTLE_ILLEGALLY = 2;
+}
+
+message HostInfo {
+  bytes host_ip = 1;
+  uint32 host_port = 2;
+  uint64 bus_id = 5;
+  bytes host_name = 6;
+}
+
+message GameSetting {
+  uint32 game_mode = 1;
+  uint32 room_create_type = 2;
+  uint32 arena_id = 3;
+  uint32 inlet_id = 4;
+  uint32 arean_buff_id = 5;
+}
+
+message GameInitInfo {
+  uint64 game_id = 1;
+  uint32 random_seed = 2;
+  uint32 frame_rate = 3;
+  uint32 start_time = 4;
+  uint32 end_time = 5;
+  Next.HostInfo host_info = 6;
+  uint64 voip_id = 7;
+  repeated Next.HostInfo ai_hosting_host_list = 8;
+  uint32 room_id = 9;
+}
+
+message ChampionInfo {
+  uint32 skin_id1 = 1;
+  uint32 skin_id2 = 2;
+  uint32 skin_id3 = 3;
+  uint32 skin_id4 = 4;
+  uint32 skin_id5 = 5;
+  uint32 skin_id6 = 6;
+  uint32 skin_id7 = 7;
+  uint32 skin_id8 = 8;
+}
+
+message SummonerInfo {
+  repeated Next.ChampionInfo skin_list = 1;
+  uint32 recently_used_champion = 2;
+  uint32 recently_joined_team = 3;
+}
+
+message AiSetting {
+  int32 ai_level = 1;
+  int32 salary_rate = 2;
+  int32 style = 3;
+  int32 aicharacter = 4;
+  int32 ai_message = 5;
+  int32 atktower_rate = 6;
+  int32 atkhero_rate = 7;
+  int32 atkplayer_rate = 8;
+  int32 atkcreep_rate = 9;
+  int32 playerrun_rate = 10;
+  int32 otherrun_rate = 11;
+  int32 idle_rate = 12;
+  int32 randommove_rate = 13;
+}
+
+message AiChampionSetting {
+  int32 champion_id = 1;
+  Next.AiSetting ai_setting = 2;
+}
+
+message AiSettingList {
+  repeated Next.AiChampionSetting ai_list = 1;
+}
+
+message PbExtendInfo {
+  uint32 clan_battle_times = 1;
+  uint32 clan_score = 3;
+  uint32 chosed_title_id = 4;
+  uint32 clan_logo = 5;
+  bytes clan_name = 6;
+  Next.PlayerTitleExtendInfo chosed_title_extend_info = 7;
+  uint32 rate_level = 8;
+}
+
+message PbExtendSvrInfo {
+  uint32 reserve_1 = 1;
+}
+
+message FrameData {
+  uint32 frame_id = 1;
+  bytes data = 2;
+}
+
+message FrameDataList {
+  repeated Next.FrameData frame_list = 1;
+}
+
+message GamePlayerDiagnosisInfo {
+  uint32 uin = 1;
+  uint32 hang_time = 2;
+  uint32 offline_time = 3;
+  uint32 rtt_delay_max = 4;
+  uint32 rtt_delay_avg = 5;
+  uint32 disconnected_count = 6;
+}
+
+message GamePlayerDiagnosisList {
+  repeated Next.GamePlayerDiagnosisInfo diagnosis_list = 1;
+}

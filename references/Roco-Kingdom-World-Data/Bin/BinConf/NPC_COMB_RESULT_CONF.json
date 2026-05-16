@@ -1,0 +1,104 @@
+{
+    "Name": "NPC_COMB_RESULT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "result_struct",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 12,
+            "Struct": {
+                "Name": "NPC_COMB_RESULT_CONF.result_struct",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "result",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "result_param",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "result_param2",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "result_param3",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "result_param4",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "result_param5",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "wait_result",
+                        "Type": "EInt32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "lock_guide",
+                        "Type": "EBool",
+                        "Offset": 28,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "npc_guide",
+                        "Type": "EInt32",
+                        "Offset": 29,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "set_permanent",
+                        "Type": "EBool",
+                        "Offset": 33,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

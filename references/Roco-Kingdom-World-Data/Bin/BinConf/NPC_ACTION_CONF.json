@@ -1,0 +1,68 @@
+{
+    "Name": "NPC_ACTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "action_type",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "action_type",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "client_submit",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "auto_submit_offline",
+            "Type": "EBool",
+            "Offset": 13,
+            "Size": 1
+        },
+        {
+            "Name": "need_save",
+            "Type": "EBool",
+            "Offset": 14,
+            "Size": 1
+        },
+        {
+            "Name": "wait_begin_data",
+            "Type": "EBool",
+            "Offset": 15,
+            "Size": 1
+        },
+        {
+            "Name": "skip_permit",
+            "Type": "EBool",
+            "Offset": 16,
+            "Size": 1
+        },
+        {
+            "Name": "skip_conf",
+            "Type": "EBool",
+            "Offset": 17,
+            "Size": 1
+        },
+        {
+            "Name": "exhausted_content_action",
+            "Type": "EBool",
+            "Offset": 18,
+            "Size": 1
+        }
+    ]
+}

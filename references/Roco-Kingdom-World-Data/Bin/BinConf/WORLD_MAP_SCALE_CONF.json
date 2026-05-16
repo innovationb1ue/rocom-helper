@@ -1,0 +1,25 @@
+{
+    "Name": "WORLD_MAP_SCALE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "min_scale",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "max_scale",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

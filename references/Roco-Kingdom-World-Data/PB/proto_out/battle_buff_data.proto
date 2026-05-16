@@ -1,0 +1,265 @@
+package Next;
+
+import "rpc_options.proto";
+import "xls_enum.proto";
+
+message BuffData_32_Skill {
+  int32 skill_id = 1;
+  int32 val = 2;
+}
+
+message BuffData_32 {
+  repeated Next.BuffData_32_Skill data = 1;
+}
+
+message BuffData_55 {
+  uint32 skill_id = 1;
+}
+
+message BuffData_52 {
+  bool is_on = 1;
+}
+
+message BuffData_56_Skill {
+  uint32 old_skill_id = 1;
+  uint32 new_skill_id = 2;
+}
+
+message BuffData_56 {
+  repeated Next.BuffData_56_Skill skill_ids = 1;
+}
+
+message BuffData_62 {
+  repeated int32 skills = 1;
+  int32 old_stack = 2;
+}
+
+message BuffData_63 {
+  repeated int32 skill_ids = 1;
+  int32 add = 2;
+}
+
+message BuffData_72_PetBuff {
+  int32 pet_id = 1;
+  int32 buff_id = 2;
+  int32 stack = 3;
+}
+
+message BuffData_72 {
+  repeated Next.BuffData_72_PetBuff data = 1;
+}
+
+message BuffData_77 {
+  repeated int32 skill_ids = 1;
+  int32 add = 2;
+}
+
+message BuffData_81 {
+  int32 hp_mod = 1;
+  int32 en_mod = 2;
+}
+
+message BuffData_89_Buff {
+  int32 buff_id = 1;
+  int32 stack = 2;
+}
+
+message BuffData_89 {
+  repeated Next.BuffData_89_Buff data = 1;
+}
+
+message BuffData_90_Convert {
+  int32 src = 1;
+  int32 stack = 2;
+  int32 dst = 3;
+}
+
+message BuffData_90_Raw {
+  int32 dst = 1;
+  int32 stack = 2;
+}
+
+message BuffData_90 {
+  repeated Next.BuffData_90_Convert convert = 1;
+  repeated Next.BuffData_90_Raw raw = 2;
+}
+
+message BuffData_91 {
+  uint32 sum_stacks = 1;
+  uint32 skill_id = 2;
+}
+
+message BuffData_92 {
+  bool aura_on = 1;
+}
+
+message BuffData_93_Skill_Energy {
+  int32 skill_id = 1;
+  int32 val = 2;
+}
+
+message BuffData_93 {
+  repeated Next.BuffData_93_Skill_Energy energy_info = 1;
+  bool is_triggered = 2;
+}
+
+message BuffData_93_Skill {
+  int32 buffbase_id = 1;
+  int32 val = 2;
+  int32 side = 3;
+  uint32 role_uin = 4;
+}
+
+message BuffData_93_Common {
+  repeated Next.BuffData_93_Skill data = 1;
+  repeated Next.BuffData_93_Skill skill_data = 2;
+  repeated int32 triggered_buff = 3;
+}
+
+message BuffData_95 {
+  repeated uint32 triggered_skills = 1;
+  int32 trigger_times = 2;
+}
+
+message BuffData_102 {
+  repeated uint32 old_base_ids = 1;
+}
+
+message BuffData_103 {
+  repeated uint32 skill_ids = 1;
+  int32 add = 2;
+}
+
+message BuffData_113_Common {
+  int32 pet_id = 1;
+  int32 buff_id = 2;
+  int32 time_cnt = 3;
+}
+
+message BuffData_113 {
+  repeated Next.BuffData_113_Common pet_info = 1;
+}
+
+message BuffData_119_Common {
+  repeated uint32 used_skill = 1;
+}
+
+message BuffData_121_Common {
+  int32 type = 1;
+  int32 value_inc = 2;
+  int32 value_dec = 3;
+  int32 time_value_inc = 4;
+  int32 time_value_dec = 5;
+  int32 last_round_value = 6;
+}
+
+message BuffData_121 {
+  repeated Next.BuffData_121_Common data = 1;
+}
+
+message BuffData_125 {
+  int32 change_hp = 1;
+  uint32 change_energy = 2;
+}
+
+message BuffData_126_Common {
+  uint32 buff_id = 1;
+  int32 stack = 2;
+}
+
+message BuffData_126 {
+  repeated Next.BuffData_126_Common data = 1;
+}
+
+message BuffData_96 {
+  uint32 original_height = 1;
+}
+
+message BuffData_132_data {
+  int32 round = 1;
+  int32 buff_id = 2;
+  repeated int32 types = 3;
+  int32 pet = 4;
+}
+
+message BuffData_132_Common {
+  repeated Next.BuffData_132_data data = 1;
+}
+
+message Buff_102 {
+  uint32 pet_id = 1;
+  repeated uint32 old_base_ids = 2;
+}
+
+message BuffData_102_Common {
+  repeated Next.Buff_102 pets_info = 1;
+}
+
+message TargetSkill_Info {
+  uint32 target_pet_id = 1;
+  uint32 target_skill_id = 2;
+  bool is_special = 3;
+}
+
+message BuffData_6_Common {
+  repeated Next.TargetSkill_Info target_skills = 1;
+}
+
+message BuffData_6 {
+  repeated Next.TargetSkill_Info target_skills = 1;
+}
+
+message BuffData_134 {
+  uint32 round_damage = 1;
+  int32 round = 2;
+}
+
+message BuffData_64_Skill {
+  repeated uint32 skill_id = 1;
+  int32 val = 2;
+}
+
+message BuffData_64 {
+  repeated Next.BuffData_64_Skill data = 1;
+}
+
+message BuffbaseRunningData {
+  uint32 idx = 1;
+  Next.BuffData_6 b6 = 27;
+  Next.BuffData_32 b32 = 2;
+  Next.BuffData_52 b52 = 12;
+  Next.BuffData_55 b55 = 23;
+  Next.BuffData_56 b56 = 19;
+  Next.BuffData_62 b62 = 11;
+  Next.BuffData_63 b63 = 24;
+  Next.BuffData_64 b64 = 26;
+  Next.BuffData_72 b72 = 3;
+  Next.BuffData_77 b77 = 4;
+  Next.BuffData_81 b81 = 5;
+  Next.BuffData_89 b89 = 6;
+  Next.BuffData_90 b90 = 7;
+  Next.BuffData_91 b91 = 14;
+  Next.BuffData_92 b92 = 13;
+  Next.BuffData_93 b93 = 21;
+  Next.BuffData_95 b95 = 9;
+  Next.BuffData_96 b96 = 22;
+  Next.BuffData_102 b102 = 20;
+  Next.BuffData_103 b103 = 10;
+  Next.BuffData_113 b113 = 15;
+  Next.BuffData_121 b121 = 16;
+  Next.BuffData_125 b125 = 17;
+  Next.BuffData_126 b126 = 18;
+  Next.BuffData_134 b134 = 25;
+}
+
+message BuffRunningData {
+  repeated Next.BuffbaseRunningData data = 1;
+}
+
+message CommonBuffData {
+  Next.BuffData_6_Common b6 = 4;
+  Next.BuffData_93_Common b93 = 1;
+  Next.BuffData_119_Common b119 = 2;
+  Next.BuffData_132_Common b132 = 3;
+  Next.BuffData_102_Common b102 = 5;
+}

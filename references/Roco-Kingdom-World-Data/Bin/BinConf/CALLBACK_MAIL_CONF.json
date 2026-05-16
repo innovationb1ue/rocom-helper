@@ -1,0 +1,25 @@
+{
+    "Name": "CALLBACK_MAIL_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "mail_id",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "callback_param_1",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

@@ -1,0 +1,123 @@
+{
+    "Name": "NPC_COMB_OPTION_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "map_ID",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "comb_is_unused",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "result_id",
+            "Type": "EUint32",
+            "Offset": 13,
+            "Size": 4
+        },
+        {
+            "Name": "npc_comb_type",
+            "Type": "EInt32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "option",
+            "Type": "EStruct",
+            "Offset": 21,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 20,
+            "Struct": {
+                "Name": "NPC_COMB_OPTION_CONF.option",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "option_cond_npc",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "option_cond_type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "con_param",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "Is_Keep",
+            "Type": "EBool",
+            "Offset": 25,
+            "Size": 1
+        },
+        {
+            "Name": "result_times",
+            "Type": "EInt32",
+            "Offset": 26,
+            "Size": 4
+        },
+        {
+            "Name": "cond_reset_type",
+            "Type": "EInt32",
+            "Offset": 30,
+            "Size": 4
+        },
+        {
+            "Name": "total_time",
+            "Type": "EInt32",
+            "Offset": 34,
+            "Size": 4
+        },
+        {
+            "Name": "version",
+            "Type": "EInt32",
+            "Offset": 38,
+            "Size": 4
+        },
+        {
+            "Name": "comb_update_type",
+            "Type": "EInt32",
+            "Offset": 42,
+            "Size": 4
+        },
+        {
+            "Name": "fail_tips",
+            "Type": "EString",
+            "Offset": 46,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

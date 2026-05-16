@@ -1,0 +1,70 @@
+{
+    "Name": "NRC_GROUP_AI_BASIC_INFO_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "event_array",
+            "Type": "EStruct",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 240,
+            "Struct": {
+                "Name": "NRC_GROUP_AI_BASIC_INFO_CONF.event_array",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "event_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "abort_type",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "group_behavior_id",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "group_station_id",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "auto_destroy",
+                        "Type": "EBool",
+                        "Offset": 16,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "lock_fsm",
+                        "Type": "EBool",
+                        "Offset": 17,
+                        "Size": 1
+                    }
+                ]
+            }
+        }
+    ]
+}

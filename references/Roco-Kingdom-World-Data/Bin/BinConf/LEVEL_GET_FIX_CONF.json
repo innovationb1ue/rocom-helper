@@ -1,0 +1,25 @@
+{
+    "Name": "LEVEL_GET_FIX_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "level_diff",
+            "Type": "EInt32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "level_grade_fix",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        }
+    ]
+}

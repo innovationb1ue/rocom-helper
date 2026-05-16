@@ -1,0 +1,139 @@
+{
+    "Name": "WEEKEND_CHALLENGE_GROUP_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "group_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "portrait",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "playername",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "level",
+            "Type": "EUint32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "mode",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "teamcode",
+            "Type": "EString",
+            "Offset": 24,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "magicid",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "team_type",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "pet_message",
+            "Type": "EStruct",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 6,
+            "Struct": {
+                "Name": "WEEKEND_CHALLENGE_GROUP_CONF.pet_message",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "petbase_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "bloodline",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "character",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "talent_a",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "talent_b",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "talent_c",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "skill_a",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "skill_b",
+                        "Type": "EUint32",
+                        "Offset": 28,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "skill_c",
+                        "Type": "EUint32",
+                        "Offset": 32,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "skill_d",
+                        "Type": "EUint32",
+                        "Offset": 36,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

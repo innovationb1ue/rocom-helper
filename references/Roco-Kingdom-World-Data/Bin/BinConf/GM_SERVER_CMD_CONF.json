@@ -1,0 +1,96 @@
+{
+    "Name": "GM_SERVER_CMD_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "cmd_id",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cmd_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cmd_desc",
+            "Type": "EString",
+            "Offset": 12,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "cmd_belong",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "param_list",
+            "Type": "EStruct",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 11,
+            "Struct": {
+                "Name": "GM_SERVER_CMD_CONF.param_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "param_key",
+                        "Type": "EString",
+                        "Offset": 0,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param_require",
+                        "Type": "EBool",
+                        "Offset": 4,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "param_type",
+                        "Type": "EInt32",
+                        "Offset": 5,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "param_name",
+                        "Type": "EString",
+                        "Offset": 9,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param_desc",
+                        "Type": "EString",
+                        "Offset": 13,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "param_option",
+                        "Type": "EString",
+                        "Offset": 17,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    }
+                ]
+            }
+        }
+    ]
+}

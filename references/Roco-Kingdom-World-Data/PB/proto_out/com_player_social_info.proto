@@ -1,0 +1,91 @@
+package Next;
+
+import "com_base_types.proto";
+import "xls_enum.proto";
+import "com_player_data.proto";
+
+message PlayerSocialAccountInfo {
+  string openid = 1;
+  uint32 register_time = 2;
+  uint32 uin = 3;
+}
+
+message PlayerSocialBaseInfo {
+  string name = 1;
+  uint32 sex = 2;
+  uint32 level = 3;
+  uint32 world_level = 4;
+  uint32 bp_gift_grade = 5;
+}
+
+message PlayerSocialOnlineInfo {
+  int32 online_state = 1;
+  uint32 logout_time = 2;
+}
+
+message PlayerSocialCardInfo {
+  bytes signature = 11;
+  uint32 card_skin_selected = 14;
+  uint32 card_icon_selected = 17;
+  uint32 card_label_first_selected = 18;
+  uint32 card_label_last_selected = 19;
+  uint32 card_handbook_collect_num = 20;
+  uint32 card_music_id = 21;
+  string card_bussiness_card_url = 28;
+}
+
+message PlayerSocialHomeInfo {
+  bytes home_name = 1;
+  uint32 home_experience = 2;
+  uint32 home_level = 3;
+  uint32 room_level = 4;
+  uint32 home_comfort_level = 5;
+  Next.RoomExpansionInfo room_expansion_info = 10;
+}
+
+message PlayerSocialBattleInfo {
+  int32 battle_state = 2;
+  uint32 battle_conf_id = 1;
+}
+
+message PlayerSocialAdditionalInfo {
+  uint32 cli_login_channel = 1;
+  Next.PlayerStartUpPrivilegeInfo start_up_privilege_info = 2;
+  Next.PlayerSettingBriefInfo setting_brief_info = 3;
+  Next.PlayerDeletionInfo deletion_info = 4;
+}
+
+message ZonePlayerSocialInfo {
+  Next.PlayerSocialAccountInfo account_info = 1;
+  Next.PlayerSocialBaseInfo base_info = 2;
+  Next.PlayerSocialOnlineInfo online_info = 3;
+  Next.PlayerSocialCardInfo card_info = 31;
+  Next.PlayerSocialHomeInfo home_info = 32;
+  Next.PlayerSocialBattleInfo battle_info = 33;
+  Next.PlayerSocialAdditionalInfo additional_info = 34;
+}
+
+message AvatarSocialPositionInfo {
+  Next.FriendPositionDisplayType display_type = 1;
+  int32 scene_res_cfg_id = 2;
+  int32 camp_id = 3;
+}
+
+message AvatarSocialVisitInfo {
+  int32 visitor_num = 1;
+}
+
+message AvatarSocialAdditionalInfo {
+}
+
+message AvatarSocialInfo {
+  Next.AvatarSocialPositionInfo pos_info = 1;
+  Next.AvatarSocialVisitInfo visit_info = 2;
+  Next.AvatarSocialAdditionalInfo additional_info = 3;
+}
+
+message PlayerSocialInfo {
+  Next.ZonePlayerSocialInfo player_social = 1;
+  Next.AvatarSocialInfo avatar_social = 2;
+  uint32 last_update_time = 3;
+}

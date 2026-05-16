@@ -1,0 +1,100 @@
+{
+	"Desc": "特殊机位",
+	"TargetA": 7,
+	"TargetB": 8,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -16,
+		"Z": 0
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": 0
+	},
+	"SprintArmLength": 520,
+	"CameraFov": 90,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CurvesArray": [
+		{
+			"IsEnable": false,
+			"TargetCameraId": 5,
+			"Duration": 1,
+			"CameraName": "换宠机位",
+			"CurveId": 0
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 1,
+			"Duration": 0.29999999999999999,
+			"CameraName": "捕捉机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 2,
+			"Duration": 0.29999999999999999,
+			"CameraName": "逃跑机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 3,
+			"Duration": 0.29999999999999999,
+			"CameraName": "道具对友机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 5,
+			"Duration": 0.29999999999999999,
+			"CameraName": "换宠机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": false,
+			"TargetCameraId": 5,
+			"Duration": 1,
+			"CameraName": "换宠机位",
+			"CurveId": 0
+		}
+	],
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 100
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 0,
+				"Y": -10
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 50
+			},
+			"Desc": ""
+		}
+	]
+}

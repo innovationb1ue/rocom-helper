@@ -1,0 +1,659 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_pet_skill.proto";
+import "com_monster.proto";
+import "xls_enum.proto";
+import "rpc_options.proto";
+
+enum PetEvolutionState {
+  EM_EVOLUTION_ADDED = 0;
+  EM_EVOLUTION_SUBMIT_MATERIAL = 1;
+  EM_EVOLUTION_FINISH = 2;
+}
+
+enum PetNatureAttrChangeWay {
+  EM_PET_NATURE_ATTR_CHANGE_WAY_BEGIN = 0;
+  EM_PET_NATURE_ATTR_CHANGE_WAY_ITEM = 0;
+  EM_PET_NATURE_ATTR_CHANGE_WAY_PET_PARTNER = 1;
+}
+
+enum PetDataBitFlag {
+  PDBF_ADD_BY_AI_PVE = 1;
+  PDBF_PET_BLOOD_HAS_BEEN_MODIFIED = 2;
+  PDBF_PET_HAS_BEEN_GROWTH = 4;
+  PDBF_PET_HAS_LEARNED_SKILLBOOK = 8;
+  PDBF_PET_TALENT_HAS_BEEN_MODIFIED = 16;
+  PDBF_PET_NATURE_EFFECT_HAS_BEEN_MODIFIED = 32;
+  PDBF_PET_TALENT_HAS_BEEN_IMPROVED = 64;
+  PDBF_PET_HAS_BEEN_GIFT_BAN_EVOLUTION = 128;
+  PDBF_PET_HAS_BATTLE_EVOLUTION = 256;
+}
+
+enum PetBusinessIdentity {
+  PBI_NONE = 0;
+  PBI_HOME_PET = 1;
+  PBI_HOME_GUARD = 2;
+}
+
+enum PetStatusFlag {
+  THROW_IN_SCENE = 1;
+  MIRACLE_CHANGING = 2;
+  NEW_IN_BAG = 4;
+  MONSTER_PET = 8;
+  CAN_MODIFY_PET_NAME = 16;
+  TASK_FORCE_LOCK = 32;
+  TASK_TOGETHER_MARKING = 64;
+  TASK_TOGETHER_IN_PROGRESS = 128;
+}
+
+message PetAttributeData {
+  uint32 total_race = 1;
+  uint32 talent = 2;
+  uint32 base_value = 3;
+  uint32 effort_exp = 4;
+  uint32 effort_lv = 5;
+  uint32 effort_add = 6;
+  int32 talent_add_value = 7;
+}
+
+message PetAttributeInfo {
+  Next.PetAttributeData hp = 1;
+  Next.PetAttributeData attack = 2;
+  Next.PetAttributeData special_attack = 3;
+  Next.PetAttributeData defense = 4;
+  Next.PetAttributeData special_defense = 5;
+  Next.PetAttributeData speed = 6;
+  repeated uint32 break_enhance_enum = 8;
+}
+
+message PetAbilityData {
+  uint32 id = 1;
+  uint32 vitality = 2;
+  uint32 last_rest_time = 3;
+}
+
+message PetAbilityInfo {
+  repeated Next.PetAbilityData ability_data = 1;
+}
+
+message BattleAIInitInfo {
+  uint32 tod = 1;
+  uint32 sleeping = 2;
+  uint32 new_skill = 3;
+  uint32 predict_type = 4;
+  uint32 night_habit = 5;
+  uint64 ai_status = 6;
+  uint32 pre_act_tag = 8;
+  uint32 pre_act_param = 9;
+}
+
+message Possession {
+  uint32 conf_id = 1;
+  uint32 level = 2;
+  uint32 stage = 3;
+}
+
+message PossessionInfo {
+  uint32 slot_size = 1;
+  repeated Next.Possession item = 2;
+  bool auto_supply = 3;
+}
+
+message PetStatistics {
+  uint32 follow_sec = 1;
+  uint32 ride_sec = 2;
+  repeated uint32 beat_type_cnt = 3;
+  uint32 collect_item_cnt = 4;
+  uint32 beat_pet_cnt = 5;
+}
+
+message PetEvoluteInfo {
+  uint32 evolute_time = 1;
+  uint32 before_base_conf_id = 2;
+  uint32 after_base_conf_id = 3;
+}
+
+message PvpFirstWinInfo {
+  uint32 win_time = 1;
+  bytes enemy_name = 2;
+  bytes last_killed_pet_name = 3;
+}
+
+message LegendFirstWinAloneInfo {
+  uint32 win_time = 1;
+  uint32 battle_conf_id = 2;
+}
+
+message BlessingInfo {
+  string from_player_name = 1;
+  string from_pet_name = 2;
+}
+
+message ObtainShinyFashionInfo {
+  uint32 obtain_time = 1;
+  uint32 pet_base_id = 2;
+}
+
+message PetKeyExperience {
+  repeated Next.PetEvoluteInfo evolute_info = 1;
+  Next.PvpFirstWinInfo pvp_first_win_info = 2;
+  Next.LegendFirstWinAloneInfo legend_first_win_alone_info = 3;
+  Next.BlessingInfo blessing_info = 4;
+  Next.ObtainShinyFashionInfo obtain_shiny_fashion_info = 5;
+  repeated uint32 text_desc = 6;
+}
+
+message PetAdditionalNewAttrInfo {
+  int32 addi_attr = 1;
+  int32 type = 2;
+}
+
+message PetAdditionalNewAttrList {
+  repeated Next.PetAdditionalNewAttrInfo addi_attr_data = 1;
+}
+
+message PetClosenessHistoryInfo {
+  int32 closeness_lv = 1;
+  uint64 lv_timestamp = 2;
+}
+
+message PetClosenessInfo {
+  int32 closeness_exp = 1;
+  int32 closeness_lv = 2;
+  repeated Next.PetClosenessHistoryInfo history_info_list = 3;
+}
+
+message DefeatInfo {
+  uint32 pet_base_id = 1;
+  int32 defeat_times = 2;
+}
+
+message InteractInfo {
+  uint32 npc_conf_id = 1;
+  int32 interact_times = 2;
+}
+
+message PetEvolutionNeedInfo {
+  repeated Next.DefeatInfo defeat_info = 1;
+  repeated Next.InteractInfo interact_info = 2;
+  int32 battle_star_light_value = 3;
+}
+
+message PetCheerPointInfo {
+  uint32 catch_way = 1;
+  uint32 mutation_type = 2;
+  uint32 pet_type = 3;
+  uint32 cheer_point = 4;
+}
+
+message PetSceneInfo {
+  uint64 npc_id = 1;
+  int32 interact_quantity = 2;
+  int32 interact_quantity_threshold = 3;
+  bool can_trig_bond_name = 4;
+  bool can_trig_bond_none = 5;
+  int32 interact_count = 6;
+}
+
+message PetData {
+  uint32 gid = 1;
+  uint32 conf_id = 2;
+  bytes name = 3;
+  uint32 info_id = 4;
+  dataconfig.PetNameSource name_src = 5;
+  repeated dataconfig.SkillDamType skill_dam_type = 6;
+  uint32 nature = 7;
+  uint32 gender = 8;
+  uint32 exp = 9;
+  uint32 level = 10;
+  uint32 ball_id = 11;
+  Next.PetSkillInfo skill = 12;
+  Next.PetAbilityInfo ability = 13;
+  Next.PetAttributeInfo attribute_info = 14;
+  Next.PetAdditionalNewAttrList attribute_new_info = 75;
+  uint32 base_conf_id = 15;
+  bool unlocked_ultimate_skill = 17;
+  uint32 evolution_chosen_idx = 19;
+  Next.PetEvolutionState evolution_stage = 20;
+  uint32 seed = 22;
+  Next.BattleAIInitInfo ai_info = 23;
+  int32 pet_status_flags = 24;
+  uint32 success_catch_cnt = 25;
+  uint32 height = 26;
+  uint32 weight = 27;
+  uint32 classis = 28;
+  uint32 last_breakthrough_lv = 30;
+  Next.PossessionInfo possession = 31;
+  uint32 add_time = 32;
+  uint32 energy = 33;
+  uint32 handbook_threshold = 35;
+  repeated uint32 synchron_num = 37;
+  bool is_first_catch = 39;
+  int32 catch_status = 40;
+  uint32 catch_lv = 41;
+  uint32 catch_base_id = 42;
+  uint32 mutation_type = 45;
+  uint32 catch_ai_status = 46;
+  uint32 blood_id = 47;
+  Next.CheerMonsterInitInfo cheer_info = 48;
+  uint32 habit_group_id = 49;
+  uint32 habit_level = 50;
+  Next.PetStatistics stat = 51;
+  uint32 ride_start_time = 52;
+  uint32 hb_prob_add = 54;
+  uint32 talent_rank = 55;
+  uint32 changed_nature_pos_attr_type = 56;
+  uint32 changed_nature_neg_attr_type = 57;
+  uint32 caught_camp = 58;
+  Next.PetSkillInfo all_skill = 59;
+  uint32 attr_version = 60;
+  uint32 skill_version = 61;
+  uint32 rand_evolu_id = 62;
+  uint32 speciality_version = 63;
+  uint32 raw_level = 65;
+  uint32 grow_times = 66;
+  int32 catch_way = 67;
+  bytes catch_visit_owner_name = 68;
+  bytes nature_desc = 69;
+  Next.PetKeyExperience key_experience = 70;
+  uint32 nightmare_elite_id = 72;
+  uint32 wear_medal_conf_id = 73;
+  uint32 medal_complete_cnt = 74;
+  Next.PetClosenessInfo closeness_info = 77;
+  dataconfig.PetPartnerMarkType partner_mark = 78;
+  Next.PetEvolutionNeedInfo evlution_need_info = 79;
+  repeated uint32 custom_medal_conf_id = 80;
+  bool is_trial_pet = 81;
+  uint32 speciality_id = 82;
+  repeated uint32 real_speciality_ids = 83;
+  bool is_in_badgechallenge = 84;
+  Next.GlassInfo glass_info = 86;
+  repeated Next.PetCheerPointInfo cheer_point_info = 87;
+  uint32 bitflag = 88;
+  int32 business_identity = 89;
+  Next.TogetherCatchInfo together_catch_info = 90;
+  repeated uint32 free_medal_conf_ids = 91;
+  Next.PetTypeInfo type = 92;
+  int32 voice = 93;
+  Next.ActivityPartnerPetData activity_partner_pet_data = 94;
+  Next.PetNatureAttrChangeWay nature_attr_change_way = 95;
+  uint32 inspire_lv = 96;
+  uint32 nature_desc_id = 97;
+  bool hide_shine = 98;
+  int32 patch_version = 99;
+  Next.PetSceneInfo scene_info = 100;
+}
+
+message ActivityPartnerPetData {
+  bytes name = 1;
+  uint32 add_time = 2;
+  uint32 catch_lv = 3;
+  uint32 caught_camp = 4;
+  int32 catch_way = 5;
+  bytes catch_visit_owner_name = 6;
+  bytes nature_desc = 7;
+  Next.PetKeyExperience key_experience = 8;
+  Next.PetClosenessInfo closeness_info = 9;
+  Next.TogetherCatchInfo together_catch_info = 10;
+  uint32 pet_base_id = 11;
+  uint32 height = 12;
+  uint32 weight = 13;
+}
+
+message TrialPetBrief {
+  int32 library_id = 1;
+  int32 refresh_time = 2;
+  repeated dataconfig.SkillDamType unit_type = 3;
+  int32 version = 4;
+}
+
+message TrialPet {
+  Next.TrialPetBrief brief = 1;
+  repeated Next.PetData pets = 2;
+}
+
+message PetTypeInfo {
+  enum ENUM {
+    PET_TYPE_NORMAL = 0;
+    PET_TYPE_TRIAL = 1;
+    PET_TYPE_MIRROR = 2;
+    PET_TYPE_RANDOM = 3;
+    PET_TYPE_RANDOM_FIGHT = 4;
+  }
+  Next.PetTypeInfo.ENUM type = 1;
+  int32 param = 2;
+}
+
+message PetSpecialityCondCheck {
+  uint32 speciality_id = 1;
+  int32 pet_gid = 2;
+  bool no_scene = 3;
+  bool can_do = 4;
+}
+
+message PetUseInfo {
+  uint32 pet_base_cfg_id = 1;
+  uint32 use_times = 2;
+}
+
+message PetUseRate {
+  uint32 pet_base_cfg_id = 1;
+  uint32 use_rate = 2;
+}
+
+message EnvEnergyInfo {
+  uint32 source_type = 1;
+  uint32 env_type = 2;
+  uint32 env_layer = 3;
+  int32 src_id = 4;
+  int32 tod_time = 5;
+  int32 expire_round = 6;
+}
+
+message PetEnvEnergyInfo {
+  uint32 pet_id = 1;
+  repeated Next.EnvEnergyInfo env_info = 2;
+}
+
+message PetHpInfo {
+  uint32 pet_gid = 1;
+  uint32 pet_curr_hp = 2;
+  uint32 pet_max_hp = 3;
+}
+
+message TogetherCatchInfo {
+  bool is_catch_together = 1;
+  bool is_onwer_catch = 2;
+  uint32 related_uin = 3;
+  bytes related_name = 4;
+  uint32 catch_time = 5;
+  uint32 transfer_deadline = 6;
+  uint32 catched_uin = 7;
+  bytes catched_name = 8;
+  repeated uint32 carried_medals = 9;
+  uint32 worn_non_auto_medal = 10;
+}
+
+message PetSpecialExData {
+  uint32 add_time = 32;
+  uint32 catch_lv = 41;
+  uint32 caught_camp = 58;
+  int32 catch_way = 67;
+  bytes catch_visit_owner_name = 68;
+  bytes nature_desc = 69;
+  Next.PetKeyExperience key_experience = 70;
+  Next.PetClosenessInfo closeness_info = 77;
+  Next.TogetherCatchInfo together_catch_info = 90;
+}
+
+message PetBriefInfo {
+  uint32 gid = 1;
+  uint32 conf_id = 2;
+  bytes name = 3;
+  uint32 info_id = 4;
+  dataconfig.PetNameSource name_src = 5;
+  repeated dataconfig.SkillDamType skill_dam_type = 6;
+  uint32 nature = 7;
+  uint32 gender = 8;
+  uint32 exp = 9;
+  uint32 level = 10;
+  Next.PetSkillInfo skill = 12;
+  Next.PetAttributeInfo attribute_info = 14;
+  uint32 base_conf_id = 15;
+  uint32 height = 26;
+  uint32 weight = 27;
+  uint32 last_breakthrough_lv = 30;
+  bool is_first_catch = 39;
+  uint32 mutation_type = 45;
+  uint32 blood_id = 47;
+  uint32 talent_rank = 55;
+  uint32 caught_camp = 58;
+  uint32 attr_version = 60;
+  uint32 skill_version = 61;
+  uint32 speciality_version = 63;
+  uint32 grow_times = 66;
+  uint32 wear_medal_conf_id = 73;
+  Next.PetAdditionalNewAttrList attribute_new_info = 75;
+  dataconfig.PetPartnerMarkType partner_mark = 78;
+  repeated uint32 custom_medal_conf_id = 80;
+  uint32 speciality_id = 82;
+  repeated uint32 real_speciality_ids = 83;
+  Next.GlassInfo glass_info = 86;
+  Next.TogetherCatchInfo together_catch_info = 90;
+  uint32 inspire_lv = 96;
+  int32 patch_version = 99;
+}
+
+message PetBacktrack {
+  uint64 last_backtrack_time = 1;
+  Next.PetBriefInfo snap_shot = 2;
+  repeated Next.PetUsedItems used_items = 3;
+  uint32 exp_from_item = 4;
+  uint32 pet_gid = 5;
+  uint32 last_breakthrough_lv = 6;
+  uint32 grow_times = 7;
+  uint32 inspire_lv = 8;
+  bool snapshot_write_db = 9;
+}
+
+message PetUsedItems {
+  uint32 id = 1;
+  uint32 used_num = 2;
+}
+
+message PetTravelInfo {
+  uint32 camp_content_id = 1;
+  uint32 camp_lv = 2;
+  repeated uint32 pet_gid = 3;
+  uint32 start_travel_sec = 4;
+  uint32 advance_num = 5;
+  bool travel_complete = 6;
+  bool will_lay_egg = 7;
+  repeated Next.PetBriefInfo pet_briefs = 8;
+  repeated int32 reward_w_pre = 9;
+}
+
+message MutationCount {
+  uint32 mutation = 1;
+  uint32 cnt = 2;
+}
+
+message PetStatisticsInfo_PetStatisticsData {
+  uint32 pet_base_id = 1;
+  uint32 battle_count = 2;
+  uint32 collect_count = 3;
+  uint32 follow_duration = 4;
+  uint64 collected_gender_bit = 5;
+  uint64 collected_nature_bit = 6;
+  uint64 collected_blood_bit = 7;
+  uint32 perfect_talent_count = 8;
+  uint32 collected_naturebuff_bit = 9;
+  repeated uint32 complete_progress_gid = 10;
+  repeated Next.MutationCount mutation_count = 11;
+}
+
+message PetStatisticsInfo {
+  repeated Next.PetStatisticsInfo_PetStatisticsData pet_statistics_data = 1;
+}
+
+message PetDataInfoList {
+  repeated Next.PetData pet_data = 1;
+}
+
+message DeletedPetInfo {
+  uint32 delete_time = 1;
+  Next.PetData pet_data = 2;
+}
+
+message DeletedPetList {
+  repeated Next.DeletedPetInfo delete_pets = 1;
+  uint32 min_delete_time = 2;
+}
+
+message PetSpecialData {
+  uint32 pet_conf_id = 1;
+  uint32 monster_conf_id = 2;
+  string pet_name = 3;
+  uint32 blood_id = 4;
+  uint32 nature_id = 5;
+  uint32 gender = 6;
+  uint32 height = 7;
+  uint32 weight = 8;
+  uint32 mutation_type = 9;
+  uint32 hp_talent = 10;
+  uint32 phy_attack_talent = 11;
+  uint32 spe_attack_talent = 12;
+  uint32 phy_defense_talent = 13;
+  uint32 spe_defense_talent = 14;
+  uint32 speed_talent = 15;
+  uint32 ball_id = 16;
+  uint32 glass_type = 17;
+  uint32 glass_value = 18;
+  uint32 speciality_id = 19;
+  repeated uint32 medal_conf_ids = 20;
+  repeated Next.PetSkillData skill_data = 21;
+  uint32 base_id = 22;
+  int32 voice = 23;
+  dataconfig.PetNameSource pet_name_src = 24;
+}
+
+message ReportInfo {
+  int32 id = 1;
+  dataconfig.ReportCoinRatio rcr = 2;
+  int32 rcr_param = 3;
+  int32 ratio = 4;
+}
+
+message PetReportInfo {
+  Next.PetBriefInfo pet_brief = 1;
+  repeated Next.ReportInfo report_infos = 2;
+  int64 final_ratio = 3;
+  int64 base_coin = 4;
+  int64 total_coin = 5;
+}
+
+message PetHabitGroup {
+  uint32 group_id = 1;
+  uint32 habit_level = 2;
+  repeated uint32 pet_gid = 3;
+}
+
+message PetHabitInfo {
+  repeated Next.PetHabitGroup habit_group = 1;
+  repeated int32 pet_team_habit_idx = 2;
+}
+
+message PetAdditionalAttrInfo {
+  repeated int32 addi_attr = 1;
+  repeated int32 addi_attr_base = 2;
+}
+
+message PetCatchInfo {
+  uint32 pet_base_id = 1;
+  uint32 success_count = 2;
+  uint32 fail_count = 3;
+  uint32 catch_probability = 4;
+  uint32 threshold_add = 5;
+}
+
+message PetBoxPetChange {
+  uint32 pet_gid = 1;
+  bool is_in_team = 2;
+  int32 id = 3;
+  int32 pos = 4;
+}
+
+message PetBox {
+  int32 box_id = 1;
+  dataconfig.WarehouseMarkType mark_type = 2;
+  repeated uint32 pet_gid = 3;
+  int32 vacancy_num = 4;
+  bytes box_name = 5;
+}
+
+message PetBackpackInfo {
+  repeated uint32 egg_gid = 1;
+  repeated Next.PetBox boxes = 3;
+  int32 last_open_box_id = 4;
+  int64 mark_unlock_info = 5;
+}
+
+message BallInfo {
+  uint32 id = 1;
+  bytes name = 2;
+  uint32 ball_prob = 5;
+  uint32 history_sup_prob = 6;
+  uint32 hp_sup_prob = 7;
+  uint32 pp_sup_prob = 8;
+  uint32 happy_sup_prob = 9;
+}
+
+message CatchRateInfo {
+  uint32 monster_id = 1;
+  uint32 ball_id = 2;
+  uint32 rate = 3;
+}
+
+message ZoneCatchResult {
+  bool is_catched = 1;
+  int32 probability = 2;
+  bool is_tech_satisfied = 3;
+  bool is_detected = 4;
+  Next.GlassInfo glass_info = 5;
+}
+
+message PetSkillUseInfo {
+  uint32 skill_id = 1;
+  uint32 use_times = 2;
+}
+
+message RankSeasonPetUseInfo {
+  uint32 pet_base_cfg_id = 1;
+  uint32 use_times = 2;
+  repeated Next.PetSkillUseInfo pet_skill_use_info = 3;
+}
+
+message PlayerPetMonitorInfo {
+  Next.PlayerPetMonitorDailyInfo daily_info = 1;
+}
+
+message PlayerPetMonitorDailyInfo {
+  int32 obtain_shiny_cnt = 1;
+  int32 obtain_glass_cnt = 2;
+  int32 obtain_shiny_glass_cnt = 3;
+}
+
+message PetTaskInfo {
+  repeated Next.PetTogetherTaskInfo together_task = 1;
+}
+
+message PetTogetherTaskInfo {
+  uint32 gid = 1;
+  uint32 task_id = 2;
+  bool is_in_task_area = 3;
+}
+
+message SceneBasePetData {
+  int32 gid = 1;
+  int32 nature = 2;
+  int32 height = 3;
+  int32 weight = 4;
+  int32 level = 5;
+  int32 mutation_type = 6;
+  bytes name = 7;
+  int32 base_conf_id = 8;
+  int32 blood_type = 9;
+  uint32 talent_rank = 10;
+  uint32 medal_conf_id = 11;
+  uint32 medal_fx_level = 12;
+  uint32 speciality_id = 14;
+  repeated uint32 real_speciality_ids = 16;
+  Next.GlassInfo glass_info = 17;
+  int32 closeness_lv = 18;
+  uint32 gender = 19;
+  int32 voice = 20;
+  int32 closeness_exp = 21;
+  Next.PetSceneInfo scene_info = 22;
+  dataconfig.PetNameSource name_src = 23;
+}

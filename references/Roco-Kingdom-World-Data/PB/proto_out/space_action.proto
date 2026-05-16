@@ -1,0 +1,1768 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_battle.proto";
+import "com_misc.proto";
+import "com_handbook.proto";
+import "com_activity.proto";
+import "com_appearance.proto";
+import "com_actor.proto";
+import "com_scene.proto";
+import "com_world_map.proto";
+import "com_home.proto";
+import "com_pet.proto";
+import "space_data.proto";
+import "xls_enum.proto";
+import "home_data.proto";
+
+enum SpaceAct_SetNpcPosReason {
+  SNPR_NONE = 0;
+  SNPR_TELEPORT = 1;
+  SNPR_WATER_RESET_POS = 2;
+  SNPR_NAV_RESET_POS = 3;
+  SNPR_CHANGE_DIR = 4;
+  SNPR_FURNITURE = 5;
+  SNPR_GM = 6;
+}
+
+enum VisualInfoChangeReason {
+  VICT_CONFIG = 1;
+  VICT_TASK_ACTION = 2;
+}
+
+message SpaceActionType {
+  enum ENUM {
+    ActorEnter = 1;
+    ActorLeave = 2;
+    ActorNum = 3;
+    ClientMove = 11;
+    ServerMove = 12;
+    InterruptServerMove = 13;
+    LookAt = 15;
+    TurnTo = 16;
+    CancelTurnTo = 17;
+    ServerFly = 18;
+    ServerAttach = 19;
+    CancelServerAttach = 20;
+    AddStoryFlags = 21;
+    RemoveStoryFlags = 22;
+    NpcOptionInfoChange = 23;
+    NpcOptionAddSelects = 24;
+    NpcOptionRemoveSelects = 25;
+    NpcDialogSelectInfoChange = 26;
+    AddNpcOption = 27;
+    RemoveNpcOption = 28;
+    BeginActResultParamsNty = 29;
+    NpcCanbeTeleportNty = 30;
+    UpdateActorLogicStatus = 31;
+    CombineLockStateChange = 32;
+    TrackingNpc = 33;
+    VisiblePlayer = 34;
+    SyncPlayerStatus = 35;
+    PotentialEnergyChange = 36;
+    EnvMask = 37;
+    PropertyTypeChange = 38;
+    BornEnd = 39;
+    DieBegin = 40;
+    NpcDistribution = 207;
+    ChangeLoopAction = 226;
+    BeginDropItem = 41;
+    EndDropItem = 42;
+    AttrChange = 51;
+    EnteredCatcher = 61;
+    LeftCatcher = 62;
+    PlayAnimation = 71;
+    StopAnimation = 72;
+    AnimPauseOrResume = 73;
+    PlaySkill = 74;
+    StopSkill = 75;
+    WorldHidden = 76;
+    WorldUnHidden = 77;
+    PlayZoomAnimation = 78;
+    PlayAnimBeforeRemove = 80;
+    ShowPetFaceState = 81;
+    ModelDisplay = 82;
+    PlayPerceptionEffect = 83;
+    PlayPerceptionHud = 84;
+    NpcTrace = 85;
+    NpcPerceivePlayer = 86;
+    BattleOnOff = 91;
+    WorldAttack = 92;
+    StopWorldAttack = 93;
+    MfbtDebug = 101;
+    BattleAIStatusChanged = 102;
+    SceneAiControlFlagsChanged = 103;
+    ServerAIJump = 104;
+    CancelServerAIJump = 105;
+    StickTo = 106;
+    FinishStickTo = 107;
+    AITryInteractNpc = 108;
+    SwitchBossAINty = 109;
+    AIMoveMode = 110;
+    InformClientSwitchAI = 112;
+    ClientSwitchToServerAINty = 113;
+    CastSceneSkill = 111;
+    FriendRide = 121;
+    CollisionCancelRecover = 131;
+    ChangeSceneNotify = 141;
+    AuraInfoChange = 151;
+    BodyTempNotify = 161;
+    ThrowedPetInfoChange = 171;
+    DelThrowMagic = 172;
+    DeleteThrowNotify = 173;
+    AirWallChange = 182;
+    WeatherChange = 191;
+    GameTimeChange = 200;
+    MinigameNotify = 201;
+    GuideTask = 202;
+    NpcPendantInfoChange = 204;
+    UnlockSleepingOwl = 205;
+    OwlRefugeInfoChange = 206;
+    HeadLookAt = 208;
+    FashionChange = 209;
+    SalonChange = 210;
+    ClientOperation = 211;
+    BondFind = 212;
+    ScenePetInfoChange = 213;
+    DotsComponentSync = 214;
+    GameTimeSync = 215;
+    PetInteractResNty = 216;
+    CombineInteractInfoChange = 217;
+    BuffInfoChange = 218;
+    NameChange = 219;
+    RelatedNpcInfosChanged = 220;
+    WorldMapInfoChanged = 221;
+    SetNpcPos = 222;
+    PlayVoice = 223;
+    StopVoice = 224;
+    CombineGuideChange = 225;
+    CatchGuaranteeChange = 227;
+    PlayerMatch = 228;
+    NpcVisualInfoChange = 229;
+    BattleBuffInfoChanged = 230;
+    CardLabelChange = 231;
+    CardSkinChange = 232;
+    SameCellTeleport = 233;
+    FollowInfoChangedNty = 234;
+    CollectHandbookRecordsChange = 235;
+    PositionInvalid = 236;
+    TaskStateChangeNty = 237;
+    PlayRealtimeDialog = 238;
+    StopRealtimeDialog = 239;
+    CardMusicChange = 240;
+    MagicCreateNpcChange = 241;
+    VelocityOrientedRotation = 242;
+    WorldLaunchPlayer = 243;
+    AIPerformGroupIdChanged = 244;
+    OwlSanctuaryDetected = 245;
+    OwlSanctuaryFruitInfoUpdate = 246;
+    OptActionNtf = 247;
+    HomeBasicInfoChangeNotify = 248;
+    HomePlantChangeNotify = 249;
+    HomePlantPlantCrop = 250;
+    HomePlantRoleWater = 251;
+    HomePlantPetWater = 252;
+    HomePlantRoleManure = 253;
+    HomePlantPetManure = 254;
+    HomePlantOwnerPick = 255;
+    HomePlantVisitorPick = 256;
+    HomeBasicVisitorEnterHome = 257;
+    HomeBasicVisitorLeavingHome = 258;
+    ActorPlantDataUpdate = 259;
+    Stun = 260;
+    CardIconChange = 261;
+    VideoRecord = 262;
+    CatchRecordInfoChange = 263;
+    HabitatNeighborInfoChange = 264;
+    AllHabitatNeighborInfo = 265;
+    WorldCombatEnter = 300;
+    WorldCombatExit = 301;
+    WorldCombatSkillCast = 302;
+    WorldCombatSkillSpawnNpc = 303;
+    WorldCombatSkillSpawnBullet = 304;
+    WorldCombatSkillFireBullet = 305;
+    WorldCombatSkillBuff = 306;
+    WorldCombatSkillEnd = 307;
+    WorldCombatHit = 308;
+    WorldCombatTextPrompts = 309;
+    WorldCombatPhaseUpdate = 310;
+    WorldCombatBegin = 311;
+    WorldCombatFinish = 312;
+    WorldCombatSkillJump = 323;
+    WorldCombatSkillJumpEnd = 324;
+    WorldCombatSkillRcd = 325;
+    WorldCombatSkillPetCollision = 326;
+    WorldCombatDotsSkillCast = 330;
+    WorldCombatDotsSkillEnd = 331;
+    WorldCombatDotsSkillCrush = 332;
+    WorldCombatDotsSkillHit = 333;
+    WorldCombatDotsSkillRotate = 334;
+    WorldCombatDotsSkillLookAt = 335;
+    WorldCombatDotsSkillCrushEnd = 336;
+    WorldCombatDotsSkillMissileLaunch = 337;
+    WorldCombatDotsSkillMissileDestroy = 338;
+    WorldCombatDotsSkillMissileStopTrace = 339;
+    WorldCombatDotsSkillJump = 340;
+    WorldCombatDotsSkillJumpCancel = 341;
+    WorldCombatDotsSkillRcd = 342;
+    WorldCombatExtraRewardUpdate = 343;
+    WorldCombatDotsSkillSelectPos = 344;
+    WorldCombatDotsSkillJumpEnd = 346;
+    WorldCombatDotsSkillRcdEnd = 347;
+    WorldCombatDotsSkillHidden = 348;
+    WorldCombatDotsSkillHiddenEnd = 349;
+    SecneSvrErrEcho = 350;
+    WorldCombatDotsSkillShowHideChange = 351;
+    WorldCombatDotsSkillPosLerpSync = 352;
+    WorldCombatDotsSkillAnimCancel = 353;
+    HomePetPlaced = 400;
+    HomePetUnplaced = 401;
+    HomePetFeeded = 402;
+    HomePetFeedCanceled = 403;
+    HomePetAwardProcuced = 404;
+    HomePetAwardComsumed = 405;
+    TravelTogetherSync = 420;
+    ActorKeepModel = 422;
+    HomeInteractNotify = 423;
+    PetClosenessLvUpgrade = 424;
+    CameraFlash = 425;
+    IdleSkill = 426;
+    PetVoice = 427;
+    VisibleCircle = 428;
+    AvatarStoryFlags = 429;
+    AISeqIdNotify = 450;
+  }
+}
+
+message SpaceAct_ActorEnter {
+  repeated Next.ActorInfo actors = 1;
+}
+
+message SpaceAct_ActorLeave {
+  repeated uint64 actor_ids = 1;
+}
+
+message SpaceAct_ActorNum {
+  Next.Position pos = 1;
+  uint32 total_num = 2;
+  uint32 view_num = 3;
+  uint32 total_advance_npc_num = 4;
+  uint32 min_weight = 5;
+}
+
+message SpaceAct_PlayAnimBeforeRemove {
+  uint64 actor_id = 1;
+}
+
+message SpaceAct_ClientMove {
+  uint64 actor_id = 1;
+  uint64 time_stamp = 2;
+  Next.Position to_pos = 3;
+  Next.Position to_rot = 4;
+  Next.Position speed = 5;
+  Next.Position acceleration = 6;
+  int32 move_mode = 7;
+  int32 custom_mode = 8;
+  bool stop_move = 12;
+  Next.Position ctrl_rot = 14;
+  bool ride_move = 16;
+  Next.Point mate_point = 17;
+  int32 mate_move_mode = 18;
+}
+
+message SpaceAct_ServerMove {
+  uint64 actor_id = 1;
+  uint64 move_mode = 2;
+  repeated uint64 to_time_list = 3;
+  repeated Next.Position to_pos_list = 4;
+  repeated int32 to_dir_list = 5;
+  uint64 move_sub_mode = 6;
+  int32 height = 7;
+  int32 height_lerp_rate = 8;
+  Next.SvrAISyncCommonInfo sync_common_info = 9;
+  int32 accept_radius = 10;
+  bool is_backward = 11;
+}
+
+message SpaceAct_ServerFly {
+  uint64 actor_id = 1;
+  Next.Position cur_dir = 2;
+  Next.Position cur_pos = 3;
+  Next.Position ctrl_pos1 = 4;
+  Next.Position ctrl_pos2 = 5;
+  Next.Position anchor_pos = 6;
+  int32 split_num = 7;
+  int32 fly_speed = 8;
+  repeated Next.Position to_pos_list = 9;
+  uint64 end_time = 10;
+  uint64 cur_time = 11;
+  Next.SvrAISyncCommonInfo sync_common_info = 12;
+  repeated uint64 to_timestamp_list = 13;
+}
+
+message SpaceAct_InterruptServerMove {
+  uint64 actor_id = 1;
+  uint32 interrupt_reason = 2;
+  Next.Point interrupt_point = 3;
+  uint64 cur_time = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+}
+
+message SpaceAct_SetNpcPos {
+  uint64 actor_id = 1;
+  Next.Position to_pos = 2;
+  Next.Position to_dir = 3;
+  uint64 cur_time = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+  Next.SpaceAct_SetNpcPosReason reason = 6;
+}
+
+message SpaceAct_ServerAttach {
+  uint64 actor_id = 1;
+  Next.Position attach_pos = 2;
+  Next.Position attach_dir = 3;
+  uint64 move_speed = 4;
+  uint64 rotate_speed = 5;
+  bool allow_rotate = 6;
+  uint64 cur_time = 7;
+  Next.SvrAISyncCommonInfo sync_common_info = 8;
+}
+
+message SpaceAct_CancelServerAttach {
+  uint64 actor_id = 1;
+  Next.Point cancel_point = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_ServerAIJump {
+  uint64 actor_id = 1;
+  Next.Position jump_pos = 2;
+  int64 max_height = 3;
+  uint64 cur_time = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+  Next.Position begin_pos = 6;
+}
+
+message SpaceAct_CancelServerAIJump {
+  uint64 actor_id = 1;
+  Next.Point cancel_point = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_StickTo {
+  uint64 actor_id = 1;
+  uint64 target_actor_id = 2;
+  int64 self_socket = 3;
+  int64 target_socket = 4;
+  int64 stick_speed = 5;
+  int64 stick_anim = 6;
+  Next.Position rotate = 7;
+  uint64 cur_time = 8;
+  Next.SvrAISyncCommonInfo sync_common_info = 9;
+  Next.Position translate = 10;
+}
+
+message SpaceAct_FinishStickTo {
+  uint64 actor_id = 1;
+  uint64 cur_time = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_AIMoveMode {
+  uint64 actor_id = 1;
+  Next.ActorInfo_AIMoveMode move_mode = 2;
+}
+
+message SpaceAct_AITryInteractNpc {
+  uint64 actor_id = 1;
+  uint64 interact_actor_id = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_SwitchBossAINty {
+  uint64 actor_id = 1;
+  bool is_server_ai = 2;
+}
+
+message SpaceAct_InformClientSwitchAINty {
+  int32 npc_type = 1;
+}
+
+message SpaceAct_ClientSwitchToServerAINty {
+  repeated uint64 actor_list = 1;
+}
+
+message SpaceAct_PlayVoice {
+  uint64 actor_id = 1;
+  uint32 voice_id = 2;
+  float voice_speed = 3;
+  float start_pos = 4;
+  uint32 loop_count = 7;
+  uint64 cur_time = 8;
+  Next.SvrAISyncCommonInfo sync_common_info = 9;
+  bool high_priority = 10;
+}
+
+message SpaceAct_StopVoice {
+  uint64 actor_id = 1;
+  uint32 voice_id = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_AddStoryFlags {
+  uint64 actor_id = 1;
+  int32 option_id = 2;
+  repeated int32 story_flags = 3;
+  uint64 avatar_id = 4;
+}
+
+message SpaceAct_RemoveStoryFlags {
+  uint64 actor_id = 1;
+  int32 option_id = 2;
+  repeated int32 story_flags = 3;
+  uint64 avatar_id = 4;
+}
+
+message SpaceAct_NpcOptionInfoChange {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  bool enabled = 3;
+  int32 executable_times = 4;
+  Next.ActorInfo_NpcActionInfo act_info = 5;
+  int32 enable_opt_gid = 6;
+  int32 succ_exec_times = 7;
+  int32 first_dialog_id = 8;
+  uint64 avatar_id = 9;
+  uint64 ineteracting_avatar_id = 10;
+}
+
+message SpaceAct_BeginActResultParamsNty {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  int32 act_type = 3;
+  repeated uint32 act_result_params = 4;
+  uint64 avatar_id = 5;
+}
+
+message SpaceAct_NpcCanbeTeleportNty {
+  uint64 npc_id = 1;
+  bool can_be_teleport = 2;
+}
+
+message SpaceAct_FollowInfoChangedNty {
+  int32 follow_id = 1;
+  int32 task_id = 2;
+  int32 old_state = 3;
+  int32 new_state = 4;
+  int32 conf_id = 5;
+}
+
+message SpaceAct_PositionInvalid {
+}
+
+message SpaceAct_NpcOptionAddSelects {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  repeated Next.ActorInfo_NpcDialogSelectInfo select_infos = 3;
+  uint64 avatar_id = 4;
+}
+
+message SpaceAct_NpcOptionRemoveSelects {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  repeated int32 select_ids = 3;
+  uint64 avatar_id = 4;
+}
+
+message SpaceAct_NpcDialogSelectInfoChange {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  Next.ActorInfo_NpcDialogSelectInfo select_info = 3;
+  uint64 avatar_id = 4;
+}
+
+message SpaceAct_AddNpcOption {
+  uint64 npc_id = 1;
+  Next.ActorInfo_NpcOptionInfo opt_info = 2;
+  uint64 avatar_id = 3;
+}
+
+message SpaceAct_RemoveNpcOption {
+  uint64 npc_id = 1;
+  int32 option_id = 2;
+  uint64 avatar_id = 3;
+}
+
+message SpaceAct_UpdateActorLogicStatus {
+  message LogicStatusChangeInfo {
+    int32 op_type = 1;
+    Next.ActorInfo_LogicStatus changed_status = 2;
+  }
+  uint64 actor_id = 1;
+  repeated Next.SpaceAct_UpdateActorLogicStatus.LogicStatusChangeInfo change_info = 2;
+}
+
+message SpaceAct_TrackingNpc {
+  repeated Next.TaskTrackingItem tracking_list = 1;
+}
+
+message SpaceAct_NpcDistribution {
+  repeated Next.ActorInfo distribution = 1;
+}
+
+message SpaceAct_ChangeLoopAction {
+  uint64 actor_id = 1;
+  string new_loop_action = 2;
+}
+
+message SpaceAct_VisibleZone {
+  message VisiblePlayer {
+    uint64 id = 1;
+    bytes name = 2;
+    bool in_visible = 3;
+  }
+  message VisiblePool {
+    uint32 area_cfg_id = 1;
+    uint64 pool_id = 2;
+    repeated Next.SpaceAct_VisibleZone.VisiblePlayer players = 3;
+    bytes cell_id_str = 4;
+  }
+  message EnterVisible {
+    bytes entrant_name = 1;
+    Next.SpaceAct_VisibleZone.VisiblePool pool = 2;
+  }
+  message LeaveVisible {
+    bytes leaver_name = 1;
+    bool merge = 2;
+    Next.SpaceAct_VisibleZone.VisiblePool pool = 3;
+    bool recycle = 4;
+  }
+  Next.SpaceAct_VisibleZone.EnterVisible enter = 1;
+  Next.SpaceAct_VisibleZone.LeaveVisible leave = 2;
+  uint64 actor_id = 3;
+}
+
+message SpaceAct_VisibleCircle {
+  message CircleMember {
+    uint32 uin = 1;
+    bytes name = 2;
+  }
+  message VisibleCircle {
+    uint64 circle_id = 1;
+    repeated Next.SpaceAct_VisibleCircle.CircleMember members = 2;
+  }
+  message EnterVisibleCircle {
+    bytes name = 1;
+    Next.SpaceAct_VisibleCircle.VisibleCircle circle = 2;
+  }
+  message LeaveVisibleCircle {
+    bytes name = 1;
+    Next.SpaceAct_VisibleCircle.VisibleCircle circle = 2;
+  }
+  uint32 uin = 1;
+  Next.SpaceAct_VisibleCircle.EnterVisibleCircle enter = 2;
+  Next.SpaceAct_VisibleCircle.LeaveVisibleCircle leave = 3;
+}
+
+message SpaceAct_AvatarStoryFlags {
+  repeated int32 story_flags = 1;
+  repeated int32 visit_owner_story_flags = 2;
+}
+
+message SpaceAct_CombineLockStateChange {
+  uint64 actor_id = 1;
+  int32 unlocked_num = 2;
+  int32 tot_lock_num = 3;
+  repeated Next.CombineCondNpcInfo cond_npc_infos = 4;
+}
+
+message SpaceAct_NpcGuideChange {
+  uint64 actor_id = 1;
+  Next.NpcGuideInfo guide_info = 2;
+  bool add_or_delete = 3;
+}
+
+message SpaceAct_MagicCreateNpcChange {
+  uint64 actor_id = 1;
+  Next.MagicCreateNpcInfo npc_info = 2;
+  bool add_or_delete = 3;
+}
+
+message SpaceAct_CatchGuaranteeChange {
+  uint64 actor_id = 1;
+  int32 catch_guarantee_rate = 2;
+  int64 last_catch_time = 3;
+}
+
+message SpaceAct_PlayerMatch {
+  int32 match_type = 1;
+  uint64 caster_uin = 2;
+  bool start_or_cancel = 3;
+  int32 cast_time = 4;
+  int32 select_hard = 5;
+  uint32 battle_cfg_id = 6;
+}
+
+message SpaceAct_NpcVisualInfoChange {
+  uint64 actor_id = 1;
+  bool cannot_be_seen = 2;
+  Next.VisualInfoChangeReason change_reason = 3;
+  uint64 npc_hide_flag = 4;
+}
+
+message SpaceAct_PotentialEnergyChange {
+  uint64 actor_id = 1;
+  Next.ActorInfo_PotentialEnergy potential_energ_info = 2;
+}
+
+message SpaceAct_PropertyTypeChange {
+  uint64 actor_id = 1;
+  Next.ActorInfo_PropertyType property_type_info = 2;
+}
+
+message SpaceAct_AuraInfoChange {
+  uint64 actor_id = 1;
+  repeated Next.ActorInfo_Aura aura_info = 3;
+  repeated Next.RemoveAuraInfo removed_auras = 4;
+}
+
+message SpaceAct_BodyTempNotify {
+  uint64 actor_id = 1;
+  int32 body_temp_final_val = 2;
+  int64 reach_final_time = 3;
+  int32 nature_temp = 4;
+}
+
+message SpaceAct_ActorBornEnd {
+  uint64 actor_id = 1;
+  uint64 cur_time = 2;
+}
+
+message SpaceAct_ActorDieBegin {
+  uint64 actor_id = 1;
+  uint64 cur_time = 2;
+  string skill_or_anim = 3;
+  bool is_skill = 4;
+  uint32 play_time = 5;
+  int32 die_reason = 6;
+  uint64 killer = 7;
+  Next.Position dir = 8;
+  repeated int32 die_reason_params = 9;
+  repeated int64 die_reason_params_64 = 10;
+}
+
+message SpaceAct_BeginDropItem {
+  uint64 src_npc_id = 1;
+  Next.Position src_npc_pos = 5;
+  int32 src_npc_cfg_id = 6;
+  int32 src_npc_ref_cfg_id = 7;
+  uint64 batch_num = 2;
+  int32 drop_itme_num = 3;
+  int32 drop_item_refresh_source = 4;
+}
+
+message SpaceAct_EndDropItem {
+  uint64 src_npc_id = 1;
+  Next.Position src_npc_pos = 3;
+  int32 src_npc_cfg_id = 4;
+  int32 src_npc_ref_cfg_id = 5;
+  uint64 batch_num = 2;
+}
+
+message SpaceAct_AttrChange {
+  uint64 actor_id = 1;
+  repeated Next.ActorInfo_Attr attrs = 2;
+}
+
+message SpaceAct_EnteredCatcher {
+  uint64 actor_id = 1;
+  uint32 entered_area_id = 2;
+  uint32 area_func_conf_id = 3;
+  bool area_camp_unlock = 4;
+}
+
+message SpaceAct_LeftCatcher {
+  uint64 actor_id = 1;
+  uint32 left_area_id = 2;
+  uint32 area_func_conf_id = 3;
+}
+
+message SpaceAct_CastSceneSkill {
+  uint64 caster_id = 1;
+  uint64 time_stamp = 2;
+  int32 skill_id = 3;
+  int32 skill_status_type = 4;
+  bool is_add_status = 5;
+}
+
+message SpaceAct_FriendRide {
+  message FriendRideInfo {
+    uint32 uin = 1;
+    int32 gid = 2;
+    bytes name = 3;
+  }
+  repeated Next.FriendRideData friend_ride_data_list = 1;
+  bool is_riding = 2;
+  repeated Next.SpaceAct_FriendRide.FriendRideInfo friend_ride_info_list = 3;
+}
+
+message SpaceAct_SyncPlayerStatus {
+  uint64 actor_id = 1;
+  uint64 time_stamp = 2;
+  int32 status = 3;
+  int32 op_code = 4;
+  int32 sub_status = 5;
+  Next.PlayerStatusCustomParams status_param = 6;
+  repeated Next.PlayerStatusSyncInfo sync_status_info_list = 7;
+}
+
+message SpaceAct_LookAt {
+  uint64 actor_id = 1;
+  uint64 target_actor_id = 2;
+  Next.Position target_pos = 3;
+  bool enable = 4;
+  bool immediately = 5;
+  Next.SvrAISyncCommonInfo sync_common_info = 6;
+  bool at_camera = 7;
+}
+
+message SpaceAct_TurnTo {
+  uint64 actor_id = 1;
+  Next.Position turn_pos = 2;
+  float turn_speed = 3;
+  uint64 cur_time = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+  bool use_anim_length = 6;
+  float anim_speed_scale = 7;
+}
+
+message SpaceAct_CancelTurnTo {
+  uint64 actor_id = 1;
+  uint64 cur_time = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_ShowPetFaceState {
+  uint64 actor_id = 1;
+  bool show = 2;
+  int32 face_state = 3;
+  float progress = 4;
+}
+
+message SpaceAct_PlayAnimation {
+  uint64 actor_id = 1;
+  uint32 anim_id = 2;
+  float play_rate = 3;
+  float start_pos = 4;
+  float blend_in_time = 5;
+  float blend_out_time = 6;
+  int32 loop_count = 7;
+  int64 cur_time = 8;
+  bool override_move = 9;
+  int32 movement_mode = 10;
+  float voice_speed = 11;
+  bool mute = 12;
+  bool pause_on_end = 13;
+  Next.SvrAISyncCommonInfo sync_common_info = 14;
+  Next.Position actor_dir = 15;
+  bool is_rootmotion = 16;
+  bool high_priority = 17;
+}
+
+message SpaceAct_StopAnimation {
+  uint64 actor_id = 1;
+  uint32 anim_id = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_AnimPauseOrResume {
+  uint64 actor_id = 1;
+  bool is_anim_pause = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_PlaySkill {
+  uint64 actor_id = 1;
+  string skill_path = 2;
+  uint64 cur_time = 3;
+  uint64 skill_id = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+  uint64 target_id = 6;
+  bool target_is_npc = 7;
+  bool use_specific_pos = 8;
+  Next.Position specific_pos = 9;
+}
+
+message SpaceAct_StopSkill {
+  uint64 actor_id = 1;
+  string skill_path = 2;
+  uint64 cur_time = 3;
+  uint64 skill_id = 4;
+  Next.SvrAISyncCommonInfo sync_common_info = 5;
+}
+
+message SpaceAct_WorldHidden {
+  uint64 actor_id = 1;
+  uint64 target_actor_id = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_WorldUnHidden {
+  uint64 actor_id = 1;
+  Next.SvrAISyncCommonInfo sync_common_info = 2;
+}
+
+message SpaceAct_ModelDisplay {
+  uint64 actor_id = 1;
+  bool is_fade_out = 2;
+  uint64 time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_PlayPerceptionEffect {
+  uint64 actor_id = 1;
+  int32 effect_id = 2;
+  uint64 time_stamp = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_PlayPerceptionHud {
+  uint64 actor_id = 1;
+  int32 hud_type = 2;
+  uint64 time_stamp = 3;
+  bool is_show = 4;
+  uint64 target_actor_id = 5;
+  Next.SvrAISyncCommonInfo sync_common_info = 6;
+  uint64 local_player_obj_id = 7;
+  int32 show_range = 8;
+}
+
+message SpaceAct_NpcPerceivePlayer {
+  uint64 actor_id = 1;
+  uint64 time_stamp = 2;
+  bool is_perceive = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_NpcTrace {
+  Next.NpcTraceInfo npc_trace_info = 1;
+}
+
+message SpaceAct_BattleOnOff {
+  uint64 actor_id = 1;
+  bool on_or_off = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_WorldAttack {
+  uint64 actor_id = 1;
+  int32 aim_type = 2;
+  int32 attack_type = 3;
+  float range = 4;
+  float predict = 5;
+  int32 damage = 6;
+  float hit_strength = 7;
+  bool is_heavy = 8;
+  uint64 time_stamp = 9;
+  uint64 target_actor_id = 10;
+  Next.SvrAISyncCommonInfo sync_common_info = 11;
+  bool use_specific_pos = 12;
+  Next.Position specific_pos = 13;
+  Next.PlayerAttackPerformType hit_perform_type = 14;
+}
+
+message SpaceAct_StopWorldAttack {
+  uint64 actor_id = 1;
+  uint64 time_stamp = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_MfbtDebug {
+  message SpaceAct_MfbtDebug_InnerEventData {
+    Next.E_SCENE_MFBT_DEBUG_EVENT_TYPE event_type = 1;
+    repeated bytes event_data = 2;
+  }
+  uint64 actor_id = 1;
+  repeated Next.SpaceAct_MfbtDebug.SpaceAct_MfbtDebug_InnerEventData event_datas = 2;
+}
+
+message SpaceAct_CollisionCancelRecover {
+  uint64 actor_id = 1;
+  bool is_collision_cancel = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_EnvMask {
+  uint64 actor_id = 1;
+  uint32 env_mask = 2;
+  repeated int32 ban_type = 3;
+  repeated int32 ban_ride_sockets = 4;
+}
+
+message SpaceAct_ChangeSceneNotify {
+  uint32 scene_cfg_id = 1;
+  Next.ActorInfo self_info = 2;
+  repeated Next.ActorInfo other_actors = 3;
+}
+
+message SpaceAct_WeatherChange {
+  uint64 actor_id = 1;
+  int32 weather = 3;
+}
+
+message SpaceAct_HeadLookAt {
+  uint64 actor_id = 1;
+  Next.Position look_at_pos = 2;
+}
+
+message SpaceAct_ClientOperation {
+  Next.ClientOperation operation = 1;
+}
+
+message SpaceAct_BondFind {
+  uint64 actor_id = 1;
+  uint64 target_actor_id = 2;
+  Next.Position target_pos = 3;
+}
+
+message SpaceAct_ScenePetInfoChange {
+  uint64 actor_id = 1;
+  Next.ActorInfo_ScenePet pet_info = 2;
+}
+
+message SpaceAct_SceneDotsComponentSync {
+  uint64 npc_id = 1;
+  repeated Next.BytesData component_datas = 2;
+}
+
+message SpaceAct_PlayZoomAnimation {
+  uint64 actor_id = 1;
+  int32 anim_id = 2;
+  Next.Position target_pos = 3;
+  float attach_to_top = 4;
+  float play_rate = 5;
+  float blend_in_time = 6;
+  float blend_out_time = 7;
+  bool decreasing_curve = 8;
+  string loop_anim_name = 10;
+  int64 cur_time = 11;
+  Next.SvrAISyncCommonInfo sync_common_info = 12;
+}
+
+message SpaceAct_TaskStateChangeNty {
+  uint64 actor_id = 1;
+  repeated int32 enabled_state_ids = 2;
+}
+
+message SpaceAct_PlayRealtimeDialog {
+  uint64 actor_id = 1;
+  uint32 dialog_id = 2;
+  uint64 cur_time = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+}
+
+message SpaceAct_StopRealtimeDialog {
+  uint64 actor_id = 1;
+  uint64 cur_time = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+}
+
+message SpaceAct_OptActionNtf {
+  int32 action_type = 1;
+  uint64 npc_id = 2;
+  int32 seat_idx = 3;
+  int32 leave_point_idx = 4;
+  bool is_client_req_leave_seat = 5;
+  Next.Point before_sit_point = 6;
+}
+
+message SpaceAct_HomePetInfoChangeNotify {
+  int32 action_type = 1;
+  Next.ActorInfo_HomePet home_pet = 2;
+}
+
+message SpaceAct_HomeInteractNotify {
+  enum InteractType {
+    ACTION_CROSS_DAY_RESET = 1;
+    ACTION_UPDATE_STEAL_INFO = 2;
+  }
+  Next.SpaceAct_HomeInteractNotify.InteractType interact_type = 1;
+  int32 total_steal_num = 2;
+  repeated uint32 home_pet_gids = 3;
+}
+
+message SpaceActionCollection {
+  Next.SpaceAct_ActorEnter actor_enter = 1;
+  Next.SpaceAct_ActorLeave actor_leave = 2;
+  Next.SpaceAct_ActorNum actor_num = 3;
+  Next.SpaceAct_ClientMove client_move = 11;
+  Next.SpaceAct_ServerMove server_move = 12;
+  Next.SpaceAct_InterruptServerMove interrupt_server_move = 13;
+  Next.SpaceAct_LookAt look_at = 15;
+  Next.SpaceAct_TurnTo turn_to = 16;
+  Next.SpaceAct_CancelTurnTo cancel_turn_to = 17;
+  Next.SpaceAct_ServerFly server_fly = 18;
+  Next.SpaceAct_ServerAttach server_attach = 19;
+  Next.SpaceAct_CancelServerAttach cancel_server_attach = 20;
+  Next.SpaceAct_AddStoryFlags add_story_flags = 21;
+  Next.SpaceAct_RemoveStoryFlags remove_story_flags = 22;
+  Next.SpaceAct_NpcOptionInfoChange npc_option_info_change = 23;
+  Next.SpaceAct_NpcOptionAddSelects npc_option_add_selects = 24;
+  Next.SpaceAct_NpcOptionRemoveSelects npc_option_remove_selects = 25;
+  Next.SpaceAct_NpcDialogSelectInfoChange npc_dialog_select_info_change = 26;
+  Next.SpaceAct_AddNpcOption add_npc_option = 27;
+  Next.SpaceAct_RemoveNpcOption remove_npc_option = 28;
+  Next.SpaceAct_BeginActResultParamsNty begin_act_result_params_nty = 29;
+  Next.SpaceAct_NpcCanbeTeleportNty npc_can_be_teleport_nty = 30;
+  Next.SpaceAct_UpdateActorLogicStatus update_actor_logic_status = 31;
+  Next.SpaceAct_CombineLockStateChange combine_lock_state_change = 32;
+  Next.SpaceAct_TrackingNpc tracking_npcs = 33;
+  Next.SpaceAct_VisibleZone visible_players = 34;
+  Next.SpaceAct_SyncPlayerStatus sync_player_status = 35;
+  Next.SpaceAct_PotentialEnergyChange potential_energy_change = 36;
+  Next.SpaceAct_EnvMask env_mask = 37;
+  Next.SpaceAct_PropertyTypeChange property_type_change = 38;
+  Next.SpaceAct_ActorBornEnd actor_born_end = 39;
+  Next.SpaceAct_ActorDieBegin actor_die_begin = 40;
+  Next.SpaceAct_BeginDropItem begin_drop_item = 41;
+  Next.SpaceAct_EndDropItem end_drop_item = 42;
+  Next.SpaceAct_AttrChange attr_change = 51;
+  Next.SpaceAct_EnteredCatcher enterted_catcher = 61;
+  Next.SpaceAct_LeftCatcher left_catcher = 62;
+  Next.SpaceAct_PlayAnimation play_animation = 71;
+  Next.SpaceAct_StopAnimation stop_animation = 72;
+  Next.SpaceAct_AnimPauseOrResume anim_pause_or_resume = 73;
+  Next.SpaceAct_PlaySkill play_skill = 74;
+  Next.SpaceAct_StopSkill stop_skill = 75;
+  Next.SpaceAct_WorldHidden world_hidden = 76;
+  Next.SpaceAct_WorldUnHidden world_unhidden = 77;
+  Next.SpaceAct_PlayZoomAnimation play_zoom_animation = 78;
+  Next.SpaceAct_PlayAnimBeforeRemove play_anim_before_remove = 80;
+  Next.SpaceAct_ShowPetFaceState show_pet_face_state = 81;
+  Next.SpaceAct_ModelDisplay model_show_or_hide = 82;
+  Next.SpaceAct_PlayPerceptionEffect play_perception_effect = 83;
+  Next.SpaceAct_PlayPerceptionHud play_perception_hud = 84;
+  Next.SpaceAct_NpcTrace npc_trace = 85;
+  Next.SpaceAct_NpcPerceivePlayer npc_perceive_player = 86;
+  Next.SpaceAct_BattleOnOff battle_on_or_off = 91;
+  Next.SpaceAct_WorldAttack world_attack = 92;
+  Next.SpaceAct_StopWorldAttack stop_world_attack = 93;
+  Next.SpaceAct_MfbtDebug mfbt_debug = 101;
+  Next.SpaceAct_BattleAIStatusChanged battle_ai_status_changed = 102;
+  Next.SpaceAct_SceneAiControlFlagsChanged scene_ai_control_flags_changed = 103;
+  Next.SpaceAct_ServerAIJump server_ai_jump = 104;
+  Next.SpaceAct_CancelServerAIJump cancel_server_ai_jump = 105;
+  Next.SpaceAct_StickTo stick_to = 106;
+  Next.SpaceAct_FinishStickTo finish_stick_to = 107;
+  Next.SpaceAct_AITryInteractNpc ai_try_interact_npc = 108;
+  Next.SpaceAct_SwitchBossAINty switch_boss_ai_nty = 109;
+  Next.SpaceAct_AIMoveMode move_mode = 110;
+  Next.SpaceAct_InformClientSwitchAINty inform_client_switch_ai = 112;
+  Next.SpaceAct_ClientSwitchToServerAINty client_switch_to_server_ai = 113;
+  Next.SpaceAct_CastSceneSkill cast_scene_skill = 111;
+  Next.SpaceAct_FriendRide friend_ride = 121;
+  Next.SpaceAct_CollisionCancelRecover collision_cancel_or_recover = 131;
+  Next.SpaceAct_ChangeSceneNotify change_scene_notify = 141;
+  Next.SpaceAct_AuraInfoChange aura_info_change = 151;
+  Next.SpaceAct_BodyTempNotify body_temp_notify = 161;
+  Next.SpaceAct_ThrowedPetInfoChange throwed_pet_info = 171;
+  Next.SpaceAct_DelThrowingMagic del_throwing_magic = 172;
+  Next.SpaceAct_DeleteThrowNotify throw_catch_notify = 173;
+  Next.SpaceAct_AirWallChange air_wall_change = 182;
+  Next.SpaceAct_WeatherChange weather_change = 191;
+  Next.SpaceAct_GameTimeChange game_time_change = 200;
+  Next.SpaceAct_MinigameNotify minigame = 201;
+  Next.SpaceAct_GuideTask guide_npcs = 202;
+  Next.SpaceAct_ClientEventResume client_event_resume = 203;
+  Next.SpaceAct_NpcPendantInfoChange npc_pendant_info_change = 204;
+  Next.SpaceAct_UnlockSleepingOwl unlock_sleeping_owl = 205;
+  Next.SpaceAct_OwlRefugeInfoChange owl_refuge_info_change = 206;
+  Next.SpaceAct_NpcDistribution npc_distribution = 207;
+  Next.SpaceAct_HeadLookAt head_look_at = 208;
+  Next.SpaceAct_FashionChange fashion_change = 209;
+  Next.SpaceAct_SalonChange salon_change = 210;
+  Next.SpaceAct_ClientOperation client_operation = 211;
+  Next.SpaceAct_BondFind bond_find = 212;
+  Next.SpaceAct_ScenePetInfoChange pet_info_change = 213;
+  Next.SpaceAct_SceneDotsComponentSync dots_component_sync = 214;
+  Next.SpaceAct_GameTimeSync game_time_sync = 215;
+  Next.SpaceAct_PetInteractResNty pet_interact_res_nty = 216;
+  Next.SpaceAct_CombineInteractInfoChange combine_interact_info_change = 217;
+  Next.SpaceAct_BuffInfoChange buff_info_change = 218;
+  Next.SpaceAct_NameChange name_change = 219;
+  Next.SpaceAct_RelatedNpcInfosChanged relate_npc_infos_change = 220;
+  Next.SpaceAct_WorldMapInfoChanged world_map_infos_change = 221;
+  Next.SpaceAct_SetNpcPos set_npc_pos = 222;
+  Next.SpaceAct_PlayVoice play_voice = 223;
+  Next.SpaceAct_StopVoice stop_voice = 224;
+  Next.SpaceAct_NpcGuideChange npc_guide_change = 225;
+  Next.SpaceAct_ChangeLoopAction loop_action = 226;
+  Next.SpaceAct_CatchGuaranteeChange catch_guarantee_change = 227;
+  Next.SpaceAct_PlayerMatch player_match = 228;
+  Next.SpaceAct_NpcVisualInfoChange npc_visual_info = 229;
+  Next.SpaceAct_BattleBuffInfoChanged battle_buff_info_change = 230;
+  Next.SpaceAct_CardLabelChange card_label_change = 231;
+  Next.SpaceAct_CardSkinChange card_skin_change = 232;
+  Next.SpaceAct_SameCellTeleport same_cell_teleport = 233;
+  Next.SpaceAct_FollowInfoChangedNty follow_info_changed_nty = 234;
+  Next.SpaceAct_CollectHandbookRecordsChange collect_handbook_records_change = 235;
+  Next.SpaceAct_PositionInvalid position_invalid = 236;
+  Next.SpaceAct_TaskStateChangeNty task_state_change_nty = 237;
+  Next.SpaceAct_PlayRealtimeDialog play_real_time_dialog = 238;
+  Next.SpaceAct_StopRealtimeDialog stop_real_time_dialog = 239;
+  Next.SpaceAct_CardMusicChange card_music_change = 240;
+  Next.SpaceAct_MagicCreateNpcChange magic_create_npc_change = 241;
+  Next.SpaceAct_VelocityOrientedRotation velocity_oriented_rotation = 242;
+  Next.SpaceAct_WorldLaunchPlayer world_launch_player = 243;
+  Next.SpaceAct_AIPerformGroupIdChanged ai_perform_group_id_changed = 244;
+  Next.SpaceAct_OptActionNtf opt_action_ntf = 245;
+  Next.SpaceAct_CardIconChange card_icon_change = 246;
+  Next.SpaceAct_VideoRecord video_record = 247;
+  Next.SpaceAct_Stun stun = 260;
+  Next.SpaceAct_CatchRecordInfoChange catch_record_info_change = 263;
+  Next.SpaceAct_HabitatNeighborInfoChange habitat_neighbor_info_change = 264;
+  Next.SpaceAct_AllHabitatNeighborInfo all_habitat_neighbor_info = 265;
+  Next.SpaceAct_WorldCombatEnter world_combat_enter = 300;
+  Next.SpaceAct_WorldCombatExit world_combat_exit = 301;
+  Next.SpaceAct_WorldCombatTextPrompts world_combat_text_prompts = 309;
+  Next.SpaceAct_WorldCombatPhaseUpdate world_combat_phase_update = 310;
+  Next.SpaceAct_WorldCombatBegin world_combat_begin = 311;
+  Next.SpaceAct_WorldCombatFinish world_combat_finish = 312;
+  Next.SpaceAct_WorldCombatDotsSkillCast world_combat_dots_skill_cast = 320;
+  Next.SpaceAct_WorldCombatDotsSkillEnd world_combat_dots_skill_end = 321;
+  Next.SpaceAct_WorldCombatDotsSkillCrush world_combat_dots_skill_crush = 322;
+  Next.SpaceAct_WorldCombatDotsSkillHit world_combat_dots_skill_hit = 323;
+  Next.SpaceAct_WorldCombatDotsSkillRotate world_combat_dots_skill_rotate = 324;
+  Next.SpaceAct_WorldCombatDotsSkillLookAt world_combat_dots_skill_lookat = 325;
+  Next.SpaceAct_WorldCombatDotsSkillCrushEnd world_combat_dots_skill_crush_end = 326;
+  Next.SpaceAct_WorldCombatDotsSkillMissileLaunch world_combat_dots_skill_missile_launch = 327;
+  Next.SpaceAct_WorldCombatDotsSkillMissileDestroy world_combat_dots_skill_missile_destroy = 328;
+  Next.SpaceAct_WorldCombatDotsSkillMissileStopTrace world_combat_dots_skill_missile_stop_trace = 329;
+  Next.SpaceAct_WorldCombatDotsSkillJump world_combat_dots_skill_jump = 330;
+  Next.SpaceAct_WorldCombatDotsSkillJumpCancel world_combat_dots_skill_jump_cancel = 331;
+  Next.SpaceAct_WorldCombatDotsSkillRcd world_combat_dots_skill_rcd = 332;
+  Next.SpaceAct_WorldCombatExtraRewardUpdate world_combat_extra_reward_update = 333;
+  Next.SpaceAct_WorldCombatDotsSkillSelectPos world_combat_dots_skill_select_pos = 334;
+  Next.SpaceAct_OwlSanctuaryDetected owl_sanctuary_detected = 335;
+  Next.SpaceAct_WorldCombatDotsSkillJumpEnd world_combat_dots_skill_jump_end = 336;
+  Next.SpaceAct_WorldCombatDotsSkillRcdEnd world_combat_dots_skill_rcd_end = 337;
+  Next.SpaceAct_WorldCombatDotsSkillHidden world_combat_dots_skill_hidden = 338;
+  Next.SpaceAct_WorldCombatDotsSkillHiddenEnd world_combat_dots_skill_hidden_end = 339;
+  Next.SpaceAct_OwlSanctuaryFruitInfoUpdate owl_sanctuary_fruit_info_update = 340;
+  Next.SpaceAct_SceneSvrErrEcho scenesvr_err_echo = 350;
+  Next.SpaceAct_WorldCombatDotsSkillShowHideChange world_combat_dots_skill_show_hide = 351;
+  Next.SpaceAct_WorldCombatDotsSkillPosLerpSync world_combat_dots_skill_pos_lerp_sync = 352;
+  Next.SpaceAct_WorldCombatDotsSkillAnimCancel world_combat_dots_skill_anim_cancel = 353;
+  Next.SpaceAct_HomeBasicInfoChangeNotify home_basic_info_change_notify = 354;
+  Next.SpaceAct_HomePetInfoChangeNotify home_pet_info_change_notify = 355;
+  Next.SpaceAct_HomePlantChangeNotify home_plant_change_notify = 356;
+  Next.SpaceAct_HomePlantPlantCrop home_plant_plant_crop = 357;
+  Next.SpaceAct_HomePlantRoleWater home_plant_role_water = 358;
+  Next.SpaceAct_HomePlantPetWater home_plant_pet_water = 359;
+  Next.SpaceAct_HomePlantRoleManure home_plant_role_manure = 360;
+  Next.SpaceAct_HomePlantPetManure home_plant_pet_manure = 361;
+  Next.SpaceAct_HomePlantOwnerPick home_plant_owner_pick = 362;
+  Next.SpaceAct_HomePlantVisitorPick home_plant_visitor_pick = 363;
+  Next.SpaceAct_HomeBasicVisitorEnterHome home_basic_visitor_enter_home = 370;
+  Next.SpaceAct_HomeBasicVisitorLeavingHome home_basic_visitor_leaving_home = 371;
+  Next.SpaceAct_ActorPlantDataUpdate actor_plant_data_update = 372;
+  Next.SpaceAct_TravelTogetherSync travel_together_sync = 373;
+  Next.SpaceAct_InnerBattle inner_battle = 390;
+  Next.SpaceAct_InnerBattleShieldBroken inner_battle_shield_broken = 391;
+  Next.SpaceAct_InnerBattleChangePet inner_battle_change_pet = 392;
+  Next.SpaceAct_ActorKeepModel actor_keep_model = 402;
+  Next.SpaceAct_HomeInteractNotify home_interact_notify = 403;
+  Next.SpaceAct_PetClosenessLvUpgrade pet_closeness_lv_upgrade = 404;
+  Next.SpaceAct_CameraFlash camera_flash = 425;
+  Next.SpaceAct_IdleSkill idle_skill = 426;
+  Next.SpaceAct_PetVoice pet_voice = 427;
+  Next.SpaceAct_VisibleCircle visible_circle = 428;
+  Next.SpaceAct_AvatarStoryFlags story_flags = 429;
+  Next.SpaceAct_AISeqIdNotify ai_seq_id_notify = 450;
+}
+
+message SpaceActionTag_Battle {
+  uint64 battle_id = 1;
+  int32 round = 2;
+  int32 skill_id = 3;
+  int32 group_id = 4;
+  int32 cast_moment = 5;
+}
+
+message SpaceActionTag_Actor {
+  uint64 actor_id = 1;
+}
+
+message SpaceActionTags {
+  Next.SpaceActionTag_Battle battle_tag = 1;
+  Next.SpaceActionTag_Actor actor_tag = 2;
+}
+
+message ZoneScenePlayActsNotify {
+  repeated Next.SpaceActionCollection acts = 1;
+  Next.SpaceActionTags act_tags = 2;
+  Next.SpaceBaseData space_base_data = 3;
+}
+
+message ZoneScenePlayActsBatchNotify {
+  repeated Next.ZoneScenePlayActsNotify acts = 1;
+  uint64 timestamp = 2;
+}
+
+message SceneSerializedActsNotify {
+  bytes serialized_acts = 1;
+}
+
+message SpaceAct_ThrowedPetInfoChange {
+  uint64 actor_id = 1;
+  repeated Next.ActorInfo_ThrowedPet throwed_pet_infos = 2;
+  repeated int32 delete_pet_gids = 3;
+}
+
+message SpaceAct_DelThrowingMagic {
+  uint64 actor_id = 1;
+  int32 throw_id = 2;
+}
+
+message SpaceAct_FieldTagChange {
+  message TagChangeInfo {
+    repeated int64 tag_data = 1;
+    int32 result_tag_type = 2;
+  }
+  repeated Next.SpaceAct_FieldTagChange.TagChangeInfo change_info = 1;
+  int32 data_length = 2;
+  int64 aura_id = 3;
+}
+
+message SpaceAct_GameTimeChange {
+  uint64 actor_id = 1;
+  Next.ActorInfo_GameTime game_time_info = 2;
+}
+
+message SpaceAct_GameTimeSync {
+  uint64 actor_id = 1;
+  uint64 game_time = 2;
+}
+
+message SpaceAct_MinigameNotify {
+  int32 status = 1;
+  uint32 minigame_cfg_id = 2;
+  repeated Next.MinigameProgress progress = 3;
+  int32 remain_time = 4;
+  uint64 trigger_npc_obj_id = 5;
+}
+
+message SpaceAct_GuideTask {
+  message GuideItem {
+    repeated Next.ActorInfo npcs = 1;
+    uint32 task_id = 2;
+    Next.Position pos = 3;
+    repeated Next.GuideInfo guide_info = 4;
+  }
+  repeated Next.SpaceAct_GuideTask.GuideItem guide_list = 1;
+}
+
+message SpaceAct_ClientEventResume {
+  uint32 event = 1;
+  repeated bytes tag = 2;
+}
+
+message SpaceAct_NpcPendantInfoChange {
+  message ChangedNpcPendantItemInfo {
+    int32 id = 1;
+    bool enable = 2;
+    int32 status = 3;
+  }
+  uint64 npc_id = 1;
+  int32 pendant_cfg_id = 2;
+  bool enable = 3;
+  repeated Next.SpaceAct_NpcPendantInfoChange.ChangedNpcPendantItemInfo changed_pendant_item_infos = 4;
+}
+
+message SpaceAct_OwlRefugeInfoChange {
+  int32 refuge_cfg_id = 1;
+  repeated int32 obtained_reward_idxs = 2;
+}
+
+message SpaceAct_UnlockSleepingOwl {
+  uint64 npc_id = 1;
+  int32 refuge_cfg_id = 2;
+}
+
+message SpaceAct_FashionChange {
+  uint64 actor_id = 1;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 2;
+  repeated int32 fashion_item_wear_data = 3;
+}
+
+message SpaceAct_SalonChange {
+  uint64 actor_id = 1;
+  repeated Next.SalonItemWearData salon_item_wear_data = 3;
+}
+
+message SpaceAct_PetInteractResNty {
+  enum PetInteractStatus {
+    SUCCESS = 1;
+    FAIL = 2;
+    WAIT_FOR_COMBINED_INTERACT = 3;
+    CANCEL_COMBINED_INTERACT = 4;
+  }
+  uint64 npc_id = 1;
+  Next.SpaceAct_PetInteractResNty.PetInteractStatus status = 2;
+  int32 pet_interact_cfg_id = 3;
+  int32 option_id = 4;
+  uint64 pet_npc_id = 5;
+  repeated uint64 combine_interact_pet_npc_ids = 6;
+}
+
+message SpaceAct_CombineInteractInfoChange {
+  uint64 actor_id = 1;
+  uint64 wait_pet_interact_avatar_id = 2;
+  repeated Next.CombineInteractPetInfo combine_interact_infos = 3;
+}
+
+message SpaceAct_BuffInfoChange {
+  uint64 actor_id = 1;
+  int64 removed_buff_id = 3;
+  int32 buff_changed_reason = 5;
+  Next.ActorInfo_Buff changed_buff_info = 6;
+}
+
+message SpaceAct_NameChange {
+  uint64 actor_id = 1;
+  string name = 2;
+}
+
+message SpaceAct_CardLabelChange {
+  uint64 actor_id = 1;
+  uint32 card_label_first_selected = 2;
+  uint32 card_label_last_selected = 3;
+}
+
+message SpaceAct_CardSkinChange {
+  uint64 actor_id = 1;
+  uint32 card_skin_selected = 2;
+}
+
+message SpaceAct_CardIconChange {
+  uint64 actor_id = 1;
+  uint32 card_icon_selected = 2;
+}
+
+message SpaceAct_VideoRecord {
+  uint64 actor_id = 1;
+  bool start_or_end = 2;
+}
+
+message SpaceAct_CollectHandbookRecordsChange {
+  repeated Next.HandbookRecord handbook_records = 1;
+}
+
+message SpaceAct_CardMusicChange {
+  uint64 actor_id = 1;
+  uint32 card_music_id = 2;
+}
+
+message SpaceAct_WorldCombatEnter {
+  uint64 npc_id = 1;
+  uint64 avatar_id = 2;
+  int32 world_combat_id = 3;
+  int32 world_combat_cfg_id = 4;
+  int32 world_combat_phase = 5;
+}
+
+message SpaceAct_WorldCombatExit {
+  uint64 avatar_id = 1;
+  int32 world_combat_id = 2;
+  uint64 npc_id = 3;
+  int32 world_combat_cfg_id = 4;
+  int32 world_combat_res = 5;
+}
+
+message SpaceAct_WorldCombatTextPrompts {
+  string text_prompts_id = 1;
+}
+
+message SpaceAct_WorldCombatPhaseUpdate {
+  int32 world_combat_id = 1;
+  uint64 npc_id = 2;
+  int32 world_combat_phase = 3;
+}
+
+message SpaceAct_WorldCombatExtraRewardUpdate {
+  int32 world_combat_id = 1;
+  uint64 npc_id = 2;
+  repeated Next.WorldCombatExtraRewardInfo extra_reward_list = 3;
+}
+
+message SpaceAct_SceneSvrErrEcho {
+  bytes err_str = 1;
+}
+
+message SpaceAct_WorldCombatBegin {
+  uint64 npc_id = 1;
+  repeated uint64 avatar_id = 2;
+  int32 world_combat_id = 3;
+  int32 world_combat_cfg_id = 4;
+  int32 world_combat_phase = 5;
+}
+
+message SpaceAct_WorldCombatFinish {
+  int32 world_combat_id = 1;
+  uint64 npc_id = 2;
+  int32 world_combat_cfg_id = 3;
+  int32 world_combat_res = 4;
+  bool is_boss_challenge = 5;
+  bool is_combat_avatar = 6;
+}
+
+message SpaceAct_WorldCombatDotsSkillCast {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillCastInfo skill_cast_info = 2;
+  Next.Point cast_point = 3;
+  bool is_need_sync_pos = 4;
+}
+
+message SpaceAct_WorldCombatDotsSkillCrush {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillCrushInfo skill_crush_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillCrushEnd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillCrushEndInfo skill_crush_end_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillHit {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillHitInfo skill_hit_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillRotate {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillRotateInfo skill_rotate_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillLookAt {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillLookAtInfo skill_lookat_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillEnd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillEndInfo skill_end_info = 2;
+  Next.Point cast_end_point = 3;
+  bool is_need_sync_pos = 4;
+}
+
+message SpaceAct_WorldCombatDotsSkillMissileLaunch {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillMissileLaunchInfo skill_missile_launch = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillMissileDestroy {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillMissileDestroyInfo skill_missile_destroy = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillMissileStopTrace {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillMissileStopTraceInfo skill_missile_stop_trace = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillJump {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillJumpInfo skill_jump = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillJumpCancel {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillJumpCancelInfo skill_jump_cancel = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillJumpEnd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillJumpEndInfo skill_jump_end = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillRcd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillRcdInfo skill_rcd = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillRcdEnd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillRcdEndInfo skill_rcd_end = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillSelectPos {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillSelectPosInfo skill_select_pos = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillHidden {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillHiddenInfo skill_hidden = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillHiddenEnd {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillHiddenEndInfo skill_hidden_end = 2;
+}
+
+message SpaceAct_BattleAIStatusChanged {
+  uint64 actor_id = 1;
+  uint64 battle_ai_status = 2;
+}
+
+message SpaceAct_SceneAiControlFlagsChanged {
+  uint64 actor_id = 1;
+  uint64 scene_ai_control_flags = 2;
+}
+
+message SpaceAct_RelatedNpcInfosChanged {
+  uint64 actor_id = 1;
+  Next.ActorInfo_RelatedNpcInfos relate_npcs = 2;
+}
+
+message SpaceAct_WorldMapInfoChanged {
+  uint64 actor_id = 1;
+  Next.WorldMapEntries changed_entries = 2;
+  int32 unlocked_world_map_block_cfg_id = 3;
+  Next.LayeredWorldMapExploreInfoOne changed_layered_explore_info = 4;
+  uint64 del_auto_track_npc_logic_id = 5;
+}
+
+message SpaceAct_BattleBuffInfoChanged {
+  uint64 actor_id = 1;
+  repeated Next.BattleBuffBrefInfo buff_info = 2;
+}
+
+message SpaceAct_SameCellTeleport {
+  uint64 actor_id = 1;
+  Next.Point to_pt = 2;
+}
+
+message SpaceAct_VelocityOrientedRotation {
+  uint64 actor_id = 1;
+  Next.Position rotation = 2;
+  Next.SvrAISyncCommonInfo sync_common_info = 3;
+  bool enable = 4;
+}
+
+message SpaceAct_WorldLaunchPlayer {
+  uint64 actor_id = 1;
+  float force_xy = 2;
+  float force_z = 3;
+  Next.Position direction = 4;
+  float cool_down = 5;
+  Next.SvrAISyncCommonInfo sync_common_info = 6;
+}
+
+message SpaceAct_AIPerformGroupIdChanged {
+  uint64 actor_id = 1;
+  int32 perform_group_id = 2;
+}
+
+message SpaceAct_OwlSanctuaryDetected {
+  Next.AvatarOwlSanctuaryInfo owl_sanctuary_info = 1;
+}
+
+message SpaceAct_OwlSanctuaryFruitInfoUpdate {
+  uint32 owl_content_id = 1;
+  repeated Next.OwlSanctuaryFruitBriefInfo fruit_infos = 2;
+  uint64 uin = 3;
+  repeated Next.AvatarOwlSanctuaryInfo owl_sanctuary_infos = 4;
+}
+
+message SpaceAct_WorldCombatDotsSkillShowHideChange {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillShowHideInfo show_hide_info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillPosLerpSync {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillPosLerpSyncInfo info = 2;
+}
+
+message SpaceAct_WorldCombatDotsSkillAnimCancel {
+  uint64 actor_id = 1;
+  Next.WorldCombatDotsSkillAnimCancelInfo info = 2;
+}
+
+message SpaceAct_AirWallChange {
+  repeated int32 add_list = 1;
+  repeated int32 sub_list = 2;
+}
+
+message SpaceAct_HomeBasicInfoChangeNotify {
+  uint64 cell_id = 1;
+  Next.ActorInfo_HomeBasicInfo home_basic_info = 2;
+}
+
+message SpaceAct_HomeBasicVisitorEnterHome {
+  uint64 actor_id = 1;
+  bytes name = 2;
+  bool is_home_owner = 3;
+  Next.HomeOwnerOnlineStatus home_owner_online_status = 4;
+}
+
+message SpaceAct_HomeBasicVisitorLeavingHome {
+  uint64 actor_id = 1;
+  bytes name = 2;
+  bool is_home_owner = 3;
+  Next.HomeOwnerOnlineStatus home_owner_online_status = 4;
+}
+
+message SpaceAct_HomePlantChangeNotify {
+  uint64 actor_id = 1;
+  Next.CellInfo_HomePlantInfo home_plant_info = 3;
+}
+
+message SpaceAct_ActorPlantDataUpdate {
+  Next.ActorPlantData actor_plant_data = 1;
+}
+
+message SpaceAct_HomePlantPlantCrop {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+  int32 seed_id = 3;
+}
+
+message SpaceAct_HomePlantRoleWater {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_HomePlantPetWater {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_HomePlantRoleManure {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_HomePlantPetManure {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_HomePlantOwnerPick {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_HomePlantVisitorPick {
+  uint64 actor_id = 1;
+  int32 land_id = 2;
+}
+
+message SpaceAct_TravelTogetherSync {
+  uint64 actor_id = 1;
+  Next.Position pos_diff = 2;
+}
+
+message SpaceAct_Stun {
+  uint64 actor_id = 1;
+  bool override_duration = 2;
+  float duration = 3;
+  Next.SvrAISyncCommonInfo sync_common_info = 4;
+  float remain_time = 5;
+}
+
+message SpaceAct_DeleteThrowNotify {
+  uint64 caster_id = 1;
+  int32 throw_id = 2;
+  uint64 npc_id = 3;
+  bool is_catch_success = 4;
+  int32 shake_times = 5;
+  bool is_tech_satisfied = 6;
+  bool is_catch = 7;
+  Next.GlassInfo glass_info = 8;
+  bool is_quick_catch = 9;
+  bool is_create_pet_npc = 10;
+}
+
+message SpaceAct_InnerBattle {
+  uint64 actor_id = 1;
+  Next.InnerBattleInfo info = 2;
+}
+
+message SpaceAct_InnerBattleShieldBroken {
+  uint64 actor_id = 1;
+  uint64 world_npc_obj_id = 2;
+  Next.InnerBattlePetDisplay pet_info = 3;
+  uint64 bfd_id = 4;
+  int32 battle_conf_id = 5;
+}
+
+message SpaceAct_InnerBattleChangePet {
+  uint64 actor_id = 1;
+  uint64 world_npc_obj_id = 2;
+  Next.InnerBattlePetDisplay pet_info = 3;
+  uint64 bfd_id = 4;
+  int32 battle_conf_id = 5;
+  bool is_side_b = 6;
+}
+
+message SpaceAct_ActorKeepModel {
+  repeated uint64 keep_model_actor_ids = 1;
+}
+
+message SpaceAct_PetClosenessLvUpgrade {
+  uint64 pet_npc_obj_id = 1;
+  int32 closeness_lv = 2;
+  uint32 owner_avatar_uin = 3;
+}
+
+message SpaceAct_CameraFlash {
+  uint64 actor_id = 1;
+  uint64 camera_npc_id = 2;
+}
+
+message SpaceAct_AISeqIdNotify {
+  repeated uint64 actor_id_list = 1;
+  repeated int32 ai_sed_list = 2;
+}
+
+message SpaceAct_IdleSkill {
+  uint64 actor_id = 1;
+  int32 skill_id = 2;
+  int32 pet_base_id = 3;
+  int32 mutation_type = 4;
+  Next.GlassInfo glass_info = 5;
+  int32 nature = 6;
+  uint64 pet_actor_id = 7;
+}
+
+message SpaceAct_PetVoice {
+  uint64 actor_id = 1;
+  uint64 owner_actor_id = 2;
+  int32 pet_gid = 3;
+}
+
+message SpaceAct_CatchRecordInfoChange {
+  uint64 actor_id = 1;
+  Next.CatchRecordInfo catch_record_datas = 2;
+  repeated uint32 del_habitat_ids = 3;
+  repeated uint32 del_evolution_chain_ids = 4;
+}
+
+message SpaceAct_HabitatNeighborInfoChange {
+  uint64 actor_id = 1;
+  Next.HabitatNeighborRelationInfo change_habitat_neighbor_datas = 2;
+  repeated uint32 del_habitat_ids = 3;
+}
+
+message SpaceAct_AllHabitatNeighborInfo {
+  uint64 actor_id = 1;
+  Next.HabitatNeighborRelationInfo all_habitat_neighbor_datas = 2;
+}

@@ -1,0 +1,114 @@
+package Next;
+
+import "com_pet_team.proto";
+import "com_battle_enum.proto";
+import "com_player_data.proto";
+import "com_goods.proto";
+
+enum DoubleTogetherStatus {
+  DTS_NONE = 0;
+  DTS_WAIT = 1;
+  DTS_TOGETHER = 2;
+  DTS_PAUSE = 3;
+}
+
+enum RelationInteractOperateType {
+  RIOT_BE_INVITED = 1;
+  RIOT_BE_ACCEPTED = 2;
+  RIOT_INTERRUPT = 3;
+  RIOT_END = 4;
+  RIOT_CHANGE = 5;
+}
+
+enum RelationInteractSubType {
+  RIST_NONE = 0;
+  RIST_HOLD_HANDS = 1;
+  RIST_DOUBLE_RIDE = 2;
+}
+
+enum AddFriendSource {
+  AFS_REQ_LIST = 0;
+  AFS_RELATIONSHIP_TREE = 1;
+}
+
+enum SpecialChatSessionUin {
+  SCSU_VISIT_TEAM = 1;
+  SCSU_MULTI_TEAM = 2;
+}
+
+enum ChatMessageType {
+  CMT_NORMAL = 0;
+  CMT_GIVE_GIFT = 1;
+}
+
+message InteractParam {
+  int32 action_id = 2;
+  bool is_lock = 3;
+  uint32 picked_egg_gid = 4;
+  uint32 picked_bagitem_conf_id = 5;
+  uint32 picked_pet_gid = 6;
+  uint64 picked_pet_npc_id = 7;
+}
+
+message RelationshipTreeData {
+  uint32 peer_uin = 1;
+  bytes relationship_bits = 2;
+}
+
+message PlayerFriendPinnedItem {
+  uint32 uin = 1;
+  int64 pinned_time = 2;
+}
+
+message PlayerFriendInfo {
+  repeated Next.PlayerFriendPinnedItem pinned_list = 1;
+}
+
+message ChatSessionInfo {
+  message BasicInfo {
+    uint32 uin = 1;
+    uint64 time_stamp = 2;
+  }
+  message FriendSessionInfo {
+    bytes name = 1;
+    bytes note = 2;
+    bytes head_img = 3;
+    uint32 card_icon_selected = 4;
+    bool online = 5;
+    uint32 last_logout_time = 6;
+    Next.PlayerBattleState state = 7;
+    Next.PlayerBattleBriefInfo battle_brief_info = 8;
+    uint32 gende = 9;
+    uint32 level_award_info = 10;
+    uint32 regist_date = 11;
+    uint32 world_level = 12;
+    uint32 offline_msg_num = 13;
+    Next.FriendVisitInfo visit_info = 14;
+  }
+  uint32 uin = 1;
+  bytes name = 2;
+  bytes note = 3;
+  bytes head_img = 4;
+  uint64 time_stamp = 5;
+  uint32 card_icon_selected = 6;
+  Next.ChatSessionInfo.BasicInfo basic_info = 7;
+  Next.ChatSessionInfo.FriendSessionInfo friend_session_info = 8;
+}
+
+message ChatMessageInfo {
+  message MsgDetailInfo {
+    uint32 session_uin = 1;
+    bytes name = 2;
+    bytes note = 3;
+    uint32 card_icon_selected = 4;
+    bool need_cypher = 5;
+    bool is_friend = 6;
+  }
+  uint32 uin = 1;
+  bytes chat_message = 2;
+  uint64 time_stamp = 3;
+  Next.ChatMessageInfo.MsgDetailInfo msg_detail_info = 4;
+  Next.ChatMessageType chat_msg_type = 5;
+  Next.GiftData gift_data = 6;
+  int64 msg_uid = 7;
+}

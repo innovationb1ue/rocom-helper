@@ -1,0 +1,669 @@
+package Next;
+
+import "com_pet.proto";
+import "com_pet_team.proto";
+import "com_task.proto";
+import "com_appearance.proto";
+import "com_battle_enum.proto";
+import "com_base_types.proto";
+import "xls_enum.proto";
+
+enum MinigameStatus {
+  MS_PROGRESS = 0;
+  MS_OPEN = 1;
+  MS_RECOVERY = 2;
+  MS_FINISH = 3;
+  MS_TIMEOUT = 4;
+  MS_EXIT = 5;
+  MS_REOPEN = 6;
+  MS_OFFLINE = 7;
+  MS_ENTER_BATTLE = 8;
+  MS_REWARDED = 9;
+  MS_DIE = 10;
+  MS_LEAVE_DUNGEON = 11;
+}
+
+enum ActivityRewardType {
+  ACTIVITY_REWARD_TYPE_NORMAL = 0;
+  ACTIVITY_REWARD_TYPE_SCORE = 1;
+}
+
+enum PlayerSeasonAdventureChapterStatus {
+  LOCK = 0;
+  UNLOCK = 1;
+  REWARED = 2;
+}
+
+message PlayerActivityInfo_ActivityStageData_SubRewardData {
+  uint32 stage_index = 1;
+  bool is_reward_taken = 2;
+  uint32 login_timestamp = 3;
+}
+
+message PlayerActivityInfo_ActivityStageData_SubData {
+  uint32 activity_stage_id = 1;
+  bool is_disposable_reward_taken = 2;
+  repeated Next.PlayerActivityInfo_ActivityStageData_SubRewardData reward_data = 3;
+  uint32 stage_timestamp = 4;
+  uint32 open_timestamp = 5;
+  uint32 enter_scene_time = 6;
+  uint32 total_stage_days = 7;
+  bool active = 8;
+}
+
+message PlayerActivityInfo_ActivityStageData {
+  repeated Next.PlayerActivityInfo_ActivityStageData_SubData sub_stage_data = 8;
+}
+
+message PlayerActivityInfo_ActivityPartData_ActivityPartParam {
+  uint32 param1 = 1;
+  string param2 = 2;
+}
+
+message PlayerActivityInfo_ActivityPartData {
+  uint32 activity_part_id = 1;
+  Next.PlayerActivityInfo.ActivityPartState state = 3;
+  Next.PlayerActivityInfo_ActivityPartData_ActivityPartParam param = 4;
+  uint32 open_timestamp = 5;
+}
+
+message PlayerActivityInfo_ActivityPetCatchData {
+  uint32 points = 1;
+  repeated uint32 received_rewards_index = 2;
+}
+
+message PlayerActivityInfo_ActivityShinyPetDayData {
+  uint32 activity_sub_id = 1;
+  uint32 total_catch_num = 2;
+  uint32 frist_caught_ranking = 3;
+  uint32 frist_caught_timestamp = 4;
+  uint32 frist_caught_camp = 5;
+  repeated uint32 shiny_caught_timestamps = 6;
+  uint32 received_reward = 7;
+  bool expired = 8;
+  uint32 flower_seed_content_id = 9;
+  bool petaled = 10;
+}
+
+message PlayerActivityInfo_ChallengeTarget {
+  int32 target_id = 1;
+  bool is_finish = 2;
+  Next.BattleTaskState temp_state = 3;
+}
+
+message PlayerActivityInfo_ChallengePetUseRate {
+  int32 pet_base_id = 1;
+  int32 use_rate = 2;
+}
+
+message PlayerActivityInfo_ChallengeLevel {
+  int32 challenge_id = 1;
+  bool is_finish = 2;
+  repeated Next.PlayerActivityInfo_ChallengeTarget targets = 3;
+  int32 take_times = 4;
+  uint32 finish_timestamp = 5;
+  uint32 level_number = 6;
+  bool is_unlock = 7;
+}
+
+message PlayerActivityInfo_ChallengeReward {
+  int32 star_required_num = 1;
+  Next.PlayerActivityInfo.ActivityRewardState state = 2;
+  int32 reward_id = 3;
+  int32 magic_lv_required = 4;
+}
+
+message PlayerActivityInfo_ActivityNpcChallengeData_Module {
+  int32 module_id = 1;
+  repeated Next.PlayerActivityInfo_ChallengeLevel levels = 2;
+  bool is_readed = 3;
+}
+
+message PlayerActivityInfo_ActivityNpcChallengeData {
+  int32 event_id = 1;
+  repeated Next.PlayerActivityInfo_ActivityNpcChallengeData_Module modules = 2;
+  repeated Next.PlayerActivityInfo_ChallengeReward rewards = 3;
+  int32 perfect_level_number = 4;
+  int32 last_level_id = 5;
+  repeated Next.PlayerActivityInfo_ChallengePetUseRate pet_use_rate = 6;
+}
+
+message PlayerActivityInfo_ActivityBossChallengeData {
+  int32 event_id = 1;
+  repeated Next.PlayerActivityInfo_ChallengeLevel levels = 2;
+  repeated Next.PlayerActivityInfo_ChallengeReward rewards = 3;
+  int32 buff_rule_id = 4;
+  int32 perfect_level_number = 5;
+  int32 last_level_id = 6;
+  repeated Next.PlayerActivityInfo_ChallengePetUseRate pet_use_rate = 7;
+  int32 battle_round = 8;
+  uint32 weakness_attack_count = 9;
+  repeated uint32 enter_battle_pet_gids = 10;
+}
+
+message PlayerActivityInfo_ActivityWeeklyChallengeTeam {
+  repeated uint32 pet_conf_id = 1;
+  uint32 total_cheer_point = 2;
+  repeated uint32 pet_gid = 3;
+  uint32 team_id = 4;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeDataPhoto photo = 5;
+  repeated uint32 fashion_ids = 6;
+  repeated Next.SalonItemWearData salon_item_data = 7;
+  repeated Next.PlayerAppearanceInfo_FashionInfo_WardrobeItem wearing_item = 8;
+}
+
+message PlayerActivityInfo_ActivityWeeklyChallengeDataPhoto {
+  uint32 photo_template_id = 1;
+  repeated uint32 pet_conf_id = 2;
+  repeated uint32 pet_gid = 3;
+  uint64 timestamp = 4;
+  repeated uint32 anime_percent = 5;
+}
+
+message PlayerActivityInfo_ActivityWeeklyChallengeInfo {
+  uint32 challenge_id = 1;
+  bool is_clear = 2;
+  uint32 highest_cheer_point = 3;
+  uint32 challenge_times = 4;
+  uint32 target_cheer_point = 5;
+}
+
+message PlayerActivityInfo_WeeklyChallengeEquipSkill {
+  uint32 pet_gid = 1;
+  repeated Next.PetSkillEquipInfo equip_infos = 2;
+}
+
+message PlayerActivityInfo_ActivityWeeklyChallengeData {
+  uint32 event_id = 1;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeInfo challenge_info = 2;
+  repeated Next.PlayerActivityInfo_ChallengeReward rewards = 3;
+  repeated Next.PlayerActivityInfo_ChallengePetUseRate pet_use_rate = 4;
+  repeated Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam pet_teams = 5;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam team_photo = 6;
+  uint32 photo_cheer_point_required = 7;
+  repeated Next.PlayerActivityInfo_WeeklyChallengeEquipSkill equip_skills = 8;
+}
+
+message PlayerActivityInfo_TerritoryTrialInfo {
+  uint32 challenge_id = 1;
+  uint32 highest_score = 2;
+  uint32 least_finish_round = 3;
+  uint32 battle_conf_id = 4;
+}
+
+message PlayerActivityInfo_ActivityTerritoryTrialData {
+  uint32 base_id = 1;
+  Next.PlayerActivityInfo_TerritoryTrialInfo trial_info = 2;
+  repeated Next.PlayerActivityInfo_ChallengeReward rewards = 3;
+}
+
+message PlayerActivityInfo_ActivityTreasureHuntData_TreasureData {
+  uint32 activity_sub_id = 1;
+  Next.PlayerActivityInfo.ActivityRewardState reward_state = 2;
+  repeated bool ride_pet_unlock = 3;
+  bool is_enter = 4;
+}
+
+message PlayerActivityInfo_ActivityTreasureHuntData {
+  repeated Next.PlayerActivityInfo_ActivityTreasureHuntData_TreasureData treasure_data = 1;
+  bool unlock = 2;
+}
+
+message PlayerActivityInfo_ActivityUpData_HatchUpStats {
+  uint32 egg_id = 1;
+  uint32 pet_id = 2;
+  uint32 hatch_finish_time = 3;
+  uint32 mutation_type = 4;
+  Next.GlassInfo glass_info = 5;
+}
+
+message PlayerActivityInfo_ActivityUpData {
+  uint64 last_hatch_up_sec = 1;
+  repeated Next.PlayerActivityInfo_ActivityUpData_HatchUpStats hatch_up_stats = 2;
+}
+
+message PlayerActivityInfo_ActivityFlowerAppearData {
+  uint32 activity_sub_id = 1;
+  repeated uint32 flower_seed_content_id = 2;
+}
+
+message PlayerActivityInfo_ActivityPetCollectionData_Reward {
+  uint32 pet_base_id = 1;
+  uint32 reward_type = 2;
+}
+
+message PlayerActivityInfo_ActivityPetCollectionData {
+  uint32 disposable_reward_taken_time = 1;
+  repeated uint32 collection_pet = 2;
+  repeated uint32 collection_pet_rewards = 3;
+  repeated Next.PlayerActivityInfo_ActivityPetCollectionData_Reward pet_rewards = 4;
+}
+
+message ActivityScoreRewardItemData {
+  int32 activity_rewards_index = 1;
+  Next.PlayerActivityInfo.ActivityRewardState state = 2;
+}
+
+message ActivityScoreRewardCompData {
+  repeated Next.ActivityScoreRewardItemData reward_data = 2;
+}
+
+message PetPartnerItem {
+  uint32 pet_base_id = 1;
+  uint32 egg_id = 2;
+  uint32 color_random_id = 3;
+  uint32 particle_random_id = 4;
+}
+
+message PlayerActivityInfo_ActivityPartnerData {
+  Next.PetData inherit_pet_data = 1;
+  repeated Next.PetPartnerItem pet_partner_items = 2;
+  uint32 select_pet_base_id = 3;
+  bool committed = 4;
+  bool choose_inherit_pet = 5;
+  bool maintain_expression = 6;
+}
+
+message PlayerActivityInfo_ActivitySpringFestivalData {
+  repeated uint32 global_popularity_task_ids = 1;
+}
+
+message InviteeInfo {
+  uint32 uin = 1;
+  uint32 level = 2;
+  string platform_name = 3;
+  string platform_openid = 4;
+  uint32 inviter_uin = 5;
+  uint32 invite_ts = 6;
+  uint32 register_ts = 7;
+  repeated uint32 part_id_claimed_list = 8;
+  uint32 last_update_ts = 9;
+}
+
+message PlayerActivityInfo_ActivityInviteRegisterData {
+  repeated Next.InviteeInfo invitee_list = 1;
+}
+
+message SeasonPreHeat_Section {
+  int32 idx = 1;
+  int32 statue = 2;
+  int64 finish_timestamp = 3;
+}
+
+message PlayerActivityInfo_ActivitySeasonPreHeatData {
+  uint32 activity_sub_id = 1;
+  Next.PlayerActivityInfo.ActivityRewardState final_reward_status = 2;
+  repeated Next.SeasonPreHeat_Section section_list = 3;
+}
+
+message PlayerActivityInfo_ActivityPetCertificationData {
+  uint32 activity_sub_id = 1;
+  uint32 progress = 2;
+  uint32 task_state = 3;
+  uint32 choosen_certificate_pet = 4;
+}
+
+message PlayerActivityInfo_ActivityPetPhotoData {
+  repeated uint32 already_taken_pets = 1;
+  bool is_disposable_reward_taken = 2;
+}
+
+message PlayerActivityInfo_ActivityData {
+  uint32 activity_id = 1;
+  dataconfig.ActivityType activity_type = 9;
+  bool expired = 10;
+  bool should_disppeared = 13;
+  bool first_open = 15;
+  uint32 activity_finish_time = 20;
+  bool track_red_point_add_flag = 27;
+  bool activity_unlock_advance = 28;
+  int32 lottery_result = 29;
+  Next.ActivityScoreRewardCompData score_reward_comp_data = 30;
+  uint32 login_accelerate_days = 32;
+  int64 last_refresh_content_timestamp = 37;
+  uint32 activity_open_time = 49;
+  Next.PlayerActivityInfo_ActivityStageData stage_data = 2;
+  repeated Next.PlayerActivityInfo_ActivityPartData part_data = 3;
+  Next.PlayerActivityInfo_ActivityPartData legendary_battle_data = 4;
+  Next.PlayerActivityInfo_ActivityPetCatchData pet_catch_data = 5;
+  Next.PlayerLimitedFlowerSeedInfo limited_flower_seed_info = 6;
+  Next.PlayerActivityInfo_ActivityShinyPetDayData shiny_pet_day_data = 7;
+  Next.PlayerActivityInfo_ActivityNpcChallengeData npc_challenge_data = 11;
+  Next.PlayerActivityInfo_ActivityBossChallengeData boss_challenge_data = 12;
+  Next.PlayerActivityInfo_ActivityTreasureHuntData treasure_hunt_data = 14;
+  Next.PlayerActivityInfo_ActivityUpData up_data = 16;
+  Next.PlayerActivityInfo_ActivityFlowerAppearData flower_appear_data = 17;
+  Next.PlayerActivityInfo_ActivityWeeklyChallengeData weekly_challenge_data = 18;
+  Next.PlayerActivityInfo_ActivityPetCollectionData pet_collection_data = 19;
+  Next.PlayerActivityInfo_ActivitySeasonCheckinData season_checkin_data = 21;
+  Next.PlayerActivityInfo_ActivityDrop drop_data = 22;
+  Next.PlayerActivityInfo_ActivityInheritPetData inherit_pet_data = 23;
+  Next.PlayerActivityInfo_ActivityCoCreation co_creation_data = 24;
+  Next.PlayerActivityInfo_ActivityMixData mix_data = 25;
+  Next.PlayerActivityInfo_ActivityConditionGroupData cond_group_data = 26;
+  Next.PlayerActivityInfo_ActivityPartnerData pet_partner_data = 31;
+  Next.PlayerActivityInfo_ActivitySpringFestivalData spring_festival_data = 33;
+  Next.PlayerActivityInfo_ActivitySeasonPreHeatData season_preheat_data = 34;
+  Next.PlayerActivityInfo_ActivityInviteRegisterData invite_register_data = 35;
+  Next.PlayerActivityInfo_ActivityTerritoryTrialData territory_trial_data = 36;
+  Next.PlayerActivityInfo_ActivityPetPhotoData pet_photo_data = 38;
+  Next.PlayerActivityInfo_ActivityPetCertificationData pet_certification_data = 39;
+}
+
+message PlayerActivityInfo {
+  enum ActivityPartState {
+    APS_NONE = 0;
+    APS_OPEN = 1;
+    APS_WAIT = 2;
+    APS_DONE = 3;
+    APS_CLOSE = 4;
+  }
+  enum ActivityRewardState {
+    ARS_UNOPEN = 0;
+    ARS_UNFINISH = 1;
+    ARS_WAIT = 2;
+    ARS_DONE = 3;
+  }
+  repeated Next.PlayerActivityInfo_ActivityData activity_data = 1;
+  uint32 last_enter_scene_timestamp = 2;
+  uint32 login_days = 3;
+  uint32 login_seconds = 4;
+  uint32 login_single_seconds = 5;
+  uint32 lost_days = 6;
+  uint32 last_record_login_day_timestamp = 7;
+  uint32 npc_challenge_perfect_level_number = 8;
+  uint32 boss_challenge_perfect_level_number = 9;
+  repeated Next.PlayerActivityInfo_ActivityWeeklyChallengeTeam photos = 10;
+  Next.PlayerActivityLoginHistory login_history = 11;
+}
+
+message PlayerActivityInfo_ActivitySeasonCheckinRewardData {
+  int32 activity_rewards_index = 1;
+  Next.PlayerActivityInfo.ActivityRewardState state = 2;
+}
+
+message PlayerActivityInfo_ActivitySeasonCheckinData {
+  repeated uint32 act_task_list = 1;
+  repeated Next.PlayerActivityInfo_ActivitySeasonCheckinRewardData reward_data = 2;
+}
+
+message PlayerActivityInfo_ActivityDropItem {
+  int32 item_id = 1;
+  int32 item_type = 2;
+  int32 item_num_today = 3;
+  int32 item_num_total = 4;
+}
+
+message PlayerActivityInfo_ActivityDropOnlineInfo {
+  uint32 drop_method_id = 1;
+  uint32 enter_timestamp = 2;
+  uint32 online_time = 3;
+  uint32 last_check_timestamp = 4;
+}
+
+message PlayerActivityInfo_ActivityDropGroup {
+  uint32 method_id = 1;
+  repeated Next.PlayerActivityInfo_ActivityDropItem drop_item_list = 2;
+  bool reach_daily_limit = 3;
+}
+
+message PlayerActivityInfo_ActivityDrop {
+  repeated Next.PlayerActivityInfo_ActivityDropGroup method_drop_list = 1;
+  repeated Next.PlayerActivityInfo_ActivityDropOnlineInfo online_list = 2;
+}
+
+message PlayerActivityInfo_ActivityCoCreation {
+  uint32 first_caught_ranking = 1;
+  uint32 first_caught_timestamp = 2;
+  uint32 emoj_type = 3;
+  repeated uint32 caught_camp = 4;
+  Next.PlayerActivityInfo.ActivityRewardState reward_state = 5;
+  Next.PlayerActivityInfo.ActivityRewardState supply_egg_state = 6;
+  Next.PlayerActivityInfo.ActivityRewardState task_reward_state = 7;
+  repeated uint32 emoj_list = 8;
+}
+
+message PlayerActivityInfo_ActivityInheritPetData {
+  Next.PetBriefInfo inherit_pet_info = 1;
+  bool add_redpoint = 2;
+  bool first_uploaded = 3;
+  int64 reserved1 = 4;
+}
+
+message BattleFieldItem {
+  uint32 battle_id = 1;
+  bool finish = 2;
+  repeated dataconfig.ActivityFaction factions = 3;
+}
+
+message NpcChallengeItem {
+  uint32 id = 1;
+  repeated Next.BattleFieldItem battle_field_items = 2;
+}
+
+message FinishFactionItem {
+  dataconfig.ActivityFaction faction = 1;
+  int64 finish_time = 2;
+}
+
+message PlayerActivityInfo_ActivityMixData {
+  dataconfig.ActivityFaction faction = 1;
+  int64 refresh_time = 2;
+  int64 next_refresh_time = 3;
+  uint32 main_task_id = 4;
+  repeated uint32 optional_task_id = 5;
+  int32 remain_refresh_times = 6;
+  repeated Next.NpcChallengeItem npc_challenge_items = 7;
+  bool init_faction = 8;
+  repeated Next.FinishFactionItem finished_faction = 9;
+  bool can_choose_new_faction = 10;
+  bool experience_card_popup = 11;
+  bool all_finish = 12;
+  repeated uint32 finish_task_id = 13;
+  bool faction_rank_settled = 14;
+  dataconfig.ActivityFaction first_choose_faction = 15;
+}
+
+message PlayerActivityLoginHistory {
+  repeated uint32 history_data = 1;
+  uint32 last_record_day = 2;
+}
+
+message ActivityCoCreationEmojItem {
+  uint32 emoj_type = 1;
+  uint64 emoj_cnt = 2;
+}
+
+message ActivityCoCreationEmojInfo {
+  repeated Next.ActivityCoCreationEmojItem emoj_list = 1;
+}
+
+message BeastResonanceInfo {
+  uint32 uin = 1;
+  uint32 start_resonance_time = 2;
+  int32 ticket_id = 3;
+  int32 ticket_num = 4;
+}
+
+message MinigameProgress {
+  uint32 npc_cfg_id = 1;
+  uint32 value = 2;
+}
+
+message BossBattleRuleInfo {
+  uint64 boss_obj_id = 1;
+  repeated uint32 rule_ids = 2;
+  uint32 level = 3;
+}
+
+message SeasonPlayerGrowth {
+  uint32 id = 1;
+  uint32 pet_gid = 2;
+  uint32 feature_skill_id = 3;
+}
+
+message SeasonPartData {
+  uint32 part_id = 1;
+  uint32 item_id = 2;
+}
+
+message SeasonInfo {
+  uint32 season_id = 1;
+  int32 season_kv_type = 2;
+  uint32 popup_time = 3;
+  repeated Next.BossBattleRuleInfo boss_battle_rule_infos = 4;
+  repeated Next.SeasonPlayerGrowth light_growths = 5;
+  uint32 season_pve_id = 6;
+  repeated Next.SeasonPartData season_part_datas = 7;
+  uint32 season_pv_time = 8;
+  uint32 season_pop_windows_time = 9;
+}
+
+message PlayerLimitedFlowerSeedInfo_PreTaskInfo {
+  uint32 task_id = 1;
+  Next.EMTaskState task_state = 2;
+}
+
+message PlayerLimitedFlowerSeedInfo_InvestTaskInfo {
+  uint32 task_id = 1;
+  Next.EMTaskState task_state = 2;
+}
+
+message PlayerLimitedFlowerSeedInfo_SubTaskInfo {
+  uint32 task_id = 1;
+  uint32 task_target = 2;
+  Next.EMTaskState task_state = 3;
+}
+
+message PlayerLimitedFlowerSeedInfo_FinalTaskInfo {
+  uint32 task_id = 1;
+  uint32 task_target = 2;
+  Next.EMTaskState task_state = 3;
+}
+
+message PlayerLimitedFlowerSeedInfo_HandbookTaskInfo {
+  uint32 pet_raise_task_id = 1;
+  Next.PlayerLimitedFlowerSeedInfo_FinalTaskInfo final_task_info = 2;
+  repeated Next.PlayerLimitedFlowerSeedInfo_SubTaskInfo sub_task_info = 3;
+}
+
+message PlayerLimitedFlowerSeedInfo {
+  uint32 spec_flower_seed_id = 1;
+  Next.PlayerLimitedFlowerSeedInfo_PreTaskInfo pre_task_info = 2;
+  repeated Next.PlayerLimitedFlowerSeedInfo_InvestTaskInfo invest_task_info = 3;
+  repeated Next.PlayerLimitedFlowerSeedInfo_HandbookTaskInfo handbook_task_info = 4;
+  uint32 flower_seed_content_id = 5;
+}
+
+message PlayerGPContestInfo {
+  enum GPContestState {
+    GPCS_NONE = 0;
+    GPCS_OPEN = 1;
+    GPCS_REWARD = 2;
+    GPCS_DONE = 3;
+  }
+  int32 gp_contest_state = 1;
+  uint32 gp_contest_rank_id = 2;
+  uint32 gp_num_victory = 3;
+  uint32 gp_num_add = 4;
+  repeated bool reward_taken = 5;
+}
+
+message PlayerLevelAwardInfo {
+  repeated uint32 valid_awards = 1;
+}
+
+message ClimbChapterItem {
+  uint32 chapter_id = 1;
+  uint32 now_finish_stage = 2;
+}
+
+message PlayerClimbChapterInfo {
+  repeated Next.ClimbChapterItem chapter_list = 1;
+}
+
+message PlayerAdventureChapterInfo {
+  uint32 pet_id = 1;
+  repeated uint32 chapters = 2;
+}
+
+message PlayerAdventureChapterList {
+  repeated Next.PlayerAdventureChapterInfo open_chapter_list = 1;
+}
+
+message PlayerAdventureData {
+  uint32 open_chapter = 1;
+  repeated uint32 rewarded_chapter = 2;
+  repeated uint32 chapters = 3;
+  Next.PlayerAdventureChapterList open_chapters = 4;
+}
+
+message PlayerShinyPetDayInfo {
+  uint32 petal_num = 1;
+  bool init = 8;
+  uint32 last_refresh_timestamp = 2;
+  uint32 total_double_times = 3;
+  uint32 remaining_doule_times = 4;
+  bool pre_deduct_double_times = 5;
+  bool has_petal = 6;
+  uint32 lock_activity = 7;
+}
+
+message PlayerActivityInfo_ConditionGroupConditionData {
+  uint32 condition_id = 1;
+  Next.PlayerActivityInfo.ActivityRewardState reward_state = 2;
+}
+
+message PlayerActivityInfo_ConditionGroupSingleData {
+  uint32 group_id = 1;
+  bool is_finish_all = 2;
+  repeated Next.PlayerActivityInfo_ConditionGroupConditionData cond_data = 3;
+  bool is_unlock = 4;
+}
+
+message PlayerActivityInfo_ActivityConditionGroupData {
+  Next.PlayerActivityInfo.ActivityRewardState reward_state = 1;
+  repeated Next.PlayerActivityInfo_ConditionGroupSingleData group_data = 2;
+}
+
+message FactionRankInfo {
+  message RankInfo {
+    dataconfig.ActivityFaction faction = 1;
+    uint64 score = 2;
+  }
+  repeated Next.FactionRankInfo.RankInfo rank_list = 1;
+}
+
+message PlayerSeasonAdventureBadge {
+  uint32 badge_lvl = 1;
+}
+
+message PlayerSeasonAdventureChapter {
+  uint32 chapter_id = 1;
+  uint32 status = 2;
+  uint32 normal_progress = 3;
+  uint32 challenge_progress = 4;
+}
+
+message SeasonAdventure {
+  uint32 season_id = 1;
+  repeated Next.PlayerSeasonAdventureChapter chapter_list = 2;
+  Next.PlayerSeasonAdventureBadge badge_info = 3;
+  uint64 open_time = 4;
+  uint64 settle_time = 5;
+}
+
+message DumpSeasonAdventure {
+  uint32 season_id = 1;
+  Next.PlayerSeasonAdventureBadge badge_info = 3;
+  uint64 open_time = 4;
+  uint64 settle_time = 5;
+  uint32 normal_progress = 6;
+  uint32 challenge_progress = 7;
+  uint32 finish_chapter_cnt = 8;
+}
+
+message PlayerSeasonAdventureData {
+  Next.SeasonAdventure cur_season = 1;
+  repeated Next.DumpSeasonAdventure dump_season_list = 2;
+}

@@ -1,0 +1,19 @@
+package Next;
+
+import "com_pet.proto";
+import "com_home.proto";
+
+message HomePetGuardOp {
+  uint32 pet_gid = 1;
+  Next.HomePetGuardOpType op_type = 2;
+  Next.SceneBasePetData pet_base_data = 3;
+}
+
+message HomeBasicSyncData {
+  bool is_owner_online = 1;
+  bytes home_name = 2;
+}
+
+message ActorPlantData {
+  int32 steal_cnt = 1;
+}

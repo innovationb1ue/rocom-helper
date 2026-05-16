@@ -1,0 +1,698 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_task.proto";
+import "com_account.proto";
+import "com_activity.proto";
+import "com_action.proto";
+import "com_bookshelf.proto";
+import "com_home.proto";
+import "com_magebook.proto";
+import "com_player_settings.proto";
+import "com_appearance.proto";
+import "com_player_data.proto";
+import "com_battle_enum.proto";
+import "com_battle.proto";
+import "com_pet.proto";
+import "com_pet_team.proto";
+import "com_handbook.proto";
+import "com_pet_egg.proto";
+import "com_pet_medal.proto";
+import "com_goods.proto";
+import "com_shop.proto";
+import "com_recharge.proto";
+import "com_mail.proto";
+import "com_misc.proto";
+import "com_dungeon.proto";
+import "com_story_flag.proto";
+import "xls_enum.proto";
+
+enum BagItemIdFlag {
+  PET_BALL_COLLECTED = 1;
+}
+
+enum PlayerPhotoAlbumType {
+  PLAYER_PHOTO_ALBUM_TYPE_NONE = 0;
+  PLAYER_PHOTO_ALBUM_TYPE_PHOTO = 1;
+  PLAYER_PHOTO_ALBUM_TYPE_CARD = 2;
+}
+
+enum PlayerBriefInfoGroup {
+  PLAYER_BRIEF_GROUP_ALL = 0;
+  PLAYER_BRIEF_GROUP_BASEINFO = 1;
+  PLAYER_BRIEF_GROUP_TIMERELATED = 2;
+  PLAYER_BRIEF_GROUP_ONLINESTATE = 3;
+  PLAYER_BRIEF_GROUP_PERMISSIONS = 4;
+  PLAYER_BRIEF_GROUP_ADDITIONAL = 5;
+  PLAYER_BRIEF_GROUP_VIRTUALITEMS = 6;
+  PLAYER_BRIEF_GROUP_HOMEINFO = 7;
+  PLAYER_BRIEF_GROUP_BATTLESTATE = 8;
+}
+
+message GuideGroup {
+  uint32 group_id = 1;
+  bool finish_all = 2;
+  repeated uint32 finish_index = 3;
+}
+
+message PlayerMiscInfo {
+  Next.ThrowItemInfo cur_selected_throw_item = 1;
+  uint32 diamond_buy_star_times = 2;
+  int32 cur_selected_magic_item_gid = 3;
+  uint32 star_recover_time = 4;
+  repeated uint32 player_rp_behavior_list = 5;
+  int32 minute_send_add_friend_count = 6;
+  repeated uint32 battle_ai_world_num = 7;
+  uint32 star_debris_recover_time = 8;
+  uint32 star_debris_state = 9;
+  repeated Next.StorageGoodsInfo storage_goods = 10;
+  Next.PlayerGPContestInfo gp_contest_info = 11;
+  uint32 pve_challenge_pet_selected_id = 12;
+  int32 friend_num_cache = 13;
+  repeated Next.GuideGroup guide_info = 14;
+  Next.HomeLevelRewardInfo home_level_reward_info = 15;
+  bool query_h5_succ = 16;
+  uint64 last_move_merge_time = 17;
+  int32 last_fashionbond_tab = 18;
+  uint64 ios_rating_popup_time = 19;
+  int64 netbar_reward_expiration = 21;
+  string gift_code = 22;
+  int32 plat_friend_num_cache = 23;
+  bool video_recording = 24;
+  repeated uint32 player_rp_behavior_using_list = 25;
+}
+
+message PlayerBookData {
+  repeated Next.BookData book_data = 1;
+}
+
+message GuideBook {
+  uint32 id = 1;
+  repeated Next.StampInfo stamps = 2;
+  uint32 unlocked_at = 3;
+}
+
+message PlayerWorldMapInfo {
+  repeated Next.GuideBook guide_books = 1;
+}
+
+message PlayerMageBookInfo {
+  repeated Next.MageNpcInfo npcs = 1;
+  repeated uint32 delayed_npcs = 2;
+  repeated uint32 delayed_items = 3;
+  repeated uint32 helper_npcs = 4;
+  repeated Next.MageNpcAssignInfo helper_assign = 5;
+  bool enabled = 6;
+  uint32 npc_refresh_time = 7;
+  uint32 helper_assign_time = 8;
+  repeated Next.MageNpcCampInfo camp_info = 9;
+  repeated Next.MageCampAssignInfo camp_assign = 10;
+}
+
+message PetTeamShareData {
+  repeated uint32 valid_pet_gids = 1;
+}
+
+message PlayerMailFailInfo {
+  repeated Next.MailFailInfo mail_fail_info_list = 1;
+}
+
+message EvalutionGroupShareForm {
+  uint32 evaluation_group = 1;
+  uint32 card_quality = 2;
+}
+
+message ShareFormItem {
+  uint32 id = 1;
+}
+
+message PlayerShareFormInfo {
+  repeated Next.ShareFormItem share_form_item = 1;
+  repeated Next.EvalutionGroupShareForm evaluation_share_form_info = 2;
+}
+
+message PlayerQQAchievementStats {
+  int64 use_pet_ball_num = 1;
+}
+
+message PlayerQQAchievementInfo {
+  int64 cur_day = 1;
+  int32 day_acc_game_duration = 2;
+  int64 last_stat_time = 3;
+  bytes achievement_reg_channel = 6;
+  Next.PlayerQQAchievementStats stats = 7;
+}
+
+message PlayerEmojiItem {
+  int32 emoji_id = 1;
+  bool is_unlock = 2;
+}
+
+message PlayerEmojiBagInfo {
+  repeated Next.PlayerEmojiItem emoji_list = 1;
+}
+
+message PetCertiMedalHistory {
+  int32 activity_id = 1;
+  int32 pet_chains = 2;
+}
+
+message PlayerPetMedalInfo {
+  repeated Next.PetMedalInfo medal_infos = 1;
+  repeated Next.PetMedalRecord collection = 2;
+  repeated Next.PetMedalAddi addi_info = 3;
+  repeated Next.PetCertiMedalHistory pet_certi_history = 4;
+}
+
+message CliPetMedalInfo {
+  repeated Next.PetMedalRecord collection = 1;
+}
+
+message PlayerGiftInfo {
+  repeated Next.GiftGivingData gift_giving_datas = 1;
+  uint32 check_giving_gift_timestamp = 2;
+}
+
+message PlayerBattleData_ObserveBattleData {
+  uint32 uin = 1;
+  uint64 flag = 2;
+  Next.PlayerSceneInfo backup_scene = 3;
+}
+
+message PlayerBattleData {
+  enum SETTLE_STEP {
+    SETTLE_STEP_IDLE = 0;
+    SETTLE_STEP_GAMING = 1;
+    SETTLE_STEP_ZONE = 2;
+    SETTLE_STEP_SCENE = 3;
+  }
+  enum PBD_FLAG {
+    PBDF_TELEPORT_ING = 1;
+    PBDF_NEED_SCENE_BACK = 2;
+    PBDF_WAIT_BATTLE_LAUNCH = 4;
+    PBDF_CREATE_BATTLE_ING = 8;
+  }
+  Next.CreateBattleInfo create_battle_info = 1;
+  uint64 battle_inst_id = 3;
+  uint64 battle_field_id = 4;
+  Next.SourceData source_data = 5;
+  Next.PlayerBattleData.SETTLE_STEP settle_step = 6;
+  Next.BattleSettleInfo settle_info = 7;
+  int32 scene_rpc_ing = 8;
+  int32 scene_rpc_cnt = 13;
+  Next.PlayerBattleData_SceneSettleInfo scene_settle_info = 9;
+  bool need_check = 10;
+  Next.PlayerBattleData_ObserveBattleData observe_battle = 11;
+  uint32 bfid_inc_id = 12;
+  uint32 z2b_create_ing = 15;
+}
+
+message PlayerMailDataInfo {
+  uint32 mail_cache_num = 1;
+  uint32 last_marquee_check_time = 2;
+}
+
+message PlayerSvrDataInfo {
+  int32 time_offset = 6;
+  uint32 last_daily_tick_time = 7;
+  Next.PlayerDungeonInfo dungeon_info = 11;
+  Next.PlayerHopeData hope_data = 12;
+  Next.PlayerBattlePassInfo battle_pass_info = 13;
+  Next.PlayerCardInfo card_info = 14;
+  Next.PlayerSubTaskInfo sub_task_info = 15;
+  Next.PlayerAppearanceInfo appearance_info = 16;
+  Next.PlayerShareFormInfo share_form_info = 17;
+  Next.PlayerBattleData battle_data = 21;
+  repeated uint32 received_mail_list = 24;
+  repeated uint32 receive_failed_mail_list = 25;
+  repeated int64 attachment_receive_fail_mail_list = 26;
+  int64 next_mail_expire_time = 27;
+  repeated Next.MailRecvBrief send_fail_mail_brief = 28;
+  Next.PlayerAdventureData adventure_data = 51;
+  Next.PlayerVisitData visit_data = 52;
+  Next.PlayerInvestTaskData invest_task = 56;
+  repeated Next.PlayerTeleportData teleports = 57;
+  repeated Next.PlayerTeachInfo teach_infos = 59;
+  Next.PlayerActivityInfo activity_info = 60;
+  Next.PlayerCopyData copy_data = 61;
+  Next.PlayerExchangeInfo exchange_info = 62;
+  Next.PlayerInteractInfo player_interact_info = 63;
+  Next.PlayerMageBookInfo mage_book_info = 64;
+  Next.TaskSummaryList task_summary_data = 66;
+  Next.MidasMoneyInfo money_info = 67;
+  Next.PlayerShinyPetDayInfo shiny_pet_day_info = 68;
+  Next.MidasDistriBillList distribute_billnos = 69;
+  uint32 last_pet_stat_report_time = 70;
+  uint32 last_pet_world_stat_update_time = 71;
+  repeated Next.SpecFlowerSeed spec_flower_seeds = 72;
+  repeated Next.PlayerAreaCheckInfo area_check_infos = 73;
+  uint32 last_pet_battle_stat_update_time = 74;
+  Next.PlayerCropFruitList crop_fruits = 75;
+  Next.SceneIdipActionNpcList npc_idip_action = 76;
+  Next.PlayerGiftLimitList gift_limit_info = 77;
+  Next.BadgeChallengeData badge_challenge_data = 78;
+  uint64 mail_version = 79;
+  Next.SeasonInfo season_info = 80;
+  Next.PlayerGiftInfo gift_info = 81;
+  Next.PlayerTypeGiftLimitList gifts_limit_info = 82;
+  repeated Next.DailyGetItemLimitlist items_limit_info = 84;
+  Next.PlayerPetMedalInfo pet_medal_info = 85;
+  Next.PlayerShareInfo share_info = 86;
+  Next.PlayerPetEggData pet_egg_data = 87;
+  Next.GoodsModifyTransAllInfo goods_trans = 88;
+  Next.PetTeamShareData pet_team_share_data = 89;
+  Next.DBShop shop = 90;
+  int64 last_check_exchange_goods_time = 91;
+  Next.PlayerMailFailInfo mail_fail_info = 92;
+  Next.DailySendMailList liabilities_mail_send_info = 93;
+  Next.PlayerSeasonAdventureData season_adventure = 94;
+  Next.PlayerTeachingTabInfo teaching_tab_info = 95;
+  Next.PlayerMailDataInfo mail_info = 96;
+}
+
+message PlayerRedPointInfo {
+  repeated Next.RedPointGroup group_info = 1;
+  repeated Next.RedPointGroup cached_group_info = 2;
+}
+
+message MusicApplyInfo {
+  uint32 music_id = 1;
+  uint32 apply_list_id = 2;
+}
+
+message PlayerMusicInfo {
+  repeated uint32 music_id_list = 1;
+  repeated Next.MusicApplyInfo apply_list = 2;
+}
+
+message PlayerStarLightInfo {
+  int32 current_progress = 1;
+  int32 unexchange_wishing_star_num = 2;
+  int32 current_efficiency = 3;
+  int32 today_star_light_num = 4;
+  bool need_notify_refresh = 5;
+}
+
+message PlayerPetInfo {
+  repeated Next.PetData pet_data = 1;
+  repeated Next.PetCatchInfo catch_info = 2;
+  uint32 generation_gid = 3;
+  uint32 fellow_gid = 4;
+  repeated uint32 bag_pos_gid = 5;
+  bytes seen_monster_bits = 6;
+  Next.PetTeamInfo team_info = 7;
+  Next.PetHandbook handbook = 8;
+  Next.PetBackpackInfo backpack_info = 9;
+  Next.PetHabitInfo habit_info = 12;
+  Next.PetStatisticsInfo statistics_info = 13;
+  repeated Next.PetTravelInfo travel_info = 14;
+  uint32 visit_remain_catch_times = 15;
+  uint32 next_visit_catch_refresh_time = 16;
+  repeated Next.PetTeamInfo team_infos = 17;
+  int32 visit_remain_shiny_catch_times = 19;
+  uint32 last_visit_shiny_catch_refresh_time = 20;
+  Next.DeletedPetList deleted_pet_list = 21;
+  repeated Next.HomePetInfo home_pet_info = 22;
+  uint64 version = 23;
+  repeated uint32 pseudo_egg_shiny_cum_prob = 24;
+  Next.GiftEggList gift_egg_list = 25;
+  repeated Next.PetReportInfo pet_report_info = 26;
+  uint32 last_write_friend_db_time = 27;
+  repeated Next.PetData mirror_pet_data = 28;
+  int32 pet_once_patch_version = 29;
+  repeated Next.RankSeasonPetUseInfo pet_use_info = 30;
+  repeated Next.PetBacktrack backtrack_info = 31;
+  repeated uint32 pseudo_egg_glass_cum_prob = 32;
+  Next.CliPetMedalInfo pet_medal_info = 33;
+  Next.PetTaskInfo pet_task_info = 34;
+  Next.PlayerPetMonitorInfo monitor_info = 35;
+  uint32 current_select_pet_gid = 36;
+}
+
+message PlayerCommonInfo {
+  uint32 coupon = 1;
+  uint64 coin = 2;
+  uint32 coin_locked = 3;
+  uint32 elo = 4;
+  uint32 in_game_time = 5;
+  uint32 tod_updated_time = 7;
+  Next.PlayerSceneInfo scene_info = 10;
+  Next.PlayerLevelAwardInfo level_award_info = 14;
+  Next.PlayerClimbChapterInfo climb_chapter = 15;
+  bool start_server_ai = 16;
+  repeated uint32 in_dungeon_id = 17;
+  uint32 online_visit_owner = 22;
+  bytes ban_player_reason = 23;
+  uint32 chat_permission_date = 24;
+  bytes ban_chat_reason = 25;
+  uint32 select_pet_conf_id = 26;
+  uint32 region_id = 28;
+  repeated uint32 select_pet_conf_id_list = 29;
+  uint32 next_region_group_id = 30;
+  repeated uint32 pet_select_region_id = 31;
+  int32 visit_permission_setting = 32;
+  int32 navigation_mode_type = 33;
+  uint32 home_last_visit_time = 37;
+  bool is_home_visiting = 38;
+  uint32 home_owner_uin = 39;
+  bool is_online_visiting_home = 40;
+  uint32 home_source_scene_cfg_id = 41;
+  uint64 home_source_scene_inst_id = 42;
+  Next.Point home_source_location = 43;
+  Next.PlayerBanInfo ban_info = 44;
+}
+
+message PlayerBattlePassExpInfo {
+  int32 last_week_exp = 1;
+  int32 level = 2;
+  int32 exp = 3;
+  uint32 last_refresh_time = 4;
+}
+
+message PlayerBattlePassRewardInfo_RewardTakenInfo {
+  bool is_free_reward_taken = 1;
+  bool is_paid_reward_taken = 2;
+  int32 bp_level = 3;
+}
+
+message PlayerBattlePassRewardInfo {
+  repeated Next.PlayerBattlePassRewardInfo_RewardTakenInfo reward_taken_info = 1;
+}
+
+message PlayerBattlePassTaskInfo {
+  repeated int32 daily_task_ids = 1;
+  repeated int32 repeat_task_ids = 3;
+  uint64 last_daily_task_reset_time = 4;
+  repeated Next.PlayerTaskInfo task_info_list = 5;
+}
+
+message PlayerBattlePassInfo {
+  int32 battle_pass_id = 1;
+  int32 theme_id = 2;
+  Next.PlayerBattlePassExpInfo exp_info = 3;
+  Next.PlayerBattlePassRewardInfo reward_info = 4;
+  Next.PlayerBattlePassTaskInfo task_info = 8;
+  repeated int32 bought_gift_sub_bag_item_ids = 9;
+}
+
+message GiftDropWeightBagNumItem {
+  uint32 id = 1;
+  uint32 num = 2;
+}
+
+message GiftDropWeithBagNumInfo {
+  uint32 id_type = 1;
+  repeated Next.GiftDropWeightBagNumItem items = 2;
+}
+
+message PlayerBagItemIdFlagInfo {
+  uint32 id = 1;
+  uint32 flag = 2;
+}
+
+message PlayerBagItemIdFlagTypeInfo {
+  uint32 type = 1;
+  repeated Next.PlayerBagItemIdFlagInfo items = 2;
+}
+
+message PlayerBagItemIdFlagList {
+  repeated Next.PlayerBagItemIdFlagTypeInfo bag_flag_items = 1;
+}
+
+message PlayerBagInfo {
+  uint32 gid = 1;
+  repeated Next.BagItemTypeList item_list = 3;
+  uint32 equipped_ball_num = 5;
+  repeated Next.HadItemInfo had_item_info = 6;
+  Next.BagBackpackInfo bag_backpack = 7;
+  repeated Next.PetMedalTaskInfo pet_medal_task_info = 8;
+  repeated Next.HadItemList had_item_list = 9;
+  uint32 is_copy = 10;
+  uint64 version = 11;
+  repeated Next.GiftDropWeithBagNumInfo drop_weight_info = 12;
+  repeated Next.BagItemMaskList mask_bag_list = 13;
+  uint32 last_check_mask_time = 14;
+  Next.PlayerBagItemIdFlagList bag_item_id_flag = 15;
+}
+
+message PlayerBlackData {
+  uint32 black_uin = 1;
+  uint64 block_time = 2;
+}
+
+message PlayerObserveBattleBlackData {
+  uint64 battle_id = 1;
+  repeated Next.PlayerBlackData black_list = 2;
+}
+
+message PlayerBlackInfo {
+  repeated Next.PlayerBlackData black_list = 1;
+  Next.PlayerObserveBattleBlackData observe_battle_black_list = 2;
+}
+
+message PlayerClientWaterMarkInfo {
+  bool close_watermark = 1;
+  uint64 end_time = 2;
+}
+
+message PlayerInfo {
+  Next.PlayerBriefInfo brief_info = 1;
+  Next.PlayerCommonInfo common_info = 2;
+  Next.PlayerBagInfo bag_info = 3;
+  Next.PlayerPetInfo pet_info = 4;
+  Next.PlayerAbilityInfo ability_info = 5;
+  Next.PlayerStoryFlagInfo story_flag_info = 6;
+  Next.PlayerMiscInfo misc_info = 7;
+  Next.PlayerWorldMapInfo world_map_info = 8;
+  Next.PlayerSvrDataInfo svr_data_info = 11;
+  Next.PlayerRedPointInfo red_point_info = 12;
+  Next.PlayerBlackInfo black_info = 13;
+  Next.PlayerPvpHisCli pvp_his_cli = 14;
+  Next.PlayerMusicInfo music_info = 15;
+  Next.PlayerStarLightInfo star_light_info = 16;
+  Next.PlayerEmojiBagInfo emoji_bag_info = 17;
+  Next.PlayerLotteryRewardConfirmBagInfo lottery_confirm = 18;
+  Next.PlayerClientWaterMarkInfo client_water_mark_info = 19;
+  Next.PlayerStartUpPrivilegeInfo start_up_privilege_info = 20;
+}
+
+message PlayerPetEggData {
+  repeated Next.PetEggCoreRecord egg_core_records = 1;
+}
+
+message CDKeyInfo {
+  string cdkey = 1;
+  bool used = 2;
+}
+
+message PlayerCDKeyInfo {
+  repeated string cdkey_list = 1;
+}
+
+message PlayerGiftLimitItem {
+  int32 id = 1;
+  int32 cnt = 2;
+  uint32 last_update_time = 3;
+}
+
+message PlayerGiftLimitList {
+  repeated Next.PlayerGiftLimitItem items = 1;
+}
+
+message PlayerTypeGiftLimitItem {
+  repeated Next.PlayerGiftLimitItem items = 1;
+  int32 type = 2;
+}
+
+message PlayerTypeGiftLimitList {
+  repeated Next.PlayerTypeGiftLimitItem items = 1;
+}
+
+message DailySendMailItem {
+  uint32 id = 1;
+  uint32 mail_send_times = 4;
+}
+
+message DailySendMailInfo {
+  uint32 type = 1;
+  repeated Next.DailySendMailItem items = 2;
+}
+
+message DailySendMailList {
+  repeated Next.DailySendMailInfo items = 3;
+}
+
+message DailyItemReasonGetInfo {
+  uint32 guard_id = 1;
+  uint32 total_num = 2;
+  uint32 total_times = 3;
+  bool has_limited = 4;
+}
+
+message DailyGetItemLimitInfo {
+  uint32 id = 1;
+  repeated Next.DailyItemReasonGetInfo reason_gets = 4;
+}
+
+message DailyGetItemLimitlist {
+  int32 goods_type = 1;
+  repeated Next.DailyGetItemLimitInfo items = 3;
+}
+
+message PlayerBattleData_RewardNpcInfo {
+  int32 npc_conf_id = 1;
+  int32 npc_num = 2;
+}
+
+message PlayerBattleData_SceneSettleInfo {
+  int32 catch_pet_cnt = 1;
+  repeated Next.PlayerBattleData_RewardNpcInfo npc_info = 2;
+}
+
+message StampInfo {
+  uint32 unlock_num = 1;
+  uint32 unlocked_at = 2;
+}
+
+message RedPointGroup {
+  int32 reason_type = 1;
+  repeated bytes point_data = 2;
+}
+
+message PlayerTeleportData {
+  uint32 id = 1;
+  uint32 lv = 2;
+}
+
+message PlayerCopyData {
+  uint32 src_uin = 1;
+  uint32 copy_time = 2;
+}
+
+message PlayerCropFruitInfo {
+  int32 owl_sanctuary_id = 1;
+  int32 num = 2;
+  uint32 bag_item_id = 3;
+}
+
+message PlayerCropFruitList {
+  repeated Next.PlayerCropFruitInfo crop_fruit_list = 1;
+}
+
+message PlayerShareRewardInfo {
+  uint32 reward_group_type = 1;
+  uint32 shared_times = 2;
+  uint32 last_share_timestamp = 3;
+  uint32 last_refresh_timestamp = 4;
+}
+
+message PlayerShareInfo {
+  repeated Next.PlayerShareRewardInfo reward_groups = 1;
+}
+
+message PlayerSyncInfo {
+  uint32 level = 1;
+  uint32 exp = 2;
+  Next.PlayerBattleState battle_state = 3;
+  uint32 coupon = 4;
+  uint64 coin = 5;
+  uint32 coin_locked = 6;
+  uint32 elo = 7;
+  int32 servertime = 8;
+  bytes name = 9;
+  uint32 sex = 10;
+  repeated uint32 in_dungeon_id = 12;
+  uint32 world_level = 13;
+  uint32 online_visit_owner = 14;
+  uint32 select_pet_conf_id = 15;
+  Next.PlayerVItemInfo vitem_info = 16;
+  repeated uint32 select_pet_conf_id_list = 17;
+  repeated uint32 pet_select_region_id = 18;
+}
+
+message ServerPref {
+  int32 int_value = 2;
+  repeated int32 list_value = 3;
+  bytes str_value = 4;
+  uint32 key = 5;
+}
+
+message HeroPref {
+  uint32 id = 1;
+  repeated Next.ServerPref prefs = 2;
+}
+
+message PlayerServerPref {
+  repeated Next.HeroPref hero_prefs = 1;
+}
+
+message PlayerCliBuffInfo {
+  string buff = 1;
+  Next.PlayerServerPref sever_pref = 2;
+}
+
+message PlayerCardInfo_CardItemOwnedInfo {
+  uint32 card_item_id = 1;
+  uint32 card_item_get_timestamp = 2;
+  uint32 card_item_num = 3;
+}
+
+message PlayerCardInfo {
+  uint32 last_name_changed_time = 5;
+  repeated Next.PlayerCardInfo_CardItemOwnedInfo icon_owned = 6;
+  repeated Next.PlayerCardInfo_CardItemOwnedInfo skin_owned = 7;
+  repeated Next.PlayerCardInfo_CardItemOwnedInfo label_owned = 8;
+  bytes cached_name = 9;
+}
+
+message PlayerCatchBallRewardInfo {
+  uint32 last_reward_time = 1;
+  uint32 next_reward_time = 2;
+  uint32 catch_ball_reward_num = 3;
+  bool enable_reward = 4;
+  bool red_point_sent = 5;
+}
+
+message PlayerAreaCheckInfo {
+  uint32 area_id = 1;
+  uint32 radius = 2;
+  uint32 conf_id = 3;
+}
+
+message PlayerTeachInfo {
+  enum TeachStatus {
+    LOCK = 0;
+    UNLOCK = 1;
+    READED = 2;
+  }
+  uint32 teach_id = 1;
+  Next.PlayerTeachInfo.TeachStatus status = 2;
+  int64 unlock_time = 3;
+  uint32 multi_condi_bit = 4;
+  uint32 multi_condi_priority = 5;
+}
+
+message TeachingUnlockProgress {
+  dataconfig.SkillDamType type = 1;
+  uint32 count = 2;
+  repeated uint32 break_award_sort = 3;
+}
+
+message TeachingTask {
+  uint32 id = 1;
+  bool is_complete = 2;
+  bool is_rewarded = 3;
+}
+
+message Teaching {
+  uint32 id = 1;
+  bool is_unlock = 2;
+  repeated Next.TeachingUnlockProgress unlock_progress = 3;
+}
+
+message PlayerTeachingTabInfo {
+  repeated Next.Teaching type_advantage = 1;
+  repeated Next.TeachingTask type_advantage_tasks = 3;
+  repeated Next.Teaching combat_mechanism = 2;
+  repeated Next.TeachingTask combat_mechanism_tasks = 4;
+}

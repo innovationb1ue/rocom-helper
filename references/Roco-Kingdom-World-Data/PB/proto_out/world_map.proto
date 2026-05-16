@@ -1,0 +1,112 @@
+package Next;
+
+import "com_base_types.proto";
+import "com_rpc.proto";
+import "com_world_map.proto";
+
+message ZoneSceneBeginSyncWorldMapInfoReq {
+  int32 world_map_entry_types = 1;
+}
+
+message ZoneSceneBeginSyncWorldMapInfoRsp {
+  Next.RetInfo ret_info = 1;
+  Next.WorldMapEntries entries = 2;
+}
+
+message ZoneSceneEndSyncWorldMapInfoReq {
+}
+
+message ZoneSceneEndSyncWorldMapInfoRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneTickWorldMapInfoSyncReq {
+}
+
+message ZoneSceneTickWorldMapInfoSyncRsp {
+  Next.RetInfo ret_info = 1;
+}
+
+message ZoneSceneWorldMapTeleportReq {
+  uint64 entry_id = 1;
+  bool use_special_teleport = 2;
+}
+
+message ZoneSceneWorldMapTeleportRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 entry_id = 6;
+  Next.Point target_pt = 7;
+}
+
+message ZoneSceneWorldMapTeleportToNpcReq {
+  uint64 npc_obj_id = 1;
+}
+
+message ZoneSceneWorldMapTeleportToNpcRsp {
+  Next.RetInfo ret_info = 1;
+  uint64 npc_obj_id = 6;
+  Next.Point target_pt = 7;
+}
+
+message ZoneSceneWorldMapTeleportToPlayerReq {
+  uint32 uin = 1;
+}
+
+message ZoneSceneWorldMapTeleportToPlayerRsp {
+  Next.RetInfo ret_info = 1;
+  uint32 uin = 2;
+  Next.Point target_pt = 3;
+}
+
+message ZoneSceneWorldMapInfoChangedNty {
+  Next.WorldMapEntries changed_entries = 2;
+}
+
+message ZoneSceneWorldMapSyncInterruptNty {
+  int32 interrupt_reason = 1;
+}
+
+message ZoneMapMarkOperateReq {
+  int32 op_type = 1;
+  int32 mark_id = 2;
+  int32 type = 3;
+  int32 world_map_cfg_id = 4;
+  bytes name = 5;
+  Next.Position pos = 6;
+  int32 layer_id = 7;
+  int32 scene_id = 8;
+}
+
+message ZoneMapMarkOperateRsp {
+  Next.RetInfo ret_info = 1;
+  Next.WorldMapEntry_Mark mark_entry = 2;
+  int32 op_type = 3;
+}
+
+message ZoneSceneGmMapMarkOperateReq {
+  int32 op_type = 1;
+  int32 num = 2;
+  int32 world_map_cfg_id = 3;
+}
+
+message ZoneSceneGmMapMarkOperateRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.WorldMapEntry_Mark mark_entry = 2;
+}
+
+message ZoneSceneWorldMapSyncAutoTrackNpcReq {
+  uint64 npc_logic_id = 1;
+}
+
+message ZoneSceneWorldMapSyncAutoTrackNpcRsp {
+  Next.RetInfo ret_info = 1;
+  Next.WorldMapAutoTrackNpcInfo auto_track_npc_info = 2;
+}
+
+message SceneWorldMapInfoChangedNty {
+  Next.WorldMapEntries changed_entries = 2;
+}
+
+message SceneWorldMapSyncInterruptNty {
+  int32 interrupt_reason = 1;
+}

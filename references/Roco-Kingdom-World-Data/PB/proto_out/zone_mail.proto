@@ -1,0 +1,76 @@
+package Next;
+
+import "com_mail.proto";
+import "com_rpc.proto";
+import "com_account.proto";
+import "mail_data.proto";
+import "xls_enum.proto";
+
+message ZoneMailGetListReq {
+}
+
+message ZoneMailGetListRsp {
+  Next.RetInfo ret_info = 1;
+  Next.MailInfoList mail_list = 3;
+}
+
+message ZoneMailGetListByPageReq {
+  uint32 page = 1;
+  uint64 version = 2;
+}
+
+message ZoneMailGetListByPageRsp {
+  Next.RetInfo ret_info = 1;
+  Next.MailInfoList mail_list = 2;
+  uint32 total_page = 3;
+  uint32 req_page = 4;
+  uint32 page_num = 6;
+  uint64 version = 7;
+  uint64 no_new_data = 8;
+}
+
+message ZoneMailGetReq {
+  int64 mail_gid = 1;
+}
+
+message ZoneMailGetRsp {
+  Next.RetInfo ret_info = 1;
+  repeated Next.MailInfo mail_info = 2;
+  uint64 version = 3;
+}
+
+message ZoneMailDelReq {
+  repeated int64 mail_gid_list = 1;
+}
+
+message ZoneMailDelRsp {
+  Next.RetInfo ret_info = 1;
+  repeated int64 mail_gid_list = 2;
+  uint64 version = 3;
+}
+
+message ZoneMailReadReq {
+  repeated int64 mail_gid_list = 1;
+}
+
+message ZoneMailReadRsp {
+  Next.RetInfo ret_info = 1;
+  repeated int64 mail_gid_list = 2;
+  uint64 version = 3;
+}
+
+message ZoneMailGetAttachmentReq {
+  int64 mail_gid = 1;
+  Next.ClientTokenInfo token_info = 2;
+}
+
+message ZoneMailGetAttachmentRsp {
+  message GetFailGoodsInfo {
+    uint32 goods_id = 1;
+    dataconfig.GoodsType type = 2;
+  }
+  Next.RetInfo ret_info = 1;
+  repeated Next.MailRecvBrief mail_brief = 2;
+  uint64 version = 3;
+  repeated Next.ZoneMailGetAttachmentRsp.GetFailGoodsInfo get_fail_goods = 4;
+}

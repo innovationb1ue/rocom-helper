@@ -1,0 +1,743 @@
+{
+    "Name": "BATTLE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "background",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "opposite_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "show_availableHP_rule",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "role_available_HP",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "rival_available_HP",
+            "Type": "EUint32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "battle_model",
+            "Type": "EUint32",
+            "Offset": 32,
+            "Size": 4
+        },
+        {
+            "Name": "npc_title",
+            "Type": "EString",
+            "Offset": 36,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "screen_show_res",
+            "Type": "EString",
+            "Offset": 40,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "show_res",
+            "Type": "EString",
+            "Offset": 44,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "show_brief_res",
+            "Type": "EString",
+            "Offset": 48,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "challanger_unit_num",
+            "Type": "EUint32",
+            "Offset": 52,
+            "Size": 4
+        },
+        {
+            "Name": "bechallanger_unit_num",
+            "Type": "EUint32",
+            "Offset": 56,
+            "Size": 4
+        },
+        {
+            "Name": "exchange_cold",
+            "Type": "EUint32",
+            "Offset": 60,
+            "Size": 4
+        },
+        {
+            "Name": "exchange_initial_cold",
+            "Type": "EUint32",
+            "Offset": 64,
+            "Size": 4
+        },
+        {
+            "Name": "max_round",
+            "Type": "EUint32",
+            "Offset": 68,
+            "Size": 4
+        },
+        {
+            "Name": "result_over_type",
+            "Type": "EUint32",
+            "Offset": 72,
+            "Size": 4
+        },
+        {
+            "Name": "background_music",
+            "Type": "EInt32",
+            "Offset": 76,
+            "Size": 4
+        },
+        {
+            "Name": "bgm_battle_state",
+            "Type": "EString",
+            "Offset": 80,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "is_auto",
+            "Type": "EUint32",
+            "Offset": 84,
+            "Size": 4
+        },
+        {
+            "Name": "assist1",
+            "Type": "EInt32",
+            "Offset": 88,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "assist2",
+            "Type": "EInt32",
+            "Offset": 92,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "assist3",
+            "Type": "EInt32",
+            "Offset": 96,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "assist4",
+            "Type": "EInt32",
+            "Offset": 100,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "assist5",
+            "Type": "EInt32",
+            "Offset": 104,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "assist6",
+            "Type": "EInt32",
+            "Offset": 108,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "can_catch_or_not",
+            "Type": "EUint32",
+            "Offset": 112,
+            "Size": 4
+        },
+        {
+            "Name": "can_useitem_or_not",
+            "Type": "EUint32",
+            "Offset": 116,
+            "Size": 4
+        },
+        {
+            "Name": "can_escape",
+            "Type": "EUint32",
+            "Offset": 120,
+            "Size": 4
+        },
+        {
+            "Name": "can_changepet",
+            "Type": "EUint32",
+            "Offset": 124,
+            "Size": 4
+        },
+        {
+            "Name": "use_ball_time",
+            "Type": "EUint32",
+            "Offset": 128,
+            "Size": 4
+        },
+        {
+            "Name": "use_happy_or_not",
+            "Type": "EUint32",
+            "Offset": 132,
+            "Size": 4
+        },
+        {
+            "Name": "round_pet_timeout",
+            "Type": "EUint32",
+            "Offset": 136,
+            "Size": 4
+        },
+        {
+            "Name": "round_select_timeout",
+            "Type": "EUint32",
+            "Offset": 140,
+            "Size": 4
+        },
+        {
+            "Name": "pre_perform_timeout",
+            "Type": "EUint32",
+            "Offset": 144,
+            "Size": 4
+        },
+        {
+            "Name": "wait_load_timeout",
+            "Type": "EUint32",
+            "Offset": 148,
+            "Size": 4
+        },
+        {
+            "Name": "catch_timeout",
+            "Type": "EUint32",
+            "Offset": 152,
+            "Size": 4
+        },
+        {
+            "Name": "settle_timeout",
+            "Type": "EUint32",
+            "Offset": 156,
+            "Size": 4
+        },
+        {
+            "Name": "use_random_or_not",
+            "Type": "EUint32",
+            "Offset": 160,
+            "Size": 4
+        },
+        {
+            "Name": "battle_item",
+            "Type": "EUint32",
+            "Offset": 164,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "npc_battle_list",
+            "Type": "EStruct",
+            "Offset": 168,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 2,
+            "Struct": {
+                "Name": "BATTLE_CONF.npc_battle_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "battle_model_1st",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "is_uid",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "npc_title_1st",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "pos1_1st",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos2_1st",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos3_1st",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos4_1st",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos5_1st",
+                        "Type": "EUint32",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos6_1st",
+                        "Type": "EUint32",
+                        "Offset": 32,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ball1_1st",
+                        "Type": "EUint32",
+                        "Offset": 36,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball2_1st",
+                        "Type": "EUint32",
+                        "Offset": 40,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball3_1st",
+                        "Type": "EUint32",
+                        "Offset": 44,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball4_1st",
+                        "Type": "EUint32",
+                        "Offset": 48,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball5_1st",
+                        "Type": "EUint32",
+                        "Offset": 52,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball6_1st",
+                        "Type": "EUint32",
+                        "Offset": 56,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "npc_ai",
+                        "Type": "EString",
+                        "Offset": 60,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "ai_word_id",
+                        "Type": "EUint32",
+                        "Offset": 64,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "npc_location",
+                        "Type": "EUint32",
+                        "Offset": 68,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "nrc_ai_model",
+                        "Type": "EInt32",
+                        "Offset": 72,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "magic",
+                        "Type": "EUint32",
+                        "Offset": 76,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "special_battle_start_time",
+            "Type": "EUint32",
+            "Offset": 172,
+            "Size": 4
+        },
+        {
+            "Name": "local_point",
+            "Type": "EInt32",
+            "Offset": 176,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_done_data",
+            "Type": "EUint32",
+            "Offset": 180,
+            "Size": 4
+        },
+        {
+            "Name": "battle_end_notify",
+            "Type": "EUint32",
+            "Offset": 184,
+            "Size": 4
+        },
+        {
+            "Name": "teamA_prohibit_buff",
+            "Type": "EInt32",
+            "Offset": 188,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "teamB_prohibit_buff",
+            "Type": "EInt32",
+            "Offset": 192,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_hideskill",
+            "Type": "EUint32",
+            "Offset": 196,
+            "Size": 4
+        },
+        {
+            "Name": "battle_refresh_content",
+            "Type": "EUint32",
+            "Offset": 200,
+            "Size": 4
+        },
+        {
+            "Name": "worldcombat_box_guideicon",
+            "Type": "EInt32",
+            "Offset": 204,
+            "Size": 4
+        },
+        {
+            "Name": "available_hp_rule",
+            "Type": "EInt32",
+            "Offset": 208,
+            "Size": 4
+        },
+        {
+            "Name": "available_hp_rule_param",
+            "Type": "EUint32",
+            "Offset": 212,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "player_battle_buff",
+            "Type": "EUint32",
+            "Offset": 216,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "npc_battle_buff",
+            "Type": "EUint32",
+            "Offset": 220,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pet_close_buff",
+            "Type": "EUint32",
+            "Offset": 224,
+            "Size": 4
+        },
+        {
+            "Name": "battle_habbit_switch",
+            "Type": "EUint32",
+            "Offset": 228,
+            "Size": 4
+        },
+        {
+            "Name": "npc_battle_ally_list",
+            "Type": "EStruct",
+            "Offset": 232,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 1,
+            "Struct": {
+                "Name": "BATTLE_CONF.npc_battle_ally_list",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "battle_model_ally",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "npc_title_ally",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "pos1_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos2_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos3_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos4_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos5_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 24,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "pos6_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 28,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "ball1_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 32,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball2_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 36,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball3_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 40,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball4_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 44,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball5_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 48,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "ball6_1st_ally",
+                        "Type": "EUint32",
+                        "Offset": 52,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "npc_ai_ally",
+                        "Type": "EString",
+                        "Offset": 56,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "if_npc_round_use_conf",
+            "Type": "EUint32",
+            "Offset": 236,
+            "Size": 4
+        },
+        {
+            "Name": "pve_npc_round_id",
+            "Type": "EUint32",
+            "Offset": 240,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "pve_npc_round_ai_type",
+            "Type": "EUint32",
+            "Offset": 244,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_rule",
+            "Type": "EUint32",
+            "Offset": 248,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_tlog_type",
+            "Type": "EUint32",
+            "Offset": 252,
+            "Size": 4
+        },
+        {
+            "Name": "die_show",
+            "Type": "EString",
+            "Offset": 256,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "escape_rule_1vn",
+            "Type": "EUint32",
+            "Offset": 260,
+            "Size": 4
+        },
+        {
+            "Name": "delete_npc_rule_1vn",
+            "Type": "EUint32",
+            "Offset": 264,
+            "Size": 4
+        },
+        {
+            "Name": "task_battle_performance_control",
+            "Type": "EInt32",
+            "Offset": 268,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "npc_round_scale",
+            "Type": "EUint32",
+            "Offset": 272,
+            "Size": 4
+        },
+        {
+            "Name": "npc_round_tip_scale",
+            "Type": "EUint32",
+            "Offset": 276,
+            "Size": 4
+        },
+        {
+            "Name": "is_mark_close",
+            "Type": "EBool",
+            "Offset": 280,
+            "Size": 1
+        },
+        {
+            "Name": "cancel_watch",
+            "Type": "EUint32",
+            "Offset": 281,
+            "Size": 4
+        },
+        {
+            "Name": "feature_resonance",
+            "Type": "EUint32",
+            "Offset": 285,
+            "Size": 4
+        }
+    ]
+}

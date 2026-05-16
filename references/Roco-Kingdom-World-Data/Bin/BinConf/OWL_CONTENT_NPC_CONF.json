@@ -1,0 +1,122 @@
+{
+    "Name": "OWL_CONTENT_NPC_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "refresh_num_max",
+            "Type": "EInt32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "is_land_pet",
+            "Type": "EBool",
+            "Offset": 12,
+            "Size": 1
+        },
+        {
+            "Name": "is_water_pet",
+            "Type": "EBool",
+            "Offset": 13,
+            "Size": 1
+        },
+        {
+            "Name": "refresh_content_num",
+            "Type": "EUint32",
+            "Offset": 14,
+            "Size": 4
+        },
+        {
+            "Name": "pet_owl_content_advanced_persent",
+            "Type": "EUint32",
+            "Offset": 18,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_max_num",
+            "Type": "EUint32",
+            "Offset": 22,
+            "Size": 4
+        },
+        {
+            "Name": "refresh_storage_num",
+            "Type": "EUint32",
+            "Offset": 26,
+            "Size": 4
+        },
+        {
+            "Name": "visit_owl_refresh_weight",
+            "Type": "EUint32",
+            "Offset": 30,
+            "Size": 4
+        },
+        {
+            "Name": "owl_content_set",
+            "Type": "EStruct",
+            "Offset": 34,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 50,
+            "Struct": {
+                "Name": "OWL_CONTENT_NPC_CONF.owl_content_set",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "owl_content_id",
+                        "Type": "EUint32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "area_group",
+                        "Type": "EUint32",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "npc_level_script",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "level_param",
+                        "Type": "EInt32",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "refresh_rule",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "content_formwork",
+                        "Type": "EUint32",
+                        "Offset": 20,
+                        "Size": 4
+                    }
+                ]
+            }
+        }
+    ]
+}

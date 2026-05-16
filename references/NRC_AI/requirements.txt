@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+openpyxl
+pandas
+beautifulsoup4
+requests

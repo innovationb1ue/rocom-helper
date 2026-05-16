@@ -1,0 +1,33 @@
+{
+    "Name": "AUDIO_CAVE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "cave_name",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "cave_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "state_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "sound_id",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        }
+    ]
+}

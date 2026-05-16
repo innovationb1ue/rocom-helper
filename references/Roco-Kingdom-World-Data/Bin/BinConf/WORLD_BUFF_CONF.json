@@ -1,0 +1,196 @@
+{
+    "Name": "WORLD_BUFF_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "buff_name",
+            "Type": "EString",
+            "Offset": 4,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "editor_name",
+            "Type": "EString",
+            "Offset": 8,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "buff_type",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "time_out_duration",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "buff_add_mode",
+            "Type": "EInt32",
+            "Offset": 20,
+            "Size": 4
+        },
+        {
+            "Name": "tick_duration",
+            "Type": "EInt32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "buff_effect_type",
+            "Type": "EInt32",
+            "Offset": 28,
+            "Size": 4
+        },
+        {
+            "Name": "params",
+            "Type": "EInt32",
+            "Offset": 32,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "is_die_delete",
+            "Type": "EBool",
+            "Offset": 36,
+            "Size": 1
+        },
+        {
+            "Name": "option",
+            "Type": "EStruct",
+            "Offset": 37,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "WORLD_BUFF_CONF.option",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "particle_npc_id",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "particle_name",
+                        "Type": "EString",
+                        "Offset": 4,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "skill_name",
+                        "Type": "EString",
+                        "Offset": 8,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "link_point",
+                        "Type": "EString",
+                        "Offset": 12,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "shifting_xyz",
+                        "Type": "EInt32",
+                        "Offset": 16,
+                        "Size": 4,
+                        "CompressedSize": 4,
+                        "DynamicArray": true
+                    },
+                    {
+                        "Name": "is_follow",
+                        "Type": "EBool",
+                        "Offset": 20,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "is_circulate",
+                        "Type": "EBool",
+                        "Offset": 21,
+                        "Size": 1
+                    },
+                    {
+                        "Name": "line_target_link_point",
+                        "Type": "EString",
+                        "Offset": 22,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "line_target_particle",
+                        "Type": "EString",
+                        "Offset": 26,
+                        "Size": 4,
+                        "CompressedSize": 4
+                    },
+                    {
+                        "Name": "is_line_block",
+                        "Type": "EBool",
+                        "Offset": 30,
+                        "Size": 1
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "jump_option",
+            "Type": "EStruct",
+            "Offset": 41,
+            "Size": 4,
+            "CompressedSize": 4,
+            "ArrayDim": 3,
+            "Struct": {
+                "Name": "WORLD_BUFF_CONF.jump_option",
+                "Type": "EStruct",
+                "Properties": [
+                    {
+                        "Name": "buff_jump_type",
+                        "Type": "EInt32",
+                        "Offset": 0,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "trigger_buff_id",
+                        "Type": "EInt32",
+                        "Offset": 4,
+                        "Size": 4
+                    },
+                    {
+                        "Name": "target_buff_id",
+                        "Type": "EInt32",
+                        "Offset": 8,
+                        "Size": 4
+                    }
+                ]
+            }
+        },
+        {
+            "Name": "repel_group_id",
+            "Type": "EInt32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "reple_priority",
+            "Type": "EInt32",
+            "Offset": 49,
+            "Size": 4
+        }
+    ]
+}

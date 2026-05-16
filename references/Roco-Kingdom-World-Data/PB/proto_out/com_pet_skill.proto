@@ -1,0 +1,78 @@
+package Next;
+
+import "com_base_types.proto";
+import "xls_enum.proto";
+
+message PetCarryonInfo {
+  uint32 carryon_id = 1;
+  uint32 carryon_idx = 2;
+  uint32 pet_gid = 3;
+}
+
+message PetSkillData {
+  uint32 id = 1;
+  uint32 type = 2;
+  bool is_learned = 3;
+  bool is_equipped = 4;
+  uint32 pos = 5;
+  uint32 unlock_need_lv = 8;
+  uint32 raw_id = 11;
+  Next.PetCarryonInfo carryon_info = 12;
+  uint32 conf_idx = 13;
+  uint32 skill_src = 14;
+  uint32 unlock_need_base_id = 15;
+  int32 use_times = 16;
+}
+
+message PetSkillRecord {
+  uint32 skill_id = 1;
+  int32 use_times = 2;
+}
+
+message SkillRecord {
+  uint32 uin = 1;
+  uint32 skill_id = 2;
+  uint32 result0 = 3;
+  uint32 result1 = 4;
+  uint32 result2 = 5;
+  int32 restraint_cnt1 = 6;
+  int32 restraint_cnt2 = 7;
+  int32 restraint_cnt3 = 8;
+}
+
+message PetSkillInfo {
+  enum COUNT_LIMIT {
+    SKILL_DATA_COUNT = 200;
+  }
+  repeated Next.PetSkillData skill_data = 1;
+  repeated uint32 happy_skill_ids = 2;
+  repeated uint32 angry_skill_ids = 3;
+}
+
+message PetPosition {
+  uint32 pet_id = 1;
+  Next.Position pos = 2;
+}
+
+message CastInfo {
+  uint32 skill_id = 1;
+  uint32 aura_conf_id = 2;
+  uint32 group_id = 3;
+  uint32 cast_moment = 4;
+  uint32 pet_base_id = 5;
+}
+
+message PetCastAura {
+  Next.PetPosition pet_pos_info = 1;
+  repeated Next.CastInfo cast_info = 2;
+}
+
+message BattleRemoveAuraInfo {
+  repeated uint32 remove_aura_effect = 1;
+  uint32 pet_base_id = 2;
+}
+
+message PetRemoveAura {
+  Next.PetPosition pet_pos_info = 1;
+  repeated Next.BattleRemoveAuraInfo remove_info = 2;
+}

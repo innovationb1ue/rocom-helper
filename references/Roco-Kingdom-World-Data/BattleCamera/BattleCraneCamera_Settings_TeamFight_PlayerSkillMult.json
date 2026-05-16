@@ -1,0 +1,122 @@
+{
+	"Desc": "团体战——技能表演机位",
+	"TargetA": 1,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": -10,
+		"Z": -30
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 100,
+		"Z": 40
+	},
+	"SprintArmLength": 950,
+	"CameraFov": 75,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -100,
+				"Y": 100
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": -20
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 3,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": -3,
+				"Y": 4
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": -100,
+				"Y": 150
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 30
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 6
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": -5,
+				"Y": 5
+			},
+			"Desc": "none"
+		},
+		{
+			"IsEnable": true,
+			"InputType": 3,
+			"EffectType": 4,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 70
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 1,
+			"Interval":
+			{
+				"X": -2,
+				"Y": 2
+			},
+			"Desc": ""
+		}
+	]
+}

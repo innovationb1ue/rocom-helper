@@ -1,0 +1,63 @@
+{
+    "Name": "BATTLE_GUIDE_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EInt32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "battle_lead_group",
+            "Type": "EUint32",
+            "Offset": 4,
+            "Size": 4
+        },
+        {
+            "Name": "battle_lead_order",
+            "Type": "EUint32",
+            "Offset": 8,
+            "Size": 4
+        },
+        {
+            "Name": "battle_guidance_location",
+            "Type": "EInt32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "battle_lead_Finish_type",
+            "Type": "EInt32",
+            "Offset": 16,
+            "Size": 4
+        },
+        {
+            "Name": "param",
+            "Type": "EUint32",
+            "Offset": 20,
+            "Size": 4,
+            "CompressedSize": 4,
+            "DynamicArray": true
+        },
+        {
+            "Name": "battle_lead_ctrl",
+            "Type": "EUint32",
+            "Offset": 24,
+            "Size": 4
+        },
+        {
+            "Name": "is_strong_guidance",
+            "Type": "EBool",
+            "Offset": 28,
+            "Size": 1
+        },
+        {
+            "Name": "force_termination",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        }
+    ]
+}

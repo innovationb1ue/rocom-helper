@@ -1,0 +1,59 @@
+{
+	"Desc": "技能的摄像机位置",
+	"TargetA": 1,
+	"TargetB": 1,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": -180
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 0,
+		"Z": 0
+	},
+	"SprintArmLength": 440,
+	"CameraFov": 60,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CurvesArray": [
+		{
+			"IsEnable": true,
+			"TargetCameraId": 1,
+			"Duration": 0.29999999999999999,
+			"CameraName": "捕捉机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 3,
+			"Duration": 0.29999999999999999,
+			"CameraName": "道具对友机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 5,
+			"Duration": 0.29999999999999999,
+			"CameraName": "换宠机位",
+			"CurveId": 4
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 9,
+			"Duration": 0.69999999999999996,
+			"CameraName": "技能表演机位",
+			"CurveId": 1
+		},
+		{
+			"IsEnable": true,
+			"TargetCameraId": 6,
+			"Duration": 0.29999999999999999,
+			"CameraName": "技能的摄像机位置",
+			"CurveId": 4
+		}
+	],
+	"ControllerArray": []
+}

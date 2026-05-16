@@ -1,0 +1,59 @@
+{
+	"Desc": "A1最终战——选择技能(宠物2)",
+	"TargetA": 6,
+	"TargetB": 2,
+	"SpringArmRotation":
+	{
+		"X": 0,
+		"Y": 4,
+		"Z": -21
+	},
+	"SpringArmOffset":
+	{
+		"X": 0,
+		"Y": 200,
+		"Z": 250
+	},
+	"SprintArmLength": 1200,
+	"CameraFov": 80,
+	"EnableDepthOfField": false,
+	"DepthOfFieldScale": 0,
+	"CameraCurve":
+	{
+		"1":
+		{
+			"Duration": 0.5,
+			"Curve": 0
+		},
+		"5":
+		{
+			"Duration": 0.5,
+			"Curve": 0
+		}
+	},
+	"CurvesArray": [],
+	"ControllerArray": [
+		{
+			"IsEnable": true,
+			"InputType": 2,
+			"EffectType": 5,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 250
+			},
+			"Desc": ""
+		},
+		{
+			"IsEnable": false,
+			"InputType": 2,
+			"EffectType": 6,
+			"Interval":
+			{
+				"X": 0,
+				"Y": 5
+			},
+			"Desc": "none"
+		}
+	]
+}

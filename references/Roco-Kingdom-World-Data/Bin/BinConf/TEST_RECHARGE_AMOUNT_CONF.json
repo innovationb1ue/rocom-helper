@@ -1,0 +1,32 @@
+{
+    "Name": "TEST_RECHARGE_AMOUNT_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "user_openid",
+            "Type": "EUint64",
+            "Offset": 4,
+            "Size": 8
+        },
+        {
+            "Name": "recharge_amount",
+            "Type": "EUint32",
+            "Offset": 12,
+            "Size": 4
+        },
+        {
+            "Name": "user_openid_new",
+            "Type": "EString",
+            "Offset": 16,
+            "Size": 4,
+            "CompressedSize": 4
+        }
+    ]
+}

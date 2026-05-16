@@ -1,0 +1,117 @@
+package Next;
+
+message SpaceEnum_SpaceObjType {
+  enum ENUM {
+    SceneMgr = 1;
+    Scene = 2;
+    Cell = 3;
+    Actor = 4;
+  }
+}
+
+message SpaceEnum_SpaceObjSubType {
+  enum ENUM {
+    SceneMgr_Normal = 1;
+    Scene_Normal = 2;
+    Cell_Normal = 4;
+    Actor_Avatar = 7;
+    Actor_Npc = 8;
+    Actor_Pet = 9;
+    Actor_Monster = 10;
+  }
+}
+
+message SpaceEnum_ActorDetailType {
+  enum ENUM {
+    Avatar_Normal = 1;
+    Avatar_Unused1 = 2;
+    Avatar_Unused2 = 3;
+    Npc_Unused1 = 4;
+    Npc_Unused2 = 5;
+    Npc_Scene = 6;
+    Npc_DropItem = 7;
+    Npc_Unused3 = 8;
+    Npc_Pet = 9;
+    Npc_HomePet = 10;
+    Npc_HomePlant = 11;
+    Npc_Seat = 12;
+    Npc_HomePetEgg = 13;
+    Npc_Unused4 = 14;
+    Npc_Unused5 = 15;
+  }
+}
+
+message SpaceEnum_AvatarSceneChangeReason {
+  enum ENUM {
+    Login = 1;
+    Reconnect = 2;
+    SwitchScene = 3;
+  }
+}
+
+message SpaceEnum_NpcRefreshSource {
+  enum ENUM {
+    None = 0;
+    Normal = 1;
+    Task = 2;
+    Minigame = 3;
+    MinigameRewardNpc = 4;
+    OwlRefuge = 5;
+    StarHitDirection = 6;
+    Dungeon = 7;
+    GM = 8;
+    NpcInteract_OpenChest = 11;
+    NpcInteract_TouchLight = 12;
+    NpcInteract_TouchStone = 13;
+    NpcInteract_ShakeTree = 14;
+    NpcInteract_OptionCreateNpc = 15;
+    NpcInteract_SubmitPetNpc = 16;
+    NpcInteract_SubmitItemNpc = 17;
+    NpcInteract_PlaySequence = 18;
+    NpcInteract_MiracleChange = 19;
+    NpcInteract_WonderPea = 21;
+    NpcInteract_CampLevelup = 22;
+    NpcInteract_CampPetFruit = 23;
+    NpcInteract_OwlSanctuaryPetFruit = 24;
+    NpcInteract_MagicTransfer = 25;
+    NpcInteract_OptionCreateNpcWithAnimPlay = 30;
+    Battle = 31;
+    WorldBossReward = 32;
+    ThrowBagItem = 41;
+    ThrowPet = 42;
+    ThrowMagic = 43;
+    Combination = 51;
+    CombineResetNpc = 52;
+    ControllableNpc = 61;
+    SkillSettle_CreateNpc = 62;
+    HomePet = 64;
+    PutSeat = 65;
+    ContinousCatchBonus = 66;
+    Activity = 67;
+    AIRefresh = 68;
+    Season = 69;
+    TravelingMerchant = 70;
+    HomePetLayEgg = 71;
+  }
+}
+
+message SpaceEnum_ActorMoveMode {
+  enum ENUM {
+    None = 0;
+    Walking = 1;
+    NavWalking = 2;
+    Falling = 3;
+    Swimming = 4;
+    Flying = 5;
+    Custom = 6;
+  }
+}
+
+message SpaceEnum_NpcActionStatus {
+  enum ENUM {
+    NotExecute = 0;
+    Executing = 1;
+    Commitable = 2;
+    Commited = 3;
+  }
+}

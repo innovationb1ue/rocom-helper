@@ -1,0 +1,98 @@
+{
+    "Name": "SCENE_ABILITY_ASCENDING_CONF",
+    "Type": "EStruct",
+    "UniqueKey": "id",
+    "Properties": [
+        {
+            "Name": "id",
+            "Type": "EUint32",
+            "Offset": 0,
+            "Size": 4
+        },
+        {
+            "Name": "allow_long_press",
+            "Type": "EBool",
+            "Offset": 4,
+            "Size": 1
+        },
+        {
+            "Name": "vertical_accelerate",
+            "Type": "EUint32",
+            "Offset": 5,
+            "Size": 4
+        },
+        {
+            "Name": "max_upward_spd",
+            "Type": "EUint32",
+            "Offset": 9,
+            "Size": 4
+        },
+        {
+            "Name": "max_speed_curve",
+            "Type": "EString",
+            "Offset": 13,
+            "Size": 4,
+            "CompressedSize": 4
+        },
+        {
+            "Name": "accelerate",
+            "Type": "EUint32",
+            "Offset": 17,
+            "Size": 4
+        },
+        {
+            "Name": "turn_threshold",
+            "Type": "EUint32",
+            "Offset": 21,
+            "Size": 4
+        },
+        {
+            "Name": "fly_delta_angular_speed",
+            "Type": "EUint32",
+            "Offset": 25,
+            "Size": 4
+        },
+        {
+            "Name": "basic_movement_id",
+            "Type": "EUint32",
+            "Offset": 29,
+            "Size": 4
+        },
+        {
+            "Name": "vitality_id",
+            "Type": "EUint32",
+            "Offset": 33,
+            "Size": 4
+        },
+        {
+            "Name": "ascend_start_vitality_cost",
+            "Type": "EUint32",
+            "Offset": 37,
+            "Size": 4
+        },
+        {
+            "Name": "min_duration",
+            "Type": "EFloat",
+            "Offset": 41,
+            "Size": 4
+        },
+        {
+            "Name": "ascending_vitality_cost",
+            "Type": "EUint32",
+            "Offset": 45,
+            "Size": 4
+        },
+        {
+            "Name": "ascend_cooldown",
+            "Type": "EFloat",
+            "Offset": 49,
+            "Size": 4
+        },
+        {
+            "Name": "maintain_press_time",
+            "Type": "EFloat",
+            "Offset": 53,
+            "Size": 4
+        }
+    ]
+}
