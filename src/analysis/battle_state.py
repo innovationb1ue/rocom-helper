@@ -136,6 +136,11 @@ class BattleStateTracker:
         return build_state_suggestions(self.state)
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
+        self._opponent_slots = set()
+        self._player_slots = set()
+        self._opponent_actor_id = None
+        self._player_actor_id = None
+
         self.state["battle_id"] = detail.get("battle_id")
         self.state["battle_mode"] = detail.get("battle_mode")
         self.state["round"] = detail.get("round", 0)

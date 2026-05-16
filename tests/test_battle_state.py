@@ -558,6 +558,31 @@ class TestBattleReset:
         assert state["my_active"]["hp_pct"] == 1.0
         assert state["phase"] == "selecting"
 
+    def test_second_battle_resets_slot_mapping(self, tracker):
+        """换宠后进入第二场战斗，槽位映射必须清零。"""
+        # First battle — 多宠物阵容
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # 对手换宠到槽位 402，填充 _opponent_slots
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 402,
+             "new_pet_name": "电鼠", "actor_side": 401},
+        ]))
+        assert 402 in tracker._opponent_slots
+        # 我方换宠到槽位 2，填充 _player_slots
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 2,
+             "new_pet_name": "草苗", "actor_side": 1},
+        ]))
+        assert 2 in tracker._player_slots
+        # 结束第一场
+        tracker.handle_event(0x132C, _finish_event("WIN"))
+        # 第二场战斗 — 所有内部追踪状态必须重置
+        tracker.handle_event(0x1316, _enter_event())
+        assert tracker._opponent_slots == set()
+        assert tracker._player_slots == set()
+        assert tracker._opponent_actor_id is None
+        assert tracker._player_actor_id is None
+
 
 class TestDefeatAndReplacement:
     def test_defeat_then_switch(self, tracker):

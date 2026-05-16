@@ -225,7 +225,7 @@ web/ (React SPA)
 - **API 客户端**：`web/src/utils/api.ts` 集中管理 Axios 调用
 - **BattleManager 单例**：`get_battle_manager()` 提供全局访问，桥接抓包器到 WebSocket 客户端和分析管线
 - **Opcode 分发**：`opcodes.py` 使用装饰器注册表（`_OPCODE_REGISTRY` 用于主 opcode，`_INNER_REGISTRY` 用于 opcode 0x0414 的内部消息分发）。`summarize()` 函数对未知 opcode 回退到 `opcode_pb_map.json` 元数据。
-- **Opcode 常量**：`src/analysis/constants.py` 集中管理所有 opcode 常量（`OPCODE_BATTLE_ENTER`、`OPCODE_ACTION_RESOLVE` 等）、opcode 集合（`LIFECYCLE_OPCODES`、`DAMAGE_OPCODES`、`IN_BATTLE_OPCODES`）、`OPCODE_LABELS`，并重导出 `SDT_TO_TYPE`。所有分析和 API 模块从此文件导入，不使用十六进制字面量。
+- **Opcode 常量**：`src/analysis/constants.py` 集中管理所有 opcode 常量（`OPCODE_BATTLE_ENTER`、`OPCODE_ACTION_RESOLVE` 等）、opcode 集合（`LIFECYCLE_OPCODES`、`DAMAGE_OPCODES`、`IN_BATTLE_OPCODES`）、`OPCODE_LABELS`，并重导出 `SDT_TO_TYPE`。所有分析和 API 模块从此文件导入，不使用十六进制字面量。回放路径（`packet_reader.py`）和实时路径（`BattleManager`）共用 `LIFECYCLE_OPCODES | IN_BATTLE_OPCODES` 作为统一的 opcode 过滤集合（22 个 opcode），确保解析范围完全一致。
 
 ### 关键架构概念
 
@@ -286,7 +286,7 @@ idle → selecting（0x1316 battle_enter）→ resolving（0x131A round_start）
 
 **抓包桥接：**
 
-`BattleManager` 通过 `_ensure_bridge()` 向 `SnifferManager` 注册回调。当抓包器捕获 TGCP DATA 包时，桥接器解码 opcode 并通过完整管线分发（tracker → formatter → analysis → WebSocket 推送）。仅处理 `_LIFECYCLE_OPCODES`（0x1316, 0x131A, 0x132C, 0x0102）和 `_IN_BATTLE_OPCODES`。
+`BattleManager` 通过 `_ensure_bridge()` 向 `SnifferManager` 注册回调。当抓包器捕获 TGCP DATA 包时，桥接器解码 opcode 并通过完整管线分发（tracker → formatter → analysis → WebSocket 推送）。仅处理 `_LIFECYCLE_OPCODES`（0x1316, 0x131A, 0x132C, 0x0102）和 `_IN_BATTLE_OPCODES`（18 个战斗内 opcode），与回放路径共用同一集合（定义在 `src/analysis/constants.py`）。
 
 ## 测试
 
