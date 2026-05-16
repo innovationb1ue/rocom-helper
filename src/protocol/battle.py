@@ -828,6 +828,8 @@ def extract_0102_creatures(record: Dict[str, Any]) -> List[Dict[str, Any]]:
                     tag, off = read_varint(blob, off)
                     length, off = read_varint(blob, off)
                 except ValueError:
+                    logger.debug("varint parse failed in extract_0102_creatures at offset %d/%d",
+                                 off, len(blob))
                     break
                 fn, wt = tag >> 3, tag & 7
                 if fn != 1 or wt != 2 or off + length > len(blob):

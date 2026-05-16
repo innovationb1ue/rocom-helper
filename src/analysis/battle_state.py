@@ -18,6 +18,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_info import PetInfo
+from src.data.loader import get_speed_buff_modifiers
 from src.analysis.constants import (
     OPCODE_ACTION_RESOLVE,
     OPCODE_BATTLE_ENTER,
@@ -38,8 +39,9 @@ def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
     """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正)，最低 1。"""
     base = pet.get("base_speed")
     if base is None:
+        logger.debug("effective_speed unavailable: base_speed is None for %s",
+                     pet.get("name", "?"))
         return None
-    from src.data.loader import get_speed_buff_modifiers
     mods = get_speed_buff_modifiers(pet.get("buffs", []))
     effective = (base + mods.get("flat_total", 0)) * (1.0 + mods.get("pct_total", 0.0))
     return max(1, int(round(effective)))
@@ -64,6 +66,8 @@ class BattleStateTracker:
         # battle slot IDs whose ownership has been established
         self._opponent_slots: set = set()
         self._player_slots: set = set()
+        self._opponent_actor_id: Optional[int] = None
+        self._player_actor_id: Optional[int] = None
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         """处理协议事件，更新状态，返回最新快照。
@@ -217,9 +221,12 @@ class BattleStateTracker:
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         for entry in detail.get("entries", []):
-            handler_name = self._ENTRY_HANDLERS.get(entry.get("kind"))
+            kind = entry.get("kind")
+            handler_name = self._ENTRY_HANDLERS.get(kind)
             if handler_name:
                 getattr(self, handler_name)(entry)
+            else:
+                logger.debug("unrecognized action entry kind=%s", kind)
 
     def _get_active_for_side(self, side_value: Any) -> Optional[Dict[str, Any]]:
         """根据 side 值获取对应的活跃宠物字典。"""
@@ -307,9 +314,26 @@ class BattleStateTracker:
         if battle_pet_id is None:
             return
 
+        actor = entry.get("actor_side")
+
         # Determine side by pet identity, not slot number range.
         is_opp = None
-        if new_pet_id is not None:
+
+        # 1. Match by known actor ID (change_pet actor is a player/client identifier)
+        if actor is not None:
+            if self._opponent_actor_id is not None and actor == self._opponent_actor_id:
+                is_opp = True
+            elif self._player_actor_id is not None and actor == self._player_actor_id:
+                is_opp = False
+            elif isinstance(actor, int) and actor > 406:
+                # Unknown large actor value: if player actor is known, this is opponent
+                if self._player_actor_id is not None:
+                    is_opp = True
+                elif self._opponent_actor_id is not None:
+                    is_opp = False
+
+        # 2. Match new_pet_id against known pets
+        if is_opp is None and new_pet_id is not None:
             in_my = any(p.get("pet_id") == new_pet_id for p in self.state["my_pets"])
             in_opp = any(p.get("pet_id") == new_pet_id for p in self.state["opp_pets"])
             if in_my and not in_opp:
@@ -317,7 +341,7 @@ class BattleStateTracker:
             elif in_opp and not in_my:
                 is_opp = True
 
-        # New pet not in either list: use rest_pet_id (the pet being benched)
+        # 3. Match by rest_pet_id (pet being benched) using slot mapping
         if is_opp is None:
             rest_pet_id = entry.get("rest_pet_id")
             if rest_pet_id in self._opponent_slots:
@@ -325,10 +349,29 @@ class BattleStateTracker:
             elif rest_pet_id in self._player_slots:
                 is_opp = False
 
-        # Fallback: numeric range
+        # 4. Match new_pet_name against known pets
+        if is_opp is None and new_pet_name:
+            for p in self.state["my_pets"]:
+                if p.get("name") == new_pet_name:
+                    is_opp = False
+                    break
+            if is_opp is None:
+                for p in self.state["opp_pets"]:
+                    if p.get("name") == new_pet_name:
+                        is_opp = True
+                        break
+
+        # 5. Fallback: numeric range
         if is_opp is None:
             bpid = int(battle_pet_id)
             is_opp = bpid >= 401
+
+        # Record actor identity for future change_pet events
+        if actor is not None and isinstance(actor, int) and actor > 406:
+            if is_opp:
+                self._opponent_actor_id = actor
+            else:
+                self._player_actor_id = actor
 
         # Record slot mapping
         bpid = int(battle_pet_id)
@@ -343,16 +386,16 @@ class BattleStateTracker:
         if active is not None:
             entry["_prev_active_name"] = active.get("name", "?")
         matched = None
-        # Match by real pet_id
-        if new_pet_id is not None:
-            for pet in pet_list:
-                if pet.get("pet_id") == new_pet_id:
-                    matched = pet
-                    break
-        # Match by name
-        if matched is None and new_pet_name:
+        # Match by name first (more reliable than pet_id for generic IDs like 20000000)
+        if new_pet_name:
             for pet in pet_list:
                 if pet.get("name") == new_pet_name:
+                    matched = pet
+                    break
+        # Match by real pet_id (skip generic Monster ID 20000000)
+        if matched is None and new_pet_id is not None and new_pet_id != 20000000:
+            for pet in pet_list:
+                if pet.get("pet_id") == new_pet_id:
                     matched = pet
                     break
         # Match by slot position (player slots 1-6 map to index 0-5)
@@ -371,7 +414,7 @@ class BattleStateTracker:
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []
-                if len(bs) >= 6 and bs[5]:
+                if len(bs) >= 6 and bs[5] is not None and bs[5] > 0:
                     matched["base_speed"] = bs[5]
             if entry.get("new_pet_current_hp") is not None and entry.get("new_pet_max_hp") is not None:
                 matched["current_hp"] = entry["new_pet_current_hp"]
@@ -379,9 +422,12 @@ class BattleStateTracker:
                 if matched["max_hp"] > 0:
                     matched["hp_pct"] = matched["current_hp"] / matched["max_hp"]
             if entry.get("new_pet_energy") is not None:
-                matched["energy"] = entry["new_pet_energy"]
+                matched["energy"] = min(10, entry["new_pet_energy"])
             if entry.get("new_pet_passive_skill_id") is not None:
                 matched["innate_skill_id"] = entry["new_pet_passive_skill_id"]
+        side_label = "OPP" if is_opp else "MY"
+        prev = entry.get("_prev_active_name", "?")
+        logger.info("change_pet: %s %s → %s", side_label, prev, new_pet_name)
 
     def _handle_effect_apply_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side")
@@ -431,6 +477,7 @@ class BattleStateTracker:
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
         self.state["phase"] = "finished"
+        logger.info("battle finished: result=%s rounds=%d", self.state["result"], self.state["round"])
         finish_pets = detail.get("finish_pet_infos", [])
         for fp in finish_pets:
             pet_id = fp.get("pet_gid")
@@ -538,11 +585,11 @@ class BattleStateTracker:
                     # 从 battle_stats[5] 设置基础速度（仅首次，战斗中不变）
                     if pet.get("base_speed") is None:
                         w_bs = w.get("battle_stats") or []
-                        if len(w_bs) >= 6 and w_bs[5]:
+                        if len(w_bs) >= 6 and w_bs[5] is not None and w_bs[5] > 0:
                             pet["base_speed"] = w_bs[5]
                     # 能量刷新
                     if w.get("energy") is not None:
-                        pet["energy"] = w["energy"]
+                        pet["energy"] = min(10, w["energy"])
                     # 属性类型（仅首次为空时填充）
                     if not pet.get("types") and w.get("types"):
                         pet["types"] = w["types"]

@@ -26,6 +26,7 @@ def extract_key_from_ack(packet: Be21Packet) -> Optional[bytes]:
     key = extra[_KEY_OFFSET:_KEY_OFFSET + _KEY_LENGTH]
     if len(key) != _KEY_LENGTH:
         return None
+    logger.debug("extracted AES key from ACK: %s", key.hex())
     return key
 
 

@@ -72,6 +72,11 @@ class BattleProcessor:
         """处理单个战斗事件，返回所有计算输出。"""
         state = self.tracker.handle_event(opcode, detail)
         round_num = state.get("round", 0)
+        label = OPCODE_LABELS.get(opcode, f"0x{opcode:04X}")
+        if opcode in (OPCODE_BATTLE_ENTER, OPCODE_BATTLE_FINISH):
+            logger.info("process_event: %s round=%d phase=%s", label, round_num, state.get("phase"))
+        else:
+            logger.debug("process_event: %s round=%d", label, round_num)
 
         # 1. 事件格式化
         formatted = format_battle_event(opcode, detail, state, round_num)

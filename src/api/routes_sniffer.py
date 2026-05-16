@@ -57,6 +57,7 @@ async def sniffer_monitor_ws(ws: WebSocket):
             "key_hex": status["key_hex"],
         }, ensure_ascii=False))
     except Exception:
+        logger.warning("sniffer monitor initial status push failed, removing client")
         mgr.remove_client(ws)
         return
 
@@ -79,6 +80,6 @@ async def sniffer_monitor_ws(ws: WebSocket):
                     "key_hex": status["key_hex"],
                 }, ensure_ascii=False))
     except WebSocketDisconnect:
-        pass
+        logger.debug("sniffer monitor WebSocket disconnected")
     finally:
         mgr.remove_client(ws)

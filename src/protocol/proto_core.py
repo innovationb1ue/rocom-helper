@@ -213,6 +213,7 @@ def parse_proto_message(data: bytes, *, depth: int = 0, max_depth: int = 10, max
         try:
             tag, off = read_varint(data, off)
         except ValueError:
+            logger.debug("varint read failed at offset 0x%X in %dB payload", start, len(data))
             clean = False
             break
         field_no, wire_type = tag >> 3, tag & 7
@@ -254,10 +255,16 @@ def parse_proto_message(data: bytes, *, depth: int = 0, max_depth: int = 10, max
                 clean = False
                 break
         except ValueError:
+            logger.debug("field parse failed at offset 0x%X in %dB payload", start, len(data))
             clean = False
             break
         fields.append(entry)
-    return {"fields": fields, "consumed": off, "clean": clean and off == len(data)}
+    result = {"fields": fields, "consumed": off, "clean": clean and off == len(data)}
+    if not result["clean"] and len(data) > 0:
+        from src.utils.logging_config import hex_preview
+        logger.warning("protobuf parse incomplete: consumed %d/%d bytes, %d fields, data=%s",
+                       off, len(data), len(fields), hex_preview(data))
+    return result
 
 # --- 辅助函数 ---
 def walk_messages(msg: Dict[str, Any], path: str = "root") -> List[Tuple[str, Dict[str, Any]]]:
@@ -432,6 +439,7 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
     name = first_text(msg, 3)
     level = pick_first(collect_varints(msg, 10), low=1, high=100)
     if not name or level is None:
+        logger.debug("extract_creature skipped: name=%s level=%s path=%s", name, level, path)
         return None
     slot = pick_first(collect_varints(msg, 1), low=0, high=999)
     pid = pick_first(collect_varints(msg, 2), low=1000)
