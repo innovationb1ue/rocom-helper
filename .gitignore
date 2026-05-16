@@ -49,11 +49,15 @@ node_modules/
 web/dist/
 web/*.local
 
+# Screenshots and images
+*.png
+*.jpg
+*.jpeg
+
 # Reports and docs output
 reports/
 tmp/
 battle_replay_*.txt
-battle_replay_*.png
 docs/battle_*_report*.txt
 
 # Progress tracking

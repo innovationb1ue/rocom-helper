@@ -18,14 +18,10 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_info import PetInfo
-from src.data.loader import get_speed_buff_modifiers
 from src.analysis.constants import (
-    OPCODE_ACTION_ACK,
     OPCODE_ACTION_RESOLVE,
     OPCODE_BATTLE_ENTER,
     OPCODE_BATTLE_FINISH,
-    OPCODE_PVP_PERFORM,
-    OPCODE_PREPLAY,
     OPCODE_ROUND_FLOW,
     OPCODE_ROUND_START,
     OPCODE_SKILL_DECLARE,
@@ -35,16 +31,15 @@ from src.analysis.constants import (
 
 logger = logging.getLogger(__name__)
 
-POISON_BUFF_IDS = {20070010, 20070011, 20070012}
+POISON_BUFF_IDS = {20070010}
 
 
 def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
     """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正)，最低 1。"""
     base = pet.get("base_speed")
     if base is None:
-        logger.debug("effective_speed unavailable: base_speed is None for %s",
-                     pet.get("name", "?"))
         return None
+    from src.data.loader import get_speed_buff_modifiers
     mods = get_speed_buff_modifiers(pet.get("buffs", []))
     effective = (base + mods.get("flat_total", 0)) * (1.0 + mods.get("pct_total", 0.0))
     return max(1, int(round(effective)))
@@ -69,8 +64,6 @@ class BattleStateTracker:
         # battle slot IDs whose ownership has been established
         self._opponent_slots: set = set()
         self._player_slots: set = set()
-        self._opponent_actor_id: Optional[int] = None
-        self._player_actor_id: Optional[int] = None
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         """处理协议事件，更新状态，返回最新快照。
@@ -105,10 +98,6 @@ class BattleStateTracker:
             self._handle_skill_declare(detail)
         elif opcode == OPCODE_ROUND_FLOW:
             self._handle_round_flow(detail)
-        elif opcode in (OPCODE_PVP_PERFORM, OPCODE_PREPLAY):
-            self._handle_action_resolve(detail)
-        elif opcode == OPCODE_ACTION_ACK:
-            self._handle_action_ack(detail)
 
         return self.get_state()
 
@@ -136,11 +125,6 @@ class BattleStateTracker:
         return build_state_suggestions(self.state)
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
-        self._opponent_slots = set()
-        self._player_slots = set()
-        self._opponent_actor_id = None
-        self._player_actor_id = None
-
         self.state["battle_id"] = detail.get("battle_id")
         self.state["battle_mode"] = detail.get("battle_mode")
         self.state["round"] = detail.get("round", 0)
@@ -216,11 +200,8 @@ class BattleStateTracker:
     #   heal → 恢复 HP
     #   energy → 更新能量值
     #   change_pet → 切换活跃精灵（匹配: pet_id → name → slot → 新建）
-    #   effect_apply → 添加/更新 buff（含 buff_info 详细字段）
-    #   effect_link → 效果联动
-    #   effect_link → 记录 buff 链接
-    #   effect_trigger → 记录效果触发
-    #   revive → 复活精灵
+    #   effect_apply → 添加/更新 buff
+    #   effect_stage → 更新 buff 阶段
 
     _ENTRY_HANDLERS = {
         "damage": "_handle_damage_entry",
@@ -231,21 +212,23 @@ class BattleStateTracker:
         "energy": "_handle_energy_entry",
         "change_pet": "_handle_change_pet_entry",
         "effect_apply": "_handle_effect_apply_entry",
-        "effect_link": "_handle_effect_link_entry",
-        "effect_trigger": "_handle_effect_trigger_entry",
-        "revive": "_handle_revive_entry",
+        "effect_stage": "_handle_effect_stage_entry",
         "weather_change": "_handle_weather_change_entry",
         "skill_state": "_handle_skill_state_entry",
+        "role_skill_cast": "_handle_role_skill_cast_entry",
+        "special_move": "_handle_special_move_entry",
+        "skill_pos_change": "_handle_skill_pos_change_entry",
+        "sp_energy_change": "_handle_sp_energy_change_entry",
+        "sp_energy_trigger": "_handle_sp_energy_trigger_entry",
+        "idle": "_handle_idle_entry",
+        "notify_perform": "_handle_notify_perform_entry",
     }
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         for entry in detail.get("entries", []):
-            kind = entry.get("kind")
-            handler_name = self._ENTRY_HANDLERS.get(kind)
+            handler_name = self._ENTRY_HANDLERS.get(entry.get("kind"))
             if handler_name:
                 getattr(self, handler_name)(entry)
-            else:
-                logger.debug("unrecognized action entry kind=%s", kind)
 
     def _get_active_for_side(self, side_value: Any) -> Optional[Dict[str, Any]]:
         """根据 side 值获取对应的活跃宠物字典。"""
@@ -302,7 +285,6 @@ class BattleStateTracker:
         if active is not None:
             active["current_hp"] = 0
             active["hp_pct"] = 0.0
-            active["last_dead_type"] = entry.get("dead_type_name", "normal")
 
     def _handle_heal_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side")
@@ -334,26 +316,9 @@ class BattleStateTracker:
         if battle_pet_id is None:
             return
 
-        actor = entry.get("actor_side")
-
         # Determine side by pet identity, not slot number range.
         is_opp = None
-
-        # 1. Match by known actor ID (change_pet actor is a player/client identifier)
-        if actor is not None:
-            if self._opponent_actor_id is not None and actor == self._opponent_actor_id:
-                is_opp = True
-            elif self._player_actor_id is not None and actor == self._player_actor_id:
-                is_opp = False
-            elif isinstance(actor, int) and actor > 406:
-                # Unknown large actor value: if player actor is known, this is opponent
-                if self._player_actor_id is not None:
-                    is_opp = True
-                elif self._opponent_actor_id is not None:
-                    is_opp = False
-
-        # 2. Match new_pet_id against known pets
-        if is_opp is None and new_pet_id is not None:
+        if new_pet_id is not None:
             in_my = any(p.get("pet_id") == new_pet_id for p in self.state["my_pets"])
             in_opp = any(p.get("pet_id") == new_pet_id for p in self.state["opp_pets"])
             if in_my and not in_opp:
@@ -361,7 +326,7 @@ class BattleStateTracker:
             elif in_opp and not in_my:
                 is_opp = True
 
-        # 3. Match by rest_pet_id (pet being benched) using slot mapping
+        # New pet not in either list: use rest_pet_id (the pet being benched)
         if is_opp is None:
             rest_pet_id = entry.get("rest_pet_id")
             if rest_pet_id in self._opponent_slots:
@@ -369,29 +334,10 @@ class BattleStateTracker:
             elif rest_pet_id in self._player_slots:
                 is_opp = False
 
-        # 4. Match new_pet_name against known pets
-        if is_opp is None and new_pet_name:
-            for p in self.state["my_pets"]:
-                if p.get("name") == new_pet_name:
-                    is_opp = False
-                    break
-            if is_opp is None:
-                for p in self.state["opp_pets"]:
-                    if p.get("name") == new_pet_name:
-                        is_opp = True
-                        break
-
-        # 5. Fallback: numeric range
+        # Fallback: numeric range
         if is_opp is None:
             bpid = int(battle_pet_id)
             is_opp = bpid >= 401
-
-        # Record actor identity for future change_pet events
-        if actor is not None and isinstance(actor, int) and actor > 406:
-            if is_opp:
-                self._opponent_actor_id = actor
-            else:
-                self._player_actor_id = actor
 
         # Record slot mapping
         bpid = int(battle_pet_id)
@@ -406,16 +352,16 @@ class BattleStateTracker:
         if active is not None:
             entry["_prev_active_name"] = active.get("name", "?")
         matched = None
-        # Match by name first (more reliable than pet_id for generic IDs like 20000000)
-        if new_pet_name:
-            for pet in pet_list:
-                if pet.get("name") == new_pet_name:
-                    matched = pet
-                    break
-        # Match by real pet_id (skip generic Monster ID 20000000)
-        if matched is None and new_pet_id is not None and new_pet_id != 20000000:
+        # Match by real pet_id
+        if new_pet_id is not None:
             for pet in pet_list:
                 if pet.get("pet_id") == new_pet_id:
+                    matched = pet
+                    break
+        # Match by name
+        if matched is None and new_pet_name:
+            for pet in pet_list:
+                if pet.get("name") == new_pet_name:
                     matched = pet
                     break
         # Match by slot position (player slots 1-6 map to index 0-5)
@@ -434,7 +380,7 @@ class BattleStateTracker:
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []
-                if len(bs) >= 6 and bs[5] is not None and bs[5] > 0:
+                if len(bs) >= 6 and bs[5]:
                     matched["base_speed"] = bs[5]
             if entry.get("new_pet_current_hp") is not None and entry.get("new_pet_max_hp") is not None:
                 matched["current_hp"] = entry["new_pet_current_hp"]
@@ -445,12 +391,6 @@ class BattleStateTracker:
                 matched["energy"] = min(10, entry["new_pet_energy"])
             if entry.get("new_pet_passive_skill_id") is not None:
                 matched["innate_skill_id"] = entry["new_pet_passive_skill_id"]
-            new_types = entry.get("new_pet_types")
-            if new_types:
-                matched["types"] = new_types
-        side_label = "OPP" if is_opp else "MY"
-        prev = entry.get("_prev_active_name", "?")
-        logger.info("change_pet: %s %s → %s", side_label, prev, new_pet_name)
 
     def _handle_effect_apply_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side")
@@ -461,27 +401,18 @@ class BattleStateTracker:
         if active is None:
             return
         buffs = active.setdefault("buffs", [])
-        change_type = entry.get("change_type")
+        stage = entry.get("effect_stage")
         ename = entry.get("effect_name")
         # BuffChangeType: 0=NULL, 1=ADD, 2=CHANGE, 3=REMOVE
-        if change_type == 3:
+        if stage == 3:
+            # 移除 buff
             active["buffs"] = [b for b in buffs if b.get("id") != effect_id]
             return
-        # Build buff_info extras from protocol fields
-        buff_extras: Dict[str, Any] = {}
-        for k in ("change_type", "buff_stack", "buff_left_round",
-                   "buff_on_field_round", "is_hidden", "hidden_stack", "del_flag"):
-            v = entry.get(k)
-            if v is not None:
-                buff_extras[k] = v
         existing = next((b for b in buffs if b["id"] == effect_id), None)
-        _bs = entry.get("buff_stack")
-        stage = _bs if _bs is not None else (1 if change_type == 1 else None)
         if existing:
             if stage is not None:
                 existing["stage"] = stage
             existing["turns_applied"] = existing.get("turns_applied", 0) + 1
-            existing.update(buff_extras)
         else:
             buffs.append({
                 "id": effect_id,
@@ -489,66 +420,131 @@ class BattleStateTracker:
                 "stage": stage,
                 "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
                 "turns_applied": 1,
-                **buff_extras,
             })
         if effect_id in POISON_BUFF_IDS:
-            bstack = entry.get("buff_stack")
-            if bstack is not None:
-                active["poison_stacks"] = bstack
-            else:
-                active["poison_stacks"] = active.get("poison_stacks", 0) + 1
+            active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
-    def _handle_effect_link_entry(self, entry: Dict[str, Any]) -> None:
-        target_side = entry.get("target_side")
-        if target_side is None:
+    def _handle_effect_stage_entry(self, entry: Dict[str, Any]) -> None:
+        actor_side = entry.get("actor_side")
+        effect_id = entry.get("effect_id")
+        new_stage = entry.get("effect_stage")
+        if actor_side is None:
             return
-        active = self._get_active_for_side(target_side)
-        if active is None:
+        active = self._get_active_for_side(actor_side)
+        if active is not None:
+            buffs = active.get("buffs", [])
+            existing = next((b for b in buffs if b["id"] == effect_id), None)
+            if existing and new_stage is not None:
+                existing["stage"] = new_stage
+
+    def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
+        weather_id = entry.get("weather_id")
+        weather_name = entry.get("weather_name")
+        if weather_id is not None and weather_name is None:
+            from src.data.loader import get_attr_name
+            weather_name = get_attr_name(weather_id)
+        self.state["weather"] = {
+            "id": weather_id,
+            "name": weather_name,
+            "expire_round": entry.get("expire_round"),
+            "changed_by_skill": entry.get("skill_name") or entry.get("skill_id"),
+            "changed_at_round": self.state["round"],
+        }
+
+    def _handle_skill_state_entry(self, entry: Dict[str, Any]) -> None:
+        caster_pet_id = entry.get("caster_pet_id")
+        if caster_pet_id is None:
             return
-        links = active.setdefault("effect_links", [])
-        links.append({
-            "effect_id": entry.get("effect_id"),
-            "effect_name": entry.get("effect_name"),
+        for active_key in ("my_active", "opp_active"):
+            active = self.state[active_key]
+            if active and active.get("pet_id") == caster_pet_id:
+                active.setdefault("skill_states", []).append({
+                    "state_code": entry.get("state_code"),
+                    "round": self.state["round"],
+                })
+                return
+
+    def _handle_role_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("role_skill_casts", []).append({
+            "caster_uin": entry.get("caster_uin"),
+            "skill_id": entry.get("skill_id"),
             "pet_id": entry.get("pet_id"),
+            "is_call_success": entry.get("is_call_success"),
+            "round": self.state["round"],
+        })
+        if entry.get("is_call_success") and entry.get("pet_id"):
+            for active_key in ("my_active", "opp_active"):
+                active = self.state[active_key]
+                if active and active.get("pet_id") == entry["pet_id"]:
+                    sid = entry.get("skill_id")
+                    if sid:
+                        used = active.setdefault("used_skills", [])
+                        if not any(s.get("skill_id") == sid for s in used):
+                            item = {"skill_id": sid}
+                            if entry.get("skill_name"):
+                                item["skill_name"] = entry["skill_name"]
+                            used.append(item)
+                    break
+
+    def _handle_special_move_entry(self, entry: Dict[str, Any]) -> None:
+        pet_id = entry.get("pet_id")
+        if pet_id is None:
+            return
+        for active_key in ("my_active", "opp_active"):
+            active = self.state[active_key]
+            if active and active.get("pet_id") == pet_id:
+                active.setdefault("special_moves", []).append({
+                    "special_move_id": entry.get("special_move_id"),
+                    "type": entry.get("special_move_type"),
+                    "round": entry.get("round") or self.state["round"],
+                    "skill_id": entry.get("skill_id"),
+                })
+                return
+
+    def _handle_skill_pos_change_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("skill_pos_changes", []).append({
+            "pet_id": entry.get("pet_id"),
+            "skill_pos_infos": entry.get("skill_pos_infos", []),
+            "round": self.state["round"],
         })
 
-    def _handle_effect_trigger_entry(self, entry: Dict[str, Any]) -> None:
-        target_side = entry.get("target_side")
-        if target_side is None:
-            return
-        active = self._get_active_for_side(target_side)
-        if active is None:
-            return
-        triggers = active.setdefault("triggered_effects", [])
-        triggers.append({
-            "effect_id": entry.get("effect_id"),
-            "effect_name": entry.get("effect_name"),
-            "trigger_result": entry.get("trigger_result"),
-            "trigger_params": entry.get("trigger_params"),
+    def _handle_sp_energy_change_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("sp_energy_log", []).append({
+            "sp_change_type": entry.get("sp_change_type"),
+            "sp_element": entry.get("sp_element"),
+            "sp_change_src": entry.get("sp_change_src"),
+            "caster_id": entry.get("caster_id"),
+            "target_id": entry.get("target_id"),
+            "change_value": entry.get("change_value"),
+            "real_change_value": entry.get("real_change_value"),
+            "round": self.state["round"],
         })
 
-    def _handle_revive_entry(self, entry: Dict[str, Any]) -> None:
-        target_side = entry.get("target_side")
-        if target_side is None:
-            return
-        active = self._get_active_for_side(target_side)
-        if active is None:
-            return
-        revive_hp = entry.get("revive_hp")
-        if revive_hp is not None and revive_hp > 0:
-            active["current_hp"] = revive_hp
-            active["hp_pct"] = revive_hp / active["max_hp"] if active["max_hp"] > 0 else 0.0
-        else:
-            # Unknown HP — just mark as alive (> 0)
-            active["current_hp"] = max(1, active.get("current_hp", 1))
-            if active["max_hp"] > 0:
-                active["hp_pct"] = active["current_hp"] / active["max_hp"]
-        active["revive_count"] = active.get("revive_count", 0) + 1
+    def _handle_sp_energy_trigger_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("sp_energy_triggers", []).append({
+            "old_skill_id": entry.get("old_skill_id"),
+            "new_skill_id": entry.get("new_skill_id"),
+            "trigger_type": entry.get("trigger_type"),
+            "round": self.state["round"],
+        })
+
+    def _handle_idle_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("idle_events", []).append({
+            "idle_pet_id": entry.get("idle_pet_id"),
+            "round": self.state["round"],
+        })
+
+    def _handle_notify_perform_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("notifications", []).append({
+            "notify_type": entry.get("notify_type"),
+            "notify_data": entry.get("notify_data"),
+            "tips_id": entry.get("tips_id"),
+            "round": self.state["round"],
+        })
 
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
         self.state["phase"] = "finished"
-        logger.info("battle finished: result=%s rounds=%d", self.state["result"], self.state["round"])
         finish_pets = detail.get("finish_pet_infos", [])
         for fp in finish_pets:
             pet_id = fp.get("pet_gid")
@@ -588,54 +584,6 @@ class BattleStateTracker:
 
     def _handle_round_flow(self, detail: Dict[str, Any]) -> None:
         self.state["round"] = detail.get("round", self.state["round"])
-
-    def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
-        weather_id = entry.get("weather_id")
-        if weather_id is None:
-            return
-        from src.data.loader import get_attr_name
-        self.state["weather"] = {
-            "id": weather_id,
-            "name": get_attr_name(weather_id),
-            "expire_round": entry.get("weather_expire_round"),
-        }
-        logger.info("weather changed: id=%d name=%s expire_round=%s",
-                     weather_id, self.state["weather"]["name"],
-                     entry.get("weather_expire_round"))
-
-    def _handle_skill_state_entry(self, entry: Dict[str, Any]) -> None:
-        pet_id = entry.get("caster_pet_id")
-        state_code = entry.get("state_code")
-        if pet_id is None or state_code is None:
-            return
-        for active_key in ("my_active", "opp_active"):
-            active = self.state[active_key]
-            if active is not None and active.get("pet_id") == pet_id:
-                active.setdefault("skill_states", {})[pet_id] = state_code
-                return
-        # Fallback: store on both actives if we can't determine which one
-        for active_key in ("my_active", "opp_active"):
-            active = self.state[active_key]
-            if active is not None:
-                active.setdefault("skill_states", {})[pet_id] = state_code
-
-    def _handle_action_ack(self, detail: Dict[str, Any]) -> None:
-        """0x130C server action acknowledgment — intermediate HP/energy update."""
-        wrappers = detail.get("state_wrappers")
-        if wrappers:
-            self._update_pets_from_wrappers(wrappers)
-            return
-        active = self.state.get("my_active")
-        if active is None:
-            return
-        hp = detail.get("current_hp")
-        if hp is not None:
-            active["current_hp"] = hp
-            if active.get("max_hp", 0) > 0:
-                active["hp_pct"] = hp / active["max_hp"]
-        energy = detail.get("energy_after")
-        if energy is not None:
-            active["energy"] = min(10, energy)
 
     @staticmethod
     def _pet_matches(pet: Dict[str, Any], w: Dict[str, Any]) -> bool:
@@ -704,7 +652,7 @@ class BattleStateTracker:
                     # 从 battle_stats[5] 设置基础速度（仅首次，战斗中不变）
                     if pet.get("base_speed") is None:
                         w_bs = w.get("battle_stats") or []
-                        if len(w_bs) >= 6 and w_bs[5] is not None and w_bs[5] > 0:
+                        if len(w_bs) >= 6 and w_bs[5]:
                             pet["base_speed"] = w_bs[5]
                     # 能量刷新
                     if w.get("energy") is not None:

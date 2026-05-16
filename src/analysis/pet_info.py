@@ -5,10 +5,7 @@ PetInfo 是一个构造辅助类，不是运行时类型。通过 from_wrapper()
 """
 from __future__ import annotations
 
-import logging
 from typing import Any, Dict, List, Optional
-
-logger = logging.getLogger(__name__)
 
 
 class PetInfo:
@@ -103,11 +100,9 @@ class PetInfo:
         pet.base_skill_pool = w.get("base_skill_pool")
         # 从 battle_stats[5] 提取基础速度（含性格/个体/努力值，战斗中不变）
         battle_stats = w.get("battle_stats") or []
-        if len(battle_stats) >= 6 and battle_stats[5] is not None and battle_stats[5] > 0:
+        if len(battle_stats) >= 6 and battle_stats[5]:
             pet.base_speed = battle_stats[5]
         pet.recalc_hp_pct()
-        logger.debug("PetInfo.from_wrapper: %s hp=%d/%d energy=%d skills=%d",
-                     pet.name, pet.current_hp, pet.max_hp, pet.energy, len(equipped))
         return pet
 
     @classmethod
@@ -133,11 +128,9 @@ class PetInfo:
         if entry.get("new_pet_energy") is not None:
             pet.energy = min(10, entry["new_pet_energy"])
         battle_stats = entry.get("new_pet_battle_stats") or []
-        if len(battle_stats) >= 6 and battle_stats[5] is not None and battle_stats[5] > 0:
+        if len(battle_stats) >= 6 and battle_stats[5]:
             pet.base_speed = battle_stats[5]
         if entry.get("new_pet_passive_skill_id") is not None:
             pet.innate_skill_id = entry["new_pet_passive_skill_id"]
         pet.recalc_hp_pct()
-        logger.debug("PetInfo.from_change_pet: %s hp=%d/%d energy=%d opp=%s",
-                     pet.name, pet.current_hp, pet.max_hp, pet.energy, is_opp)
         return pet

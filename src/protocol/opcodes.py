@@ -12,10 +12,7 @@ summarize() 是公开的分发入口：
 """
 from __future__ import annotations
 
-import logging
 from typing import Any, Callable, Dict, Optional, Tuple
-
-logger = logging.getLogger(__name__)
 
 from src.protocol.proto_core import (
     collect_varints,
@@ -308,5 +305,4 @@ def summarize(record: Any, inner: Optional[Any] = None) -> Tuple[str, Dict[str, 
             "pb_type": meta.get("type", ""),
         }
 
-    logger.warning("unknown opcode 0x%04X", opcode)
     return "unknown", {"opcode": opcode}

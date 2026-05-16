@@ -153,12 +153,7 @@ class BattleReplayRunner:
             rs.events.append(snap)
             rs.state_at_end = state_after
             rs.formatted_events.extend(formatted_dicts)
-            seen_keys = {(s["type"], s["message"]) for s in rs.suggestions}
-            for s in suggestions:
-                key = (s["type"], s["message"])
-                if key not in seen_keys:
-                    seen_keys.add(key)
-                    rs.suggestions.append(s)
+            rs.suggestions.extend(suggestions)
             if battle_advice_dict:
                 rs.battle_advice = battle_advice_dict
                 rs.damage_predictions = battle_advice_dict.get("skill_analysis", [])

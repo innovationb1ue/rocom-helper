@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from src.analysis.battle_state import BattleStateTracker, _compute_effective_speed
+from src.analysis.battle_state import BattleStateTracker
 
 
 @pytest.fixture
@@ -258,128 +258,13 @@ class TestChangePet:
         assert state["my_active"]["buffs"] == []
 
 
-class TestSideRouting:
-    """side 路由测试：通过 pet_id 匹配而非槽位数值范围判断归属。"""
-
-    def test_change_pet_by_pet_id_not_slot_range(self, tracker):
-        """换宠时通过 new_pet_id 匹配 my_pets 判定归属，不依赖 battle_pet_id >= 401。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # Player pet 草苗 (id=101) swaps in at slot 403 (>=401, normally "opponent")
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 403,
-             "new_pet_name": "草苗", "new_pet_id": 101,
-             "new_pet_types": [3], "new_pet_level": 50,
-             "actor_side": 100001},
-        ]))
-        assert state["my_active"]["name"] == "草苗"
-
-    def test_opp_change_pet_by_pet_id_not_slot_range(self, tracker):
-        """换宠时通过 new_pet_id 匹配 opp_pets 判定归属，不依赖 battle_pet_id < 401。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # Opponent pet 电鼠 (id=201) swaps in at slot 3 (<401, normally "player")
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "电鼠", "new_pet_id": 201,
-             "new_pet_types": [4], "new_pet_level": 50,
-             "actor_side": 200002},
-        ]))
-        assert state["opp_active"]["name"] == "电鼠"
-
-    def test_skill_cast_routes_to_opp_active_by_slot_mapping(self, tracker):
-        """对手换宠后，其新槽位 actor_side=3 的 skill_cast 路由到 opp_active。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # First, opponent swaps to 电鼠 at slot 3
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "电鼠", "new_pet_id": 201,
-             "new_pet_types": [4], "new_pet_level": 50,
-             "actor_side": 200002},
-        ]))
-        # Then 电鼠 uses a skill at slot 3 — energy goes to opp_active
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "skill_cast", "actor_side": 3,
-             "energy_after": 8, "energy_delta": -2},
-        ]))
-        assert state["opp_active"]["energy"] == 8
-        # my_active energy should be unchanged
-        assert state["my_active"]["energy"] == 5
-
-    def test_energy_entry_routes_by_slot_mapping(self, tracker):
-        """对手槽位 3 的 energy 事件路由到 opp_active。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "电鼠", "new_pet_id": 201,
-             "new_pet_types": [4], "actor_side": 200002},
-        ]))
-        # Use some energy first
-        tracker.state["opp_active"]["energy"] = 2
-        # Energy event at slot 3
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "energy", "target_side": 3, "energy_after": 7},
-        ]))
-        assert state["opp_active"]["energy"] == 7
-
-    def test_actor_id_cached_for_future_change_pets(self, tracker):
-        """首次换宠记录 actor ID，后续同 actor 的换宠直接复用。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # First change: player actor 100001
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 2,
-             "new_pet_name": "草苗", "new_pet_id": 101,
-             "new_pet_types": [3], "actor_side": 100001},
-        ]))
-        assert tracker._player_actor_id == 100001
-        # Second change: same actor, pet_id not in any list
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "火龙", "new_pet_id": 100,
-             "new_pet_types": [1], "actor_side": 100001},
-        ]))
-        # Should still be player (matched by actor)
-        assert state["my_active"]["name"] == "火龙"
-
-    def test_unknown_actor_with_known_player_actor_is_opponent(self, tracker):
-        """当 player actor 已知时，遇到不同的未知大 actor 值判定为对手。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # First: player change records actor 100001
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 2,
-             "new_pet_name": "草苗", "new_pet_id": 101,
-             "new_pet_types": [3], "actor_side": 100001},
-        ]))
-        # Unknown actor 999999 with new pet not in any list → opponent
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "陌生宠", "new_pet_id": 99999,
-             "new_pet_types": [0], "actor_side": 999999},
-        ]))
-        assert state["opp_active"]["name"] == "陌生宠"
-        assert 3 in tracker._opponent_slots
-
-    def test_slot_mapping_persists_across_rounds(self, tracker):
-        """槽位映射在换宠后持续生效。"""
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 3,
-             "new_pet_name": "电鼠", "new_pet_id": 201,
-             "new_pet_types": [4], "actor_side": 200002},
-        ]))
-        # Recorded: slot 3 = opponent
-        assert 3 in tracker._opponent_slots
-        # Fire a round_start (simulates new round)
-        tracker.handle_event(0x131A, {"round": 2, "wrappers": []})
-        # Slot mapping survives
-        assert 3 in tracker._opponent_slots
-
-
 class TestEffectApply:
     def test_new_effect_added(self, tracker):
         """新效果被添加到 buffs。"""
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 100, "effect_name": "烧伤", "change_type": 1, "buff_stack": 1},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": 1},
         ]))
         buffs = state["my_active"]["buffs"]
         assert len(buffs) == 1
@@ -391,11 +276,11 @@ class TestEffectApply:
         tracker.handle_event(0x1316, _enter_event())
         tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 100, "effect_name": "烧伤", "change_type": 1, "buff_stack": 1},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": 1},
         ]))
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 100, "effect_name": "烧伤", "change_type": 2, "buff_stack": 2},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": 2},
         ]))
         buffs = state["my_active"]["buffs"]
         assert len(buffs) == 1  # Not duplicated
@@ -407,7 +292,7 @@ class TestEffectApply:
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 401,
-             "effect_id": 200, "effect_name": "中毒", "change_type": 1, "buff_stack": 1,
+             "effect_id": 200, "effect_name": "中毒", "effect_stage": 1,
              "related_skills": [{"skill_name": "毒液攻击", "skill_id": 7700002}]},
         ]))
         buff = state["opp_active"]["buffs"][0]
@@ -418,18 +303,23 @@ class TestEffectApply:
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 401,
-             "effect_id": 100, "effect_name": "烧伤", "change_type": 1, "buff_stack": 1},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": 1},
         ]))
         assert len(state["opp_active"]["buffs"]) == 1
 
-    def test_buff_stack_sets_stage(self, tracker):
-        """buff_stack 决定 buff 的 stage（层数）值。"""
+    def test_effect_stage_update(self, tracker):
+        """effect_stage 类型事件更新已有 buff 的 stage。"""
         tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x1324, _action_resolve_event([
+        tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 100, "effect_name": "物攻提升", "change_type": 1, "buff_stack": 5},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": 1},
         ]))
-        assert state["my_active"]["buffs"][0]["stage"] == 5
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_stage", "actor_side": 1,
+             "effect_id": 100, "effect_stage": 3},
+        ]))
+        assert state["my_active"]["buffs"][0]["stage"] == 3
+
 
 class TestHeal:
     def test_hp_restored(self, tracker):
@@ -558,31 +448,6 @@ class TestBattleReset:
         assert state["my_active"]["hp_pct"] == 1.0
         assert state["phase"] == "selecting"
 
-    def test_second_battle_resets_slot_mapping(self, tracker):
-        """换宠后进入第二场战斗，槽位映射必须清零。"""
-        # First battle — 多宠物阵容
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        # 对手换宠到槽位 402，填充 _opponent_slots
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 402,
-             "new_pet_name": "电鼠", "actor_side": 401},
-        ]))
-        assert 402 in tracker._opponent_slots
-        # 我方换宠到槽位 2，填充 _player_slots
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 2,
-             "new_pet_name": "草苗", "actor_side": 1},
-        ]))
-        assert 2 in tracker._player_slots
-        # 结束第一场
-        tracker.handle_event(0x132C, _finish_event("WIN"))
-        # 第二场战斗 — 所有内部追踪状态必须重置
-        tracker.handle_event(0x1316, _enter_event())
-        assert tracker._opponent_slots == set()
-        assert tracker._player_slots == set()
-        assert tracker._opponent_actor_id is None
-        assert tracker._player_actor_id is None
-
 
 class TestDefeatAndReplacement:
     def test_defeat_then_switch(self, tracker):
@@ -691,21 +556,25 @@ class TestSuggestions:
         assert "low_energy" in types
 
     def test_debuffed_suggestion(self, tracker):
-        """多个负面状态时追踪 buff。
-        注: get_suggestions 检查 stacks < 0，但 buff dict 使用 stage 字段。
-        debuffed 建议当前不会触发，因为字段名不匹配（stacks vs stage）。"""
+        """多个负面状态时出现 debuffed 建议。
+        注: get_suggestions 检查 stacks < 0，而 effect_apply 设置 stage 字段。
+        需要 buffs 中有 stacks 字段才能触发。"""
         tracker.handle_event(0x1316, _enter_event())
         tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 100, "effect_name": "烧伤", "change_type": 1, "buff_stack": 1},
+             "effect_id": 100, "effect_name": "烧伤", "effect_stage": -1},
             {"kind": "effect_apply", "target_side": 1,
-             "effect_id": 101, "effect_name": "中毒", "change_type": 1, "buff_stack": 1},
+             "effect_id": 101, "effect_name": "中毒", "effect_stage": -1},
         ]))
+        # Verify buffs are tracked (even if suggestion logic uses different field)
         buffs = tracker.state["my_active"]["buffs"]
         assert len(buffs) == 2
+        # The debuffed suggestion checks stacks < 0, but effect_apply sets stage.
+        # This test documents the current behavior.
         suggestions = tracker.get_suggestions()
         types = [s["type"] for s in suggestions]
         # Currently won't trigger because buff dict has "stage" not "stacks"
+        # If the code is fixed to check stage or add stacks, this should pass:
         # assert "debuffed" in types
 
     def test_no_suggestions_before_battle(self, tracker):
@@ -713,275 +582,145 @@ class TestSuggestions:
         assert tracker.get_suggestions() == []
 
 
-class TestSpeedTracking:
-    """速度追踪测试 — 覆盖 base_speed 提取、effective_speed 计算、set-once 不变性。"""
-
-    def _enter_event_with_speed(self):
-        """battle_enter 事件，wrappers 包含 battle_stats。"""
-        return {
-            "opcode": 0x1316,
-            "battle_id": 12345,
-            "battle_mode": 1,
-            "round": 0,
-            "max_round": 30,
-            "wrappers": [
-                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
-                 "hp": 300, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 148]},
-                {"pet_id": 200, "pet_name": "水龟", "types": [2], "side": 401,
-                 "hp": 350, "max_hp": 350, "battle_stats": [350, 0, 0, 0, 0, 267]},
-            ],
-        }
-
-    def test_base_speed_from_battle_enter(self, tracker):
-        """battle_enter 的 battle_stats[5] 正确设置为 base_speed。"""
-        state = tracker.handle_event(0x1316, self._enter_event_with_speed())
-        assert state["my_active"]["base_speed"] == 148
-        assert state["opp_active"]["base_speed"] == 267
-
-    def test_effective_speed_equals_base_without_buffs(self, tracker):
-        """无 speed buff 时 effective_speed == base_speed。"""
-        state = tracker.handle_event(0x1316, self._enter_event_with_speed())
-        assert state["my_active"]["effective_speed"] == 148
-        assert state["opp_active"]["effective_speed"] == 267
-
-    def test_effective_speed_none_without_base(self, tracker):
-        """无 battle_stats 时 base_speed 和 effective_speed 均为 None。"""
-        state = tracker.handle_event(0x1316, _enter_event())
-        assert state["my_active"]["base_speed"] is None
-        assert state["my_active"]["effective_speed"] is None
-
-    def test_effective_speed_with_known_buff(self):
-        """speed buff 20010100 (+10 flat/stage) 在 stage=2 时 +20。"""
-        pet = {"name": "测试宠", "base_speed": 148, "buffs": [
-            {"id": 20010100, "stage": 2},
-        ]}
-        assert _compute_effective_speed(pet) == 168  # 148 + 10*2
-
-    def test_effective_speed_with_pct_buff(self):
-        """pct speed buff (20010011, +20% total) 在无 flat 时乘算。"""
-        pet = {"name": "测试宠", "base_speed": 150, "buffs": [
-            {"id": 20010011, "stage": 1},
-        ]}
-        assert _compute_effective_speed(pet) == 180  # 150 * 1.2
-
-    def test_effective_speed_minimum_one(self):
-        """effective_speed 最低为 1。"""
-        pet = {"name": "测试宠", "base_speed": 10, "buffs": [
-            {"id": 20010056, "stage": 2},  # -10 flat/stage → 10 - 20 = -10 → max(1, ...)
-        ]}
-        assert _compute_effective_speed(pet) == 1
-
-    def test_base_speed_from_change_pet(self, tracker):
-        """change_pet 的 new_pet_battle_stats[5] 正确设置新宠物 base_speed。"""
-        tracker.handle_event(0x1316, self._enter_event_with_speed())
-        state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 402,
-             "new_pet_name": "电鼠", "new_pet_id": 999,
-             "new_pet_types": [4], "new_pet_level": 50,
-             "new_pet_battle_stats": [280, 0, 0, 0, 0, 200],
-             "new_pet_current_hp": 280, "new_pet_max_hp": 280,
-             "new_pet_energy": 5},
-        ]))
-        assert state["opp_active"]["name"] == "电鼠"
-        assert state["opp_active"]["base_speed"] == 200
-
-    def test_base_speed_not_overwritten_by_round_start(self, tracker):
-        """round_start 提供不同 speed 时不覆盖已设置的 base_speed。"""
-        tracker.handle_event(0x1316, self._enter_event_with_speed())
-        assert tracker.state["my_active"]["base_speed"] == 148
-        # Round start with a different speed value in wrapper
-        tracker.handle_event(0x131A, {
-            "round": 1,
-            "wrappers": [
-                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
-                 "hp": 280, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 999]},
-            ],
-        })
-        # base_speed should remain 148 (set-once invariant)
-        assert tracker.state["my_active"]["base_speed"] == 148
-
-    def test_base_speed_set_from_round_start_when_initially_missing(self, tracker):
-        """battle_enter 无 battle_stats 时，round_start 补充 base_speed。"""
-        tracker.handle_event(0x1316, _enter_event())
-        assert tracker.state["my_active"]["base_speed"] is None
-        # Round start provides battle_stats
-        state = tracker.handle_event(0x131A, {
-            "round": 1,
-            "wrappers": [
-                {"pet_id": 100, "pet_name": "火龙", "types": [1], "side": 1,
-                 "hp": 300, "max_hp": 300, "battle_stats": [300, 100, 150, 120, 100, 148]},
-            ],
-        })
-        assert state["my_active"]["base_speed"] == 148
-
-    def test_battle_stats_zero_speed_not_set(self, tracker):
-        """battle_stats[5]=0 不应设置 base_speed。"""
-        state = tracker.handle_event(0x1316, {
-            "opcode": 0x1316, "battle_id": 1, "battle_mode": 1,
-            "round": 0, "max_round": 30,
-            "wrappers": [
-                {"pet_id": 100, "pet_name": "零速宠", "types": [1], "side": 1,
-                 "hp": 300, "max_hp": 300, "battle_stats": [300, 0, 0, 0, 0, 0]},
-            ],
-        })
-        assert state["my_active"]["base_speed"] is None
-
-
 # ---------------------------------------------------------------------------
-# P1 协议覆盖扩展测试
+# New perform type handlers
 # ---------------------------------------------------------------------------
-
-
-class TestPvpPerformState:
-    """0x13FC/0x13F3 应触发与 0x1324 相同的状态更新。"""
-
-    def test_pvp_perform_damage_updates_opp_hp(self, tracker):
-        tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x13FC, _action_resolve_event([
-            {"kind": "damage", "damage": 100, "target_hp_after": 250,
-             "damage_target_side": 401},
-        ]))
-        assert state["opp_active"]["current_hp"] == 250
-
-    def test_pvp_perform_skill_cast_updates_energy(self, tracker):
-        tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x13FC, _action_resolve_event([
-            {"kind": "skill_cast", "actor_side": 1, "skill_id": 1,
-             "skill_name": "火花", "energy_delta": -2, "energy_after": 8},
-        ]))
-        assert state["my_active"]["energy"] == 8
-
-    def test_preplay_damage_updates_opp_hp(self, tracker):
-        tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x13F3, _action_resolve_event([
-            {"kind": "damage", "damage": 80, "target_hp_after": 270,
-             "damage_target_side": 401},
-        ]))
-        assert state["opp_active"]["current_hp"] == 270
-
-    def test_pvp_perform_change_pet(self, tracker):
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        state = tracker.handle_event(0x13FC, _action_resolve_event([
-            {"kind": "change_pet", "battle_pet_id": 402, "actor_side": 401,
-             "rest_pet_id": 401,
-             "new_pet_name": "电鼠", "new_pet_id": 201, "new_pet_types": [4],
-             "new_pet_level": 50, "new_pet_hp": 280, "new_pet_max_hp": 280,
-             "new_pet_energy": 5},
-        ]))
-        assert state["opp_active"]["name"] == "电鼠"
-
-    def test_pvp_perform_defeat(self, tracker):
-        tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x13FC, _action_resolve_event([
-            {"kind": "defeat", "defeat_target_side": 401, "defeat_actor_side": 1},
-        ]))
-        assert state["opp_active"]["current_hp"] == 0
-
 
 class TestWeatherChange:
-    """entry_type 22 weather_change 应更新 state["weather"]。"""
-
-    def test_weather_change_updates_state(self, tracker):
+    def test_weather_updated(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "weather_change", "weather_id": 5,
-             "weather_expire_round": 3, "skill_id": 7700001},
+            {"kind": "weather_change", "weather_id": 3, "weather_name": "草",
+             "skill_name": "Sunny Day", "expire_round": 5},
         ]))
-        assert state["weather"]["id"] == 5
-        assert state["weather"]["expire_round"] == 3
+        assert state["weather"]["id"] == 3
+        assert state["weather"]["name"] == "草"
+        assert state["weather"]["expire_round"] == 5
+        assert state["weather"]["changed_by_skill"] == "Sunny Day"
 
-    def test_weather_change_mid_battle(self, tracker):
+    def test_weather_overwrite(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "weather_change", "weather_id": 3, "weather_expire_round": 5},
+            {"kind": "weather_change", "weather_id": 3, "weather_name": "草",
+             "expire_round": 5},
         ]))
-        assert tracker.state["weather"]["id"] == 3
         state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "weather_change", "weather_id": 7, "weather_expire_round": 2},
+            {"kind": "weather_change", "weather_id": 4, "weather_name": "火",
+             "expire_round": 8},
         ]))
-        assert state["weather"]["id"] == 7
-        assert state["weather"]["expire_round"] == 2
-
-    def test_weather_change_no_id_ignored(self, tracker):
-        tracker.handle_event(0x1316, _enter_event())
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "weather_change"},
-        ]))
-        # weather unchanged — still initial value from _enter_event (id=0)
-        assert tracker.state["weather"]["id"] == 0
+        assert state["weather"]["id"] == 4
+        assert state["weather"]["expire_round"] == 8
 
 
 class TestSkillState:
-    """entry_type 19 skill_state 应记录到 active pet 的 skill_states 字典。"""
-
-    def test_skill_state_recorded_on_my_pet(self, tracker):
+    def test_skill_state_recorded(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "skill_state", "caster_pet_id": 100, "state_code": 5},
+            {"kind": "skill_state", "caster_pet_id": 100, "state_code": 2},
         ]))
-        assert state["my_active"]["skill_states"][100] == 5
+        assert len(state["my_active"].get("skill_states", [])) == 1
+        assert state["my_active"]["skill_states"][0]["state_code"] == 2
 
-    def test_skill_state_recorded_on_opp_pet(self, tracker):
+    def test_skill_state_no_match(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "skill_state", "caster_pet_id": 200, "state_code": 8},
+            {"kind": "skill_state", "caster_pet_id": 999, "state_code": 1},
         ]))
-        assert state["opp_active"]["skill_states"][200] == 8
+        assert state["my_active"].get("skill_states") is None
 
-    def test_skill_state_missing_fields_ignored(self, tracker):
+
+class TestRoleSkillCast:
+    def test_role_skill_recorded(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "skill_state"},
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "role_skill_cast", "caster_uin": 5001, "skill_id": 7700001,
+             "skill_name": "Destiny", "pet_id": 100, "is_call_success": True},
         ]))
-        assert "skill_states" not in tracker.state["my_active"]
+        assert len(state.get("role_skill_casts", [])) == 1
+        assert state["role_skill_casts"][0]["skill_id"] == 7700001
+        assert state["role_skill_casts"][0]["round"] == 0
 
-
-class TestActionAck:
-    """0x130C 应更新 HP/energy 中间状态。"""
-
-    def test_action_ack_updates_hp_and_energy(self, tracker):
+    def test_role_skill_success_adds_to_used_skills(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
-        tracker.handle_event(0x1324, _action_resolve_event([
-            {"kind": "damage", "damage": 100, "target_hp_after": 200,
-             "damage_target_side": 1},
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "role_skill_cast", "caster_uin": 5001, "skill_id": 7700001,
+             "skill_name": "Destiny", "pet_id": 100, "is_call_success": True},
         ]))
-        state = tracker.handle_event(0x130C, {
-            "current_hp": 195,
-            "energy_after": 3,
-        })
-        assert state["my_active"]["current_hp"] == 195
-        assert state["my_active"]["energy"] == 3
+        used = state["my_active"].get("used_skills", [])
+        assert any(s.get("skill_id") == 7700001 for s in used)
 
-    def test_action_ack_energy_update_only(self, tracker):
+
+class TestSpecialMove:
+    def test_special_move_recorded(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x130C, {
-            "energy_after": 7,
-        })
-        assert state["my_active"]["energy"] == 7
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "special_move", "pet_id": 100, "special_move_id": 1,
+             "special_move_type": 2, "round": 3, "skill_id": 7700001},
+        ]))
+        assert len(state["my_active"].get("special_moves", [])) == 1
+        assert state["my_active"]["special_moves"][0]["special_move_id"] == 1
 
-    def test_action_ack_with_wrappers(self, tracker):
-        tracker.handle_event(0x1316, _enter_event_multi_pet())
-        state = tracker.handle_event(0x130C, {
-            "state_wrappers": [
-                {"pet_id": 100, "pet_name": "火龙", "side": 1,
-                 "hp": 280, "max_hp": 300},
-                {"pet_id": 200, "pet_name": "水龟", "side": 401,
-                 "hp": 310, "max_hp": 350},
-            ],
-        })
-        assert state["my_active"]["current_hp"] == 280
-        assert state["opp_active"]["current_hp"] == 310
 
-    def test_action_ack_no_active_pet(self, tracker):
-        state = tracker.handle_event(0x130C, {
-            "current_hp": 100,
-            "energy_after": 5,
-        })
-        assert state["my_active"] is None
-
-    def test_action_ack_hp_pct_recalculated(self, tracker):
+class TestSkillPosChange:
+    def test_skill_pos_change_stored(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
-        state = tracker.handle_event(0x130C, {
-            "current_hp": 150,
-        })
-        assert state["my_active"]["hp_pct"] == 150 / 300
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "skill_pos_change", "pet_id": 100,
+             "skill_pos_infos": [{"skill_id": 7700001, "old_pos": 1, "new_pos": 3, "change_type": 1}]},
+        ]))
+        changes = state.get("skill_pos_changes", [])
+        assert len(changes) == 1
+        assert changes[0]["pet_id"] == 100
+        assert len(changes[0]["skill_pos_infos"]) == 1
+
+
+class TestSpEnergyChange:
+    def test_sp_energy_stored(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "sp_energy_change", "sp_change_type": 1,
+             "sp_element": {"dam_type": 3, "stack": 2},
+             "sp_change_src": 2, "change_value": 1, "real_change_value": 1},
+        ]))
+        log = state.get("sp_energy_log", [])
+        assert len(log) == 1
+        assert log[0]["sp_change_type"] == 1
+        assert log[0]["sp_element"]["stack"] == 2
+
+
+class TestSpEnergyTrigger:
+    def test_sp_trigger_stored(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "sp_energy_trigger", "trigger_type": 2,
+             "old_skill_id": 7700001, "old_skill_name": "Fire",
+             "new_skill_id": 7700002, "new_skill_name": "Fire+",
+             "caster_id": 100},
+        ]))
+        triggers = state.get("sp_energy_triggers", [])
+        assert len(triggers) == 1
+        assert triggers[0]["new_skill_id"] == 7700002
+
+
+class TestIdle:
+    def test_idle_recorded(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "idle", "idle_pet_id": 100},
+        ]))
+        assert len(state.get("idle_events", [])) == 1
+        assert state["idle_events"][0]["idle_pet_id"] == 100
+
+
+class TestNotifyPerform:
+    def test_notify_stored(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "notify_perform", "notify_type": 1,
+             "notify_data": [3, 5], "tips_id": "weather_reject"},
+        ]))
+        notifs = state.get("notifications", [])
+        assert len(notifs) == 1
+        assert notifs[0]["notify_type"] == 1
+        assert notifs[0]["notify_data"] == [3, 5]
+

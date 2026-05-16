@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Card, Row, Col, Button, Space, Tag, Alert, Badge } from 'antd';
 import {
   ApiOutlined, CheckCircleOutlined, WarningOutlined,
@@ -34,18 +34,8 @@ const BattleLive: React.FC = () => {
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
 
-  const { startMonitoring, stopMonitoring, connectWs } = useSnifferMonitor();
+  const { startMonitoring, stopMonitoring } = useSnifferMonitor();
   const sniffer = useSnifferStore();
-
-  const autoConnectedRef = useRef(false);
-
-  useEffect(() => {
-    if (autoConnectedRef.current) return;
-    autoConnectedRef.current = true;
-    connectWs();
-    connectBattle();
-    setWsStarted(true);
-  }, []);
 
   const startWs = () => { connectBattle(); setWsStarted(true); };
 

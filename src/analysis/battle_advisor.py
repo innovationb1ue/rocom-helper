@@ -13,11 +13,8 @@ BattleAdvisor 是伤害分析的入口点，它:
 """
 from __future__ import annotations
 
-import logging
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
-
-logger = logging.getLogger(__name__)
 
 from src.analysis.damage_calc import DamageCalculator, DamageResult
 from src.analysis.innate_hooks import register_innate_hooks
@@ -88,8 +85,6 @@ class BattleAdvisor:
         my_active = state.get("my_active")
         opp_active = state.get("opp_active")
         if not my_active or not opp_active:
-            logger.debug("analyze skipped: my_active=%s opp_active=%s",
-                         bool(my_active), bool(opp_active))
             return BattleAdvice()
 
         equipped = my_active.get("equipped_skills") or my_active.get("skills") or my_active.get("used_skills") or []
@@ -104,8 +99,6 @@ class BattleAdvisor:
 
         # 对手技能分析：优先协议数据，回退到热门预设
         opp_equipped, opp_source = self._resolve_opp_skills(opp_active)
-        logger.info("opp skills resolved: source=%s count=%d for %s",
-                    opp_source, len(opp_equipped), opp_active.get("name", "?"))
         opp_skill_analysis: List[SkillAnalysis] = []
         if opp_equipped:
             opp_skill_analysis = self._build_skill_analysis(

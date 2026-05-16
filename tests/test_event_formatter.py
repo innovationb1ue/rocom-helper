@@ -289,7 +289,7 @@ class TestFormatEffectApply:
             "target_side": 401,
             "effect_id": 100,
             "effect_name": "烧伤",
-            "change_type": 1,
+            "effect_stage": 1,
         }
         ev = format_action_entry(entry, _state_after_enter())
         assert ev.kind == "effect_apply"

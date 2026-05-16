@@ -51,8 +51,6 @@ def parse_be21_from_buffer(data: bytearray, direction: str, start: int) -> Tuple
             continue
         result = _validate_be21_header(data, off)
         if result is None:
-            logger.debug("BE21 header validation failed at offset %d: %s",
-                         off, bytes(data[off:off + FIXED_HDR_LEN]).hex())
             off += 2
             continue
         cmd, seq, hdr_len, body_len = result

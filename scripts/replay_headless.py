@@ -15,9 +15,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.analysis.replay_runner import BattleReplayRunner
-from src.utils.logging_config import setup_logging
-
-setup_logging()
 
 
 def _session_dir(name: str) -> Path:
@@ -51,17 +48,8 @@ def _print_summary(result) -> None:
                 hp = pet.get("current_hp", 0)
                 max_hp = pet.get("max_hp", 0)
                 energy = pet.get("energy", 0)
-                eff = pet.get("effective_speed")
-                base = pet.get("base_speed")
-                if eff is not None and base is not None and eff != base:
-                    spd_str = f"{eff} (base {base})"
-                elif eff is not None:
-                    spd_str = str(eff)
-                elif base is not None:
-                    spd_str = str(base)
-                else:
-                    spd_str = "?"
-                print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}  SPD={spd_str}")
+                spd = pet.get("effective_speed") or pet.get("base_speed") or "?"
+                print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}  SPD={spd}")
 
         # Formatted events
         if rs.formatted_events:
@@ -112,9 +100,7 @@ def main():
     parser = argparse.ArgumentParser(description="Headless battle replay (no server needed)")
     parser.add_argument("--session", default="battle_session_1", help="Session directory name")
     parser.add_argument("--round", type=int, default=None, help="Stop at this round")
-    parser.add_argument("--no-json", dest="write_json", action="store_false", help="Skip JSON output to tmp/")
-    parser.add_argument("--json", dest="write_json", action="store_true", help="Write JSON result to tmp/ (default)")
-    parser.set_defaults(write_json=True)
+    parser.add_argument("--json", "--no-json", default=True, action=argparse.BooleanOptionalAction, help="Write JSON result to tmp/ (default: --json, use --no-json to skip)")
     args = parser.parse_args()
 
     from tests.packet_reader import load_battle_packets
@@ -134,7 +120,7 @@ def main():
 
     _print_summary(result)
 
-    if args.write_json:
+    if args.json:
         output = {
             "total_packets": result.total_packets,
             "stopped_early": result.stopped_early,

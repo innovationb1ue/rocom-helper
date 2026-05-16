@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.data.loader import get_buff_damage_reduction, get_buff_stat_modifiers, get_innate_skill, get_innate_skills_for_pet
+from src.data.loader import get_buff_damage_reduction, get_buff_stat_modifiers, get_innate_skill
 
 
 def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -15,19 +15,6 @@ def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
             innate = get_innate_skill(buff_id)
             if innate is not None:
                 skills.append(innate)
-    return skills
-
-
-def _get_all_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """获取所有先天技能：来自 buffs 扫描 + 来自宠物被动天赋（pets 映射）。"""
-    skills = _get_active_innate_skills(pet)
-    base_id = pet.get("base_id")
-    if base_id:
-        pet_skills = get_innate_skills_for_pet(int(base_id))
-        seen_ids = {id(s) for s in skills}
-        for s in pet_skills:
-            if id(s) not in seen_ids:
-                skills.append(s)
     return skills
 
 
@@ -47,7 +34,7 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     additive_bonus = 0
     multiplier = 1
 
-    for skill in _get_all_innate_skills(attacker):
+    for skill in _get_active_innate_skills(attacker):
         if skill.get("effect_type") != "combo_modify":
             continue
         params = skill.get("effect_params", {})
@@ -90,7 +77,7 @@ def stat_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     attacker = ctx.get("attacker", {})
 
     total_modifier = 0.0
-    for skill in _get_all_innate_skills(attacker):
+    for skill in _get_active_innate_skills(attacker):
         if skill.get("effect_type") != "stat_modify":
             continue
         params = skill.get("effect_params", {})
@@ -119,7 +106,7 @@ def type_resist_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     attacker = ctx.get("attacker", {})
 
     min_eff = 0.0
-    for skill in _get_all_innate_skills(attacker):
+    for skill in _get_active_innate_skills(attacker):
         if skill.get("effect_type") != "type_resist_modify":
             continue
         params = skill.get("effect_params", {})
@@ -162,7 +149,7 @@ def power_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """威力修正 — 附加吸血等效果，将元数据写入 context 供上层消费。"""
     attacker = ctx.get("attacker", {})
 
-    for skill in _get_all_innate_skills(attacker):
+    for skill in _get_active_innate_skills(attacker):
         if skill.get("effect_type") != "power_modify":
             continue
         params = skill.get("effect_params", {})

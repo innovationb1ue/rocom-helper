@@ -28,7 +28,6 @@ def _make_attacker(
     current_hp=300,
     energy=10,
     combo_bonus=0,
-    base_id=None,
     poison_stacks=0,
     buffs=None,
     first_strike=False,
@@ -50,8 +49,6 @@ def _make_attacker(
             {"name": "SPD", "total": 150},
         ],
     }
-    if base_id is not None:
-        pet["base_id"] = base_id
     if buffs is not None:
         pet["buffs"] = buffs
     return pet
@@ -105,10 +102,10 @@ class TestComboModifyHook:
         assert result["hit_count"] == 2  # base unchanged
 
     def test_combo_always_adds_hits(self):
-        """连击+1 (buff 20450020): always +1 hit — 持久 buff 在 buff 列表中被 hook 扫描到"""
+        """连击+1 (buff 20450020): always +1 hit"""
         attacker = _make_attacker(
             combo_bonus=3,
-            buffs=[{"id": 20450020}],  # 持久 buff，hook 直接扫描
+            buffs=[{"id": 20450020}],
         )
         ctx = {
             "min_damage": 50,
@@ -119,7 +116,7 @@ class TestComboModifyHook:
             "skill_meta": _make_skill(),
         }
         result = combo_modify_hook(ctx)
-        assert result["hit_count"] == 5  # (1 base + 3 combo + 0 acc) * 1 + 1 bonus
+        assert result["hit_count"] == 5  # (1 base + 3 combo) * 1 + 1 bonus
         assert result["min_damage"] == 50
         assert result["max_damage"] == 60
 
@@ -192,10 +189,10 @@ class TestComboModifyHook:
         assert result["hit_count"] == 4  # (2 + 2) * 1, no element bonus
 
     def test_combo_multiple_innate_skills(self):
-        """Multiple combo innate skills stack additively — persistent buffs scanned by hook."""
+        """Multiple combo innate skills stack additively."""
         attacker = _make_attacker(
             combo_bonus=2,
-            buffs=[{"id": 20450020}, {"id": 20450050}],  # 连击+1 + 通用连击+1 (persistent)
+            buffs=[{"id": 20450020}, {"id": 20450050}],  # 连击+1 + 通用连击+1
         )
         ctx = {
             "min_damage": 50,
@@ -206,7 +203,7 @@ class TestComboModifyHook:
             "skill_meta": _make_skill(),
         }
         result = combo_modify_hook(ctx)
-        assert result["hit_count"] == 5  # (1 + 2 + 0 acc) * 1 + 1 + 1
+        assert result["hit_count"] == 5  # (1 + 2) * 1 + 1 + 1
 
     def test_no_innate_buff_uses_base_combo(self):
         """Combo bonus but no innate skills → hit_count = base + combo_bonus."""
@@ -239,48 +236,6 @@ class TestComboModifyHook:
         }
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 4  # 2 base + 2 combo
-
-    def test_passive_talent_via_pet_mapping(self):
-        """被动天赋通过 base_id 从 innate_skills.json pets 映射发现（无需 buff）。"""
-        # 厉毒修萝 base_id=3420，pets 映射中有 29990910（毒连击/侵蚀）
-        attacker = _make_attacker(
-            combo_bonus=0,
-            base_id=3420,
-            buffs=[],  # 无 buff，天赋通过 pet mapping 发现
-        )
-        defender = _make_defender(poison_stacks=5)
-        ctx = {
-            "min_damage": 50,
-            "max_damage": 60,
-            "hit_count": 2,
-            "attacker": attacker,
-            "defender": defender,
-            "skill_meta": _make_skill(),
-        }
-        result = combo_modify_hook(ctx)
-        # (2 base + 0 combo) * 1 + 5 poison = 7
-        assert result["hit_count"] == 7
-
-    def test_passive_talent_and_buff_stack(self):
-        """被动天赋 + buff 扫描的结果应该叠加（不重复）。"""
-        # base_id=3420 提供 29990910，buff 20450020 是另一个 combo_modify
-        attacker = _make_attacker(
-            combo_bonus=1,
-            base_id=3420,
-            buffs=[{"id": 20450020}],  # 连击+1（持久 buff）
-        )
-        defender = _make_defender(poison_stacks=3)
-        ctx = {
-            "min_damage": 50,
-            "max_damage": 60,
-            "hit_count": 2,
-            "attacker": attacker,
-            "defender": defender,
-            "skill_meta": _make_skill(),
-        }
-        result = combo_modify_hook(ctx)
-        # (2 + 1) * 1 + 3 poison + 1 always = 7
-        assert result["hit_count"] == 7
 
 
 # ---------------------------------------------------------------------------

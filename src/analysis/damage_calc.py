@@ -11,13 +11,10 @@
 """
 from __future__ import annotations
 
-import logging
 import math
 import re
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
-
-logger = logging.getLogger(__name__)
 
 from src.data.loader import (
     get_buff_stat_modifiers,
@@ -143,8 +140,6 @@ class DamageCalculator:
         power = self._get_power(skill_meta)
         damage_type = skill_meta.get("damage_type", 0)
         if power <= 0 or damage_type not in (2, 3):
-            logger.debug("calculate skipped: skill=%s power=%d damage_type=%d",
-                         skill_meta.get("name", skill_meta.get("id", "?")), power, damage_type)
             return None
 
         raw_dam_type = skill_meta.get("skill_dam_type", 0)
@@ -386,8 +381,6 @@ class DamageCalculator:
             if result is not None:
                 results.append(result)
         results.sort(key=lambda r: r.total_max_damage, reverse=True)
-        logger.debug("calculate_all: %s vs %s → %d attack skills analyzed",
-                     attacker.get("name", "?"), defender.get("name", "?"), len(results))
         return results
 
     # ------------------------------------------------------------------

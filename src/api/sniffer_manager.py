@@ -71,7 +71,7 @@ class SnifferManager:
             try:
                 self._loop.call_soon_threadsafe(cb, record)
             except Exception:
-                logger.warning("record callback dispatch failed", exc_info=True)
+                pass
 
     # ---- WebSocket 管理 ----
 
@@ -95,7 +95,6 @@ class SnifferManager:
                 try:
                     await ws.send_text(text)
                 except Exception:
-                    logger.debug("sniffer broadcast send failed, removing client")
                     dead.append(ws)
             for ws in dead:
                 self._ws_clients.remove(ws)
@@ -114,14 +113,6 @@ class SnifferManager:
             self._save_key(data.get("key_hex"), data.get("flow_id", ""))
             self._set_state("key_captured", "密钥已捕获，正在监听数据")
             self._push({"type": "key_captured", **data})
-        elif event_type == "key_stale":
-            self._key_hex = None
-            if self._flow_count > 0:
-                self._set_state(
-                    "connected",
-                    "密钥可能过期，等待新密钥（如一直无密钥请重启游戏）",
-                )
-            self._push({"type": "key_stale", **data})
         elif event_type == "record":
             full_record = data.get("record")
             if full_record is not None:
@@ -136,7 +127,7 @@ class SnifferManager:
             if self._key_hex:
                 self._set_state("key_captured", "密钥已加载，正在监听数据")
             else:
-                self._set_state("connected", "游戏已连接，等待密钥（如一直无密钥请重启游戏）")
+                self._set_state("connected", "游戏已连接，等待密钥...")
 
     # ---- 监控循环 ----
 
@@ -180,7 +171,7 @@ class SnifferManager:
         if any_has_key or self._key_hex:
             self._set_state("key_captured", "密钥已获取，正在监听数据")
         elif self._state == "listening":
-            self._set_state("connected", "游戏已连接，等待密钥（如一直无密钥请重启游戏）")
+            self._set_state("connected", "游戏已连接，等待密钥...")
 
     # ---- 启动/停止 ----
 
@@ -231,12 +222,7 @@ class SnifferManager:
             on_event=self._on_sniffer_event,
             packet_logger=pkt_log,
         )
-        try:
-            self._sniffer.start()
-        except Exception as exc:
-            self._set_state("idle", f"启动失败: {exc}")
-            self._sniffer = None
-            raise
+        self._sniffer.start()
 
         # 4. 短暂等待后评估实际状态（游戏可能已打开）
         await asyncio.sleep(0.3)

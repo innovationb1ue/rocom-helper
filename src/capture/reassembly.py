@@ -95,8 +95,6 @@ class DirectionState:
                 existing = bytes(self.buffer[start:start + overlap])
                 incoming = payload[:overlap]
                 if existing != incoming:
-                    logger.debug("retransmission data mismatch at seq=%d offset=%d (%dB vs %dB)",
-                                 seq, start, len(existing), min(overlap, len(payload)))
                     if start < self.parse_offset:
                         return
                     del self.buffer[start:]
@@ -134,8 +132,6 @@ class DirectionState:
             farthest_seq = max(self._pending)
             dropped = self._pending.pop(farthest_seq)
             self._pending_bytes -= len(dropped)
-            logger.warning("pending buffer overflow: dropping segment seq=%d (%dB), pending=%dB",
-                           farthest_seq, len(dropped), self._pending_bytes)
 
     def _drain_pending(self) -> None:
         assert self._next_contig_seq is not None
@@ -179,7 +175,6 @@ class FlowState:
     c2s: DirectionState = field(default_factory=lambda: DirectionState("c2s"))
     s2c: DirectionState = field(default_factory=lambda: DirectionState("s2c"))
     seen_acks: _BoundedAckSet = field(default_factory=_BoundedAckSet)
-    consecutive_parse_fail: int = 0
     key: Optional[bytes] = None
 
     def direction_state(self, direction: str) -> DirectionState:

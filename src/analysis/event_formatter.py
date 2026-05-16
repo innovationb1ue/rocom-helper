@@ -109,14 +109,9 @@ def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent
     dmg = entry.get("damage", 0)
     hp = entry.get("target_hp_after")
     sname = entry.get("skill_name")
-    is_hit = entry.get("is_hit", True)
     hp_str = f"HP→{hp}" if hp is not None else ""
     src = f" [{sname}]" if sname else ""
-    if not is_hit:
-        summary = f"{target} 未命中{src}"
-    else:
-        shield = " [护盾]" if entry.get("has_shield") else ""
-        summary = f"{target} 受到 {dmg} 伤害 ({hp_str}){src}{shield}"
+    summary = f"{target} 受到 {dmg} 伤害 ({hp_str}){src}"
     return FormattedEvent(
         kind="damage",
         round=0,
@@ -126,11 +121,6 @@ def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent
             "damage": dmg,
             "hp_after": hp,
             "skill_name": sname,
-            "is_hit": is_hit,
-            "is_critical": entry.get("is_critical"),
-            "has_shield": entry.get("has_shield"),
-            "execution": entry.get("execution"),
-            "restraint_type": entry.get("restraint_type"),
         },
         icon="thunderbolt",
         color="red",
@@ -140,18 +130,11 @@ def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent
 def _fmt_defeat(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
     winner = side_label(entry.get("actor_side"))
     defeated = side_label(entry.get("target_side"))
-    dead_type_name = entry.get("dead_type_name", "")
-    type_str = f" ({dead_type_name})" if dead_type_name and dead_type_name != "normal" else ""
     return FormattedEvent(
         kind="defeat",
         round=0,
-        summary=f"{winner} 击败了 {defeated}!{type_str}",
-        detail={
-            "winner_side": winner,
-            "defeated_side": defeated,
-            "dead_type": entry.get("dead_type"),
-            "dead_type_name": dead_type_name,
-        },
+        summary=f"{winner} 击败了 {defeated}!",
+        detail={"winner_side": winner, "defeated_side": defeated},
         icon="skull",
         color="red",
     )
@@ -161,8 +144,7 @@ def _fmt_effect_apply(entry: Dict[str, Any], _state: Dict[str, Any]) -> Formatte
     actor = side_label(entry.get("actor_side"))
     target = side_label(entry.get("target_side"))
     ename = entry.get("effect_name") or entry.get("effect_id") or "(未知效果)"
-    _bs = entry.get("buff_stack")
-    stage = _bs if _bs is not None else (1 if entry.get("change_type") == 1 else None)
+    stage = entry.get("effect_stage")
     related = entry.get("related_skills")
     parts = [f"{actor}→{target} {ename}"]
     if stage is not None:
@@ -347,77 +329,6 @@ def _fmt_supply_pet(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedE
     )
 
 
-SKILL_STATE_NAMES = {
-    0: "NULL", 1: "READY", 2: "IN_CD", 3: "NOT_EQUIPPED",
-    4: "NO_PP", 5: "DISABLED", 6: "LEGENDARY_INVALID", 7: "TEAM_INVALID",
-    8: "LACK_ENERGY", 9: "BAN_WATER", 10: "BAN_BUFF_6",
-    11: "BAN_BUFF_6_NO_SIGN", 12: "LEGENDARY_LIMIT", 13: "B1_FORBID",
-}
-
-
-def _fmt_weather_change(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
-    weather_id = entry.get("weather_id")
-    weather_name = entry.get("weather_name") or str(weather_id or "?")
-    expire = entry.get("weather_expire_round")
-    sname = entry.get("skill_name")
-    parts = [f"天气变化: {weather_name}"]
-    if expire is not None:
-        parts.append(f"持续{expire}回合")
-    if sname:
-        parts.append(f"({sname})")
-    return FormattedEvent(
-        kind="weather_change",
-        round=0,
-        summary=" ".join(parts),
-        detail={
-            "weather_id": weather_id,
-            "weather_name": weather_name,
-            "expire_round": expire,
-            "skill_name": sname,
-        },
-        icon="cloud",
-        color="blue",
-    )
-
-
-def _fmt_skill_state(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
-    pet_id = entry.get("caster_pet_id")
-    state_code = entry.get("state_code", 0)
-    state_name = SKILL_STATE_NAMES.get(state_code, f"UNKNOWN({state_code})")
-    disabled = state_code in (2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
-    return FormattedEvent(
-        kind="skill_state",
-        round=0,
-        summary=f"技能状态: pet={pet_id} {state_name}",
-        detail={"caster_pet_id": pet_id, "state_code": state_code, "state_name": state_name},
-        icon="lock" if disabled else "unlock",
-        color="orange" if disabled else "green",
-    )
-
-
-def _fmt_combo_skill_cast(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
-    caster = side_label(entry.get("actor_side"))
-    idx = entry.get("combo_index", 0)
-    total = entry.get("combo_count", 1)
-    sname = entry.get("skill_name")
-    src = f" [{sname}]" if sname else ""
-    return FormattedEvent(
-        kind="combo_skill_cast",
-        round=0,
-        summary=f"{caster} 连击 {idx + 1}/{total}{src}",
-        detail={
-            "caster_side": caster,
-            "combo_index": idx,
-            "combo_count": total,
-            "skill_name": sname,
-            "skill_perform_type": entry.get("skill_perform_type"),
-            "change_target_id": entry.get("change_target_id"),
-        },
-        icon="thunderbolt",
-        color="purple",
-    )
-
-
 def _fmt_generic(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
     kind = entry.get("kind", "unknown")
     return FormattedEvent(
@@ -430,11 +341,104 @@ def _fmt_generic(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEven
     )
 
 
+def _fmt_weather_change(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    name = entry.get("weather_name") or entry.get("weather_id", "?")
+    expire = entry.get("expire_round")
+    skill = entry.get("skill_name")
+    parts = [f"天气变化: {name}"]
+    if expire is not None:
+        parts.append(f"持续至回合{expire}")
+    if skill:
+        parts.append(f"({skill})")
+    return FormattedEvent(
+        kind="weather_change", round=0,
+        summary=" ".join(parts),
+        detail=entry, icon="cloud-sun", color="blue",
+    )
+
+
+def _fmt_skill_state(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    code = entry.get("state_code", "?")
+    return FormattedEvent(
+        kind="skill_state", round=0,
+        summary=f"技能状态变化: code={code}",
+        detail=entry, icon="settings", color="gray",
+    )
+
+
+def _fmt_role_skill_cast(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    name = entry.get("skill_name") or entry.get("skill_id", "?")
+    ok = entry.get("is_call_success")
+    summary = f"天命技能: {name}"
+    if ok is not None:
+        summary += f" {'成功' if ok else '失败'}"
+    return FormattedEvent(
+        kind="role_skill_cast", round=0,
+        summary=summary,
+        detail=entry, icon="star", color="purple",
+    )
+
+
+def _fmt_special_move(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    name = entry.get("skill_name") or entry.get("special_move_id", "?")
+    return FormattedEvent(
+        kind="special_move", round=0,
+        summary=f"特殊行动: {name}",
+        detail=entry, icon="zap", color="orange",
+    )
+
+
+def _fmt_skill_pos_change(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    infos = entry.get("skill_pos_infos", [])
+    n = len(infos)
+    return FormattedEvent(
+        kind="skill_pos_change", round=0,
+        summary=f"技能位置变化: {n}个技能",
+        detail=entry, icon="move", color="gray",
+    )
+
+
+def _fmt_sp_energy_change(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    t = entry.get("sp_change_type", "?")
+    val = entry.get("change_value", 0)
+    return FormattedEvent(
+        kind="sp_energy_change", round=0,
+        summary=f"SP能量: type={t} value={val}",
+        detail=entry, icon="battery", color="yellow",
+    )
+
+
+def _fmt_sp_energy_trigger(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    old = entry.get("old_skill_name") or entry.get("old_skill_id", "?")
+    new = entry.get("new_skill_name") or entry.get("new_skill_id", "?")
+    return FormattedEvent(
+        kind="sp_energy_trigger", round=0,
+        summary=f"SP触发: {old} → {new}",
+        detail=entry, icon="refresh-cw", color="yellow",
+    )
+
+
+def _fmt_idle(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    return FormattedEvent(
+        kind="idle", round=0,
+        summary="待机",
+        detail=entry, icon="pause", color="gray",
+    )
+
+
+def _fmt_notify_perform(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    t = entry.get("notify_type", "?")
+    return FormattedEvent(
+        kind="notify_perform", round=0,
+        summary=f"通知: type={t}",
+        detail=entry, icon="bell", color="gray",
+    )
+
+
 _SUPPRESSED_KINDS = {"data_update"}
 
 _ENTRY_FORMATTERS: Dict[str, Any] = {
     "skill_cast": _fmt_skill_cast,
-    "combo_skill_cast": _fmt_combo_skill_cast,
     "damage": _fmt_damage,
     "defeat": _fmt_defeat,
     "effect_apply": _fmt_effect_apply,
@@ -450,6 +454,13 @@ _ENTRY_FORMATTERS: Dict[str, Any] = {
     "supply_pet": _fmt_supply_pet,
     "weather_change": _fmt_weather_change,
     "skill_state": _fmt_skill_state,
+    "role_skill_cast": _fmt_role_skill_cast,
+    "special_move": _fmt_special_move,
+    "skill_pos_change": _fmt_skill_pos_change,
+    "sp_energy_change": _fmt_sp_energy_change,
+    "sp_energy_trigger": _fmt_sp_energy_trigger,
+    "idle": _fmt_idle,
+    "notify_perform": _fmt_notify_perform,
 }
 
 
