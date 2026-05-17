@@ -531,6 +531,9 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
     initial_buffs = extract_battle_buffs(dm)
     # 先天特性/被动技能 from BattleInsidePetInfo.field 64
     passive_skill_id = pick_first(collect_varints(dm, 64))
+    # 能量来自 PetData.field 33。battle_attr[26] 是"宠物伤害类型1"，不是能量。
+    # PetData.energy 在 battle_enter 时为 0（未设置），在 round_start 时为实际值。
+    raw_energy = pick_first(collect_varints(ce["sub"], 33))
 
     return {
         "name": creature["name"], "level": creature["level"],
@@ -540,7 +543,7 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "battle_stats": ds[1:7] if len(ds) >= 7 else [],
         "battle_max_hp": max_hp, "max_hp": max_hp,
         "current_hp": current_hp, "hp": current_hp,
-        "energy": ds[26] if len(ds) >= 27 else None,
+        "energy": raw_energy if raw_energy and raw_energy > 0 else None,
         "stats": creature.get("stats", []),
         "skills": all_skills,
         "equipped_skills": equipped_skills,

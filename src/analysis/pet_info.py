@@ -26,7 +26,7 @@ class PetInfo:
         self.current_hp: int = 0
         self.max_hp: int = 0
         self.hp_pct: float = 1.0
-        self.energy: int = 5
+        self.energy: int = 10
         self.buffs: List[Dict[str, Any]] = []
         self.initial_buff_ids: List[int] = []
         self.innate_skill_id: Any = None

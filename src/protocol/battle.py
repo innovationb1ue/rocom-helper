@@ -637,12 +637,15 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                     ds = collect_varints(state_sub, 6)
                     if len(ds) >= 7:
                         out["new_pet_battle_stats"] = ds[1:7]
-                    # current_hp from field 25, energy from field 26
+                    # current_hp from battle_attr[25]
                     if len(ds) >= 26:
                         out["new_pet_current_hp"] = ds[25]
                         out["new_pet_max_hp"] = ds[1]
-                    if len(ds) >= 27:
-                        out["new_pet_energy"] = ds[26]
+                    # 能量来自 PetData.field 33（info_sub = PetData）
+                    # battle_attr[26] 是"宠物伤害类型1"，不是能量。
+                    raw_pet_energy = pick_first(collect_varints(info_sub, 33)) if info_sub else None
+                    if raw_pet_energy is not None and raw_pet_energy > 0:
+                        out["new_pet_energy"] = raw_pet_energy
                     # passive_skill_id from field 64
                     out["new_pet_passive_skill_id"] = pick_first(collect_varints(state_sub, 64))
 

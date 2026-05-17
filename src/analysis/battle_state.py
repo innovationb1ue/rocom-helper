@@ -149,7 +149,7 @@ class BattleStateTracker:
         my_pets = []
         opp_pets = []
         for w in wrappers:
-            pet_info = PetInfo.from_wrapper(w, default_energy=5).to_dict()
+            pet_info = PetInfo.from_wrapper(w, default_energy=10).to_dict()
             equipped = w.get("equipped_skills") or []
             side = w.get("side")
             side_label = "MY" if (side == 1 or side == "我方") else "OPP"
@@ -654,9 +654,10 @@ class BattleStateTracker:
                         w_bs = w.get("battle_stats") or []
                         if len(w_bs) >= 6 and w_bs[5]:
                             pet["base_speed"] = w_bs[5]
-                    # 能量刷新
-                    if w.get("energy") is not None:
-                        pet["energy"] = min(10, w["energy"])
+                    # 能量刷新（PetData.field 33）。None = 未设置（battle_enter），跳过
+                    wrapper_energy = w.get("energy")
+                    if wrapper_energy is not None and wrapper_energy > 0:
+                        pet["energy"] = min(10, wrapper_energy)
                     # 属性类型（仅首次为空时填充）
                     if not pet.get("types") and w.get("types"):
                         pet["types"] = w["types"]

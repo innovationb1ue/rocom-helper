@@ -1,75 +1,81 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 Claude Code (claude.ai/code) 提供代码库工作指引。
 
-## Project Overview
+## 项目概述
 
-Roco PvP Helper (洛克王国 PvP 辅助工具) — a real-time battle analysis and suggestion tool for Roco Kingdom PvP. It passively monitors game network traffic on port 8195, decrypts the custom BE21 protocol, tracks live battle state, and provides actionable suggestions (type counters, threat assessment, team composition) during PvP battles. The tool is purely passive — it only reads traffic, never sends packets to the game.
+洛克王国 PvP 辅助工具 — 实时战斗分析与建议工具。被动监听游戏 8195 端口的网络流量，解密自定义 BE21 协议，跟踪实时战斗状态，在 PvP 对战中提供可操作建议（属性克制、威胁评估、阵容搭配）。工具纯粹被动——只读取流量，不会向游戏发送任何数据包。
 
-## Tech Stack
+## 运行环境
 
-- **Backend**: Python 3.9+, FastAPI, Scapy, PyCryptodome, uvicorn
-- **Python launcher**: Use `py` (not `python`) to run Python on Windows — `python` is not on PATH
-- **Frontend**: React 19, TypeScript, Ant Design 6, Zustand, Vite 8, React Router 7
-- **Protocol**: Custom BE21 binary framing with AES-128-CBC encryption, protobuf-like message payloads
+- **生产运行环境**：Windows — 工具和游戏都在 Windows 上运行
+- **开发环境**：可能在 macOS 上开发，但**所有代码必须以 Windows 为基准**
+- **注意事项**：使用 Windows 兼容的 API、路径和命令。Scapy 抓包在 Windows 上需要安装 Npcap。使用 `py`（不是 `python`）作为 Python 启动器。功能完成前必须在 Windows 上测试。
 
-## Commands
+## 技术栈
 
-### Backend
+- **后端**：Python 3.9+, FastAPI, Scapy, PyCryptodome, uvicorn
+- **Python 启动器**：Windows 上使用 `py`（不是 `python`）— `python` 不在 PATH 中
+- **前端**：React 19, TypeScript, Ant Design 6, Zustand, Vite 8, React Router 7
+- **协议**：自定义 BE21 二进制帧格式，AES-128-CBC 加密，类 protobuf 消息载荷
+
+## 命令
+
+### 后端
 ```bash
-py -m src.main                   # Start FastAPI server on :8000 (with hot reload)
-pytest                          # Run all tests
-pytest tests/test_crypto.py     # Run a single test file
-pytest -k "test_name"           # Run tests matching a name pattern
+py -m src.main                   # 启动 FastAPI 服务 :8000（支持热重载）
+pytest                          # 运行所有测试
+pytest tests/test_crypto.py     # 运行单个测试文件
+pytest -k "test_name"           # 按名称模式匹配运行测试
 ```
 
-### Headless Replay (后端自闭环)
+### 后端自闭环回放
 ```bash
-py -m scripts.replay_headless --session battle_session_1       # Text summary with events, predictions, hooks
-py -m scripts.replay_headless --session battle_session_1 --json  # Full JSON output (written to tmp/)
-py -m scripts.replay_headless --round 7                        # Stop at round 7
-py -m scripts.generate_battle_report --json                    # Generate report file (docs/battle_report.txt)
-py -m scripts.replay_to_frontend --delay 80 --session battle_session_1  # Push replay to WebSocket frontend
-py -m scripts.replay_to_frontend --delay 80 --session battle_session_1 --round 7  # Replay to round 7
+py -m scripts.replay_headless --session battle_session_1       # 文本摘要（事件、预测、hook 建议）
+py -m scripts.replay_headless --session battle_session_1 --json  # 完整 JSON 输出（写入 tmp/）
+py -m scripts.replay_headless --round 7                        # 在第 7 回合停止
+py -m scripts.generate_battle_report --json                    # 生成报告文件（docs/battle_report.txt）
+py -m scripts.replay_to_frontend --delay 80 --session battle_session_1  # 推送回放到前端 WebSocket
+py -m scripts.replay_to_frontend --delay 80 --session battle_session_1 --round 7  # 回放到第 7 回合
 ```
 
-### Battle Extraction (战斗包提取)
+### 战斗包提取
 ```bash
-py -m scripts.extract_battle --session 2026-05-16_20-12-54_monitor        # List battles in raw capture
-py -m scripts.extract_battle --session battle_session_3                    # List battles in fixture
-py -m scripts.extract_battle --session <id> --extract 1                   # Extract battle #1 to test fixtures
-py -m scripts.extract_battle --session <id> --extract all                 # Extract all battles
-py -m scripts.extract_battle --session <id> --extract 1 --verify         # Extract and verify correctness
-py -m scripts.extract_battle --session <id> --extract 1 --pad-before 10 --pad-after 5  # Custom padding
+py -m scripts.extract_battle --session 2026-05-16_20-12-54_monitor        # 列出原始抓包中的战斗
+py -m scripts.extract_battle --session battle_session_3                    # 列出 fixture 中的战斗
+py -m scripts.extract_battle --session <id> --extract 1                   # 提取第 1 场战斗到测试 fixture
+py -m scripts.extract_battle --session <id> --extract all                 # 提取所有战斗
+py -m scripts.extract_battle --session <id> --extract 1 --verify         # 提取并验证正确性
+py -m scripts.extract_battle --session <id> --extract 1 --pad-before 10 --pad-after 5  # 自定义前后填充
 ```
 
-### Frontend (from `web/`)
+### 前端（在 `web/` 目录下）
 ```bash
-npm run dev                     # Vite dev server on :5173
-npm run build                   # TypeScript compile + Vite production build
-npm run lint                    # ESLint
+npm run dev                     # Vite 开发服务器 :5173
+npm run build                   # TypeScript 编译 + Vite 生产构建
+npm run lint                    # ESLint 检查
 ```
 
-## Development Workflow
+## 开发工作流
 
-**Mandatory after every development task** — complete all steps in order:
+**每次开发任务完成后必须执行** — 按顺序完成以下步骤：
 
-### 1. Run Full Test Suite
+### 1. 运行完整测试套件
 ```bash
 pytest
 ```
-All tests must pass before proceeding. Fix any failures before moving on.
+所有测试必须通过才能继续。先修复失败测试再进行下一步。
 
-### 2. Start Backend & Frontend
+### 2. 启动后端和前端
 ```bash
-# Terminal 1 — Backend
+# 终端 1 — 后端
 py -m src.main
 
-# Terminal 2 — Frontend
+# 终端 2 — 前端
 cd web && npm run dev
 ```
 
-### 3. MCP Battle Replay Verification (完整的前后端回放验证)
+### 3. MCP 战斗回放验证（完整的前后端回放验证）
 
 当要求进行"完整的前后端回放验证"时，必须使用 MCP Chrome DevTools 工具进行自动化验证，而非手动操作浏览器。
 
@@ -98,17 +104,17 @@ cd web && npm run dev
 
 如果发现任何异常，必须调查并修复后才能标记任务完成。
 
-### 4. Screenshot Cleanup
+### 4. 截图清理
 
-**Always delete screenshot files immediately after reviewing them.** When taking screenshots (via MCP `take_screenshot` or any other method), delete the file as soon as you've analyzed it. Never leave `.png`/`.jpg`/`.jpeg` screenshot files lingering in the project directory. This applies to both main agent and subagent usage.
+**审查后立即删除截图文件。** 通过 MCP `take_screenshot` 或其他方式截图后，分析完毕即删除。不要在项目目录中遗留 `.png`/`.jpg`/`.jpeg` 截图文件。此规则适用于主 agent 和子 agent。
 
-### 5. Headless Replay Verification (后端自闭环回放验证)
+### 5. 后端自闭环回放验证
 
 当要求进行"后端自闭环验证"时，使用 `BattleReplayRunner` 进行纯后端验证，无需启动服务器或前端。
 
 **步骤：**
 
-1. **运行 headless replay** — 使用 Bash 运行：
+1. **运行 headless 回放** — 使用 Bash 运行：
    ```bash
    py -m scripts.replay_headless --session battle_session_1
    ```
@@ -121,245 +127,245 @@ cd web && npm run dev
 3. **运行 JSON 输出对比** — 使用 `--json` 生成结构化数据进行字段级验证
 4. **运行相关测试** — `pytest tests/test_replay_runner.py -v` 确保所有回放测试通过
 
-## Architecture
+## 架构
 
-The system is a layered pipeline with clear boundaries between capture, parsing, analysis, and presentation:
+系统是一个分层管线，在抓包、解析、分析、展示之间有清晰的边界：
 
 ```
-Network Traffic (port 8195)
+网络流量（端口 8195）
   │
   ▼
-capture/sniffer.py ── Scapy AsyncSniffer, orchestrates the pipeline
+capture/sniffer.py ── Scapy AsyncSniffer，编排整个管线
   │
-  ├── capture/key_capture.py ── Extract AES session key from ACK packets
-  ├── capture/reassembly.py ── TCP stream reassembly into ordered flows
-  ├── capture/frame.py ── BE21 frame parsing (header + body extraction)
-  ├── capture/crypto.py ── AES-128-CBC decryption of encrypted bodies
+  ├── capture/key_capture.py ── 从 ACK 包提取 AES 会话密钥
+  ├── capture/reassembly.py ── TCP 流重组为有序流
+  ├── capture/frame.py ── BE21 帧解析（头部 + 载荷提取）
+  ├── capture/crypto.py ── AES-128-CBC 解密加密载荷
   │
   ▼
 protocol/
-  ├── proto_core.py ── Protobuf parser, TGCP transport (4 formats), creature/state extraction, game constants
-  ├── opcodes.py ── Decorator-based opcode/inner-message registry with dispatch
-  ├── battle.py ── Battle-specific extraction (dual: schema-first + raw field fallback)
+  ├── proto_core.py ── Protobuf 解析器、TGCP 传输（4 种格式）、宠物/状态提取、游戏常量
+  ├── opcodes.py ── 基于装饰器的 opcode/内部消息注册与分发
+  ├── battle.py ── 战斗专用提取（双路径：schema 优先 + 原始字段回退）
   │
   ▼
 analysis/
-  ├── constants.py ── Shared opcode constants, OPCODE_LABELS, SDT_TO_TYPE re-export (single source of truth)
-  ├── pet_info.py ── PetInfo construction factory (from_wrapper/from_change_pet → to_dict), unifies pet dict construction, includes base_speed from battle_stats[5]
-  ├── battle_state.py ── Real-time battle state machine (HP, energy, buffs, turn tracking)
-  ├── battle_processor.py ── Pure sync event processor (state + formatting + damage + hooks), shared by BattleManager and ReplayRunner
-  ├── battle_advisor.py ── Battle analysis coordinator (skill analysis + damage prediction + state suggestions)
-  ├── damage_calc.py ── Damage calculation engine with 4-stage hook pipeline
-  ├── innate_hooks.py ── Innate skill damage hooks (combo/stat/type/power modifications)
-  ├── event_formatter.py ── Protocol events → UI-ready formatted events
-  ├── replay_runner.py ── Headless replay runner (no FastAPI/WebSocket), produces ReplayResult with per-event snapshots
-  ├── hook_registry.py ── Extensible analysis hook system (ABC-based, lifecycle-aware)
+  ├── constants.py ── 共享 opcode 常量、OPCODE_LABELS、SDT_TO_TYPE 重导出（单一数据源）
+  ├── pet_info.py ── PetInfo 构建工厂（from_wrapper/from_change_pet → to_dict），统一宠物字典构建，包含 base_speed（来自 battle_stats[5]）
+  ├── battle_state.py ── 实时战斗状态机（HP、能量、buff、回合追踪）
+  ├── battle_processor.py ── 纯同步事件处理器（状态 + 格式化 + 伤害 + hooks），BattleManager 和 ReplayRunner 共用
+  ├── battle_advisor.py ── 战斗分析协调器（技能分析 + 伤害预测 + 状态建议）
+  ├── damage_calc.py ── 伤害计算引擎，4 阶段 hook 管线
+  ├── innate_hooks.py ── 天赋技能伤害 hooks（连击/属性/类型/威力修改）
+  ├── event_formatter.py ── 协议事件 → UI 格式化事件
+  ├── replay_runner.py ── 无头回放器（无 FastAPI/WebSocket），生成 ReplayResult 和逐事件快照
+  ├── hook_registry.py ── 可扩展分析 hook 系统（基于 ABC，生命周期感知）
   ├── hooks/
-  │   ├── __init__.py ── Default hook factory
-  │   ├── opponent_tracker.py ── Opponent skill/switch pattern tracking
-  │   ├── energy_monitor.py ── Energy monitoring with attack window detection
-  │   └── switch_advisor.py ── Type-based switch recommendations
-  ├── coverage.py ── Offensive/defensive type coverage calculation
-  ├── counter.py ── Counter-pick logic based on type matchups
-  ├── threat.py ── Threat assessment for opponent pets
-  ├── team_builder.py ── Team composition suggestions
+  │   ├── __init__.py ── 默认 hook 工厂
+  │   ├── opponent_tracker.py ── 对手技能/换宠模式追踪
+  │   ├── energy_monitor.py ── 能量监控与攻击窗口检测
+  │   └── switch_advisor.py ── 基于属性克制的换宠建议
+  ├── coverage.py ── 攻击/防御属性覆盖计算
+  ├── counter.py ── 基于属性克制的 counter-pick 逻辑
+  ├── threat.py ── 对手宠物威胁评估
+  ├── team_builder.py ── 阵容搭配建议
   │
   ▼
 game/
-  ├── type_chart.py ── TypeChart class: 18-type effectiveness matrix, weakness/resistance queries, coverage scores
-  ├── stats.py ── Base stat calculator (HP + 5 stat formulas), nature modifiers, stat ratings
-  ├── skill_eval.py ── Skill scoring engine (power, efficiency, accuracy, PP, type coverage, effects)
+  ├── type_chart.py ── TypeChart 类：18 属性克制矩阵、弱点/抗性查询、覆盖评分
+  ├── stats.py ── 种族值计算器（HP + 5 项属性公式）、性格修正、属性评级
+  ├── skill_eval.py ── 技能评分引擎（威力、效率、命中率、PP、属性覆盖、效果）
   │
   ▼
 api/ (FastAPI)
-  ├── app.py ── Application factory (create_app), CORS, router mounting
-  ├── battle_manager.py ── Global singleton: sniffer bridge, WS push, hook dispatch
-  ├── sniffer_manager.py ── Packet capture session management
-  ├── routes_battle.py ── WebSocket (/ws/battle) + REST + replay endpoints
-  ├── routes_sniffer.py ── Packet capture control API
-  ├── routes_teams.py ── Team analysis endpoints
-  ├── routes_pets.py ── Pet data queries
-  ├── routes_data.py ── Static game data serving
+  ├── app.py ── 应用工厂（create_app）、CORS、路由挂载
+  ├── battle_manager.py ── 全局单例：抓包桥接、WS 推送、hook 分发
+  ├── sniffer_manager.py ── 抓包会话管理
+  ├── routes_battle.py ── WebSocket（/ws/battle）+ REST + 回放端点
+  ├── routes_sniffer.py ── 抓包控制 API
+  ├── routes_teams.py ── 阵容分析端点
+  ├── routes_pets.py ── 宠物数据查询
+  ├── routes_data.py ── 静态游戏数据服务
   │
   ▼
 web/ (React SPA)
-  ├── stores/ ── Zustand stores (battleStore, snifferStore, petsStore)
-  ├── hooks/ ── useBattle (WebSocket), usePets (REST), useSnifferMonitor
+  ├── stores/ ── Zustand 状态管理（battleStore, snifferStore, petsStore）
+  ├── hooks/ ── useBattle（WebSocket）、usePets（REST）、useSnifferMonitor
   ├── pages/ ── Dashboard, PetBrowser, TeamBuilder, TypeChart, BattleLive, BattleHistory
   ├── components/ ── PetCard, TeamSlot, TypeBadge, BattleTimeline, BattleEventLog,
   │                  DamagePredictionPanel, SkillPanel, HookAdvicePanel,
   │                  BattleSummaryPanel, TeamRoster, CoverageRadar
 ```
 
-### Data Files
+### 数据文件
 
-Static game data lives in `data/game/` as JSON files (~24MB total). Key files:
+静态游戏数据存放在 `data/game/` 目录，为 JSON 文件（约 24MB）。关键文件：
 
-**Core databases:**
-- `pet_map.json` (706K) — Pet definitions (ID, name, base stats, types)
-- `skill_map.json` (1.2M) — Skill definitions (power, element, energy cost, target type)
-- `pet_skill_map.json` — Pet-to-skill mapping (which skills each pet can learn)
-- `type_chart.json` (2.8K) — 18-type effectiveness matrix
-- `attr_map.json` (12K) — Attribute/type name lookup
+**核心数据库：**
+- `pet_map.json` (706K) — 宠物定义（ID、名称、种族值、属性）
+- `skill_map.json` (1.2M) — 技能定义（威力、属性、能量消耗、目标类型）
+- `pet_skill_map.json` — 宠物与技能映射（每个宠物可学习的技能）
+- `type_chart.json` (2.8K) — 18 属性克制矩阵
+- `attr_map.json` (12K) — 属性/类型名称查找
 
-**Protocol and schemas:**
-- `proto_schema.json` (3.1M) — Protobuf message schema definitions
-- `opcode_pb_map.json` (315K) — Opcode-to-protobuf-message mapping
-- `pb_message_index.json` (1.8M) — Protobuf message name index
+**协议与 schema：**
+- `proto_schema.json` (3.1M) — Protobuf 消息 schema 定义
+- `opcode_pb_map.json` (315K) — opcode 到 protobuf 消息的映射
+- `pb_message_index.json` (1.8M) — Protobuf 消息名称索引
 
-**Battle data:**
-- `innate_skills.json` (4.5K) — Innate skill definitions for the damage hook system
-- `buff_map.json` (891K) — Buff/effect definitions (IDs, names, descriptions)
-- `buffbase_map.json` (1.1M) — Base buff definitions
+**战斗数据：**
+- `innate_skills.json` (4.5K) — 天赋技能定义，用于伤害 hook 系统
+- `buff_map.json` (891K) — Buff/效果定义（ID、名称、描述）
+- `buffbase_map.json` (1.1M) — 基础 buff 定义
 
-**Monster and wiki data:**
-- `monster_map.json` (7.3M) — In-game monster ID mapping
-- `wiki_pets.json` (217K) — Wiki-sourced pet data (fallback stats)
-- `wiki_skills.json` (90K) — Wiki-sourced skill data
-- `special_move_map.json` (86K) — Special move definitions
+**怪物与 wiki 数据：**
+- `monster_map.json` (7.3M) — 游戏内怪物 ID 映射
+- `wiki_pets.json` (217K) — Wiki 来源的宠物数据（备用种族值）
+- `wiki_skills.json` (90K) — Wiki 来源的技能数据
+- `special_move_map.json` (86K) — 特殊招式定义
 
-The `src/data/loader.py` module provides typed access to this data; `src/data/scraper.py` and `src/data/updater.py` handle scraping from game wikis.
+`src/data/loader.py` 模块提供类型化数据访问；`src/data/scraper.py` 和 `src/data/updater.py` 负责从游戏 wiki 爬取数据。
 
-### Key Design Patterns
+### 关键设计模式
 
-- **Backend entry point**: `src/main.py` runs uvicorn with `src.api.app:app` (factory pattern via `create_app()`)
-- **Route registration**: All routers are mounted in `app.py` with `/api` prefix (except battle WebSocket at root)
-- **CORS**: Allowed origins are `localhost:5173` and `127.0.0.1:5173` (Vite dev server)
-- **State management**: Zustand stores on frontend; WebSocket for battle state, REST for pet/team data
-- **API client**: `web/src/utils/api.ts` centralizes Axios calls to the backend
-- **Battle manager singleton**: `get_battle_manager()` provides global access to `BattleManager`, which bridges the packet sniffer to WebSocket clients and the analysis pipeline
-- **Opcode dispatch**: `opcodes.py` uses decorator registries (`_OPCODE_REGISTRY` for main opcodes, `_INNER_REGISTRY` for inner-message dispatch on opcode 0x0414). The `summarize()` function falls back to `opcode_pb_map.json` metadata for unknown opcodes.
-- **Opcode constants**: `src/analysis/constants.py` centralizes all opcode constants (`OPCODE_BATTLE_ENTER`, `OPCODE_ACTION_RESOLVE`, etc.), opcode sets (`LIFECYCLE_OPCODES`, `DAMAGE_OPCODES`, `IN_BATTLE_OPCODES`), `OPCODE_LABELS`, and re-exports `SDT_TO_TYPE`. All analysis and API modules import from this file instead of using hex literals.
+- **后端入口**：`src/main.py` 通过 `src/api.app:app` 运行 uvicorn（工厂模式 `create_app()`）
+- **路由注册**：所有路由在 `app.py` 中以 `/api` 前缀挂载（战斗 WebSocket 除外）
+- **CORS**：允许的源为 `localhost:5173` 和 `127.0.0.1:5173`（Vite 开发服务器）
+- **状态管理**：前端使用 Zustand stores；战斗状态通过 WebSocket，宠物/阵容数据通过 REST
+- **API 客户端**：`web/src/utils/api.ts` 集中管理 Axios 调用
+- **BattleManager 单例**：`get_battle_manager()` 提供全局访问，桥接抓包器到 WebSocket 客户端和分析管线
+- **Opcode 分发**：`opcodes.py` 使用装饰器注册表（`_OPCODE_REGISTRY` 用于主 opcode，`_INNER_REGISTRY` 用于 opcode 0x0414 的内部消息分发）。`summarize()` 函数对未知 opcode 回退到 `opcode_pb_map.json` 元数据。
+- **Opcode 常量**：`src/analysis/constants.py` 集中管理所有 opcode 常量（`OPCODE_BATTLE_ENTER`、`OPCODE_ACTION_RESOLVE` 等）、opcode 集合（`LIFECYCLE_OPCODES`、`DAMAGE_OPCODES`、`IN_BATTLE_OPCODES`）、`OPCODE_LABELS`，并重导出 `SDT_TO_TYPE`。所有分析和 API 模块从此文件导入，不使用十六进制字面量。回放路径（`packet_reader.py`）和实时路径（`BattleManager`）共用 `LIFECYCLE_OPCODES | IN_BATTLE_OPCODES` 作为统一的 opcode 过滤集合（22 个 opcode），确保解析范围完全一致。
 
-### Key Architectural Concepts
+### 关键架构概念
 
-**Dual Hook Systems:**
+**双 Hook 系统：**
 
-The project has two separate hook systems serving different purposes:
+项目有两套独立的 hook 系统，服务于不同目的：
 
-1. **Damage Calculation Hooks** (`damage_calc.py`) — A 4-stage pipeline within `DamageCalculator` that modifies damage computation:
-   - `pre_power` — Modify skill power before calculation
-   - `post_base` — Modify base damage after core formula
-   - `pre_final` — Modify effectiveness/STAB before final multiplication
-   - `post_calc` — Modify final damage values, hit counts
-   - Innate skill hooks (`innate_hooks.py`) use this system: `stat_modify_hook` (post_base), `type_resist_modify_hook` (pre_final), `combo_modify_hook` and `power_modify_hook` (post_calc).
+1. **伤害计算 Hooks**（`damage_calc.py`）— `DamageCalculator` 内的 4 阶段管线，修改伤害计算：
+   - `pre_power` — 在计算前修改技能威力
+   - `post_base` — 在核心公式后修改基础伤害
+   - `pre_final` — 在最终乘法前修改克制/STAB
+   - `post_calc` — 修改最终伤害值和命中次数
+   - 天赋技能 hooks（`innate_hooks.py`）使用此系统：`stat_modify_hook`（post_base）、`type_resist_modify_hook`（pre_final）、`combo_modify_hook` 和 `power_modify_hook`（post_calc）。
 
-2. **Analysis Hook System** (`hook_registry.py`) — An ABC-based event-driven hook system triggered by battle lifecycle events:
-   - Triggers: `ON_BATTLE_ENTER`, `ON_ROUND_START`, `ON_ACTION_RESOLVE`, `ON_SPECIAL_REFRESH`, `ON_BATTLE_FINISH`, `ON_CHANGE_PET`, `ON_DEFEAT`
-   - Hooks implement `AnalysisHook` ABC and return `HookAdvice` dataclass
-   - Default hooks: `OpponentTrackerHook`, `EnergyMonitorHook`, `SwitchAdvisorHook`
+2. **分析 Hook 系统**（`hook_registry.py`）— 基于 ABC 的事件驱动 hook 系统，由战斗生命周期事件触发：
+   - 触发器：`ON_BATTLE_ENTER`, `ON_ROUND_START`, `ON_ACTION_RESOLVE`, `ON_SPECIAL_REFRESH`, `ON_BATTLE_FINISH`, `ON_CHANGE_PET`, `ON_DEFEAT`
+   - Hooks 实现 `AnalysisHook` ABC 并返回 `HookAdvice` dataclass
+   - 默认 hooks：`OpponentTrackerHook`, `EnergyMonitorHook`, `SwitchAdvisorHook`
 
-**Note:** `register_innate_hooks()` is called automatically by `BattleAdvisor`, so damage analysis triggered via `BattleManager` has innate hooks active. However, if `DamageCalculator` is instantiated directly (e.g., in tests or standalone scripts), `register_innate_hooks()` must be called explicitly for innate skill effects to apply.
+**注意**：`register_innate_hooks()` 由 `BattleAdvisor` 自动调用，因此通过 `BattleManager` 触发的伤害分析已激活天赋 hooks。但如果直接实例化 `DamageCalculator`（如测试或独立脚本），必须显式调用 `register_innate_hooks()` 才能应用天赋技能效果。
 
-**PvP Data Availability:**
+**PvP 数据可用性：**
 
-The protocol provides asymmetric data for the two sides. Understanding what is and isn't available is critical for action recommendation:
+协议对双方提供不对称数据。理解哪些数据可用、哪些不可用，对行动建议至关重要：
 
-- **Speed**: Available for both sides via `battle_stats[5]` from the very first packet (`battle_enter` 0x1316). Stored in `pet["base_speed"]` — immutable during battle. `pet["effective_speed"]` is computed on-demand in `get_state()` from `base_speed` + active speed buffs (via `get_speed_buff_modifiers` in `loader.py`).
-- **Equipped skills**: Only available for the player's own pets (`inside_info_f8` source). Opponent `equipped_skills` is always `[]`.
-- **Opponent skills learned**: Accumulated via `used_skills` as the opponent uses skills during battle. The opponent's full skill pool is available from `pet_skill_map.json` keyed by `base_id`.
-- **Stats (ATK/DEF/SPA/SPD)**: Protocol sends `battle_stats[1:5]` but these are typically `0` for the opponent — only HP (`[0]`) and Speed (`[5]`) are populated. The `stats` field from `extract_creature` is also empty for opponents.
+- **速度**：双方都可用，通过 `battle_stats[5]` 从第一个包（`battle_enter` 0x1316）获取。存储在 `pet["base_speed"]` 中 — 战斗中不可变。`pet["effective_speed"]` 在 `get_state()` 中按需计算，基于 `base_speed` + 活跃速度 buff（通过 `loader.py` 中的 `get_speed_buff_modifiers`）。
+- **装备技能**：仅自己方宠物可用（`inside_info_f8` 来源）。对手的 `equipped_skills` 始终为 `[]`。
+- **对手已学技能**：通过 `used_skills` 在对手使用技能时逐步累积。对手完整技能池可从 `pet_skill_map.json` 按 `base_id` 查询。
+- **属性（物攻/物防/特攻/特防）**：协议发送 `battle_stats[1:5]` 但对手通常为 `0` — 仅 HP（`[0]`）和速度（`[5]`）有值。`extract_creature` 的 `stats` 字段对手也为空。
 
-**Dual Extraction Strategy (battle.py):**
+**双提取策略（battle.py）：**
 
-All major extractors in `battle.py` use a dual approach:
-1. **Schema-first**: Decode via `proto_schema.json` definitions for structured, type-safe access
-2. **Raw fallback**: Manual protobuf field parsing when schema data is unavailable
+`battle.py` 中所有主要提取器使用双路径方法：
+1. **Schema 优先**：通过 `proto_schema.json` 定义解码，结构化、类型安全
+2. **原始回退**：当 schema 数据不可用时手动解析 protobuf 字段
 
-Both paths produce the same output shape. The `_schema_quality()` helper tags each result with `parse_quality`.
+两条路径产生相同的输出格式。`_schema_quality()` 辅助函数为每个结果标记 `parse_quality`。
 
-**Battle Lifecycle:**
+**战斗生命周期：**
 
 ```
-idle → selecting (0x1316 battle_enter) → resolving (0x131A round_start)
-  → [action events: 0x1324, 0x130C, 0x13F4, ...]
-  → [repeat per round]
-  → finished (0x132C battle_finish)
+idle → selecting（0x1316 battle_enter）→ resolving（0x131A round_start）
+  → [行动事件：0x1324, 0x130C, 0x13F4, ...]
+  → [每回合重复]
+  → finished（0x132C battle_finish）
 ```
 
-**Battle Extraction:**
+**战斗提取：**
 
-`scripts/extract_battle.py` extracts individual battles from raw capture sessions into test fixtures. It scans `.bin` file metadata for `0x1316`/`0x132C` opcode pairs to detect battle boundaries, then copies all packets in the time window (with configurable padding) to `tests/fixtures/packets/battle_session_N/`. Verification runs `BattleReplayRunner` on both the original (filtered to the time window) and extracted packets, comparing `final_state` and `battle_summary` for exact match.
+`scripts/extract_battle.py` 从原始抓包会话中提取单场战斗到测试 fixture。它扫描 `.bin` 文件元数据中的 `0x1316`/`0x132C` opcode 对来检测战斗边界，然后将时间窗口内的所有包（可配置前后填充）复制到 `tests/fixtures/packets/battle_session_N/`。验证步骤对原始（过滤到时间窗口）和提取的包分别运行 `BattleReplayRunner`，比较 `final_state` 和 `battle_summary` 确保完全匹配。
 
-**WebSocket Message Types:**
+**WebSocket 消息类型：**
 
-The `/ws/battle` endpoint pushes these message types to connected clients:
-- `connected` — Initial connection confirmation
-- `state_update` — Full battle state snapshot after every event. Each pet dict includes `base_speed` (exact value from `battle_stats[5]`, set once at battle_enter and never modified — speed buffs should compute from this base)
-- `battle_event` / `battle_events` — Formatted battle event(s) for timeline
-- `battle_summary` — End-of-battle summary (computed at 0x132C)
-- `skill_analysis` — Damage prediction for all equipped skills (with optional `traits`)
-- `hook_advice` — Analysis hook recommendations (energy, switches, opponent patterns)
-- `suggestions` — Simple rule-based suggestions (low HP, low energy, etc.)
+`/ws/battle` 端点向已连接客户端推送以下消息类型：
+- `connected` — 初始连接确认
+- `state_update` — 每次事件后的完整战斗状态快照。每个宠物字典包含 `base_speed`（来自 `battle_stats[5]` 的精确值，在 battle_enter 时设置后不再修改 — 速度 buff 应从此基础值计算）
+- `battle_event` / `battle_events` — 格式化的战斗事件，用于时间线展示
+- `battle_summary` — 战斗结束摘要（在 0x132C 时计算）
+- `skill_analysis` — 所有装备技能的伤害预测（可选包含 `traits`）
+- `hook_advice` — 分析 hook 建议（能量、换宠、对手模式）
+- `suggestions` — 基于规则的简单建议（低 HP、低能量等）
 
-**Sniffer Bridge:**
+**抓包桥接：**
 
-`BattleManager` registers a callback with `SnifferManager` via `_ensure_bridge()`. When the sniffer captures a TGCP DATA packet, the bridge decodes the opcode and dispatches it through the full pipeline (tracker → formatter → analysis → WebSocket push). Only `_LIFECYCLE_OPCODES` (0x1316, 0x131A, 0x132C, 0x0102) and `_IN_BATTLE_OPCODES` are processed.
+`BattleManager` 通过 `_ensure_bridge()` 向 `SnifferManager` 注册回调。当抓包器捕获 TGCP DATA 包时，桥接器解码 opcode 并通过完整管线分发（tracker → formatter → analysis → WebSocket 推送）。仅处理 `_LIFECYCLE_OPCODES`（0x1316, 0x131A, 0x132C, 0x0102）和 `_IN_BATTLE_OPCODES`（18 个战斗内 opcode），与回放路径共用同一集合（定义在 `src/analysis/constants.py`）。
 
-## Testing
+## 测试
 
-Tests live in `tests/` and mirror the module structure. The suite contains **640+ tests** across ~30 test files. Key test areas:
+测试位于 `tests/` 目录，与模块结构对应。套件包含 **640+ 个测试**，覆盖约 30 个测试文件。主要测试领域：
 
-- **Protocol parsing**: `test_opcodes.py`, `test_frame.py`, `test_crypto.py`, `test_skill_extraction.py`, `test_type_extraction.py`
-- **Game mechanics**: `test_type_chart.py` (50 tests), `test_stats.py` (21 tests), `test_skill_eval.py` (8 tests)
-- **Battle state**: `test_battle_state.py`, `test_event_formatter.py`, `test_battle_replay.py`
-- **Damage calculation**: `test_damage_calc.py`, `test_innate_hooks.py` (24 tests), `test_innate_integration.py` (17 end-to-end tests)
-- **Analysis hooks**: `test_hook_registry.py`, `test_hook_opponent_tracker.py`, `test_hook_energy_monitor.py`, `test_hook_switch_advisor.py`
-- **Strategy**: `test_counter.py`, `test_coverage.py`, `test_team_builder.py`, `test_threat.py`
-- **API**: `test_api.py`, `test_replay_api.py`, `test_battle_advisor.py`, `test_battle_advisor_integration.py`
-- **Data**: `test_loader.py`
+- **协议解析**：`test_opcodes.py`, `test_frame.py`, `test_crypto.py`, `test_skill_extraction.py`, `test_type_extraction.py`
+- **游戏机制**：`test_type_chart.py`（50 个测试）, `test_stats.py`（21 个测试）, `test_skill_eval.py`（8 个测试）
+- **战斗状态**：`test_battle_state.py`, `test_event_formatter.py`, `test_battle_replay.py`
+- **伤害计算**：`test_damage_calc.py`, `test_innate_hooks.py`（24 个测试）, `test_innate_integration.py`（17 个端到端测试）
+- **分析 hooks**：`test_hook_registry.py`, `test_hook_opponent_tracker.py`, `test_hook_energy_monitor.py`, `test_hook_switch_advisor.py`
+- **策略**：`test_counter.py`, `test_coverage.py`, `test_team_builder.py`, `test_threat.py`
+- **API**：`test_api.py`, `test_replay_api.py`, `test_battle_advisor.py`, `test_battle_advisor_integration.py`
+- **数据**：`test_loader.py`
 
-Test fixtures are in `tests/fixtures/` (including `packets/battle_session_1/` and `packets/battle_session_2/` for replay testing). All tests use real data, not mocks.
+测试 fixture 位于 `tests/fixtures/`（包含 `packets/battle_session_1/` 和 `packets/battle_session_2/` 用于回放测试）。所有测试使用真实数据，不使用 mock。
 
-### Headless Testing Data Structures
+### 无头测试数据结构
 
-The `BattleReplayRunner` produces structured output via three dataclasses. Understanding these is essential for writing analysis tests:
+`BattleReplayRunner` 通过三个 dataclass 产生结构化输出。理解这些对编写分析测试至关重要：
 
-**`ReplayResult`** (top-level, from `src/analysis/replay_runner.py`):
+**`ReplayResult`**（顶层，来自 `src/analysis/replay_runner.py`）：
 ```python
 @dataclass
 class ReplayResult:
-    total_packets: int                           # Events processed
-    events: List[ReplayEventSnapshot]            # Flat per-event snapshots
-    rounds: List[RoundSnapshot]                  # Per-round aggregation
-    final_state: Dict[str, Any]                  # Final BattleStateTracker state
-    battle_summary: Dict[str, Any]               # From compute_battle_summary()
-    stopped_early: bool                          # Whether stop_round triggered
+    total_packets: int                           # 已处理事件数
+    events: List[ReplayEventSnapshot]            # 逐事件的扁平快照
+    rounds: List[RoundSnapshot]                  # 逐回合聚合
+    final_state: Dict[str, Any]                  # 最终 BattleStateTracker 状态
+    battle_summary: Dict[str, Any]               # 来自 compute_battle_summary()
+    stopped_early: bool                          # 是否因 stop_round 提前停止
 ```
 
-**`RoundSnapshot`** (per-round aggregation):
+**`RoundSnapshot`**（逐回合聚合）：
 - `round_num`, `state_at_start`, `state_at_end`
-- `damage_predictions` — List of per-skill damage prediction dicts
-- `formatted_events` — Aggregated UI-ready event dicts (kind/summary/icon/color)
-- `suggestions` — Aggregated suggestion dicts (type/message)
+- `damage_predictions` — 每个技能的伤害预测字典列表
+- `formatted_events` — 聚合的 UI 就绪事件字典（kind/summary/icon/color）
+- `suggestions` — 聚合的建议字典（type/message）
 
-**`ReplayEventSnapshot`** (per-event, most granular):
+**`ReplayEventSnapshot`**（逐事件，最细粒度）：
 - `opcode`, `kind`, `round_num`
-- `state_before`, `state_after` — Battle state before/after this event
-- `battle_advice` — Dict with `skill_analysis` (damage predictions) and `opp_traits`
-- `hook_advice` — List of dicts (hook_id/title/priority/messages)
-- `suggestions` — List of dicts (type/message)
+- `state_before`, `state_after` — 事件前后的战斗状态
+- `battle_advice` — 包含 `skill_analysis`（伤害预测）和 `opp_traits` 的字典
+- `hook_advice` — 字典列表（hook_id/title/priority/messages）
+- `suggestions` — 字典列表（type/message）
 
-**`ProcessResult`** (from `BattleProcessor.process_event()`):
-- `state` — Updated battle state dict
-- `formatted_events` — List of FormattedEvent
-- `battle_advice` — Skill analysis dict (or None)
-- `hook_advice` — List of hook advice dicts
-- `suggestions` — List of suggestion dicts
+**`ProcessResult`**（来自 `BattleProcessor.process_event()`）：
+- `state` — 更新后的战斗状态字典
+- `formatted_events` — FormattedEvent 列表
+- `battle_advice` — 技能分析字典（或 None）
+- `hook_advice` — hook 建议字典列表
+- `suggestions` — 建议字典列表
 
-**`battle_advice` dict structure** (when present):
-- `skill_analysis` — List of dicts per skill: `skill_name`, `expected_damage`, `can_ko`, `effectiveness`, `effectiveness_label`, `energy_cost`, `hit_count`, `damage_breakdown`, `warnings`
-- `opp_traits` — List of detected opponent innate traits
+**`battle_advice` 字典结构**（当存在时）：
+- `skill_analysis` — 每个技能的字典列表：`skill_name`, `expected_damage`, `can_ko`, `effectiveness`, `effectiveness_label`, `energy_cost`, `hit_count`, `damage_breakdown`, `warnings`
+- `opp_traits` — 检测到的对手天赋特性列表
 
-**`hook_advice` dict structure** (each entry):
-- `hook_id` — e.g., `"opponent_tracker"`, `"energy_monitor"`, `"switch_advisor"`
-- `priority` — 0=urgent, 1=important, 2=info
-- `title` — Human-readable title
-- `messages` — List of dicts with `message` key
+**`hook_advice` 字典结构**（每条记录）：
+- `hook_id` — 如 `"opponent_tracker"`, `"energy_monitor"`, `"switch_advisor"`
+- `priority` — 0=紧急, 1=重要, 2=信息
+- `title` — 可读标题
+- `messages` — 包含 `message` 键的字典列表
 
-### Analysis Test Patterns
+### 分析测试模式
 
-**Pattern 1: Full replay integration test** (tests the entire pipeline with real packets):
+**模式 1：完整回放集成测试**（用真实包测试整个管线）：
 ```python
 from tests.packet_reader import load_battle_packets
 from src.analysis.replay_runner import BattleReplayRunner
@@ -368,10 +374,10 @@ packets = load_battle_packets("tests/fixtures/packets/battle_session_1")
 runner = BattleReplayRunner()
 result = runner.run(packets)
 
-# Assertions on final state
+# 验证最终状态
 assert result.final_state["round"] == 17
 assert result.final_state["result"] == "WIN_HP"
-# Assertions on per-round predictions
+# 验证逐回合预测
 for rs in result.rounds:
     if rs.damage_predictions:
         for pred in rs.damage_predictions:
@@ -379,17 +385,17 @@ for rs in result.rounds:
             assert "can_ko" in pred
 ```
 
-**Pattern 2: Single-event processor test** (tests BattleProcessor with constructed events):
+**模式 2：单事件处理器测试**（用构造的事件测试 BattleProcessor）：
 ```python
 from src.analysis.battle_processor import BattleProcessor
 
 processor = BattleProcessor()
 pr = processor.process_event(0x1316, battle_enter_detail)
 assert len(pr.state["my_pets"]) == 6
-assert pr.formatted_events  # Should produce at least one event
+assert pr.formatted_events  # 应产生至少一个事件
 ```
 
-**Pattern 3: State tracker unit test** (tests state transitions step by step):
+**模式 3：状态追踪器单元测试**（逐步测试状态转换）：
 ```python
 from src.analysis.battle_state import BattleStateTracker
 
@@ -400,61 +406,61 @@ assert state["phase"] == "selecting"
 assert state["my_active"] is not None
 ```
 
-**Pattern 4: Targeted stop-round test** (tests intermediate battle states):
+**模式 4：指定回合停止测试**（测试中间战斗状态）：
 ```python
 runner = BattleReplayRunner()
 result = runner.run(packets, stop_round=5)
 assert result.stopped_early is True
-# Check state at round 5
+# 检查第 5 回合状态
 round5 = result.rounds[-1]
 assert round5.round_num == 5
 ```
 
-**Pattern 5: Flag-based selective testing** (disable expensive computations):
+**模式 5：标志选择性测试**（禁用高开销计算）：
 ```python
 runner = BattleReplayRunner(include_analysis=False, include_hooks=False)
-result = runner.run(packets)  # Only state tracking, no damage/hook computation
+result = runner.run(packets)  # 仅状态追踪，无伤害/hook 计算
 assert result.final_state is not None
 assert all(rs.battle_advice is None for rs in result.rounds)
 ```
 
-### Headless Replay CLI Output Guide
+### 无头回放 CLI 输出指南
 
-`replay_headless` text output structure (one section per round):
+`replay_headless` 文本输出结构（每回合一个区块）：
 ```
 === Round N ===
   My: {name} HP {cur}/{max} Energy {n}  |  Opp: {name} HP {cur}/{max}
-  [kind] summary text                    ← formatted events
-  SUGGEST: [type] message                ← suggestions
-  {skill_name}  dmg: {n} range: [{min}-{max}] eff: {label} [KO]  ← damage predictions
-  HOOK: [hook_id] title                  ← hook advice
+  [kind] summary text                    ← 格式化事件
+  SUGGEST: [type] message                ← 建议
+  {skill_name}  dmg: {n} range: [{min}-{max}] eff: {label} [KO]  ← 伤害预测
+  HOOK: [hook_id] title                  ← hook 建议
     - message text
 ```
 
-JSON output (`--json`, written to `tmp/`): structured `ReplayResult` serialization with all fields above.
+JSON 输出（`--json`，写入 `tmp/`）：结构化的 `ReplayResult` 序列化，包含上述所有字段。
 
-## Reference Repositories
+## 参考仓库
 
-These external repositories are useful references for protocol parsing and game data:
+以下外部仓库是协议解析和游戏数据的有用参考：
 
-All reference repos are cloned locally under `references/`.
+所有参考仓库已克隆到本地 `references/` 目录下。
 
 ### Roco-Kingdom-Protocol-Parser (RKPP)
 
-Local path: `references/Roco-Kingdom-Protocol-Parser/`
+本地路径：`references/Roco-Kingdom-Protocol-Parser/`
 
-洛克王国战斗协议解析器 — the primary reference for battle protocol parsing. Key areas of overlap:
-- **Protocol parsing**: `rkpp_proto_core.py` (proto-tree parsing), `rkpp_proto_battle.py` (battle semantics) — mirrors our `protocol/proto_core.py` and `protocol/battle.py`
-- **Network layer**: `rkpp_network.py` (TCP reassembly, BE21 framing, AES-CBC decryption, key extraction) — mirrors our `capture/` modules
-- **Battle analysis**: `rkpp_analysis.py` (schema-driven field decoding), `rkpp_reporter.py` (battle summaries) — mirrors our `analysis/battle_state.py`
-- **Data**: `Data.py` / `Data/` — runtime data access and offline index data
-- **Server doc**: `Server.md` — server protocol documentation
+洛克王国战斗协议解析器 — 战斗协议解析的主要参考。关键重叠领域：
+- **协议解析**：`rkpp_proto_core.py`（proto-tree 解析）、`rkpp_proto_battle.py`（战斗语义）— 对应我们的 `protocol/proto_core.py` 和 `protocol/battle.py`
+- **网络层**：`rkpp_network.py`（TCP 重组、BE21 帧解析、AES-CBC 解密、密钥提取）— 对应我们的 `capture/` 模块
+- **战斗分析**：`rkpp_analysis.py`（schema 驱动的字段解码）、`rkpp_reporter.py`（战斗摘要）— 对应我们的 `analysis/battle_state.py`
+- **数据**：`Data.py` / `Data/` — 运行时数据访问和离线索引数据
+- **服务器文档**：`Server.md` — 服务器协议文档
 
-Use this repo to cross-reference opcode meanings, protobuf field structures, battle state transitions, and any protocol details not yet covered in our implementation.
+使用此仓库交叉验证 opcode 含义、protobuf 字段结构、战斗状态转换，以及我们实现中尚未覆盖的协议细节。
 
 ### Roco-Kingdom-World-Data
 
-Local path: `references/Roco-Kingdom-World-Data/`
+本地路径：`references/Roco-Kingdom-World-Data/`
 
 洛克王国游戏完整解包数据 — 游戏本地所有配置的真实数据源，包含 676 个 JSON 配置文件 + 64 个 protobuf 定义文件。所有 JSON 统一结构为 `{"RocoDataRows": {"ID": {...}}}`。
 
@@ -581,15 +587,15 @@ Local path: `references/Roco-Kingdom-World-Data/`
 
 ### NRC_AI
 
-Local path: `references/NRC_AI/`
+本地路径：`references/NRC_AI/`
 
-洛克王国战斗 AI 模拟器 — 基于蒙特卡洛树搜索（MCTS）的自动对战模拟系统。最核心的价值在于其**效果引擎**（Effect Engine），对 100+ 种战斗效果原语做了完整的数据驱动实现。Key areas:
-- **效果引擎**: `src/effect_engine.py`（Handler 注册表，执行效果原语）、`src/effect_models.py`（`E` 枚举：100+ 效果原语类型定义）、`src/effect_data.py`（59 个手工配置技能效果 + 68 个特性效果配置）
-- **自动生成效果**: `src/skill_effects_generated.py`（455 个自动生成的技能效果配置）
-- **战斗逻辑**: `src/battle.py`（回合流程、印记系统、状态管理）
-- **数据模型**: `src/models.py`（Pokemon / Skill / BattleState 数据模型）、`src/effect_models.py`（Timing / SkillTiming 触发时机定义）
-- **数据**: `data/nrc.db`（SQLite: 461 精灵 × 495 技能）、`scripts/`（爬虫 / 效果生成器 / 审计工具）
-- **文档**: `docs/COVERAGE_MATRIX.md`（特性覆盖矩阵）、`docs/SKILLS_ABILITIES_CONFIG_GUIDE.md`（配置开发手册）
+洛克王国战斗 AI 模拟器 — 基于蒙特卡洛树搜索（MCTS）的自动对战模拟系统。最核心的价值在于其**效果引擎**（Effect Engine），对 100+ 种战斗效果原语做了完整的数据驱动实现。关键领域：
+- **效果引擎**：`src/effect_engine.py`（Handler 注册表，执行效果原语）、`src/effect_models.py`（`E` 枚举：100+ 效果原语类型定义）、`src/effect_data.py`（59 个手工配置技能效果 + 68 个特性效果配置）
+- **自动生成效果**：`src/skill_effects_generated.py`（455 个自动生成的技能效果配置）
+- **战斗逻辑**：`src/battle.py`（回合流程、印记系统、状态管理）
+- **数据模型**：`src/models.py`（Pokemon / Skill / BattleState 数据模型）、`src/effect_models.py`（Timing / SkillTiming 触发时机定义）
+- **数据**：`data/nrc.db`（SQLite: 461 精灵 × 495 技能）、`scripts/`（爬虫 / 效果生成器 / 审计工具）
+- **文档**：`docs/COVERAGE_MATRIX.md`（特性覆盖矩阵）、`docs/SKILLS_ABILITIES_CONFIG_GUIDE.md`（配置开发手册）
 
 **何时参考此仓库：**
 - 实现或扩展 `innate_hooks.py` 中的天赋/特性伤害修改逻辑时，参考 NRC_AI 的 `effect_data.py` 和 `effect_models.py` 了解特定效果原语的参数格式和行为定义
@@ -598,6 +604,6 @@ Local path: `references/NRC_AI/`
 - 验证技能效果的正确性时，用 `skill_effects_generated.py` 和 `effect_data.py` 交叉比对
 - 需要查找宠物基础数值或技能数据库时，参考 `data/nrc.db` 和 `src/pokemon_db.py` / `src/skill_db.py`
 
-## Language Notes
+## 语言约定
 
-The codebase uses Chinese for UI strings, comments, and docstrings. Game data files use Chinese field names. Preserve this convention when modifying UI or data-related code.
+代码库中的 UI 文本、注释和文档字符串使用中文。游戏数据文件使用中文字段名。修改 UI 或数据相关代码时请保持此约定。

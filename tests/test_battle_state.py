@@ -360,7 +360,7 @@ class TestEnergyRecovery:
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "energy", "target_side": 1, "energy_delta": 2},
         ]))
-        assert state["my_active"]["energy"] == 7  # 5 + 2
+        assert state["my_active"]["energy"] == 10  # 已满能量，delta 被上限截断
 
 
 class TestSpecialRefresh:
