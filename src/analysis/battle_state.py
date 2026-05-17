@@ -732,17 +732,7 @@ class BattleStateTracker:
                 pet_info = PetInfo.from_wrapper(w).to_dict()
                 pet_list.append(pet_info)
                 matched = pet_list[-1]
-            # 更新活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
+            # round_start wrapper 仅包含当前出战精灵，是活跃指针的权威数据
             active_key = "my_active" if is_mine else "opp_active"
-            cur_active = self.state[active_key]
-            if cur_active is None:
+            if matched is not None:
                 self.state[active_key] = matched
-            elif matched is not None:
-                if cur_active is matched:
-                    self.state[active_key] = matched
-                else:
-                    w_bcid = w.get("base_conf_id")
-                    if w_bcid is not None and cur_active.get("base_conf_id") == w_bcid:
-                        self.state[active_key] = matched
-                    elif cur_active.get("name") == matched.get("name") and cur_active.get("name") != "?":
-                        self.state[active_key] = matched
