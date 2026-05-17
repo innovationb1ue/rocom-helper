@@ -6,7 +6,7 @@
 
 ## 前提条件
 
-- 后端运行: `python -m src.main` (端口 8000)
+- 后端运行: `python -m src.main` (端口 8000)（Windows 上使用 `py` 代替 `python`）
 - 前端运行: `cd web && npm run dev` (端口 5173)
 - 浏览器打开 `http://localhost:5173/battle-live`
 
@@ -38,13 +38,16 @@ curl -X POST "http://localhost:8000/api/battle/replay?stop_round=7"
 
 ```bash
 # 默认回放到战斗结束
-python -m scripts.replay_to_frontend --delay 80 --session battle_session_1
+py -m scripts.replay_to_frontend --delay 80 --session battle_session_1
 
 # 回放到 R7 停止
-python -m scripts.replay_to_frontend --delay 80 --round 7
+py -m scripts.replay_to_frontend --delay 80 --round 7
 
 # 回放到 R10 停止
-python -m scripts.replay_to_frontend --delay 80 --round 10
+py -m scripts.replay_to_frontend --delay 80 --round 10
+
+# 指定后端地址
+py -m scripts.replay_to_frontend --delay 80 --host localhost --port 8000
 ```
 
 参数:
@@ -82,7 +85,11 @@ python -m scripts.replay_to_frontend --delay 80 --round 10
 | Session | 目录 | 包数量 | 回合 | 结果 |
 |---------|------|--------|------|------|
 | battle_session_1 | `tests/fixtures/packets/battle_session_1/` | ~176 (过滤后) | 17 | WIN_HP |
-| battle_session_2 | `tests/fixtures/packets/battle_session_2/` | 有数据 | 有 | 有 |
+| battle_session_2 | `tests/fixtures/packets/battle_session_2/` | ~30 (过滤后) | — | — |
+| battle_session_3 | `tests/fixtures/packets/battle_session_3/` | — | — | — |
+| battle_session_4 | `tests/fixtures/packets/battle_session_4/` | — | — | — |
+| battle_session_5 | `tests/fixtures/packets/battle_session_5/` | — | — | — |
+| battle_session_6 | `tests/fixtures/packets/battle_session_6/` | — | — | — |
 
 Session 目录结构:
 ```
@@ -149,3 +156,30 @@ tests/fixtures/packets/battle_session_1/
 3. `delay_ms=0` 时所有包瞬间处理完，前端一次性收到所有更新
 4. 建议用 `delay_ms=100~200` 观察实时效果
 5. 回放可以重复执行，每次都会重置状态
+
+## 无头回放
+
+不需要启动服务器和前端，纯后端回放：
+
+```bash
+# 文本摘要输出
+py -m scripts.replay_headless --session battle_session_1
+
+# JSON 输出（写入 tmp/ 目录）
+py -m scripts.replay_headless --session battle_session_1 --json
+
+# 在指定回合停止
+py -m scripts.replay_headless --session battle_session_1 --round 7
+```
+
+输出包含：每回合事件摘要、伤害预测、建议、hook 建议、最终状态。
+
+## 战斗报告
+
+生成格式化的战斗报告文件：
+
+```bash
+py -m scripts.generate_battle_report --json
+```
+
+输出包含完整的回合分析、伤害对比和战斗总结。

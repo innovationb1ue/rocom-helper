@@ -99,7 +99,7 @@ TCP 传输不保证包按序到达，且可能重传。`FlowState` 维护双向�
 
 1. 监听 `0x1002`（ACK）帧
 2. 从帧的 `header_extra` 字段的第 2~18 字节提取 16 字节密钥
-3. 密钥写入 `session_key.txt`，支持手动预设
+3. 密钥写入 `logs/session_key.txt`，支持手动预设
 
 ```python
 # 密钥位于 ACK 帧的 header_extra[2:18]
@@ -156,7 +156,8 @@ state = {
     "battle_mode": ...,      # 战斗模式
     "round": 0,              # 当前回合
     "max_round": 0,          # 最大回合
-    "weather_id": ...,       # 天气
+    "phase": "idle",         # idle | selecting | resolving | finished
+    "weather": {"id": None, "name": None, "expire_round": None},  # 天气
     "my_pets": [...],        # 我方精灵列表
     "opp_pets": [...],       # 敌方精灵列表
     "my_active": {...},      # 我方上场精灵
@@ -178,8 +179,21 @@ state = {
     "hp_pct": 0.8,           # HP 百分比 (0.0~1.0)
     "energy": 5,              # 能量 (0~10)
     "buffs": [...],           # 增益/减益状态
+    "initial_buff_ids": [...], # 初始 buff ID 列表
+    "innate_skill_id": ...,   # 天赋技能 ID
+    "level": ...,             # 等级
+    "slot": ...,              # 槽位 (1-6 或 401-406)
+    "side": ...,              # 侧 (1=我方, 401=敌方)
+    "stats": [...],           # 属性列表
+    "skills": [...],          # 技能列表
+    "equipped_skills": [...], # 已装备技能（仅我方可用）
+    "base_id": ...,           # 基础 ID
+    "base_conf_id": ...,      # 基础配置 ID（进化阶段 petbase ID）
+    "base_skill_pool": [...], # 完整技能池（按 base_id 查询）
     "combo_bonus": 0,         # 连击数修正值（combo_skill_cast 事件更新）
     "poison_stacks": 0,       # 中毒层数（effect_apply 事件更新）
+    "used_skills": [...],     # 对手已使用技能（逐步累积）
+    "base_speed": ...,        # 基础速度（battle_stats[5]，战斗中不变）
 }
 ```
 
@@ -234,7 +248,7 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 
 #### 先天技能 Hook
 
-`innate_hooks.py` 提供四个 Hook 函数，由 `register_innate_hooks()` 注册：
+`innate_hooks.py` 提供五个 Hook 函数，由 `register_innate_hooks()` 注册：
 
 | Hook 函数 | 注册阶段 | effect_type | 效果 |
 |-----------|---------|-------------|------|
@@ -242,8 +256,9 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 | `type_resist_modify_hook` | pre_final | type_resist_modify | 提升属性克制倍率下限（如无视抵抗） |
 | `combo_modify_hook` | post_calc | combo_modify | 增加连击次数，总伤害 = 单次 × 连击 |
 | `power_modify_hook` | post_calc | power_modify | 附加效果如先手吸血 |
+| `damage_reduction_hook` | pre_final | damage_reduction | 根据防守方 buff 减伤（80/50%减伤等） |
 
-支持触发条件：`always`、`per_poison_stack`、`skill_element_used`、`hp_below`、`first_strike`
+支持触发条件：`always`、`per_poison_stack`、`skill_element_used`、`hp_below`、`first_strike`、`specific_skill`
 
 #### BattleAdvisor
 
@@ -303,6 +318,9 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 // 状态更新（每次事件后推送）
 {"type": "state_update", "state": {...}}
 
+// 查询状态响应
+{"type": "state", "state": {...}}
+
 // 格式化战斗事件
 {"type": "battle_event", "event": {...}}
 {"type": "battle_events", "events": [{...}, ...]}
@@ -311,7 +329,7 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 {"type": "suggestions", "suggestions": [{"type": "low_hp", "message": "..."}]}
 
 // 伤害预测分析
-{"type": "skill_analysis", "skills": [...], "traits": [...], "opp_traits": [...]}
+{"type": "skill_analysis", "skills": [...], "traits": [...], "opp_traits": [...], "opp_skill_analysis": [...], "opp_skill_source": "protocol"|"used"|"preset"|""}
 
 // 分析 Hook 建议
 {"type": "hook_advice", "advice": [{"hook_id": "...", "priority": 0, "title": "...", "messages": [...]}]}
@@ -322,6 +340,15 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 // 克制推荐
 {"type": "counter_pick", "opponent": {...}}
 ```
+
+#### REST 端点
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/battle/state` | 获取当前战斗状态 |
+| GET | `/api/battle/pets` | 获取双方精灵列表 |
+| GET | `/api/battle/effects` | 获取天气/buff 信息 |
+| POST | `/api/battle/replay` | 回放战斗包（参数：delay_ms, session, stop_round） |
 
 ### 2.8 Web 前端
 
@@ -384,7 +411,7 @@ npm run dev
 
 ### 3.6 （可选）预设密钥
 
-如果自动密钥提取失败，可手动创建 `session_key.txt`：
+如果自动密钥提取失败，可手动创建 `logs/session_key.txt`：
 
 ```
 key_hex=0123456789abcdef0123456789abcdef
@@ -444,6 +471,12 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 游戏逻辑 | `src/game/stats.py` | 种族值/能力值计算（HP + 5 属性公式） |
 | 游戏逻辑 | `src/game/skill_eval.py` | 技能评分引擎 |
 | API | `src/api/routes_battle.py` | WebSocket 战斗端点 |
+| 分析 | `src/analysis/battle_processor.py` | 纯同步事件处理器（状态 + 格式化 + 伤害 + hooks） |
+| 分析 | `src/analysis/pet_info.py` | 宠物信息构造工厂（from_wrapper/from_change_pet → to_dict） |
+| 分析 | `src/analysis/event_formatter.py` | 协议事件 → UI 格式化事件 |
+| 分析 | `src/analysis/constants.py` | Opcode 常量、集合、标签集中管理 |
+| API | `src/api/sniffer_manager.py` | 抓包器生命周期管理、密钥持久化 |
+| API | `src/api/battle_manager.py` | 全局单例：抓包桥接、WS 推送、hook 分发 |
 | API | `src/api/app.py` | FastAPI 应用入口 |
 | 入口 | `src/main.py` | Uvicorn 启动脚本 |
 | 前端 | `web/src/pages/BattleLive.tsx` | 实时战斗页面 |

@@ -88,8 +88,8 @@ py -m scripts.extract_battle --session <id> --extract 1 --output my_battle
 ```
 tests/fixtures/packets/battle_session_N/
 ├── _session.json                          # 元数据
-├── 20260516_0x4013_201254.123.bin         # 时间窗口内的所有 .bin 包
-├── 20260516_0x4013_201255.456.bin
+├── s2c_0x4013_0001_201254.123.bin         # 时间窗口内的所有 .bin 包
+├── c2s_0x1001_0002_201255.456.bin
 └── ...
 ```
 
@@ -100,10 +100,10 @@ tests/fixtures/packets/battle_session_N/
   "session_start": "2026-05-16T20:15:00",
   "session_id": "battle_session_4",
   "source_session": "2026-05-16_20-12-54_monitor",
-  "source_path": "logs/packets/2026-05-16_20-12-54_monitor",
+  "source_path": "logs\\packets\\2026-05-16_20-12-54_monitor",
   "battle_index": 1,
-  "enter_file": "20260516_0x4013_201254.123.bin",
-  "finish_file": "20260516_0x4013_201345.789.bin",
+  "enter_file": "s2c_0x4013_0042_201254.123.bin",
+  "finish_file": "s2c_0x4013_0198_201345.789.bin",
   "enter_ts": "20:12:54.123",
   "finish_ts": "20:13:45.789",
   "pad_before": 5.0,

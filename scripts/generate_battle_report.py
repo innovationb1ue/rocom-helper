@@ -120,7 +120,13 @@ def generate_report(session_dir: Path, stop_round: Optional[int] = None) -> str:
                 max_hp = pet.get("max_hp", 0)
                 energy = pet.get("energy", 0)
                 hp_str = f"HP {hp}/{max_hp}" if max_hp > 0 else f"HP {hp}"
-                lines.append(f"  {label}: {name}  {hp_str}  能量={energy}")
+                spd = pet.get("effective_speed") or pet.get("base_speed")
+                base_spd = pet.get("base_speed")
+                if spd is not None:
+                    spd_str = f"  速度={spd}" if spd == base_spd or base_spd is None else f"  速度={spd}(base {base_spd})"
+                else:
+                    spd_str = ""
+                lines.append(f"  {label}: {name}  {hp_str}  能量={energy}{spd_str}")
 
         # Formatted events
         if rs.formatted_events:

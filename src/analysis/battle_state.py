@@ -35,13 +35,17 @@ POISON_BUFF_IDS = {20070010}
 
 
 def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
-    """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正)，最低 1。"""
+    """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正 + 属性等级修正)，最低 1。"""
     base = pet.get("base_speed")
     if base is None:
         return None
-    from src.data.loader import get_speed_buff_modifiers
-    mods = get_speed_buff_modifiers(pet.get("buffs", []))
-    effective = (base + mods.get("flat_total", 0)) * (1.0 + mods.get("pct_total", 0.0))
+    from src.data.loader import get_buff_stat_modifiers, get_speed_buff_modifiers
+    speed_mods = get_speed_buff_modifiers(pet.get("buffs", []))
+    stat_mods = get_buff_stat_modifiers(pet.get("buffs", []))
+    pct = (speed_mods.get("pct_total", 0.0)
+           + stat_mods.get("spd_up", 0.0)
+           - stat_mods.get("spd_down", 0.0))
+    effective = (base + speed_mods.get("flat_total", 0)) * (1.0 + pct)
     return max(1, int(round(effective)))
 
 

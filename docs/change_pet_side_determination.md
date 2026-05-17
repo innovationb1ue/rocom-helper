@@ -56,17 +56,26 @@ message BattleChangePet {
 
 `player_id` 等于 `creater_uin`（房主）或对手的某种 ID。格式取决于服务器版本或对手类型，不能作为可靠的 side 判断依据。
 
-## 当前解决方案
+## 当前实现
 
-`_handle_change_pet_entry` 使用多级判断链：
+`_handle_change_pet_entry`（`src/analysis/battle_state.py`）使用 6 级判断链确定换宠侧边：
 
-1. 用 `rest_pet_id` 匹配已知 `opp_pets`/`my_pets`（通过 pet_id）
-2. 用 `new_pet_id` 匹配已知宠物列表
-3. 用已知 slot 映射
-4. 用当前活跃宠物匹配
-5. Fallback: `target_side >= 401`
+1. 用 `rest_pet_id`（被换下的宠物）匹配已知 `opp_pets`/`my_pets`（通过 `pet_id` 和 `base_conf_id`）
+2. 用 `new_pet_id`（换上的宠物）匹配已知列表（排除通用 ID 20000000）
+3. 用已建立的 slot 映射（`_opponent_slots`/`_player_slots` 集合）
+4. 用当前活跃宠物的 `pet_id`/`base_conf_id` 匹配 `rest_pet_id`
+5. Fallback: `target_side >= 401`（从 `_extract_actor_target` 提取的字段）
+6. Final fallback: `battle_pet_id >= 401`
 
-同时维护 `_position_side` 缓存避免重复匹配。
+每次确定侧边后，将 `battle_pet_id` 记入 `_opponent_slots` 或 `_player_slots` 集合，供后续换宠事件使用。
+
+换上的宠物匹配也使用多级策略：优先 `base_conf_id`，其次 `pet_id`（排除 20000000），最后名称匹配。未知宠物通过 `PetInfo.from_change_pet()` 创建新条目。
+
+### 关键实现细节
+
+- `base_conf_id` 匹配至关重要：对手 `pet_id` 可能是通用值 20000000，但 `base_conf_id`（进化阶段 petbase ID）始终可用
+- `_opponent_slots`/`_player_slots` 是持久化的 slot 集合，跨回合有效
+- 换宠后还会从协议数据更新新宠物的 HP、能量、buff、battle_stats 等信息
 
 ## wrapper side vs change_pet 位置编号
 

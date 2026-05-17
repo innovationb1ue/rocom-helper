@@ -724,3 +724,80 @@ class TestNotifyPerform:
         assert notifs[0]["notify_type"] == 1
         assert notifs[0]["notify_data"] == [3, 5]
 
+
+# ── 有效速度计算测试 ──────────────────────────────────────────────
+
+def _make_speed_pet(base_speed, buffs=None):
+    """构造带速度信息的宠物字典，用于 _compute_effective_speed 测试。"""
+    return {
+        "pet_id": 100, "name": "Speedy", "types": [1],
+        "current_hp": 300, "max_hp": 300, "hp_pct": 1.0,
+        "energy": 5, "buffs": buffs or [],
+        "base_speed": base_speed,
+    }
+
+
+class TestEffectiveSpeed:
+    """测试 _compute_effective_speed 包含直接速度和属性等级速度修正。"""
+
+    def test_no_buffs_effective_equals_base(self):
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(200)
+        assert _compute_effective_speed(pet) == 200
+
+    def test_none_base_speed(self):
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(None)
+        assert _compute_effective_speed(pet) is None
+
+    def test_stat_spd_up_only(self):
+        """buff 20010060 (魔防等级提升10) 只有 spd_up=0.1。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(100, [{"id": 20010060, "stage": 1}])
+        assert _compute_effective_speed(pet) == 110
+
+    def test_stat_spd_down_only(self):
+        """buff 20010080 (魔防等级降低10) 只有 spd_down=0.1。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(100, [{"id": 20010080, "stage": 1}])
+        assert _compute_effective_speed(pet) == 90
+
+    def test_stat_spd_up_and_down_cancel(self):
+        """spd_up 和 spd_down 等量抵消。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(100, [
+            {"id": 20010060, "stage": 1},
+            {"id": 20010080, "stage": 1},
+        ])
+        assert _compute_effective_speed(pet) == 100
+
+    def test_stage_multiplies_stat_mod(self):
+        """stage=2 使属性等级效果翻倍。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(100, [{"id": 20010060, "stage": 2}])
+        assert _compute_effective_speed(pet) == 120
+
+    def test_minimum_speed_is_one(self):
+        """极端负修正不会让速度低于 1。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(5, [{"id": 20010080, "stage": 10}])
+        assert _compute_effective_speed(pet) == 1
+
+    def test_combined_direct_and_stat(self):
+        """直接速度 + 属性等级速度组合计算。"""
+        from src.analysis.battle_state import _compute_effective_speed
+        pet = _make_speed_pet(100, [
+            {"id": 20010100, "stage": 1},
+            {"id": 20010060, "stage": 1},
+        ])
+        # (100 + 10) * (1.0 + 0.1) = 121
+        assert _compute_effective_speed(pet) == 121
+
+    def test_effective_speed_in_state_snapshot(self):
+        """get_state() 的快照中包含 effective_speed。"""
+        tracker = BattleStateTracker()
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.get_state()
+        my = state["my_active"]
+        assert my.get("effective_speed") is None
+

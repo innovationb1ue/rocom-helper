@@ -284,6 +284,7 @@ record 结构核心字段：
 结果码映射 (`BATTLE_RESULT_MAP`)：
 | 码 | 结果 |
 |----|------|
+| 0 | NULL |
 | 2 | WIN |
 | 4 | LOSE |
 | 10 | MONSTER_RUNAWAY |
@@ -291,7 +292,10 @@ record 结构核心字段：
 | 18 | WIN_DEFEAT |
 | 34 | WIN_CATCH |
 | 66 | WIN_HP |
+| 68 | LOSE_HP |
+| 132 | MONSTER_ESCAPE |
 | 260 | RUNAWAY_ROLE_MAGIC |
+| 516 | MONSTER_ESCAPE2 |
 
 ---
 
@@ -307,7 +311,8 @@ state = {
     "battle_mode": int | None,
     "round": int,                   # 当前回合
     "max_round": int,
-    "weather_id": int | None,
+    "phase": str,              # "idle" | "selecting" | "resolving" | "finished"
+    "weather": {"id": int | None, "name": str | None, "expire_round": int | None},
     "result": "WIN" | "LOSE" | ... | None,
     "my_pets": [pet_info, ...],     # 我方所有精灵
     "opp_pets": [pet_info, ...],    # 敌方所有精灵
@@ -328,9 +333,22 @@ state = {
     "max_hp": int,
     "hp_pct": float,               # 0.0 ~ 1.0
     "energy": int,                  # 当前能量
-    "buffs": [],
+    "buffs": [],                    # 当前 buff 列表
+    "initial_buff_ids": [int],      # 初始 buff ID
+    "innate_skill_id": int | None,  # 天赋技能 ID
+    "level": int | None,
+    "slot": int | None,             # 槽位 (1-6 或 401-406)
+    "side": int | None,             # 1=我方, 401=敌方
+    "stats": [],                    # 属性列表
+    "skills": [],                   # 技能列表
+    "equipped_skills": [],          # 已装备技能（仅我方可用）
+    "base_id": int | None,          # 基础 ID
+    "base_conf_id": int | None,     # 基础配置 ID
+    "base_skill_pool": list | None, # 完整技能池
     "combo_bonus": int,             # 连击数修正值（combo_skill_cast 事件更新，换宠时重置）
     "poison_stacks": int,           # 中毒层数（effect_apply 中 POISON_BUFF_IDS 事件更新）
+    "used_skills": [],              # 对手已使用技能
+    "base_speed": int | None,       # 基础速度（battle_stats[5]，战斗中不变）
 }
 ```
 
@@ -462,6 +480,7 @@ result = calc.calculate(
     attacker={"types": [1], "current_hp": 200, "max_hp": 300, ...},
     defender={"types": [2], "max_hp": 250, "current_hp": 250, ...},
     skill_meta=get_skill_meta(7700001),
+    weather=None,  # 可选，天气对象 {"id": ..., ...}
 )
 # result: DamageResult 或 None（非攻击技能）
 # result.hit_count — 连击数
@@ -470,11 +489,14 @@ result = calc.calculate(
 ```
 
 `DamageResult` 关键字段:
-- `min_damage` / `max_damage`: 单次命中伤害
+- `expected_damage`: 确定性伤害值（主要字段）
+- `min_damage` / `max_damage`: 向后兼容别名，均等于 `expected_damage`
 - `hit_count`: 连击次数（默认 1）
-- `total_min_damage` / `total_max_damage`: 总伤害 = 单次 × 连击
+- `total_min_damage` / `total_max_damage`: 向后兼容别名 = `expected_damage * hit_count`
 - `can_ko`: 总伤害是否 >= 目标当前 HP
 - `effectiveness` / `effectiveness_label`: 属性克制倍率
+- `damage_breakdown`: 详细计算分步
+- `warnings`: 警告列表（如能量不足）
 - `confidence`: "high" (抓包数据) 或 "medium" (wiki 估算)
 
 4 阶段 Hook 管线:
@@ -492,6 +514,7 @@ result = calc.calculate(
 |-----------|---------|-------------|------|
 | `stat_modify_hook` | post_base | stat_modify | HP 低于阈值时百分比提升伤害 |
 | `type_resist_modify_hook` | pre_final | type_resist_modify | 提升属性克制倍率下限 |
+| `damage_reduction_hook` | pre_final | damage_reduction | 根据防守方 buff 减伤（如 80/50%减伤） |
 | `combo_modify_hook` | post_calc | combo_modify | 增加连击次数 |
 | `power_modify_hook` | post_calc | power_modify | 附加效果如先手吸血 |
 

@@ -49,6 +49,9 @@ def _print_summary(result) -> None:
                 max_hp = pet.get("max_hp", 0)
                 energy = pet.get("energy", 0)
                 spd = pet.get("effective_speed") or pet.get("base_speed") or "?"
+                base_spd = pet.get("base_speed")
+                if spd != "?" and base_spd is not None and spd != base_spd:
+                    spd = f"{spd} (base {base_spd})"
                 print(f"  {label}: {name}  HP {hp}/{max_hp}  EP={energy}  SPD={spd}")
 
         # Formatted events
