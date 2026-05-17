@@ -154,12 +154,11 @@ class BattleProcessor:
         """opcode → HookTrigger 映射。0x1324 额外检查 entries 中的 kind。"""
         triggers = list(_OPCODE_TRIGGER_MAP.get(opcode, []))
         if opcode == OPCODE_ACTION_RESOLVE:
-            for entry in detail.get("entries", []):
-                kind = entry.get("kind")
-                if kind == "change_pet":
-                    triggers.append(HookTrigger.ON_CHANGE_PET)
-                elif kind == "defeat":
-                    triggers.append(HookTrigger.ON_DEFEAT)
+            kinds = {entry.get("kind") for entry in detail.get("entries", [])}
+            if "change_pet" in kinds:
+                triggers.append(HookTrigger.ON_CHANGE_PET)
+            if "defeat" in kinds:
+                triggers.append(HookTrigger.ON_DEFEAT)
         return triggers
 
     # ------------------------------------------------------------------

@@ -40,13 +40,13 @@ py -m scripts.replay_to_frontend --delay 80 --session battle_session_1 --round 7
 ```
 
 ### 战斗包提取
+
+详细文档见 [`docs/extract_battle.md`](docs/extract_battle.md)。
+
 ```bash
-py -m scripts.extract_battle --session 2026-05-16_20-12-54_monitor        # 列出原始抓包中的战斗
-py -m scripts.extract_battle --session battle_session_3                    # 列出 fixture 中的战斗
-py -m scripts.extract_battle --session <id> --extract 1                   # 提取第 1 场战斗到测试 fixture
-py -m scripts.extract_battle --session <id> --extract all                 # 提取所有战斗
-py -m scripts.extract_battle --session <id> --extract 1 --verify         # 提取并验证正确性
-py -m scripts.extract_battle --session <id> --extract 1 --pad-before 10 --pad-after 5  # 自定义前后填充
+py -m scripts.extract_battle --session <id>                 # 列出战斗
+py -m scripts.extract_battle --session <id> --extract 1     # 提取第 1 场
+py -m scripts.extract_battle --session <id> --extract all   # 提取所有
 ```
 
 ### 前端（在 `web/` 目录下）
@@ -283,9 +283,7 @@ idle → selecting（0x1316 battle_enter）→ resolving（0x131A round_start）
   → finished（0x132C battle_finish）
 ```
 
-**战斗提取：**
-
-`scripts/extract_battle.py` 从原始抓包会话中提取单场战斗到测试 fixture。它扫描 `.bin` 文件元数据中的 `0x1316`/`0x132C` opcode 对来检测战斗边界，然后将时间窗口内的所有包（可配置前后填充）复制到 `tests/fixtures/packets/battle_session_N/`。验证步骤对原始（过滤到时间窗口）和提取的包分别运行 `BattleReplayRunner`，比较 `final_state` 和 `battle_summary` 确保完全匹配。
+**战斗提取：** 从抓包会话中检测战斗边界并提取到测试 fixture，详见 [`docs/extract_battle.md`](docs/extract_battle.md)。
 
 **WebSocket 消息类型：**
 

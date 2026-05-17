@@ -435,11 +435,13 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
         return None
     slot = pick_first(collect_varints(msg, 1), low=0, high=999)
     pid = pick_first(collect_varints(msg, 2), low=1000)
+    base_conf_id = pick_first(collect_varints(msg, 15))
     stats = extract_stats(msg)
     all_skills = extract_skills(msg)
     equipped = [it for it in all_skills if 1 <= it["equipped_slot"] <= 4]
     out: Dict[str, Any] = {
         "name": name, "level": level, "slot": slot, "pet_id": pid,
+        "base_conf_id": base_conf_id,
         "types": [SDT_TO_TYPE.get(v, v) for v in collect_varints(msg, 6)],
         "stats": stats, "max_hp": stats[0]["total"] if stats else None,
         "skills": all_skills,
@@ -551,6 +553,7 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "initial_buffs": initial_buffs,
         "passive_skill_id": passive_skill_id,
         "base_id": creature.get("base_id"),
+        "base_conf_id": creature.get("base_conf_id"),
         "base_skill_pool": creature.get("base_skill_pool"),
         "source_opcode": record["opcode"], "source_opcode_hex": record.get("opcode_hex", ""),
         "seq": record.get("seq"), "path": path,

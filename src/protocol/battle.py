@@ -626,6 +626,7 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                     out["new_pet_name"] = first_text(info_sub, 3)
                     out["new_pet_types"] = [SDT_TO_TYPE.get(v, v) for v in collect_varints(info_sub, 6)]
                     out["new_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
+                    out["new_pet_base_conf_id"] = pick_first(collect_varints(info_sub, 15))
                 # pet_state sub (field 1 of wrapper) = BattleInsidePetInfo
                 state_sub = first_sub(pwg.get(1, []))
                 if state_sub:

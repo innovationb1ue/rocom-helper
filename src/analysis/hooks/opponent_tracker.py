@@ -33,6 +33,7 @@ class OpponentTrackerHook(AnalysisHook):
         self._opp_skill_counts: Dict[str, Counter] = {}  # pet_name -> {skill_name: count}
         self._opp_switch_log: List[Dict[str, Any]] = []
         self._total_rounds: int = 0
+        self._last_switch_key: Optional[tuple] = None
 
     def reset(self) -> None:
         self._reset_state()
@@ -57,13 +58,16 @@ class OpponentTrackerHook(AnalysisHook):
             for entry in ctx.entries:
                 if entry.get("kind") == "change_pet":
                     new_name = entry.get("new_pet_name", "?")
-                    opp_active = ctx.state.get("opp_active", {})
-                    hp_pct = opp_active.get("hp_pct", 1.0)
-                    self._opp_switch_log.append({
-                        "round": ctx.round_num,
-                        "new_pet": new_name,
-                        "prev_hp_pct": round(hp_pct, 2),
-                    })
+                    key = (ctx.round_num, new_name)
+                    if key != self._last_switch_key:
+                        opp_active = ctx.state.get("opp_active", {})
+                        hp_pct = opp_active.get("hp_pct", 1.0)
+                        self._opp_switch_log.append({
+                            "round": ctx.round_num,
+                            "new_pet": new_name,
+                            "prev_hp_pct": round(hp_pct, 2),
+                        })
+                        self._last_switch_key = key
 
         if not messages:
             return None

@@ -313,28 +313,35 @@ class BattleStateTracker:
         battle_pet_id = entry.get("battle_pet_id")
         new_pet_name = entry.get("new_pet_name")
         new_pet_id = entry.get("new_pet_id")
+        new_base_conf_id = entry.get("new_pet_base_conf_id")
         if battle_pet_id is None:
             return
 
-        # Determine side by pet identity, not slot number range.
+        # 使用 base_conf_id 匹配宠物列表确定侧边（比 pet_id 更可靠）
         is_opp = None
-        if new_pet_id is not None:
+        if new_base_conf_id is not None:
+            in_my = any(p.get("base_conf_id") == new_base_conf_id for p in self.state["my_pets"])
+            in_opp = any(p.get("base_conf_id") == new_base_conf_id for p in self.state["opp_pets"])
+            if in_my and not in_opp:
+                is_opp = False
+            elif in_opp and not in_my:
+                is_opp = True
+        # Fallback: pet_id 匹配（排除 20000000）
+        if is_opp is None and new_pet_id is not None and new_pet_id != 20000000:
             in_my = any(p.get("pet_id") == new_pet_id for p in self.state["my_pets"])
             in_opp = any(p.get("pet_id") == new_pet_id for p in self.state["opp_pets"])
             if in_my and not in_opp:
                 is_opp = False
             elif in_opp and not in_my:
                 is_opp = True
-
-        # New pet not in either list: use rest_pet_id (the pet being benched)
+        # Fallback: 已知的 slot 映射
         if is_opp is None:
-            rest_pet_id = entry.get("rest_pet_id")
-            if rest_pet_id in self._opponent_slots:
+            bpid = int(battle_pet_id)
+            if bpid in self._opponent_slots:
                 is_opp = True
-            elif rest_pet_id in self._player_slots:
+            elif bpid in self._player_slots:
                 is_opp = False
-
-        # Fallback: numeric range
+        # Final fallback: numeric range
         if is_opp is None:
             bpid = int(battle_pet_id)
             is_opp = bpid >= 401
@@ -352,13 +359,19 @@ class BattleStateTracker:
         if active is not None:
             entry["_prev_active_name"] = active.get("name", "?")
         matched = None
-        # Match by real pet_id
-        if new_pet_id is not None:
+        # 优先用 base_conf_id 匹配（始终可用，即使 pet_id=20000000）
+        if new_base_conf_id is not None:
+            for pet in pet_list:
+                if pet.get("base_conf_id") == new_base_conf_id:
+                    matched = pet
+                    break
+        # 其次用 pet_id 匹配（对手可能在之前的 change_pet 中已更新真实 conf_id）
+        if matched is None and new_pet_id is not None and new_pet_id != 20000000:
             for pet in pet_list:
                 if pet.get("pet_id") == new_pet_id:
                     matched = pet
                     break
-        # Match by name
+        # 名称匹配作为兜底
         if matched is None and new_pet_name:
             for pet in pet_list:
                 if pet.get("name") == new_pet_name:
@@ -374,9 +387,17 @@ class BattleStateTracker:
             matched = PetInfo.from_change_pet(entry, battle_pet_id, is_opp).to_dict()
             pet_list.append(matched)
         if matched is not None:
+            # 如果获得了真实的 conf_id，更新宠物记录（从 20000000 更新为真实值）
+            if new_pet_id is not None and new_pet_id != 20000000:
+                if matched.get("pet_id") == 20000000:
+                    matched["pet_id"] = new_pet_id
+            # 同样更新 base_conf_id
+            if new_base_conf_id is not None and matched.get("base_conf_id") is None:
+                matched["base_conf_id"] = new_base_conf_id
             self.state[active_key] = matched
             matched["buffs"] = []
             matched["combo_bonus"] = 0
+            matched["poison_stacks"] = 0
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []
@@ -606,9 +627,8 @@ class BattleStateTracker:
     # 匹配逻辑（按优先级）:
     #   1. pet_id 精确匹配（通用对手ID 20000000 需要二次匹配 slot/name）
     #   2. 未匹配则创建新条目
-    # 每侧仅第一个 wrapper 更新 active 指针（通过 seen_sides 去重）
+    # 活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
     def _update_pets_from_wrappers(self, wrappers: List[Dict[str, Any]]) -> None:
-        seen_sides: set = set()
         for w in wrappers:
             side = w.get("side")
             is_mine = (side == 1 or side == "我方")
@@ -632,6 +652,8 @@ class BattleStateTracker:
                         pet["stats"] = w["stats"]
                     if w.get("base_id") is not None:
                         pet["base_id"] = w["base_id"]
+                    if w.get("base_conf_id") is not None:
+                        pet["base_conf_id"] = w["base_conf_id"]
                     if w.get("base_skill_pool") is not None:
                         pet["base_skill_pool"] = w["base_skill_pool"]
                     # 刷新先天特性
@@ -663,18 +685,20 @@ class BattleStateTracker:
                         pet["types"] = w["types"]
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
-                    # Keep active reference pointing to the same dict in pet_list
-                    active_key = "my_active" if is_mine else "opp_active"
-                    cur_active = self.state[active_key]
-                    if cur_active is not None and cur_active.get("pet_id") == pet.get("pet_id"):
-                        self.state[active_key] = pet
                     break
             if matched is None:
                 pet_info = PetInfo.from_wrapper(w).to_dict()
                 pet_list.append(pet_info)
                 matched = pet_list[-1]
-            # Update active pet only for first wrapper per side
+            # 更新活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
             active_key = "my_active" if is_mine else "opp_active"
-            if side not in seen_sides:
-                seen_sides.add(side)
-                self.state[active_key] = matched
+            cur_active = self.state[active_key]
+            if cur_active is not None and matched is not None:
+                if cur_active is matched:
+                    self.state[active_key] = matched
+                else:
+                    w_bcid = w.get("base_conf_id")
+                    if w_bcid is not None and cur_active.get("base_conf_id") == w_bcid:
+                        self.state[active_key] = matched
+                    elif cur_active.get("name") == matched.get("name") and cur_active.get("name") != "?":
+                        self.state[active_key] = matched

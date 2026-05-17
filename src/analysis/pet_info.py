@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from src.data.loader import get_pet_meta, get_pet_skill_meta
+
 
 class PetInfo:
     """宠物战斗信息构造器。"""
@@ -15,7 +17,7 @@ class PetInfo:
         "pet_id", "name", "types", "current_hp", "max_hp", "hp_pct",
         "energy", "buffs", "initial_buff_ids", "innate_skill_id",
         "level", "slot", "side", "stats", "skills", "equipped_skills",
-        "base_id", "base_skill_pool", "combo_bonus", "poison_stacks",
+        "base_id", "base_conf_id", "base_skill_pool", "combo_bonus", "poison_stacks",
         "used_skills", "base_speed",
     )
 
@@ -37,6 +39,7 @@ class PetInfo:
         self.skills: List[Dict[str, Any]] = []
         self.equipped_skills: List[Dict[str, Any]] = []
         self.base_id: Any = None
+        self.base_conf_id: Any = None
         self.base_skill_pool: Any = None
         self.combo_bonus: int = 0
         self.poison_stacks: int = 0
@@ -68,6 +71,7 @@ class PetInfo:
             "skills": self.skills,
             "equipped_skills": self.equipped_skills,
             "base_id": self.base_id,
+            "base_conf_id": self.base_conf_id,
             "base_skill_pool": self.base_skill_pool,
             "combo_bonus": self.combo_bonus,
             "poison_stacks": self.poison_stacks,
@@ -97,6 +101,7 @@ class PetInfo:
         pet.skills = w.get("skills", [])
         pet.equipped_skills = equipped
         pet.base_id = w.get("base_id")
+        pet.base_conf_id = w.get("base_conf_id")
         pet.base_skill_pool = w.get("base_skill_pool")
         # 从 battle_stats[5] 提取基础速度（含性格/个体/努力值，战斗中不变）
         battle_stats = w.get("battle_stats") or []
@@ -132,5 +137,16 @@ class PetInfo:
             pet.base_speed = battle_stats[5]
         if entry.get("new_pet_passive_skill_id") is not None:
             pet.innate_skill_id = entry["new_pet_passive_skill_id"]
+        # 从协议数据提取 base_conf_id（PetData field 15，进化阶段 petbase ID）
+        if entry.get("new_pet_base_conf_id") is not None:
+            pet.base_conf_id = entry["new_pet_base_conf_id"]
+        # 查找 base_id（通过 conf_id → pet_meta → base_id）
+        if pet.pet_id is not None and pet.pet_id != 20000000:
+            pet_meta_data = get_pet_meta(pet.pet_id)
+            if isinstance(pet_meta_data, dict) and pet_meta_data.get("base_id") is not None:
+                pet.base_id = pet_meta_data["base_id"]
+                skill_pool = get_pet_skill_meta(pet.base_id)
+                if isinstance(skill_pool, dict):
+                    pet.base_skill_pool = skill_pool.get("level_skills") or []
         pet.recalc_hp_pct()
         return pet

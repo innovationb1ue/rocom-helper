@@ -221,9 +221,10 @@ class Sniffer:
                 )
             return
 
-        inner = None
         if record.get("opcode") == 0x0414:
-            inner = extract_inner_message(record.get("root", {}))
+            return
+
+        inner = None
 
         kind, summary = summarize(record, inner)
         record["_summary_kind"] = kind
