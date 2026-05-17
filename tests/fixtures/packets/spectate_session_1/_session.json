@@ -1,0 +1,21 @@
+{
+  "session_start": "2026-05-17T23:57:54.407363",
+  "session_id": "spectate_session_1",
+  "battle_type": "spectate",
+  "source_session": "2026-05-17_23-44-14_monitor",
+  "source_path": "logs\\packets\\2026-05-17_23-44-14_monitor",
+  "battle_index": 1,
+  "enter_file": "s2c_0x4013_51525_234420.429.bin",
+  "finish_file": "s2c_0x4013_52138_235455.740.bin",
+  "enter_ts": "23:44:20.429",
+  "finish_ts": "23:54:55.740",
+  "pad_before": 5.0,
+  "pad_after": 2.0,
+  "file_count": 548,
+  "spectate_players": {
+    "player_a_uin": 1701281,
+    "player_b_uin": 403074280,
+    "player_a_pets": ["化蝶", "公平鸽", "贝古斯", "幽影树", "圆号鱼", "寒音蛇"],
+    "player_b_pets": ["迷途羔羊", "蜜瓜摇摇冰", "月牙雪熊", "寂灭骨龙", "翠顶夫人", "尖嘴狐仙"]
+  }
+}
