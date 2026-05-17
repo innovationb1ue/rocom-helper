@@ -88,7 +88,7 @@ class PetInfo:
         pet.pet_id = w.get("pet_id") or w.get("pet_gid")
         pet.name = w.get("pet_name") or w.get("name", "?")
         pet.types = w.get("types", [])
-        pet.current_hp = w.get("hp") or w.get("current_hp", 0)
+        pet.current_hp = w.get("hp") if w.get("hp") is not None else w.get("current_hp", 0)
         pet.max_hp = w.get("max_hp", 0)
         pet.energy = min(10, w.get("energy", default_energy))
         pet.buffs = list(initial_buffs)

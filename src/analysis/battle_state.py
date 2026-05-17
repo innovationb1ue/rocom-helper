@@ -125,6 +125,9 @@ class BattleStateTracker:
         return build_state_suggestions(self.state)
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
+        self._opponent_slots.clear()
+        self._player_slots.clear()
+
         self.state["battle_id"] = detail.get("battle_id")
         self.state["battle_mode"] = detail.get("battle_mode")
         self.state["round"] = detail.get("round", 0)
@@ -245,7 +248,12 @@ class BattleStateTracker:
         active_key = "my_active" if self._is_mine(target_side) else "opp_active"
         active = self.state[active_key]
         if active is not None:
-            active["current_hp"] = target_hp if target_hp is not None else max(0, active["current_hp"] - damage)
+            # Use target_hp_after only if it's valid (not exceeding max_hp)
+            max_hp = active.get("max_hp", 0)
+            if target_hp is not None and (max_hp <= 0 or target_hp <= max_hp):
+                active["current_hp"] = max(0, target_hp)
+            else:
+                active["current_hp"] = max(0, active["current_hp"] - damage)
             if active.get("max_hp", 0) > 0:
                 active["hp_pct"] = active["current_hp"] / active["max_hp"]
             else:
@@ -293,8 +301,8 @@ class BattleStateTracker:
             return
         active = self._get_active_for_side(target_side)
         if active is not None and active["max_hp"] > 0:
-            active["current_hp"] = hp_after
-            active["hp_pct"] = hp_after / active["max_hp"]
+            active["current_hp"] = min(hp_after, active["max_hp"])
+            active["hp_pct"] = active["current_hp"] / active["max_hp"]
 
     def _handle_energy_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side") or entry.get("actor_side")
@@ -317,31 +325,60 @@ class BattleStateTracker:
         if battle_pet_id is None:
             return
 
-        # 使用 base_conf_id 匹配宠物列表确定侧边（比 pet_id 更可靠）
+        # 判断换宠发生在哪方。target_side 1-6/401-406 在不同对局中可能反转
+        # （取决于谁是房主），所以优先用已知宠物列表交叉验证。
         is_opp = None
-        if new_base_conf_id is not None:
-            in_my = any(p.get("base_conf_id") == new_base_conf_id for p in self.state["my_pets"])
-            in_opp = any(p.get("base_conf_id") == new_base_conf_id for p in self.state["opp_pets"])
-            if in_my and not in_opp:
-                is_opp = False
-            elif in_opp and not in_my:
-                is_opp = True
-        # Fallback: pet_id 匹配（排除 20000000）
+
+        # 1. 用 rest_pet_id（被换下的宠物）匹配已知列表
+        rest_pet_id = entry.get("rest_pet_id")
+        if rest_pet_id is not None:
+            for pet in self.state["opp_pets"]:
+                if pet.get("pet_id") == rest_pet_id or pet.get("base_conf_id") == rest_pet_id:
+                    is_opp = True
+                    break
+            if is_opp is None:
+                for pet in self.state["my_pets"]:
+                    if pet.get("pet_id") == rest_pet_id or pet.get("base_conf_id") == rest_pet_id:
+                        is_opp = False
+                        break
+
+        # 2. 用 new_pet_id 匹配已知列表（换上的宠物可能已知）
         if is_opp is None and new_pet_id is not None and new_pet_id != 20000000:
-            in_my = any(p.get("pet_id") == new_pet_id for p in self.state["my_pets"])
-            in_opp = any(p.get("pet_id") == new_pet_id for p in self.state["opp_pets"])
-            if in_my and not in_opp:
-                is_opp = False
-            elif in_opp and not in_my:
-                is_opp = True
-        # Fallback: 已知的 slot 映射
+            for pet in self.state["opp_pets"]:
+                if pet.get("pet_id") == new_pet_id:
+                    is_opp = True
+                    break
+            if is_opp is None:
+                for pet in self.state["my_pets"]:
+                    if pet.get("pet_id") == new_pet_id:
+                        is_opp = False
+                        break
+
+        # 3. 已知的 slot 映射
         if is_opp is None:
             bpid = int(battle_pet_id)
             if bpid in self._opponent_slots:
                 is_opp = True
             elif bpid in self._player_slots:
                 is_opp = False
-        # Final fallback: numeric range
+
+        # 4. 用当前活跃宠物判断（换宠替换的是活跃宠物）
+        if is_opp is None:
+            active = self.state.get("opp_active")
+            if active and (active.get("pet_id") == rest_pet_id or active.get("base_conf_id") == rest_pet_id):
+                is_opp = True
+        if is_opp is None:
+            active = self.state.get("my_active")
+            if active and (active.get("pet_id") == rest_pet_id or active.get("base_conf_id") == rest_pet_id):
+                is_opp = False
+
+        # 5. Fallback: target_side numeric range
+        if is_opp is None:
+            target_side = entry.get("target_side")
+            if target_side is not None:
+                is_opp = int(target_side) >= 401
+
+        # 6. Final fallback: battle_pet_id range
         if is_opp is None:
             bpid = int(battle_pet_id)
             is_opp = bpid >= 401
@@ -398,6 +435,7 @@ class BattleStateTracker:
             matched["buffs"] = []
             matched["combo_bonus"] = 0
             matched["poison_stacks"] = 0
+            matched["used_skills"] = []
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []
@@ -693,7 +731,9 @@ class BattleStateTracker:
             # 更新活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
             active_key = "my_active" if is_mine else "opp_active"
             cur_active = self.state[active_key]
-            if cur_active is not None and matched is not None:
+            if cur_active is None:
+                self.state[active_key] = matched
+            elif matched is not None:
                 if cur_active is matched:
                     self.state[active_key] = matched
                 else:

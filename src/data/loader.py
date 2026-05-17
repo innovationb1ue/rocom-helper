@@ -615,6 +615,8 @@ def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: in
     if not weather:
         return 1.0
     name = weather.get("name") or ""
+    if not isinstance(name, str):
+        name = ""
     is_rain = "雨" in name
     if is_rain and skill_element == _WATER_TYPE_ID:
         return 1.5
