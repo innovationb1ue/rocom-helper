@@ -28,6 +28,7 @@ from src.analysis.constants import (
 from src.analysis.event_formatter import format_battle_event, FormattedEvent
 from src.analysis.hook_registry import HookContext, HookRegistry, HookTrigger
 from src.analysis.hooks import create_default_hooks
+from src.analysis.tactical_engine import TacticalEngine
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ class ProcessResult:
     battle_advice: Optional[Dict[str, Any]] = None
     hook_advice: List[Dict[str, Any]] = field(default_factory=list)
     suggestions: List[Dict[str, str]] = field(default_factory=list)
+    tactical: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -63,6 +65,7 @@ class BattleProcessor:
         self.tracker = BattleStateTracker()
         self._advisor: Optional[BattleAdvisor] = None
         self._hook_registry: Optional[HookRegistry] = None
+        self._tactical_engine: Optional[TacticalEngine] = None
 
     # ------------------------------------------------------------------
     # Core processing
@@ -81,6 +84,11 @@ class BattleProcessor:
         if self.battle_active() and opcode in self._DAMAGE_OPCODES:
             battle_advice_dict = self._compute_damage_analysis(state)
 
+        # 2.5 战术推荐
+        tactical_dict: Optional[Dict[str, Any]] = None
+        if self.battle_active() and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
+            tactical_dict = self._compute_tactical(state)
+
         # 3. Hook 分析
         hook_advice_dicts: List[Dict[str, Any]] = []
         if self.battle_active():
@@ -95,6 +103,7 @@ class BattleProcessor:
             battle_advice=battle_advice_dict,
             hook_advice=hook_advice_dicts,
             suggestions=suggestions,
+            tactical=tactical_dict,
         )
 
     # ------------------------------------------------------------------
@@ -112,6 +121,22 @@ class BattleProcessor:
         if not advice.skill_analysis:
             return None
         return advice.to_dict()
+
+    # ------------------------------------------------------------------
+    # Tactical recommendations
+    # ------------------------------------------------------------------
+
+    def _get_tactical_engine(self) -> TacticalEngine:
+        if self._tactical_engine is None:
+            self._tactical_engine = TacticalEngine()
+        return self._tactical_engine
+
+    def _compute_tactical(self, state: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        engine = self._get_tactical_engine()
+        rec = engine.recommend(state)
+        if rec is None or not rec.actions:
+            return None
+        return rec.to_dict()
 
     # ------------------------------------------------------------------
     # Hook dispatch
@@ -168,6 +193,7 @@ class BattleProcessor:
     def reset(self) -> None:
         self.tracker = BattleStateTracker()
         self._advisor = None
+        self._tactical_engine = None
         if self._hook_registry is not None:
             self._hook_registry.reset()
 

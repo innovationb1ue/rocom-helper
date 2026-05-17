@@ -121,6 +121,9 @@ class BattleManager:
         if result.hook_advice:
             await self._push_hook_advice_dicts(result.hook_advice)
 
+        if result.tactical:
+            await self._push_tactical(result.tactical)
+
         return result
 
     # ------------------------------------------------------------------
@@ -205,6 +208,20 @@ class BattleManager:
     async def _push_hook_advice_dicts(self, advice_list: List[Dict[str, Any]]) -> None:
         msg = json.dumps(
             {"type": "hook_advice", "advice": advice_list},
+            ensure_ascii=False,
+        )
+        dead: List[WebSocket] = []
+        for ws in self._ws_clients:
+            try:
+                await ws.send_text(msg)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self._ws_clients.remove(ws)
+
+    async def _push_tactical(self, rec_dict: Dict[str, Any]) -> None:
+        msg = json.dumps(
+            {"type": "tactical_recommendations", **rec_dict},
             ensure_ascii=False,
         )
         dead: List[WebSocket] = []

@@ -94,6 +94,34 @@ export interface HookAdvice {
   expires_round?: number | null;
 }
 
+export interface ActionScore {
+  action_type: string;
+  skill_id: number | null;
+  skill_name: string | null;
+  switch_to_name: string | null;
+  score: number;
+  reason: string;
+  damage_dealt: number | null;
+  damage_taken: number | null;
+  can_ko: boolean;
+  energy_cost: number;
+}
+
+export interface OpponentAction {
+  action_type: string;
+  skill_id: number | null;
+  skill_name: string | null;
+  switch_to_name: string | null;
+  probability: number;
+}
+
+export interface TacticalRecommendation {
+  actions: ActionScore[];
+  opp_predicted: OpponentAction[];
+  round_number: number;
+  confidence: string;
+}
+
 export interface BattleState {
   battle_id: number | null;
   round: number;
@@ -113,6 +141,7 @@ export interface BattleState {
   hookAdvice: HookAdvice[];
   oppSkillAnalysis: SkillAnalysis[];
   oppSkillSource: string;
+  tacticalRecommendations: TacticalRecommendation | null;
 }
 
 interface BattleStore extends BattleState {
@@ -129,6 +158,7 @@ interface BattleStore extends BattleState {
   setHookAdvice: (advice: HookAdvice[]) => void;
   setOppSkillAnalysis: (skills: SkillAnalysis[], source: string) => void;
   clearExpiredAdvice: (currentRound: number) => void;
+  setTacticalRecommendations: (rec: TacticalRecommendation | null) => void;
 }
 
 const initialState: BattleState = {
@@ -150,6 +180,7 @@ const initialState: BattleState = {
   hookAdvice: [],
   oppSkillAnalysis: [],
   oppSkillSource: '',
+  tacticalRecommendations: null,
 };
 
 export const useBattleStore = create<BattleStore>((set) => ({
@@ -176,4 +207,5 @@ export const useBattleStore = create<BattleStore>((set) => ({
       (a) => a.expires_round == null || a.expires_round >= currentRound
     ),
   })),
+  setTacticalRecommendations: (rec) => set({ tacticalRecommendations: rec }),
 }));

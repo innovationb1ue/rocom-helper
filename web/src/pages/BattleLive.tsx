@@ -14,6 +14,7 @@ import BattleSummaryPanel from '../components/BattleSummaryPanel';
 import SkillPanel from '../components/SkillPanel';
 import OpponentSkillPanel from '../components/OpponentSkillPanel';
 import HookAdvicePanel from '../components/HookAdvicePanel';
+import TacticalPanel from '../components/TacticalPanel';
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; text: string }> = {
   idle: { color: 'default', icon: <CloseCircleOutlined />, text: '未启动' },
@@ -30,6 +31,7 @@ const BattleLive: React.FC = () => {
     round, result, suggestions, connected,
     formattedEvents, battleSummary, skillAnalysis, traits, oppTraits,
     hookAdvice, oppSkillAnalysis, oppSkillSource,
+    tacticalRecommendations,
   } = useBattleStore();
   const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -129,6 +131,9 @@ const BattleLive: React.FC = () => {
           <TeamRoster pets={opp_pets} activePet={opp_active} side="opp" label="敌方阵容" />
         </Col>
       </Row>
+
+      {/* 战术推荐面板 */}
+      <TacticalPanel recommendations={tacticalRecommendations} />
 
       {/* 技能分析面板 */}
       <SkillPanel skills={skillAnalysis} oppActive={opp_active} traits={traits} />

@@ -1,10 +1,10 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useBattleStore } from '../stores/battleStore';
-import type { FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice } from '../stores/battleStore';
+import type { FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice, TacticalRecommendation } from '../stores/battleStore';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice } = useBattleStore();
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations } = useBattleStore();
 
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -42,12 +42,14 @@ export function useBattle() {
           }
         } else if (msg.type === 'hook_advice') {
           setHookAdvice(msg.advice as HookAdvice[]);
+        } else if (msg.type === 'tactical_recommendations') {
+          setTacticalRecommendations(msg as TacticalRecommendation);
         }
       } catch (err) {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));
