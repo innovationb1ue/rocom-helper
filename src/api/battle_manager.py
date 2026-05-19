@@ -38,6 +38,7 @@ class BattleManager:
         self._processor = BattleProcessor()
         self._ws_clients: List[WebSocket] = []
         self._bridge_registered = False
+        self._process_lock = asyncio.Lock()
 
     @property
     def tracker(self) -> Optional[BattleStateTracker]:
@@ -104,27 +105,28 @@ class BattleManager:
     # ------------------------------------------------------------------
 
     async def process_event(self, opcode: int, detail: Dict[str, Any]) -> ProcessResult:
-        result = self._processor.process_event(opcode, detail)
+        async with self._process_lock:
+            result = self._processor.process_event(opcode, detail)
 
-        if result.formatted_events:
-            await self._push_events(result.formatted_events)
+            if result.formatted_events:
+                await self._push_events(result.formatted_events)
 
-        await self._push_state(result.state, result.suggestions)
+            await self._push_state(result.state, result.suggestions)
 
-        if opcode == OPCODE_BATTLE_FINISH:
-            summary = compute_battle_summary(result.state)
-            await self._push_summary(summary)
+            if opcode == OPCODE_BATTLE_FINISH:
+                summary = compute_battle_summary(result.state)
+                await self._push_summary(summary)
 
-        if result.battle_advice:
-            await self._push_damage_analysis_dict(result.battle_advice, result.state)
+            if result.battle_advice:
+                await self._push_damage_analysis_dict(result.battle_advice, result.state)
 
-        if result.hook_advice:
-            await self._push_hook_advice_dicts(result.hook_advice)
+            if result.hook_advice:
+                await self._push_hook_advice_dicts(result.hook_advice)
 
-        if result.tactical:
-            await self._push_tactical(result.tactical)
+            if result.tactical:
+                await self._push_tactical(result.tactical)
 
-        return result
+            return result
 
     # ------------------------------------------------------------------
     # WebSocket push helpers

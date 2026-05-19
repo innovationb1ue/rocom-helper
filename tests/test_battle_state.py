@@ -149,6 +149,61 @@ class TestDamageTracking:
         ]))
         assert state["opp_active"]["current_hp"] == 170
 
+    def test_round_start_does_not_reset_opp_hp(self, tracker):
+        """round_start wrapper 不应将对手 HP 重置为满血。"""
+        tracker.handle_event(0x1316, _enter_event())
+        # R1: 对手受到伤害
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "damage": 100, "target_hp_after": 250,
+             "damage_target_side": 401},
+        ]))
+        # R2 round_start: 服务器发送满血 wrapper（不可靠数据）
+        state = tracker.handle_event(0x131A, {
+            "opcode": 0x131A,
+            "round": 2,
+            "wrappers": [
+                {"pet_id": 100, "side": 1, "hp": 300, "max_hp": 300},
+                {"pet_id": 200, "side": 401, "hp": 350, "max_hp": 350},
+            ],
+        })
+        # 对手 HP 不应被重置为满血
+        assert state["opp_active"]["current_hp"] == 250
+
+    def test_round_start_updates_player_hp(self, tracker):
+        """round_start wrapper 对我方宠物应正常更新 HP。"""
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "damage": 80, "target_hp_after": 220,
+             "damage_target_side": 1},
+        ]))
+        # 服务器在 round_start 发送我方当前 HP = 200（可能有其他扣血来源）
+        state = tracker.handle_event(0x131A, {
+            "opcode": 0x131A,
+            "round": 2,
+            "wrappers": [
+                {"pet_id": 100, "side": 1, "hp": 200, "max_hp": 300},
+            ],
+        })
+        # 我方宠物应接受服务器数据
+        assert state["my_active"]["current_hp"] == 200
+
+    def test_round_start_opp_hp_decrease_allowed(self, tracker):
+        """round_start wrapper 降低对手 HP 应该接受。"""
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "damage": 100, "target_hp_after": 250,
+             "damage_target_side": 401},
+        ]))
+        # 服务器发送更低的 HP（可靠数据）
+        state = tracker.handle_event(0x131A, {
+            "opcode": 0x131A,
+            "round": 2,
+            "wrappers": [
+                {"pet_id": 200, "side": 401, "hp": 240, "max_hp": 350},
+            ],
+        })
+        assert state["opp_active"]["current_hp"] == 240
+
 
 class TestSkillCast:
     def test_energy_consumed(self, tracker):

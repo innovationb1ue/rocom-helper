@@ -681,7 +681,9 @@ class BattleStateTracker:
                 if self._pet_matches(pet, w):
                     matched = pet
                     if "hp" in w:
-                        pet["current_hp"] = w["hp"]
+                        new_hp = w["hp"]
+                        if is_mine or new_hp is None or new_hp <= pet.get("current_hp", float("inf")):
+                            pet["current_hp"] = new_hp if new_hp is not None else pet["current_hp"]
                     if "max_hp" in w:
                         pet["max_hp"] = w["max_hp"]
                     if w.get("name") and w["name"] != "?":
