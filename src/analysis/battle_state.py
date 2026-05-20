@@ -692,8 +692,9 @@ class BattleStateTracker:
                         pet["pet_id"] = w["pet_id"]
                     if w.get("level") is not None:
                         pet["level"] = w["level"]
-                    if w.get("stats"):
-                        pet["stats"] = w["stats"]
+                    new_stats = w.get("stats")
+                    if new_stats and len(new_stats) >= len(pet.get("stats", [])):
+                        pet["stats"] = new_stats
                     if w.get("base_id") is not None:
                         pet["base_id"] = w["base_id"]
                     if w.get("base_conf_id") is not None:

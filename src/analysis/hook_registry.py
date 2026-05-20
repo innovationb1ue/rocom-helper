@@ -57,6 +57,17 @@ class HookAdvice:
         return asdict(self)
 
 
+@dataclass
+class HookSignal:
+    hook_id: str
+    signal_type: str          # "avoid_skill" | "prefer_switch" | "priority_target"
+    target: Optional[str] = None
+    strength: float = 0.0     # 0.0-1.0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
 class AnalysisHook(ABC):
 
     @property
@@ -78,6 +89,10 @@ class AnalysisHook(ABC):
 
     def reset(self) -> None:
         pass
+
+    def emit_signals(self, ctx: HookContext) -> List[HookSignal]:
+        """可选：发出影响战术引擎评分的信号。"""
+        return []
 
 
 class HookRegistry:
@@ -116,6 +131,16 @@ class HookRegistry:
                 hook.on_battle_finish(ctx)
             except Exception:
                 logger.exception("Hook %s on_battle_finish failed", hook.hook_id)
+
+    def collect_signals(self, ctx: HookContext) -> List[HookSignal]:
+        """收集所有钩子发出的信号。"""
+        signals: List[HookSignal] = []
+        for hook in self._hooks.values():
+            try:
+                signals.extend(hook.emit_signals(ctx))
+            except Exception:
+                logger.exception("Hook %s emit_signals failed", hook.hook_id)
+        return signals
 
     def reset(self) -> None:
         for hook in self._hooks.values():

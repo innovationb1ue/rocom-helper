@@ -24,7 +24,10 @@ def _get_active_innate_skills(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
-    """连击修正 — 根据先天技能增加连击次数，总伤害 = 单次伤害 × 连击总数。"""
+    """连击修正 — 根据先天技能增加连击次数，总伤害 = 单次伤害 × 连击总数。
+
+    同时读取 buff 的 stage 字段作为连击加成（如 buff 21080150 stage=3 → +3 hits）。
+    """
     attacker = ctx.get("attacker", {})
     defender = ctx.get("defender", {})
     combo_bonus = attacker.get("combo_bonus", 0)
@@ -34,18 +37,27 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     additive_bonus = 0
     multiplier = 1
 
-    for skill in _get_active_innate_skills(attacker):
-        if skill.get("effect_type") != "combo_modify":
+    for buff in attacker.get("buffs", []):
+        buff_id = buff.get("id")
+        if buff_id is None:
+            continue
+        skill = get_innate_skill(buff_id)
+        if skill is None or skill.get("effect_type") != "combo_modify":
             continue
         params = skill.get("effect_params", {})
         trigger = params.get("trigger", "always")
+        buff_stage = buff.get("stage", 0) or 0
 
         if trigger == "always":
             mult = params.get("multiplier", 0)
             if mult > 1:
                 multiplier = max(multiplier, mult)
             else:
-                additive_bonus += params.get("value", 0)
+                # 如果 buff stage > 0，用 stage 作为加成值（覆盖固定 value）
+                if buff_stage > 0:
+                    additive_bonus += buff_stage
+                else:
+                    additive_bonus += params.get("value", 0)
         elif trigger == "per_poison_stack":
             stacks = defender.get("poison_stacks", 0)
             additive_bonus += params.get("value", 0) * stacks

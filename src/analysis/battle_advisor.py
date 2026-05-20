@@ -21,6 +21,8 @@ from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
 from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills
 from src.game.type_chart import TypeChart
+from src.game.skill_eval import score_skill
+from src.analysis.counter import CounterPicker
 
 
 @dataclass
@@ -50,6 +52,7 @@ class SkillAnalysis:
     weather_mult: Optional[float] = None
     damage_breakdown: Optional[Dict[str, Any]] = None
     warnings: List[str] = field(default_factory=list)
+    _quality_score: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -93,7 +96,8 @@ class BattleAdvisor:
 
         weather = state.get("weather")
         skill_analysis = self._build_skill_analysis(my_active, opp_active, equipped, weather)
-        suggestions = self._build_suggestions(my_active, opp_active, skill_analysis)
+        my_pets = state.get("my_pets", [])
+        suggestions = self._build_suggestions(my_active, opp_active, skill_analysis, my_pets)
         traits = self._extract_traits(my_active)
         opp_traits = self._extract_traits(opp_active)
 
@@ -149,6 +153,9 @@ class BattleAdvisor:
                     sa.weather_mult = dr.weather_mult
                     sa.damage_breakdown = dr.damage_breakdown
                     sa.warnings = dr.warnings
+            # 技能综合质量评分
+            eval_dict = self._eval_skill_dict(eq, meta)
+            sa._quality_score = round(score_skill(eval_dict, self.chart), 1)
             results.append(sa)
         results.sort(key=lambda s: s.equipped_slot)
         return results
@@ -185,11 +192,45 @@ class BattleAdvisor:
             skill_desc=desc,
         )
 
+    @staticmethod
+    def _eval_skill_dict(eq: Dict[str, Any], meta: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+        """构造适合 skill_eval.score_skill 的技能字典。"""
+        power = 0
+        energy_cost = eq.get("cost_energy") or 0
+        accuracy = 100
+        pp = 20
+        type_id = eq.get("skill_element") or 0
+        effect_desc = eq.get("skill_desc")
+
+        if meta:
+            dam_para = meta.get("dam_para", [])
+            power = dam_para[0] if dam_para else 0
+            ec = meta.get("energy_cost", [0])
+            energy_cost = energy_cost or (ec[0] if ec else 0)
+            hit_para = meta.get("hit_para")
+            if hit_para is not None:
+                accuracy = hit_para / 100
+            pp = meta.get("max_pp", 20)
+            effect_desc = effect_desc or meta.get("desc")
+            dt = meta.get("skill_dam_type")
+            if dt is not None:
+                type_id = SDT_TO_TYPE.get(dt, type_id)
+
+        return {
+            "power": power,
+            "energy_cost": energy_cost,
+            "accuracy": accuracy,
+            "pp": pp,
+            "type_id": type_id,
+            "effect_desc": effect_desc,
+        }
+
     def _build_suggestions(
         self,
         my_active: Dict[str, Any],
         opp_active: Dict[str, Any],
         skill_analysis: List[SkillAnalysis],
+        my_pets: Optional[List[Dict[str, Any]]] = None,
     ) -> List[Dict[str, str]]:
         suggestions: List[Dict[str, str]] = []
         attack_skills = [s for s in skill_analysis if s.expected_damage is not None]
@@ -212,6 +253,26 @@ class BattleAdvisor:
                 "type": "resisted",
                 "message": "所有攻击技能均被抵抗，考虑换宠",
             })
+            # team-level 反制建议
+            if my_pets:
+                living = [
+                    p for p in my_pets
+                    if p.get("current_hp", 1) > 0 and p.get("pet_id") != my_active.get("pet_id")
+                ]
+                if living:
+                    picker = CounterPicker(self.chart)
+                    norm_opp = {"types": opp_active.get("types", [])}
+                    norm_living = [
+                        {"types": p.get("types", []), "pet_id": p.get("pet_id"), "name": p.get("name")}
+                        for p in living
+                    ]
+                    counters = picker.find_counters([norm_opp], norm_living, top_n=1)
+                    if counters:
+                        name = counters[0].get("name", "未知")
+                        suggestions.append({
+                            "type": "counter_switch",
+                            "message": f"当前对位被全面克制，建议换上 {name} 进行反制",
+                        })
 
         low_energy = [s for s in attack_skills if "能量不足" in "".join(s.warnings)]
         if len(low_energy) == len(attack_skills) and attack_skills:

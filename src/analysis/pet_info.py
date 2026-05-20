@@ -98,6 +98,16 @@ class PetInfo:
         pet.slot = w.get("slot")
         pet.side = w.get("side")
         pet.stats = w.get("stats", [])
+        # 如果 stats 为空，尝试从 battle_stats 构造（6 项：HP/ATK/DEF/SPA/SPD/SPE）
+        if not pet.stats:
+            _BATTLE_STAT_NAMES = ["HP", "ATK", "DEF", "SPA", "SPD", "SPE"]
+            battle_stats = w.get("battle_stats") or []
+            if len(battle_stats) >= 6:
+                pet.stats = [
+                    {"name": name, "total": val}
+                    for name, val in zip(_BATTLE_STAT_NAMES, battle_stats)
+                    if val is not None
+                ]
         pet.skills = w.get("skills", [])
         pet.equipped_skills = equipped
         pet.base_id = w.get("base_id")

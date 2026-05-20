@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookTrigger
+from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookSignal, HookTrigger
 
 logger = logging.getLogger(__name__)
 
@@ -82,6 +82,26 @@ class EnergyMonitorHook(AnalysisHook):
             title="能量监控",
             messages=messages,
         )
+
+    def emit_signals(self, ctx: HookContext) -> List[HookSignal]:
+        """能量不足时发出 avoid_skill 信号。"""
+        my_active = ctx.state.get("my_active")
+        if not my_active:
+            return []
+
+        my_energy = my_active.get("energy", 5)
+        equipped = my_active.get("equipped_skills") or my_active.get("used_skills") or []
+        min_cost = self._min_attack_cost(equipped)
+
+        signals: List[HookSignal] = []
+        if my_energy <= 1 and min_cost > 1:
+            signals.append(HookSignal(
+                hook_id=self.hook_id,
+                signal_type="avoid_skill",
+                target=None,
+                strength=0.9,
+            ))
+        return signals
 
     @staticmethod
     def _min_attack_cost(equipped: List[Dict[str, Any]]) -> int:

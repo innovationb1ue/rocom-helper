@@ -237,6 +237,40 @@ class TestComboModifyHook:
         result = combo_modify_hook(ctx)
         assert result["hit_count"] == 4  # 2 base + 2 combo
 
+    def test_combo_stage_adds_hits(self):
+        """buff stage 编码连击加成：21080150 stage=3 → +3 hits"""
+        attacker = _make_attacker(
+            combo_bonus=0,
+            buffs=[{"id": 21080150, "stage": 3}],
+        )
+        ctx = {
+            "min_damage": 10,
+            "max_damage": 10,
+            "hit_count": 1,
+            "attacker": attacker,
+            "defender": _make_defender(),
+            "skill_meta": _make_skill(),
+        }
+        result = combo_modify_hook(ctx)
+        assert result["hit_count"] == 4  # 1 base + 3 stage
+
+    def test_combo_stage_with_combo_bonus(self):
+        """combo_bonus + buff stage 同时生效"""
+        attacker = _make_attacker(
+            combo_bonus=2,
+            buffs=[{"id": 21080150, "stage": 3}],
+        )
+        ctx = {
+            "min_damage": 10,
+            "max_damage": 10,
+            "hit_count": 1,
+            "attacker": attacker,
+            "defender": _make_defender(),
+            "skill_meta": _make_skill(),
+        }
+        result = combo_modify_hook(ctx)
+        assert result["hit_count"] == 6  # (1 base + 2 combo) * 1 + 3 stage
+
 
 # ---------------------------------------------------------------------------
 # TestStatModifyHook

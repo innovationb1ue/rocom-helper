@@ -393,9 +393,13 @@ def get_innate_skills_for_pet(base_id: int) -> List[Dict[str, Any]]:
 
 # attr_map ID → stat modifier key
 _ATTR_TO_STAT_KEY = {
+    17: "atk_up", 18: "spa_up",
     29: "atk_up", 30: "spa_up", 31: "def_up", 32: "spd_up",
     33: "atk_down", 34: "spa_down", 35: "def_down", 36: "spd_down",
 }
+
+# 某些 attr_id 的值存储在 params[4] 而非 params[2]
+_ATTR_USING_PARAM4 = {17, 18}
 
 # buff_id → {"atk_up": 0.2, "atk_down": 0.0, ...} cached lookup
 _buff_stat_cache: Optional[Dict[int, Dict[str, float]]] = None
@@ -424,7 +428,11 @@ def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
             value = None
             try:
                 attr_id = params_list[0].get("params", [None])[0]
-                value = params_list[2].get("params", [None])[0]
+                raw_val = params_list[2].get("params", [None])[0]
+                # 某些 attr_id（如 17/18）的值存储在 params[4]
+                if (raw_val == 0 or raw_val is None) and attr_id in _ATTR_USING_PARAM4 and len(params_list) >= 5:
+                    raw_val = params_list[4].get("params", [None])[0]
+                value = raw_val
             except (IndexError, AttributeError):
                 continue
             if attr_id is None or value is None:
@@ -432,6 +440,8 @@ def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
             stat_key = _ATTR_TO_STAT_KEY.get(attr_id)
             if stat_key:
                 mods[stat_key] = mods.get(stat_key, 0.0) + value / 10000.0
+            else:
+                logger.debug("Unmapped buff attr_id %s in buffbase %s (buff %s)", attr_id, bb_id, buff_id)
         if mods:
             table[buff_id] = mods
     return table

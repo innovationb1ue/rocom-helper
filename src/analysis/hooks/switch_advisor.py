@@ -4,8 +4,9 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookTrigger
+from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookSignal, HookTrigger
 from src.analysis.constants import OPCODE_ACTION_RESOLVE
+from src.analysis.counter import CounterPicker
 from src.game.type_chart import TypeChart
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ class SwitchAdvisorHook(AnalysisHook):
 
     def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
         self._chart = type_chart or TypeChart()
+        self._counter = CounterPicker(self._chart)
 
     def on_battle_enter(self, ctx: HookContext) -> None:
         pass
@@ -105,6 +107,35 @@ class SwitchAdvisorHook(AnalysisHook):
             messages=messages,
         )
 
+    def emit_signals(self, ctx: HookContext) -> List[HookSignal]:
+        """检测到不利对位时发出 prefer_switch 信号。"""
+        my_active = ctx.state.get("my_active")
+        opp_active = ctx.state.get("opp_active")
+        if not my_active or not opp_active:
+            return []
+
+        opp_types = opp_active.get("types", [])
+        my_types = my_active.get("types", [])
+        if not opp_types:
+            return []
+
+        my_offensive = self._best_effectiveness(my_types, opp_types)
+        opp_offensive = self._best_effectiveness(opp_types, my_types)
+
+        signals: List[HookSignal] = []
+        if opp_offensive >= 2.0 and my_offensive <= 1.0:
+            best_switch = self._find_best_counter(
+                ctx.state.get("my_pets", []), opp_active,
+            )
+            if best_switch:
+                signals.append(HookSignal(
+                    hook_id=self.hook_id,
+                    signal_type="prefer_switch",
+                    target=best_switch.get("name"),
+                    strength=0.8,
+                ))
+        return signals
+
     def _best_effectiveness(
         self, attack_types: List[int], defend_types: List[int],
     ) -> float:
@@ -122,19 +153,22 @@ class SwitchAdvisorHook(AnalysisHook):
         if not opp_types:
             return None
 
-        best_pet = None
-        best_score = 0.0
-        for pet in my_pets:
-            if pet.get("current_hp", 1) <= 0:
-                continue
-            pet_types = pet.get("types", [])
-            if not pet_types:
-                continue
-            offensive = self._best_effectiveness(pet_types, opp_types)
-            defensive = 1.0 / max(0.25, self._best_effectiveness(opp_types, pet_types))
-            score = offensive * defensive
-            if score > best_score:
-                best_score = score
-                best_pet = pet
+        living = [
+            p for p in my_pets
+            if p.get("current_hp", 1) > 0 and p.get("pet_id") != opp_pet.get("pet_id")
+        ]
+        if not living:
+            return None
 
-        return best_pet if best_score > 1.5 else None
+        norm_opp = {"types": opp_types}
+        norm_living = [
+            {"types": p.get("types", []), "pet_id": p.get("pet_id"), "name": p.get("name")}
+            for p in living
+        ]
+        counters = self._counter.find_counters([norm_opp], norm_living, top_n=1)
+        if counters:
+            counter_id = counters[0].get("pet_id")
+            for p in living:
+                if p.get("pet_id") == counter_id:
+                    return p
+        return None
