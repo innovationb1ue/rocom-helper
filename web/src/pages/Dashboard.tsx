@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Row, Col, Statistic, Typography } from 'antd';
-import { ThunderboltOutlined, TeamOutlined, DatabaseOutlined } from '@ant-design/icons';
+import { ThunderboltOutlined, DatabaseOutlined } from '@ant-design/icons';
 import { fetchDataStatus } from '../utils/api';
 
 const Dashboard: React.FC = () => {

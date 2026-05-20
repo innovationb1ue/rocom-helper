@@ -11,17 +11,17 @@ interface Props {
   label: string;
 }
 
-const TeamRoster: React.FC<Props> = ({ pets, activePet, label }) => {
+const TeamRoster: React.FC<Props> = ({ pets, activePet, side, label }) => {
   return (
     <Card size="small" title={label} style={{ height: '100%' }}>
       {pets.length === 0 && <div style={{ color: '#999', fontSize: 13 }}>暂无精灵</div>}
-      {pets.map((pet) => {
+      {pets.map((pet, index) => {
         const isActive = activePet?.pet_id === pet.pet_id;
         const isDefeated = pet.current_hp <= 0;
         const pct = Math.round(pet.hp_pct * 100);
         return (
           <div
-            key={pet.pet_id}
+            key={`${side}-${pet.pet_id}-${pet.name}-${index}`}
             style={{
               display: 'flex',
               alignItems: 'center',

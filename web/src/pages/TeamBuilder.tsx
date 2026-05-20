@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Row, Col, Card, Button, Input, Space, List, Tag, Progress, Alert } from 'antd';
 import { fetchPets, analyzeTeam, findCounters } from '../utils/api';
 import TeamSlot from '../components/TeamSlot';
-import TypeBadge from '../components/TypeBadge';
-import CoverageRadar from '../components/CoverageRadar';
 import type { TeamAnalysis, CounterResult } from '../utils/api';
 
 const TeamBuilderPage: React.FC = () => {

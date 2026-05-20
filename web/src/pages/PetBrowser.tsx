@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
 import { Table, Input, Space, Drawer, Descriptions } from 'antd';
 import { usePets } from '../hooks/usePets';
-import TypeBadge from '../components/TypeBadge';
 import { fetchPetDetail } from '../utils/api';
 
+type PetDetail = {
+  pet?: {
+    id?: React.ReactNode;
+    name?: React.ReactNode;
+    base_id?: React.ReactNode;
+  };
+};
+
 const PetBrowser: React.FC = () => {
-  const { pets, total, types, loading, searchName, page, pageSize, setSearchName, setPage } = usePets();
-  const [detail, setDetail] = useState<Record<string, unknown> | null>(null);
+  const { pets, total, loading, searchName, page, pageSize, setSearchName, setPage } = usePets();
+  const [detail, setDetail] = useState<PetDetail | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const showDetail = async (id: number) => {
     const data = await fetchPetDetail(id);
-    setDetail(data);
+    setDetail(data as PetDetail);
     setDrawerOpen(true);
   };
 
@@ -41,9 +48,9 @@ const PetBrowser: React.FC = () => {
       <Drawer title="精灵详情" open={drawerOpen} onClose={() => setDrawerOpen(false)} width={400}>
         {detail && (
           <Descriptions column={1} size="small">
-            <Descriptions.Item label="ID">{(detail.pet as Record<string, unknown>)?.id}</Descriptions.Item>
-            <Descriptions.Item label="名称">{(detail.pet as Record<string, unknown>)?.name as string}</Descriptions.Item>
-            <Descriptions.Item label="Base ID">{(detail.pet as Record<string, unknown>)?.base_id as number}</Descriptions.Item>
+            <Descriptions.Item label="ID">{detail.pet?.id}</Descriptions.Item>
+            <Descriptions.Item label="名称">{detail.pet?.name}</Descriptions.Item>
+            <Descriptions.Item label="Base ID">{detail.pet?.base_id}</Descriptions.Item>
           </Descriptions>
         )}
       </Drawer>

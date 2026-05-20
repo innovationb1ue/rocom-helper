@@ -1,5 +1,13 @@
 import { create } from 'zustand';
 
+const MAX_FORMATTED_EVENTS = 500;
+const MAX_SUGGESTIONS = 20;
+
+function takeLast<T>(items: T[], max: number): T[] {
+  if (items.length <= max) return items;
+  return items.slice(-max);
+}
+
 export interface EquippedSkill {
   skill_id: number;
   equipped_slot: number;
@@ -188,14 +196,14 @@ export const useBattleStore = create<BattleStore>((set) => ({
   updateState: (partial) => set((s) => ({ ...s, ...partial })),
   addSuggestion: (s) => set((st) => {
     if (st.suggestions.some(x => x.type === s.type && x.message === s.message)) return st;
-    return { suggestions: [...st.suggestions, s] };
+    return { suggestions: takeLast([...st.suggestions, s], MAX_SUGGESTIONS) };
   }),
   setConnected: (c) => set({ connected: c }),
   reset: () => set(initialState),
   addFormattedEvent: (event) =>
-    set((st) => ({ formattedEvents: [...st.formattedEvents, event] })),
+    set((st) => ({ formattedEvents: takeLast([...st.formattedEvents, event], MAX_FORMATTED_EVENTS) })),
   addFormattedEvents: (events) =>
-    set((st) => ({ formattedEvents: [...st.formattedEvents, ...events] })),
+    set((st) => ({ formattedEvents: takeLast([...st.formattedEvents, ...events], MAX_FORMATTED_EVENTS) })),
   setBattleSummary: (summary) => set({ battleSummary: summary }),
   setSkillAnalysis: (skills) => set({ skillAnalysis: skills }),
   setTraits: (traits) => set({ traits }),

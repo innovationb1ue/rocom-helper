@@ -105,9 +105,14 @@ class BattleAdvisor:
         opp_equipped, opp_source = self._resolve_opp_skills(opp_active)
         opp_skill_analysis: List[SkillAnalysis] = []
         if opp_equipped:
-            opp_skill_analysis = self._build_skill_analysis(
+            raw = self._build_skill_analysis(
                 opp_active, my_active, opp_equipped, weather,
             )
+            # 过滤无名技能并限制数量（PvP 常规 4 个，首领化 7 个）
+            opp_skill_analysis = [
+                sa for sa in raw
+                if sa.skill_name and sa.skill_name != "?"
+            ][:4]
 
         return BattleAdvice(
             skill_analysis=skill_analysis,

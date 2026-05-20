@@ -274,10 +274,12 @@ class BattleStateTracker:
         if skill_id is not None:
             used = active.setdefault("used_skills", [])
             if not any(s.get("skill_id") == skill_id for s in used):
-                item = {"skill_id": skill_id}
-                if entry.get("skill_name"):
-                    item["skill_name"] = entry["skill_name"]
-                used.append(item)
+                skill_name = entry.get("skill_name")
+                if not skill_name:
+                    from src.data.loader import get_skill_name
+                    skill_name = get_skill_name(skill_id)
+                if skill_name:
+                    used.append({"skill_id": skill_id, "skill_name": skill_name})
         if energy_after is not None:
             active["energy"] = min(10, energy_after)
         else:

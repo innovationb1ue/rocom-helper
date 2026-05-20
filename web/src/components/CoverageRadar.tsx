@@ -1,6 +1,6 @@
 import React from 'react';
 import { Progress, Tooltip } from 'antd';
-import { multiplierColor, TYPE_NAMES } from '../utils/typeColors';
+import { multiplierColor } from '../utils/typeColors';
 
 interface Props {
   coverage: Record<string, number>;
