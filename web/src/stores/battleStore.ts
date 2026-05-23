@@ -39,9 +39,11 @@ export interface BattlePet {
   skills?: EquippedSkill[];
   equipped_skills?: EquippedSkill[];
   base_id?: number;
+  base_conf_id?: number;
   side?: number;
   base_speed?: number;
   effective_speed?: number;
+  battle_uid?: string;
 }
 
 export interface SkillAnalysis {

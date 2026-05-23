@@ -16,6 +16,7 @@ from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
 from src.analysis.skill_classifier import classify_skill_effect
 from src.analysis.counter import CounterPicker
+from src.analysis.pet_identity import same_battle_pet
 from src.analysis.threat import ThreatAssessor
 from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills, get_pet_skill_meta
 from src.game.type_chart import TypeChart
@@ -235,11 +236,10 @@ class TacticalEngine:
             })
 
         # 换宠
-        active_pet_id = my_active.get("pet_id")
         for pet in my_pets:
             if pet.get("current_hp", 1) <= 0:
                 continue
-            if pet.get("pet_id") == active_pet_id:
+            if same_battle_pet(pet, my_active):
                 continue
             actions.append({
                 "action_type": "switch",
@@ -287,7 +287,7 @@ class TacticalEngine:
         if switch_prob > 0:
             living_bench = [
                 p for p in opp_pets
-                if p.get("current_hp", 1) > 0 and p.get("pet_id") != opp_active.get("pet_id")
+                if p.get("current_hp", 1) > 0 and not same_battle_pet(p, opp_active)
             ]
             if living_bench:
                 per_pet = switch_prob / len(living_bench)
@@ -817,9 +817,9 @@ class TacticalEngine:
         norm_bench = [self._normalize_pet_for_analysis(p) for p in living_bench]
         counters = self._counter.find_counters([norm_my_active], norm_bench, top_n=1)
         if counters:
-            counter_id = counters[0].get("pet_id")
+            counter = counters[0]
             for p in living_bench:
-                if p.get("pet_id") == counter_id:
+                if same_battle_pet(p, counter):
                     return p
 
         return living_bench[0]

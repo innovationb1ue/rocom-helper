@@ -9,6 +9,7 @@ import copy
 from typing import Any, Dict, List, Optional
 
 from src.analysis.battle_state import POISON_BUFF_IDS
+from src.analysis.pet_identity import refresh_battle_uid
 
 
 def project_state_after_entries(state: Dict[str, Any], entries: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -122,6 +123,7 @@ def _project_change_pet(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
     battle_pet_id = entry.get("battle_pet_id")
     new_pet_name = entry.get("new_pet_name")
     new_pet_id = entry.get("new_pet_id")
+    new_base_conf_id = entry.get("new_pet_base_conf_id")
     if battle_pet_id is None:
         return
 
@@ -138,7 +140,12 @@ def _project_change_pet(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
     active_key = "opp_active" if is_opp else "my_active"
 
     matched = None
-    if new_pet_id is not None and new_pet_id != 20000000:
+    if new_base_conf_id is not None:
+        for pet in pet_list:
+            if pet.get("base_conf_id") == new_base_conf_id:
+                matched = pet
+                break
+    if matched is None and new_pet_id is not None and new_pet_id != 20000000:
         for pet in pet_list:
             if pet.get("pet_id") == new_pet_id:
                 matched = pet
@@ -154,6 +161,11 @@ def _project_change_pet(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
             matched = pet_list[idx]
 
     if matched is not None:
+        if matched.get("side") is None:
+            matched["side"] = 401 if is_opp else 1
+        if matched.get("slot") is None:
+            matched["slot"] = battle_pet_id
+        refresh_battle_uid(matched, side=401 if is_opp else 1)
         state[active_key] = matched
 
 

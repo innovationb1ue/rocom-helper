@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from src.analysis.pet_identity import battle_uid
 from src.data.loader import get_pet_meta, get_pet_skill_meta
 
 
@@ -18,7 +19,7 @@ class PetInfo:
         "energy", "buffs", "initial_buff_ids", "innate_skill_id",
         "level", "slot", "side", "stats", "skills", "equipped_skills",
         "base_id", "base_conf_id", "base_skill_pool", "combo_bonus", "poison_stacks",
-        "used_skills", "base_speed",
+        "used_skills", "base_speed", "battle_uid",
     )
 
     def __init__(self) -> None:
@@ -45,6 +46,7 @@ class PetInfo:
         self.poison_stacks: int = 0
         self.used_skills: List[Dict[str, Any]] = []
         self.base_speed: Optional[int] = None
+        self.battle_uid: Optional[str] = None
 
     def recalc_hp_pct(self) -> None:
         if self.max_hp > 0:
@@ -77,6 +79,7 @@ class PetInfo:
             "poison_stacks": self.poison_stacks,
             "used_skills": self.used_skills,
             "base_speed": self.base_speed,
+            "battle_uid": self.battle_uid,
         }
 
     @classmethod
@@ -117,6 +120,7 @@ class PetInfo:
         battle_stats = w.get("battle_stats") or []
         if len(battle_stats) >= 6 and battle_stats[5]:
             pet.base_speed = battle_stats[5]
+        pet.battle_uid = battle_uid(pet.to_dict())
         pet.recalc_hp_pct()
         return pet
 
@@ -158,5 +162,6 @@ class PetInfo:
                 skill_pool = get_pet_skill_meta(pet.base_id)
                 if isinstance(skill_pool, dict):
                     pet.base_skill_pool = skill_pool.get("level_skills") or []
+        pet.battle_uid = battle_uid(pet.to_dict())
         pet.recalc_hp_pct()
         return pet

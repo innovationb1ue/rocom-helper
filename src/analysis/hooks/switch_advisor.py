@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional
 from src.analysis.hook_registry import AnalysisHook, HookAdvice, HookContext, HookSignal, HookTrigger
 from src.analysis.constants import OPCODE_ACTION_RESOLVE
 from src.analysis.counter import CounterPicker
+from src.analysis.pet_identity import same_battle_pet
 from src.game.type_chart import TypeChart
 
 logger = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ class SwitchAdvisorHook(AnalysisHook):
 
         if is_opp_switch and not messages:
             best_switch = self._find_best_counter(my_pets, opp_active)
-            if best_switch and best_switch.get("pet_id") != my_active.get("pet_id"):
+            if best_switch and not same_battle_pet(best_switch, my_active):
                 pet_name = best_switch.get("name", "未知")
                 best_eff = self._best_effectiveness(
                     best_switch.get("types", []), opp_types,
@@ -155,20 +156,28 @@ class SwitchAdvisorHook(AnalysisHook):
 
         living = [
             p for p in my_pets
-            if p.get("current_hp", 1) > 0 and p.get("pet_id") != opp_pet.get("pet_id")
+            if p.get("current_hp", 1) > 0 and not same_battle_pet(p, opp_pet)
         ]
         if not living:
             return None
 
         norm_opp = {"types": opp_types}
         norm_living = [
-            {"types": p.get("types", []), "pet_id": p.get("pet_id"), "name": p.get("name")}
+            {
+                "types": p.get("types", []),
+                "pet_id": p.get("pet_id"),
+                "name": p.get("name"),
+                "slot": p.get("slot"),
+                "side": p.get("side"),
+                "base_conf_id": p.get("base_conf_id"),
+                "battle_uid": p.get("battle_uid"),
+            }
             for p in living
         ]
         counters = self._counter.find_counters([norm_opp], norm_living, top_n=1)
         if counters:
-            counter_id = counters[0].get("pet_id")
+            counter = counters[0]
             for p in living:
-                if p.get("pet_id") == counter_id:
+                if same_battle_pet(p, counter):
                     return p
         return None

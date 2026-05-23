@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional
 from src.analysis.damage_calc import DamageCalculator, DamageResult
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
+from src.analysis.pet_identity import same_battle_pet
 from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills
 from src.game.type_chart import TypeChart
 from src.game.skill_eval import score_skill
@@ -262,13 +263,21 @@ class BattleAdvisor:
             if my_pets:
                 living = [
                     p for p in my_pets
-                    if p.get("current_hp", 1) > 0 and p.get("pet_id") != my_active.get("pet_id")
+                    if p.get("current_hp", 1) > 0 and not same_battle_pet(p, my_active)
                 ]
                 if living:
                     picker = CounterPicker(self.chart)
                     norm_opp = {"types": opp_active.get("types", [])}
                     norm_living = [
-                        {"types": p.get("types", []), "pet_id": p.get("pet_id"), "name": p.get("name")}
+                        {
+                            "types": p.get("types", []),
+                            "pet_id": p.get("pet_id"),
+                            "name": p.get("name"),
+                            "slot": p.get("slot"),
+                            "side": p.get("side"),
+                            "base_conf_id": p.get("base_conf_id"),
+                            "battle_uid": p.get("battle_uid"),
+                        }
                         for p in living
                     ]
                     counters = picker.find_counters([norm_opp], norm_living, top_n=1)

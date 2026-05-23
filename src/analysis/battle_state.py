@@ -18,6 +18,7 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_info import PetInfo
+from src.analysis.pet_identity import is_hidden_pet_id, refresh_battle_uid, same_battle_pet
 from src.analysis.constants import (
     OPCODE_ACTION_RESOLVE,
     OPCODE_BATTLE_ENTER,
@@ -123,6 +124,25 @@ class BattleStateTracker:
                 return pet.get("name")
         return None
 
+    @staticmethod
+    def _stable_pet_matches(pet: Dict[str, Any], w: Dict[str, Any]) -> bool:
+        w_pid = w.get("pet_id") or w.get("pet_gid")
+        p_pid = pet.get("pet_id")
+        w_pet = {
+            "pet_id": w_pid,
+            "slot": w.get("slot"),
+            "side": w.get("side"),
+            "base_conf_id": w.get("base_conf_id"),
+            "battle_uid": w.get("battle_uid"),
+        }
+        if same_battle_pet(pet, w_pet):
+            return True
+        if p_pid is not None and w_pid is not None and p_pid == w_pid:
+            if is_hidden_pet_id(p_pid):
+                return pet.get("name") == (w.get("name") or w.get("pet_name"))
+            return True
+        return False
+
     def get_suggestions(self) -> List[Dict[str, str]]:
         """基于当前状态给出实时建议。委托给 battle_advisor.build_state_suggestions。"""
         from src.analysis.battle_advisor import build_state_suggestions
@@ -168,11 +188,19 @@ class BattleStateTracker:
             )
             if side == 1 or side == "我方":
                 my_pets.append(pet_info)
+                if pet_info.get("slot") is not None:
+                    self._player_slots.add(int(pet_info["slot"]))
             else:
                 opp_pets.append(pet_info)
+                if pet_info.get("slot") is not None:
+                    self._opponent_slots.add(int(pet_info["slot"]))
 
         self.state["my_pets"] = my_pets
         self.state["opp_pets"] = opp_pets
+        for pet in my_pets:
+            refresh_battle_uid(pet, side=1)
+        for pet in opp_pets:
+            refresh_battle_uid(pet, side=401)
         if my_pets:
             self.state["my_active"] = my_pets[0]
         if opp_pets:
@@ -369,11 +397,11 @@ class BattleStateTracker:
                 is_opp = False
 
         # 4. 用当前活跃宠物判断（换宠替换的是活跃宠物）
-        if is_opp is None:
+        if is_opp is None and rest_pet_id is not None:
             active = self.state.get("opp_active")
             if active and (active.get("pet_id") == rest_pet_id or active.get("base_conf_id") == rest_pet_id):
                 is_opp = True
-        if is_opp is None:
+        if is_opp is None and rest_pet_id is not None:
             active = self.state.get("my_active")
             if active and (active.get("pet_id") == rest_pet_id or active.get("base_conf_id") == rest_pet_id):
                 is_opp = False
@@ -430,6 +458,10 @@ class BattleStateTracker:
             matched = PetInfo.from_change_pet(entry, battle_pet_id, is_opp).to_dict()
             pet_list.append(matched)
         if matched is not None:
+            if matched.get("side") is None:
+                matched["side"] = 401 if is_opp else 1
+            if matched.get("slot") is None:
+                matched["slot"] = battle_pet_id
             # 如果获得了真实的 conf_id，更新宠物记录（从 20000000 更新为真实值）
             if new_pet_id is not None and new_pet_id != 20000000:
                 if matched.get("pet_id") == 20000000:
@@ -437,6 +469,7 @@ class BattleStateTracker:
             # 同样更新 base_conf_id
             if new_base_conf_id is not None and matched.get("base_conf_id") is None:
                 matched["base_conf_id"] = new_base_conf_id
+            refresh_battle_uid(matched, side=401 if is_opp else 1)
             self.state[active_key] = matched
             matched["buffs"] = []
             matched["combo_bonus"] = 0
@@ -680,7 +713,7 @@ class BattleStateTracker:
             pet_id = w.get("pet_id") or w.get("pet_gid")
             matched = None
             for pet in pet_list:
-                if self._pet_matches(pet, w):
+                if self._stable_pet_matches(pet, w):
                     matched = pet
                     if "hp" in w:
                         new_hp = w["hp"]
@@ -701,6 +734,10 @@ class BattleStateTracker:
                         pet["base_id"] = w["base_id"]
                     if w.get("base_conf_id") is not None:
                         pet["base_conf_id"] = w["base_conf_id"]
+                    if w.get("slot") is not None:
+                        pet["slot"] = w["slot"]
+                    if w.get("side") is not None:
+                        pet["side"] = w["side"]
                     if w.get("base_skill_pool") is not None:
                         pet["base_skill_pool"] = w["base_skill_pool"]
                     # 刷新先天特性
@@ -732,9 +769,11 @@ class BattleStateTracker:
                         pet["types"] = w["types"]
                     if pet["max_hp"] > 0:
                         pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
+                    refresh_battle_uid(pet)
                     break
             if matched is None:
                 pet_info = PetInfo.from_wrapper(w).to_dict()
+                refresh_battle_uid(pet_info)
                 pet_list.append(pet_info)
                 matched = pet_list[-1]
             # round_start wrapper 仅包含当前出战精灵，是活跃指针的权威数据
