@@ -1,0 +1,2529 @@
+{
+  "restraint_percent": {
+    "editor_name": "单倍克制伤害倍率",
+    "value": 10000
+  },
+  "double_restraint_percent": {
+    "editor_name": "双倍克制伤害倍率",
+    "value": 20000
+  },
+  "restrained_percent": {
+    "editor_name": "单倍被克制伤害倍率",
+    "value": 5000
+  },
+  "double_restrained_percent": {
+    "editor_name": "双倍被克制伤害倍率",
+    "value": 7500
+  },
+  "battle_unit_maximum": {
+    "editor_name": "战斗中一方上场的最大单位数量",
+    "value": 6
+  },
+  "battle_catch_times": {
+    "editor_name": "每回合最大抓捕次数",
+    "value": 1
+  },
+  "battle_overtime_limit": {
+    "editor_name": "战斗操作倒计时隐藏时间上限（大于这个值的倒计时都会隐藏掉）",
+    "value": 300
+  },
+  "battle_gve_blood_energy": {
+    "editor_name": "精灵选招完毕后获得能量数",
+    "value": []
+  },
+  "battle_gve_blood_deathround": {
+    "editor_name": "固定回合数+精灵死亡次数*系数",
+    "value": [
+      2,
+      2
+    ]
+  },
+  "battle_gve_blood_boss_energy": {
+    "editor_name": "血脉boss能量以及上限",
+    "value": 99
+  },
+  "catch_fight_max": {
+    "editor_name": "捕捉概率战斗修正最大值",
+    "value": 10000
+  },
+  "catch_icon_display_time": {
+    "editor_name": "捕捉广播图标显示的秒数",
+    "value": 3
+  },
+  "_all": {
+    "battle_unit_maximum": {
+      "editor_name": "战斗中一方上场的最大单位数量",
+      "value": 6
+    },
+    "battle_catch_times": {
+      "editor_name": "每回合最大抓捕次数",
+      "value": 1
+    },
+    "base_prob_ball_id": {
+      "editor_name": "作为基础捕获率参照的咕噜球id",
+      "value": 100002
+    },
+    "history_time_maximum": {
+      "editor_name": "历史捕捉次数已配置的最大次数",
+      "value": 27
+    },
+    "battle_overtime_limit": {
+      "editor_name": "战斗操作倒计时隐藏时间上限（大于这个值的倒计时都会隐藏掉）",
+      "value": 300
+    },
+    "pvp_tem_battle_id": {
+      "editor_name": "简单PVP战斗指定的战斗ID",
+      "value": [
+        307001,
+        307002
+      ]
+    },
+    "restraint_percent": {
+      "editor_name": "单倍克制伤害倍率",
+      "value": 10000
+    },
+    "double_restraint_percent": {
+      "editor_name": "双倍克制伤害倍率",
+      "value": 20000
+    },
+    "restrained_percent": {
+      "editor_name": "单倍被克制伤害倍率",
+      "value": 5000
+    },
+    "double_restrained_percent": {
+      "editor_name": "双倍被克制伤害倍率",
+      "value": 7500
+    },
+    "catch_fight_max": {
+      "editor_name": "捕捉概率战斗修正最大值",
+      "value": 10000
+    },
+    "catch_pet_back_level（废弃，在monster中每个怪都可单独配置）": {
+      "editor_name": "捕捉宠物回退等级（全局）",
+      "value": 10
+    },
+    "catch_icon_display_time": {
+      "editor_name": "捕捉广播图标显示的秒数",
+      "value": 3
+    },
+    "1vn_battle_id": {
+      "editor_name": "大世界1VN战斗指定的战斗ID",
+      "value": 307003
+    },
+    "1vn_battle_radius": {
+      "editor_name": "大世界1VN战斗抓取半径",
+      "value": 1000
+    },
+    "battle_gve_blood_energy": {
+      "editor_name": "精灵选招完毕后获得能量数",
+      "value": []
+    },
+    "battle_gve_blood_deathround": {
+      "editor_name": "固定回合数+精灵死亡次数*系数",
+      "value": [
+        2,
+        2
+      ]
+    },
+    "battle_gve_blood_boss_energy": {
+      "editor_name": "血脉boss能量以及上限",
+      "value": 99
+    },
+    "1v1v1_battle_id": {
+      "editor_name": "大世界1V1V1战斗指定的战斗ID",
+      "value": 307015
+    },
+    "1v1v1_battle_radius": {
+      "editor_name": "大世界1V1V1战斗抓取半径",
+      "value": 2000
+    },
+    "default_battle_time_limit": {
+      "editor_name": "默认战斗最大时长，单位为秒",
+      "value": 7200
+    },
+    "B1_final_battle_state3_evolution": {
+      "editor_name": "B1最终战，3阶段特殊技能id",
+      "value": 7000341
+    },
+    "B1_FINAL_BATTLE_STATE2_INITIAL_GPA": {
+      "editor_name": "B1最终战2阶段的初始绩点",
+      "value": 1000
+    },
+    "B1_FINAL_BATTLE_STATE3_INITIAL_GPA": {
+      "editor_name": "B1最终战3阶段的初始绩点",
+      "value": 9999
+    },
+    "B1_FINAL_BATTLE_STATE2_SIGN_DIALOGUE": {
+      "editor_name": "B1最终战2阶段触发特殊逻辑的对话",
+      "value": 24999022
+    },
+    "B1_FINAL_BATTLE_STATE2_SIGN_SKILL": {
+      "editor_name": "B1最终战2阶段触发特殊逻辑的技能",
+      "value": 7000341
+    },
+    "B1_FINAL_BATTLE_STATE3_SIGN_DIALOGUE": {
+      "editor_name": "B1最终战3阶段的分屏dialogue",
+      "value": 24999035
+    },
+    "B1_TEACHER_CURE": {
+      "editor_name": "B1魔药老师技能",
+      "value": 7000351
+    },
+    "B1_TEACHER_BUFF": {
+      "editor_name": "B1双人老师技能",
+      "value": 7000352
+    },
+    "B1_FINAL_BATTLE_STATE3_LB": {
+      "editor_name": "B1最终战3阶段奥义",
+      "value": 7000346
+    },
+    "B1_TEACHER_CURE_DIALOGUE": {
+      "editor_name": "B1魔药老师对话",
+      "value": 24999033
+    },
+    "B1_TEACHER_BUFF_DIALOGUE": {
+      "editor_name": "B1双人老师对话",
+      "value": 24999034
+    },
+    "B1_P2_ROUND1_DIALOGUE": {
+      "editor_name": "B1最终战p2第一回合对话",
+      "value": 24999010
+    },
+    "B1_P3_ROUND1_DIALOGUE": {
+      "editor_name": "B1最终战p3第一回合对话",
+      "value": 24999025
+    },
+    "B1_P3_ROUND3_DIALOGUE": {
+      "editor_name": "B1最终战p3第3回合对话",
+      "value": 24999037
+    },
+    "B1_FINAL_P2_REST_WEATHER_BUFF": {
+      "editor_name": "B1最终战P1结束P2开始时，重置天气的effect",
+      "value": 1029001
+    },
+    "B1_P1_ROUND1_DIALOGUE": {
+      "editor_name": "B1最终战p1第一回合对话",
+      "value": 24999001
+    },
+    "B1_P3_MAXROUND": {
+      "editor_name": "B1最终战最大回合数",
+      "value": 4
+    },
+    "B1_P2_END_DIALOGUE": {
+      "editor_name": "P2尾声对话",
+      "value": 24999061
+    },
+    "B1_P2_START_DIALOGUE": {
+      "editor_name": "P2入场前对话",
+      "value": 24999013
+    },
+    "character_max_energy": {
+      "editor_name": "角色用于必杀技消耗的最大能量点",
+      "value": 9
+    },
+    "pet_common_globalskill": {
+      "editor_name": "通用必杀技能",
+      "value": 7000010
+    },
+    "triple_restraint_percent": {
+      "editor_name": "三倍克制伤害倍率",
+      "value": 30000
+    },
+    "triple_restrained_percent": {
+      "editor_name": "三倍被克制伤害倍率",
+      "value": 9900
+    },
+    "match_pattern_time": {
+      "editor_name": "GM工具匹配时间（秒）",
+      "value": 20000
+    },
+    "match_pattern_battleid": {
+      "editor_name": "1v1人机模式随机池子",
+      "value": [
+        399041,
+        399042,
+        399043,
+        399044,
+        399045,
+        399046
+      ]
+    },
+    "match_pattern_battleid2": {
+      "editor_name": "2v2人机模式随机池子",
+      "value": [
+        399032,
+        399033,
+        399034
+      ]
+    },
+    "match_pattern_practicemode": {
+      "editor_name": "练习模式木桩",
+      "value": 399039
+    },
+    "Change_pet_skill": {
+      "editor_name": "是否开启登场宠物释放技能",
+      "value": 1
+    },
+    "battle_field_layer_max": {
+      "editor_name": "战场势能最大层数",
+      "value": 3
+    },
+    "battle_entry_role_hp_low_text": {
+      "editor_name": "主角HP值显示UI的文字显示--与野怪战斗，进战斗初始即为决战回合（暂时无引用）",
+      "value": []
+    },
+    "battle_process_role_hp_deduct_text": {
+      "editor_name": "主角HP消耗UI的文字显示--非决战回合",
+      "value": []
+    },
+    "battle_end_role_hp_deduct_text": {
+      "editor_name": "主角HP消耗UI的文字显示--最后一回合，接返回复活点界面",
+      "value": []
+    },
+    "battle_process_opposite_hp_deduct_text": {
+      "editor_name": "人形怪HP消耗UI的文字显示--中间回合",
+      "value": []
+    },
+    "battle_end_opposite_hp_deduct_text": {
+      "editor_name": "人形怪HP消耗UI的文字显示--消耗完干劲值，最终回合",
+      "value": []
+    },
+    "battle_people_hp_rules": {
+      "editor_name": "与人形怪战斗，战斗开始规则介绍UI的文字说明",
+      "value": []
+    },
+    "enjoy_field_buff1": {
+      "editor_name": "环境亲和【弱】BUFF id",
+      "value": 20010110
+    },
+    "enjoy_field_buff2": {
+      "editor_name": "环境亲和【强】BUFF id",
+      "value": 20010130
+    },
+    "hate_field_buff1": {
+      "editor_name": "环境抵触【弱】BUFF id",
+      "value": 20010150
+    },
+    "hate_field_buff2": {
+      "editor_name": "环境抵触【强】BUFF id",
+      "value": 20010170
+    },
+    "catch_handicap": {
+      "editor_name": "全局捕捉难度常数A",
+      "value": 7700
+    },
+    "sneak_modify": {
+      "editor_name": "偷袭修正",
+      "value": 150000
+    },
+    "min_throw_distance": {
+      "editor_name": "最小投掷奖励距离（单位为cm）",
+      "value": 500
+    },
+    "throw_distance": {
+      "editor_name": "投掷距离换算参数",
+      "value": 5
+    },
+    "throw_distance_reward": {
+      "editor_name": "投掷距离奖励修正常数",
+      "value": 20000
+    },
+    "throw_distance_reward_max": {
+      "editor_name": "最大投掷距离奖励补正",
+      "value": 4000
+    },
+    "catch_pr_low": {
+      "editor_name": "捕捉率指示器禁止捕捉概率范围（红色瞄准框）",
+      "value": [
+        0,
+        500
+      ]
+    },
+    "catch_pr_middle": {
+      "editor_name": "捕捉率指示器1格概率范围（黄色瞄准框）",
+      "value": [
+        500,
+        1500
+      ]
+    },
+    "catch_pr_high": {
+      "editor_name": "捕捉率指示器2格概率范围（白色瞄准框）",
+      "value": [
+        1500,
+        10000
+      ]
+    },
+    "catch_pr_full": {
+      "editor_name": "捕捉率指示器3格概率范围",
+      "value": [
+        8000,
+        10000
+      ]
+    },
+    "pvp_open": {
+      "editor_name": "pvp功能开关",
+      "value": 1
+    },
+    "game_time_per_round": {
+      "editor_name": "每回合推进的时间（游戏内时间，秒）",
+      "value": 360
+    },
+    "damage_percent_limit": {
+      "editor_name": "百分比增减伤保护",
+      "value": 1000
+    },
+    "battle_skill_prediction_sihu": {
+      "editor_name": "出招提示tips的标题似乎想要",
+      "value": []
+    },
+    "battle_skill_prediction_xiang": {
+      "editor_name": "出招提示tips的文字，向",
+      "value": []
+    },
+    "battle_skill_prediction_shifang": {
+      "editor_name": "出招提示tips的文字，释放某种技能",
+      "value": []
+    },
+    "area_succeed_percent": {
+      "editor_name": "光环判断成功所需目标地块比例（万分比）",
+      "value": 5000
+    },
+    "aura_battle_dilation": {
+      "editor_name": "光环在战斗中的延长时间比例（万分比）",
+      "value": 20000
+    },
+    "base_model_radius": {
+      "editor_name": "模型比例基础半径（单位厘米）",
+      "value": 100
+    },
+    "base_aura_radies": {
+      "editor_name": "光环比例基础半径（单位厘米）",
+      "value": 300
+    },
+    "aura_trans_percent": {
+      "editor_name": "缩放光环对应的缩放比例（万分比）",
+      "value": 1500
+    },
+    "round_energy": {
+      "editor_name": "每回合回复的能量",
+      "value": []
+    },
+    "magicstar_catch_modify": {
+      "editor_name": "星星魔法标记捕捉修正",
+      "value": 12000
+    },
+    "level_modify": {
+      "editor_name": "等级修正参数",
+      "value": 10800
+    },
+    "battle_skill_prediction_sihubu": {
+      "editor_name": "似乎不会使用",
+      "value": []
+    },
+    "sleep_buff_id": {
+      "editor_name": "睡眠BUFFid",
+      "value": 20500010
+    },
+    "escape_emote": {
+      "editor_name": "触发自动逃跑时，NPC播放的动作",
+      "value": 9
+    },
+    "backstab_buff_id": {
+      "editor_name": "背袭捕捉BUFFid",
+      "value": 20330010
+    },
+    "change_pet_icon": {
+      "editor_name": "换宠技能的显示，用来在洞察系统中显示",
+      "value": 7000080
+    },
+    "escape_failure_emote": {
+      "editor_name": "逃跑失败的动作",
+      "value": 18
+    },
+    "escape_call_back": {
+      "editor_name": "自动逃跑收宠动画资源id（skill_res)",
+      "value": 791214
+    },
+    "escape_camera_time": {
+      "editor_name": "自动逃跑镜头的持续时间（毫秒）",
+      "value": 2000
+    },
+    "battle_npc_skill_prediction_sihu": {
+      "editor_name": "出招提示tips的标题似乎想要",
+      "value": []
+    },
+    "battle_npc_skill_prediction_xiang": {
+      "editor_name": "出招提示tips的文字，向",
+      "value": []
+    },
+    "battle_npc_skill_prediction_shifang": {
+      "editor_name": "出招提示tips的文字，释放某种技能",
+      "value": []
+    },
+    "battle_npc_skill_prediction_sihubu": {
+      "editor_name": "似乎不会使用",
+      "value": []
+    },
+    "sleep_buff_loop": {
+      "editor_name": "睡眠BUFF持续时的TIP",
+      "value": []
+    },
+    "sleep_buff_end": {
+      "editor_name": "睡眠BUFF结束时的TIP",
+      "value": []
+    },
+    "backstab_buff_loop": {
+      "editor_name": "背袭BUFF持续时的TIP",
+      "value": []
+    },
+    "backstab_buff_end": {
+      "editor_name": "背袭BUFF结束时的TIP",
+      "value": []
+    },
+    "drill_buff_id": {
+      "editor_name": "进战埋地BUFFid",
+      "value": 20500030
+    },
+    "drill_buff_loop": {
+      "editor_name": "埋地BUFF持续时的TIP",
+      "value": []
+    },
+    "drill_buff_end": {
+      "editor_name": "埋地BUFF结束时的TIP",
+      "value": []
+    },
+    "static_buff_id": {
+      "editor_name": "进战静止BUFFid",
+      "value": 20500040
+    },
+    "static_buff_loop": {
+      "editor_name": "静止BUFF持续时的TIP",
+      "value": []
+    },
+    "static_buff_end": {
+      "editor_name": "静止BUFF结束时的TIP",
+      "value": []
+    },
+    "mimic_buff_id": {
+      "editor_name": "进战幻化BUFFid",
+      "value": 20500050
+    },
+    "mimic_buff_loop": {
+      "editor_name": "幻化BUFF持续时的TIP",
+      "value": []
+    },
+    "mimic_buff_end": {
+      "editor_name": "幻化BUFF结束时的TIP",
+      "value": []
+    },
+    "drill_forbid_catch": {
+      "editor_name": "埋地BUFF持续时被捕捉的TIP",
+      "value": []
+    },
+    "static_forbid_catch": {
+      "editor_name": "静止BUFF持续时被捕捉的TIP",
+      "value": []
+    },
+    "mimic_forbid_catch": {
+      "editor_name": "幻化BUFF持续时被捕捉的TIP",
+      "value": []
+    },
+    "magic_stun_buff_id": {
+      "editor_name": "魔法击晕BUFFid",
+      "value": 20500060
+    },
+    "magic_stun_loop": {
+      "editor_name": "魔法击晕BUFF持续时的TIP",
+      "value": []
+    },
+    "magic_stun_end": {
+      "editor_name": "魔法击晕BUFF结束时的TIP",
+      "value": []
+    },
+    "is_battle_defeat_get_energy": {
+      "editor_name": "击败野怪回复能量的功能--开关",
+      "value": []
+    },
+    "sleep_skill_tip": {
+      "editor_name": "睡眠BUFF持续时释放技能的TIP",
+      "value": []
+    },
+    "drill_skill_tip": {
+      "editor_name": "埋地BUFF持续时释放技能的TIP",
+      "value": []
+    },
+    "static_skill_tip": {
+      "editor_name": "静止BUFF持续时释放技能的TIP",
+      "value": []
+    },
+    "mimic_skill_tip": {
+      "editor_name": "幻化BUFF持续时释放技能的TIP",
+      "value": []
+    },
+    "battle_skill_prediction_energy": {
+      "editor_name": "洞察系统中，能量的描述",
+      "value": []
+    },
+    "drill_forbid_props": {
+      "editor_name": "埋地BUFF持续时被使用道具的TIP",
+      "value": []
+    },
+    "static_forbid_props": {
+      "editor_name": "静止BUFF持续时被使用道具的TIP",
+      "value": []
+    },
+    "mimic_forbid_props": {
+      "editor_name": "幻化BUFF持续时被使用道具的TIP",
+      "value": []
+    },
+    "pet_word_hint": {
+      "editor_name": "精灵使用文字洞察的通用id",
+      "value": 10001
+    },
+    "disable_pet_hint": {
+      "editor_name": "是否屏蔽旧的精灵洞察",
+      "value": 1
+    },
+    "deepwater_length": {
+      "editor_name": "深水区判定深度（厘米）",
+      "value": 8
+    },
+    "buff_tip_show_time_cd": {
+      "editor_name": "效果的显示文字间隔时间（毫秒）",
+      "value": 800
+    },
+    "ghost_buff_id": {
+      "editor_name": "进战幽灵化BUFFid",
+      "value": 20500070
+    },
+    "thunder_buff_id": {
+      "editor_name": "进战闪电化BUFFid",
+      "value": 20500080
+    },
+    "diving_buff_id": {
+      "editor_name": "进战潜水BUFFid",
+      "value": 20500090
+    },
+    "trail_buff_id": {
+      "editor_name": "进战尾随BUFFid",
+      "value": 20500100
+    },
+    "thunder_buff_loop": {
+      "editor_name": "闪电步BUFF持续时的TIP",
+      "value": []
+    },
+    "diving_buff_loop": {
+      "editor_name": "潜水BUFF持续时的TIP",
+      "value": []
+    },
+    "trail_buff_loop": {
+      "editor_name": "尾随BUFF持续时的TIP",
+      "value": []
+    },
+    "notify_radius": {
+      "editor_name": "通知半径（m）",
+      "value": 15
+    },
+    "reset_time": {
+      "editor_name": "重置时间（s）",
+      "value": 60
+    },
+    "burnout_time": {
+      "editor_name": "倦怠次数",
+      "value": 3
+    },
+    "delay_time_basic": {
+      "editor_name": "呼朋引伴基础延迟时间",
+      "value": []
+    },
+    "delay_time_growth_distance": {
+      "editor_name": "呼朋引伴延迟增长距离基数",
+      "value": 100
+    },
+    "delay_time_growth_rate": {
+      "editor_name": "呼朋引伴每距离基数增长延迟",
+      "value": []
+    },
+    "WaterShakeGapTime": {
+      "editor_name": "水面战斗镜头晃动间隔（秒）",
+      "value": 45
+    },
+    "WaterShakeSpendTime": {
+      "editor_name": "水面战斗镜头晃动持续（秒）",
+      "value": 2
+    },
+    "touch_battle_min_cd": {
+      "editor_name": "接触战斗最短触发间隔",
+      "value": 3
+    },
+    "ball_shake_times_param": {
+      "editor_name": "球抖动分布计算参数",
+      "value": 10000
+    },
+    "worldcombat_battle_basetime": {
+      "editor_name": "新首领战基础出手次数",
+      "value": 1
+    },
+    "worldcombat_battle_dizzy1": {
+      "editor_name": "新首领战1阶眩晕剩余时间；首回合出手次数；首领眩晕回合；战斗最大回合",
+      "value": [
+        0,
+        15,
+        1,
+        1,
+        999
+      ]
+    },
+    "worldcombat_battle_dizzy2": {
+      "editor_name": "新首领战2阶眩晕剩余时间；首回合出手次数；首领眩晕回合；战斗最大回合",
+      "value": [
+        15,
+        30,
+        1,
+        1,
+        999
+      ]
+    },
+    "touch_battle_player_trigger_angle": {
+      "editor_name": "接触进战斗玩家触发角度",
+      "value": 30
+    },
+    "touch_battle_npc_trigger_angle": {
+      "editor_name": "接触进战斗精灵触发角度",
+      "value": 30
+    },
+    "1vn_battle_throwbattle_attack_radius": {
+      "editor_name": "大世界1VN战斗-投掷交互抓取攻击精灵半径",
+      "value": 600
+    },
+    "1vn_battle_throwbattle_group_radius": {
+      "editor_name": "大世界1VN战斗-投掷交互抓取群组精灵半径",
+      "value": 1500
+    },
+    "1vn_battle_touchbattle_attack_radius": {
+      "editor_name": "大世界1VN战斗-接触交互抓取攻击精灵半径",
+      "value": 800
+    },
+    "1vn_battle_touchbattle_group_radius": {
+      "editor_name": "大世界1VN战斗-接触交互抓取群组精灵半径",
+      "value": 1500
+    },
+    "backstab_throwbattle_trigger_angle": {
+      "editor_name": "背袭战斗-投掷交互角度",
+      "value": 60
+    },
+    "backstab_touchbattle_trigger_angle": {
+      "editor_name": "背袭战斗-接触交互角度",
+      "value": 45
+    },
+    "player_hit_npc_world_animation": {
+      "editor_name": "玩家撞-精灵大世界动画",
+      "value": []
+    },
+    "player_hit_npc_closeup_animation": {
+      "editor_name": "玩家撞-精灵近景动画",
+      "value": []
+    },
+    "player_hit_skip_throw_ball": {
+      "editor_name": "玩家撞-是否跳过玩家扔球动画",
+      "value": []
+    },
+    "npc_hit_player_world_animation": {
+      "editor_name": "精灵撞-玩家大世界动画",
+      "value": []
+    },
+    "npc_hit_npc_closeup_animation": {
+      "editor_name": "精灵撞-精灵近景动画",
+      "value": []
+    },
+    "npc_hit_skip_throw_ball": {
+      "editor_name": "精灵撞-是否跳过玩家扔球动画",
+      "value": 1
+    },
+    "each_hit_npc_closeup_animation": {
+      "editor_name": "互相撞-精灵近景动画",
+      "value": []
+    },
+    "each_hit_npc_world_animation": {
+      "editor_name": "互相撞-精灵大世界动画",
+      "value": []
+    },
+    "each_hit_player_world_animation": {
+      "editor_name": "互相撞-玩家大世界动画",
+      "value": []
+    },
+    "each_hit_skip_throw_ball": {
+      "editor_name": "互相撞-是否跳过玩家扔球动画",
+      "value": []
+    },
+    "velocity_difference_threshold": {
+      "editor_name": "改变撞击类型的速度差阈值",
+      "value": 200
+    },
+    "worldcombat_battle_dizzy_buff1": {
+      "editor_name": "新首领战--眩晕buff1",
+      "value": 20040030
+    },
+    "worldcombat_battle_dizzy_buff2": {
+      "editor_name": "新首领战--眩晕buff2",
+      "value": 20040031
+    },
+    "worldcombat_battle_weak_buff": {
+      "editor_name": "【废弃】新首领战--虚弱",
+      "value": 20010200
+    },
+    "low_catch_prob_show": {
+      "editor_name": "战斗中，捕捉率低精灵表演（红色瞄准框）",
+      "value": []
+    },
+    "middle_catch_prob_show": {
+      "editor_name": "战斗中，捕捉率较低精灵表演（黄色瞄准框）",
+      "value": []
+    },
+    "high_catch_prob_show": {
+      "editor_name": "战斗中，捕捉率正常精灵表演",
+      "value": []
+    },
+    "worldcombat_battle_dizzy_buff0": {
+      "editor_name": "新首领战--眩晕buff0",
+      "value": 20040032
+    },
+    "block_hit_animation_battle_ai_status": {
+      "editor_name": "屏蔽接触进战受击动画的AI状态",
+      "value": [
+        3,
+        6,
+        8,
+        10
+      ]
+    },
+    "1vn_battle_cheer_pet_enter": {
+      "editor_name": "1VN战斗围攻精灵登场TIP",
+      "value": []
+    },
+    "1vn_battle_pet_join_1vn": {
+      "editor_name": "1VN战斗开始TIP",
+      "value": []
+    },
+    "1vn_battle_cheer_pet_escape": {
+      "editor_name": "1VN战斗围攻精灵逃离TIP",
+      "value": []
+    },
+    "worldcombat_battle_dizzy_buff3": {
+      "editor_name": "新首领战--眩晕buff3",
+      "value": 20040033
+    },
+    "worldcombat_battle_dizzy_buff4": {
+      "editor_name": "新首领战--眩晕buff4",
+      "value": 20040034
+    },
+    "worldcombat_battle_broken_weakness1": {
+      "editor_name": "【废弃】新首领战——扔中弱点/击破1弱点，赋予效果层数",
+      "value": 2
+    },
+    "worldcombat_battle_broken_weakness2": {
+      "editor_name": "【废弃】新首领战——扔中弱点+击破1弱点/击破2弱点，赋予效果层数",
+      "value": 4
+    },
+    "worldcombat_battle_broken_weakness3": {
+      "editor_name": "【废弃】新首领战——扔中弱点+击破2弱点/击破3弱点，赋予效果层数",
+      "value": 6
+    },
+    "worldcombat_battle_dizzy3": {
+      "editor_name": "新首领战3阶眩晕剩余时间；首回合出手次数；首领眩晕回合；战斗最大回合",
+      "value": [
+        30,
+        45,
+        1,
+        1,
+        999
+      ]
+    },
+    "worldcombat_battle_dizzy4": {
+      "editor_name": "新首领战4阶眩晕剩余时间；首回合出手次数；首领眩晕回合；战斗最大回合",
+      "value": [
+        45,
+        60,
+        1,
+        1,
+        999
+      ]
+    },
+    "1vn_battle_surrender": {
+      "editor_name": "1VN战斗启用投降模式",
+      "value": []
+    },
+    "worldcombat_battle_weak_buff_plus": {
+      "editor_name": "【废弃】新首领战--虚弱（通用弱点时的虚弱）",
+      "value": 20010200
+    },
+    "worldcombat_battle_broken_weakness1_plus": {
+      "editor_name": "【废弃】新首领战——扔中弱点/击破1弱点，赋予效果层数（通用弱点时的虚弱）",
+      "value": 1
+    },
+    "worldcombat_battle_broken_weakness2_plus": {
+      "editor_name": "【废弃】新首领战——扔中弱点+击破1弱点/击破2弱点，赋予效果层数（通用弱点时的虚弱）",
+      "value": 2
+    },
+    "worldcombat_battle_broken_weakness3_plus": {
+      "editor_name": "【废弃】新首领战——扔中弱点+击破2弱点/击破3弱点，赋予效果层数（通用弱点时的虚弱）",
+      "value": 3
+    },
+    "catch_guarant_retain_time": {
+      "editor_name": "捕捉保底清零间隔时间，单位为秒",
+      "value": 180
+    },
+    "exit_evolve_confirm_time": {
+      "editor_name": "自动关闭（战斗中）进化确认页的时间，单位为秒",
+      "value": 180
+    },
+    "exit_evolve_finish_time": {
+      "editor_name": "自动关闭（战斗中）进化结算页的时间，单位为秒",
+      "value": 30
+    },
+    "nightmare_pet_buff": {
+      "editor_name": "噩梦buff",
+      "value": 20960010
+    },
+    "worldcombat_battle_dizzy0": {
+      "editor_name": "新首领战未眩晕时，首回合出手次数；首领眩晕回合；战斗最大回合",
+      "value": [
+        1,
+        0,
+        999
+      ]
+    },
+    "nonmagic_battle_ai_status": {
+      "editor_name": "非星星魔法击晕的进战AI状态的id",
+      "value": 20
+    },
+    "3dui_switch_on_battle_type": {
+      "editor_name": "启用3dUI的战斗类型",
+      "value": [
+        11,
+        12,
+        19,
+        31
+      ]
+    },
+    "battle_map_local_blood": {
+      "editor_name": "血脉团体战场景路径",
+      "value": []
+    },
+    "blood_pr_low": {
+      "editor_name": "低血量（显示红色），万进制，左开右闭",
+      "value": [
+        0,
+        2500
+      ]
+    },
+    "blood_pr_middle": {
+      "editor_name": "中等血量（显示黄色），万进制，左开右闭",
+      "value": [
+        2500,
+        5000
+      ]
+    },
+    "battle_mimic_tip_skill": {
+      "editor_name": "触发木桶戏法时，隐藏精灵的tip中显示的特性",
+      "value": 299001
+    },
+    "battle_attention_tip_show_time": {
+      "editor_name": "战斗规则UI界面不可关闭的时间（毫秒）",
+      "value": 1000
+    },
+    "worldcombat_battle_execution_trigger": {
+      "editor_name": "【商测版本】首领战进入奖励回合的触发血量万分比",
+      "value": 5000
+    },
+    "worldcombat_battle_execution_round": {
+      "editor_name": "【商测版本】进入奖励回合前的行动次数区间；进入奖励回合内的连续出手次数；眩晕buffid",
+      "value": [
+        1,
+        3,
+        5,
+        20040035,
+        4,
+        7,
+        4,
+        20040036,
+        7,
+        999,
+        3,
+        20040037
+      ]
+    },
+    "worldcombat_battle_gain_expose": {
+      "editor_name": "【商测版本】WBE_GAIN_EXPOSE枚举对应的buff_config中的ID（注意生命翻倍当前单独处理改值）",
+      "value": [
+        2,
+        20011200,
+        3,
+        20011210,
+        4,
+        20011220,
+        5,
+        20011230,
+        6,
+        20011240
+      ]
+    },
+    "worldcombat_battle_pet_buff": {
+      "editor_name": "【商测版本】首领战局外精灵获得的world_buffid",
+      "value": 30016
+    },
+    "no_pet_battle": {
+      "editor_name": "可以不带精灵的战斗（序章专用）",
+      "value": [
+        308132,
+        308133,
+        308134
+      ]
+    },
+    "AI_battle_list": {
+      "editor_name": "人工智能接入战斗名单",
+      "value": [
+        316051,
+        316053,
+        316054,
+        316055,
+        316057,
+        316058,
+        316059,
+        316061,
+        316062
+      ]
+    },
+    "AI_uid_list": {
+      "editor_name": "人工智能在基础列表的基础上额外增加的玩家名单",
+      "value": [
+        335545836,
+        301993963,
+        402656964,
+        738199397,
+        469763935,
+        402655282,
+        268438564,
+        637534239,
+        905971225,
+        771754862,
+        905969860,
+        301991673,
+        469762363
+      ]
+    },
+    "AI_battle_switch": {
+      "editor_name": "是否开启人工智能",
+      "value": 2
+    },
+    "parallel_buff_list": {
+      "editor_name": "触发吹飞特殊后置时，需要并行的buffid",
+      "value": [
+        20940010,
+        20940011
+      ]
+    },
+    "parallel_buff_show_time": {
+      "editor_name": "触发吹飞特殊后置时，需要并行的buffid的最大并行时间（毫秒）",
+      "value": 800
+    },
+    "pvp_rank_stage_bgm": {
+      "editor_name": "pvp排位的BGM",
+      "value": []
+    },
+    "fantastic_blood_pro": {
+      "editor_name": "野外捕捉的精灵是奇异血脉的概率(百万）",
+      "value": 100
+    },
+    "warm_control_enable_pvp": {
+      "editor_name": "pvpAI模型是否开启温暖局",
+      "value": 1
+    },
+    "warm_control_enable_pve": {
+      "editor_name": "pveAI模型是否开启温暖局",
+      "value": []
+    },
+    "advanced_evolution_level_1": {
+      "editor_name": "下一次进化等级处于1~20级时，进化等级-当前等级需＜a",
+      "value": 5
+    },
+    "advanced_evolution_level_2": {
+      "editor_name": "下一次进化等级处于21~30级时，进化等级-当前等级需＜b",
+      "value": 5
+    },
+    "advanced_evolution_level_3": {
+      "editor_name": "下一次进化等级处于31~40级时，进化等级-当前等级需＜c",
+      "value": 10
+    },
+    "advanced_evolution_level_4": {
+      "editor_name": "下一次进化等级处于41~50级时，进化等级-当前等级需＜d",
+      "value": 10
+    },
+    "advanced_evolution_level_5": {
+      "editor_name": "下一次进化等级处于51~60级时，进化等级-当前等级需＜e",
+      "value": 10
+    },
+    "advanced_evolution_player_RemainingHealth": {
+      "editor_name": "配置玩家剩余血量低于多少时，可触发超前进化",
+      "value": 1
+    },
+    "advanced_evolution_pet_RemainingHealth": {
+      "editor_name": "配置站场友方精灵剩余血量≤多少时，可触发超前进化（万分比）",
+      "value": 2500
+    },
+    "advanced_evolution_probability": {
+      "editor_name": "配置触发超前进化的概率（万分比）。概率待观察",
+      "value": 1000
+    },
+    "battle_process_assist_hp_deduct_text": {
+      "editor_name": "助战HP消耗UI的文字显示--非决战回合",
+      "value": []
+    },
+    "battle_end_assist_hp_deduct_text": {
+      "editor_name": "助战HP消耗UI的文字显示--最后一回合，接返回复活点界面",
+      "value": []
+    },
+    "1vn_escape_res": {
+      "editor_name": "1vn替补精灵逃跑的资源",
+      "value": []
+    },
+    "catch_pet_recover_playermagic_time": {
+      "editor_name": "捕捉精灵是否回复共鸣魔法次数，配1开启功能",
+      "value": 1
+    },
+    "buff_list_show_num": {
+      "editor_name": "buff栏最大显示buff数量",
+      "value": 5
+    },
+    "battle_attention_tip_close_time": {
+      "editor_name": "战斗规则UI界面最多可显示时间（秒）",
+      "value": 5
+    },
+    "battle_npc_guarantee": {
+      "editor_name": "战斗中配了不合法的NPC时的保底显示",
+      "value": 12017
+    },
+    "muti_pve_round_select_timeout": {
+      "editor_name": "联机多人战斗回合限制时间",
+      "value": 60
+    },
+    "syn_battle_waiting_tip": {
+      "editor_name": "同步进战等待其他玩家选招提示",
+      "value": []
+    },
+    "syn_battle_catch_tip": {
+      "editor_name": "同步进战其他玩家捕捉提示",
+      "value": []
+    },
+    "syn_battle_other_player_flee_tip": {
+      "editor_name": "同步进战其他玩家逃跑提示",
+      "value": []
+    },
+    "watch_to_assist_not_friend_tip": {
+      "editor_name": "不是好友无法观战转助战提示TIP",
+      "value": []
+    },
+    "watch_to_assist_player_is_full_tip": {
+      "editor_name": "观战转助战但是人数已满提示",
+      "value": []
+    },
+    "watch_to_assist_battle_tip": {
+      "editor_name": "观战转助战提示TIP",
+      "value": []
+    },
+    "assist_battle_tip": {
+      "editor_name": "助战表演提示TIP",
+      "value": []
+    },
+    "syn_battle_end_waiting_time": {
+      "editor_name": "同步进战有一方提前离开战斗的等待倒计时",
+      "value": 10
+    },
+    "syn_battle_choose_other_player_pet": {
+      "editor_name": "同步进战更换精灵点选其他玩家精灵提示",
+      "value": []
+    },
+    "observed_battle_end_tip": {
+      "editor_name": "观战战斗结束提示",
+      "value": []
+    },
+    "catch_bigworld_low_1": {
+      "editor_name": "局外捕捉概率低",
+      "value": [
+        0,
+        500
+      ]
+    },
+    "catch_bigworld_middle_2": {
+      "editor_name": "局外捕捉概率较低",
+      "value": [
+        500,
+        1500
+      ]
+    },
+    "catch_bigworld_middle_3": {
+      "editor_name": "局外捕捉概率中",
+      "value": [
+        1500,
+        5000
+      ]
+    },
+    "catch_bigworld_high_4": {
+      "editor_name": "局外捕捉概率较高",
+      "value": [
+        5000,
+        7000
+      ]
+    },
+    "catch_bigworld_high_5": {
+      "editor_name": "局外捕捉概率高",
+      "value": [
+        7000,
+        10000
+      ]
+    },
+    "dimo_battle_ball": {
+      "editor_name": "迪莫首战战斗id和所用咕噜球",
+      "value": [
+        308213,
+        100255
+      ]
+    },
+    "weather_duration": {
+      "editor_name": "战斗内天气的持续回合数（配1当回合消失）",
+      "value": 8
+    },
+    "battle_solo_title": {
+      "editor_name": "匹配模式标题",
+      "value": []
+    },
+    "battle_pair_title": {
+      "editor_name": "人机模式标题",
+      "value": []
+    },
+    "battle_practice_title": {
+      "editor_name": "训练模式标题",
+      "value": []
+    },
+    "battle_solo_picture_big": {
+      "editor_name": "匹配模式大图",
+      "value": []
+    },
+    "battle_pair_picture_big": {
+      "editor_name": "人机模式大图",
+      "value": []
+    },
+    "battle_practice_picture_big": {
+      "editor_name": "训练模式大图",
+      "value": []
+    },
+    "battle_solo_picture_0": {
+      "editor_name": "匹配模式未选中",
+      "value": []
+    },
+    "battle_pair_picture_0": {
+      "editor_name": "人机模式未选中",
+      "value": []
+    },
+    "battle_practice_picture_0": {
+      "editor_name": "训练模式未选中",
+      "value": []
+    },
+    "battle_solo_picture_1": {
+      "editor_name": "匹配模式选中",
+      "value": []
+    },
+    "battle_pair_picture_1": {
+      "editor_name": "人机模式选中",
+      "value": []
+    },
+    "battle_practice_picture_1": {
+      "editor_name": "训练模式选中",
+      "value": []
+    },
+    "battle_solo_depict": {
+      "editor_name": "匹配模式描述",
+      "value": []
+    },
+    "battle_pair_depict": {
+      "editor_name": "人机模式描述",
+      "value": []
+    },
+    "battle_practice_depict": {
+      "editor_name": "训练模式描述",
+      "value": []
+    },
+    "battle_solo_button": {
+      "editor_name": "匹配模式开始按钮文字",
+      "value": []
+    },
+    "battle_pair_button": {
+      "editor_name": "人机模式开始按钮文字",
+      "value": []
+    },
+    "battle_practice_button": {
+      "editor_name": "训练模式开始按钮文字",
+      "value": []
+    },
+    "battle_double_depict": {
+      "editor_name": "双精灵模式描述",
+      "value": []
+    },
+    "battle_pvp_level": {
+      "editor_name": "PVP双方调整后的等级",
+      "value": 60
+    },
+    "battle_mappoint_random": {
+      "editor_name": "PVP战场选点随机池子（废弃移步PVP_CONF）",
+      "value": [
+        1101,
+        1102,
+        1103,
+        1104
+      ]
+    },
+    "battle_mappoint_1": {
+      "editor_name": "PVP战场选点1",
+      "value": [
+        103,
+        430811,
+        671497,
+        890
+      ]
+    },
+    "battle_mappoint_2": {
+      "editor_name": "PVP战场选点2",
+      "value": [
+        103,
+        404147,
+        642168,
+        1121
+      ]
+    },
+    "battle_mappoint_3": {
+      "editor_name": "PVP战场选点3",
+      "value": [
+        103,
+        430811,
+        671497,
+        890
+      ]
+    },
+    "battle_mappoint_4": {
+      "editor_name": "PVP战场选点4",
+      "value": [
+        103,
+        404147,
+        642168,
+        1121
+      ]
+    },
+    "battle_mappoint_5": {
+      "editor_name": "PVP战场选点5",
+      "value": [
+        103,
+        430811,
+        671497,
+        890
+      ]
+    },
+    "battle_mappoint_6": {
+      "editor_name": "PVP战场选点6",
+      "value": [
+        103,
+        404147,
+        642168,
+        1121
+      ]
+    },
+    "battle_mappoint_7": {
+      "editor_name": "PVP战场选点7",
+      "value": [
+        103,
+        430811,
+        671497,
+        890
+      ]
+    },
+    "battle_mappoint_8": {
+      "editor_name": "PVP战场选点8",
+      "value": [
+        103,
+        404147,
+        642168,
+        1121
+      ]
+    },
+    "pvp_npc_around_random": {
+      "editor_name": "PVP围观NPC随机池子",
+      "value": [
+        62130,
+        62133,
+        62136,
+        62142,
+        62143,
+        62148,
+        62150,
+        62156,
+        62164,
+        62167,
+        62183,
+        62185,
+        62212
+      ]
+    },
+    "pve_npc_around_range": {
+      "editor_name": "PVE围观NPC拉取最大范围",
+      "value": 1000
+    },
+    "npc_show_time interval": {
+      "editor_name": "选招阶段NPC表演时间间隔",
+      "value": 5
+    },
+    "npc_show_time interval_random_deviation": {
+      "editor_name": "时间间隔随机浮动",
+      "value": 1
+    },
+    "around_npc_animation_name1": {
+      "editor_name": "NPC表演动画组1",
+      "value": []
+    },
+    "around_npc_animation_name2": {
+      "editor_name": "NPC表演动画组2",
+      "value": []
+    },
+    "around_npc_animation_name3": {
+      "editor_name": "配置的动作在选招阶段和非选招阶段都会一直播放，当有动作打断该动作时，先播放其他动作，播放结束后，继续播放该配置的动作",
+      "value": []
+    },
+    "around_npc_animation_battle_actime_random_deviation": {
+      "editor_name": "因为AI导致的围观NPC的动作，触发时的随机偏差值（毫秒），比如配置500，就是从0~500毫秒，随机取1个值x，然后当围观NPC收到AI需要播放的动作时，延迟x毫秒后再播放",
+      "value": 200
+    },
+    "wild_rare_monster_cannot_escape": {
+      "editor_name": "野生稀有血脉精灵不会逃跑。",
+      "value": 1
+    },
+    "around_player_animation_name": {
+      "editor_name": "局外围观玩家表演动画",
+      "value": []
+    },
+    "around_player_animation_time interval": {
+      "editor_name": "局外围观玩家表演时间间隔",
+      "value": 8
+    },
+    "around_player_animation interval_random_deviation": {
+      "editor_name": "局外围观玩家表演时间间隔随机浮动",
+      "value": 2
+    },
+    "battle_map_time": {
+      "editor_name": "PVP战场默认时间",
+      "value": 57600
+    },
+    "battle_map_weather": {
+      "editor_name": "PVP战场默认天气",
+      "value": 1
+    },
+    "battle_trainer_emoji1": {
+      "editor_name": "PVP表情按钮图片1",
+      "value": []
+    },
+    "battle_trainer_emoji2": {
+      "editor_name": "PVP表情按钮图片2",
+      "value": []
+    },
+    "battle_trainer_emoji3": {
+      "editor_name": "PVP表情按钮图片3",
+      "value": []
+    },
+    "battle_trainer_action_boy_1": {
+      "editor_name": "PVP训练师动作1",
+      "value": []
+    },
+    "battle_trainer_action_boy_2": {
+      "editor_name": "PVP训练师动作2",
+      "value": []
+    },
+    "battle_trainer_action_boy_3": {
+      "editor_name": "PVP训练师动作3",
+      "value": []
+    },
+    "is_battle_catch_need_round": {
+      "editor_name": "战斗内捕捉是否占回合开关",
+      "value": 1
+    },
+    "pvp_ingore_naughty": {
+      "editor_name": "PVP对战中是否关闭精灵的听话设定（0为开启 1为关闭）",
+      "value": 1
+    },
+    "battle_mappoint_blood": {
+      "editor_name": "血脉团战选点",
+      "value": [
+        0,
+        0,
+        600000
+      ]
+    },
+    "battle_model_scale_blood": {
+      "editor_name": "血脉团战精灵体型放大倍数（万分比）",
+      "value": 25000
+    },
+    "charging_skill_id": {
+      "editor_name": "精灵正在蓄力中",
+      "value": 7100100
+    },
+    "boss_hp_section_num": {
+      "editor_name": "boss战血量分段",
+      "value": 6
+    },
+    "buff_ball_1": {
+      "editor_name": "普通咕噜球1",
+      "value": 100002
+    },
+    "buff_ball_2": {
+      "editor_name": "高级咕噜球",
+      "value": 100003
+    },
+    "buff_ball_3": {
+      "editor_name": "爱心球",
+      "value": 100254
+    },
+    "buff_ball_4": {
+      "editor_name": "国王球",
+      "value": 100255
+    },
+    "buff_ball_5": {
+      "editor_name": "历战球",
+      "value": 100256
+    },
+    "buff_ball_6": {
+      "editor_name": "瞌睡球",
+      "value": 100261
+    },
+    "buff_ball_7": {
+      "editor_name": "美妙球",
+      "value": 100262
+    },
+    "buff_ball_8": {
+      "editor_name": "好战球",
+      "value": 100263
+    },
+    "buff_ball_9": {
+      "editor_name": "光合球",
+      "value": 100271
+    },
+    "buff_ball_10": {
+      "editor_name": "网兜球",
+      "value": 100272
+    },
+    "buff_ball_11": {
+      "editor_name": "暗星球",
+      "value": 100273
+    },
+    "buff_ball_12": {
+      "editor_name": "调温球",
+      "value": 100274
+    },
+    "buff_ball_13": {
+      "editor_name": "绝缘球",
+      "value": 100275
+    },
+    "buff_ball_14": {
+      "editor_name": "水珠球",
+      "value": 100281
+    },
+    "buff_ball_15": {
+      "editor_name": "冰凌球",
+      "value": 100282
+    },
+    "buff_ball_16": {
+      "editor_name": "淘沙球",
+      "value": 100283
+    },
+    "buff_ball_17": {
+      "editor_name": "变幻球",
+      "value": 100284
+    },
+    "buff_ball_18": {
+      "editor_name": "临时咕噜球",
+      "value": 280001
+    },
+    "pvp_choose_first_time": {
+      "editor_name": "首发精灵选择倒计时",
+      "value": 25
+    },
+    "pet_legendary_deployment_limits": {
+      "editor_name": "异核精灵最大上阵数量限制（已废弃配置，不生效）",
+      "value": 1
+    },
+    "cr_weight": {
+      "editor_name": "体重差的绝对值范围",
+      "value": [
+        0,
+        4000,
+        14000,
+        30000,
+        60000,
+        120000,
+        999999
+      ]
+    },
+    "visit_catch_number_battle_notice": {
+      "editor_name": "他人大世界捕捉时的剩余互访捕捉次数提示",
+      "value": []
+    },
+    "pvp_match_award_vitem_id": {
+      "editor_name": "匹配对战奖励货币枚举id",
+      "value": 1
+    },
+    "pvp_match_per_defeat_award_num": {
+      "editor_name": "匹配对战击败敌方奖励货币单位数",
+      "value": 1
+    },
+    "pvp_match_taopao_bonus_award_num": {
+      "editor_name": "匹配对战敌方逃跑额外奖励货币数",
+      "value": 10000
+    },
+    "pvp_balance_break_times": {
+      "editor_name": "pvp平衡指定突破次数",
+      "value": 5
+    },
+    "pvp_tips_hold_time": {
+      "editor_name": "pvptips停留秒数",
+      "value": 5
+    },
+    "battle_in_the_air_height": {
+      "editor_name": "识别为空中战斗的离地高度",
+      "value": 500
+    },
+    "pvp_max_team_num": {
+      "editor_name": "每个pvp玩法可使用的最大队伍数量",
+      "value": 8
+    },
+    "pvp_constant_p": {
+      "editor_name": "常数P~",
+      "value": 9000
+    },
+    "pvp_constant_i": {
+      "editor_name": "常数i，用于设置i场战斗后，精灵评分会变为常数p",
+      "value": 50
+    },
+    "pvp_technical_score_initial": {
+      "editor_name": "初始技巧分（友谊对决可再次切磋的玩法，再次切磋的不再影响技巧分）",
+      "value": 1500
+    },
+    "pvp_rd": {
+      "editor_name": "初始评分偏差",
+      "value": 350
+    },
+    "pvp_vol": {
+      "editor_name": "初始波动率（万分比）",
+      "value": 600
+    },
+    "pvp_match_score_diff_r": {
+      "editor_name": "技巧分区间初始寻找范围 以及 每次扩大分的范围",
+      "value": [
+        1000,
+        1000
+      ]
+    },
+    "pvp_match_score_time": {
+      "editor_name": "匹配分区扩大时间（秒）",
+      "value": 1
+    },
+    "pvp_match_pet_score_difference": {
+      "editor_name": "匹配时的精灵总分评分最大分差绝对值（小于等于后面配置的数）",
+      "value": 10000
+    },
+    "pvp_team_name": {
+      "editor_name": "pvp队伍默认初始名称",
+      "value": []
+    },
+    "pvp_team_magic_nameless": {
+      "editor_name": "当前队伍无共鸣魔法时显示名",
+      "value": []
+    },
+    "pvp_team_same_pet": {
+      "editor_name": "无法上阵同种的精灵",
+      "value": []
+    },
+    "pvp_team_name_set": {
+      "editor_name": "编辑小队名称",
+      "value": []
+    },
+    "pvp_team_none": {
+      "editor_name": "请选择需要上阵的精灵",
+      "value": []
+    },
+    "pvp_team_exceed_num": {
+      "editor_name": "",
+      "value": []
+    },
+    "pvp_team_num_none": {
+      "editor_name": "队伍中没有精灵",
+      "value": []
+    },
+    "pvp_refresh_type": {
+      "editor_name": "PVP积分上限刷新类型",
+      "value": []
+    },
+    "pvp_refresh_reset_param": {
+      "editor_name": "重置周期时长(废弃）",
+      "value": []
+    },
+    "pvp_refresh_reset_param2": {
+      "editor_name": "重置时间起点(废弃）",
+      "value": []
+    },
+    "pvp_score_max": {
+      "editor_name": "整个pvp玩法的积分总上限（限制的是每场战斗击败对方精灵时获得的制胜点数上限，此上限按周期重置，重置配置为上方1357-1359的配置）(废弃）",
+      "value": 350
+    },
+    "pvp_score_localization1": {
+      "editor_name": "今日",
+      "value": []
+    },
+    "pvp_score_localization2": {
+      "editor_name": "今日(已满)",
+      "value": []
+    },
+    "pvp_battle_again_num": {
+      "editor_name": "可再次切磋的次数，20250421调整：除排位赛以外，其他类型PVP会判断对方是否为好友关系，是就没有再次切磋限制，该状况并不是需求只是优先级很低的待处理问题",
+      "value": 2
+    },
+    "pvp_juezhan": {
+      "editor_name": "决战用动作",
+      "value": []
+    },
+    "pvp_liansha": {
+      "editor_name": "连杀用动作",
+      "value": []
+    },
+    "pvp_wansha": {
+      "editor_name": "完杀用动作",
+      "value": []
+    },
+    "pvp_yingdui": {
+      "editor_name": "应对用动作",
+      "value": []
+    },
+    "pvp_team_pet1": {
+      "editor_name": "PVP对单只精灵进行编队调整，左上角文本",
+      "value": []
+    },
+    "pvp_battle_again_max_tip": {
+      "editor_name": "可再次切磋的次数达到上限后，再次点击切磋按钮提示文字",
+      "value": []
+    },
+    "a1_finalbattle_prologue_target_camera": {
+      "editor_name": "A1最终战进场时G6衔接到的机位",
+      "value": [
+        -6247,
+        2343,
+        427,
+        0,
+        0,
+        -90
+      ]
+    },
+    "a1_finalbattle_correct_rate_need": {
+      "editor_name": "唤名时正确率限制",
+      "value": 6666
+    },
+    "a1_finalbattle_effective_factor": {
+      "editor_name": "克制时愿力增长乘数",
+      "value": 2
+    },
+    "a1_finalbattle_wishpower_decay": {
+      "editor_name": "精灵战败时愿力的衰退值",
+      "value": 2
+    },
+    "a1_finalbattle_bag_item_1": {
+      "editor_name": "唤名魔法的道具ID",
+      "value": 104009
+    },
+    "a1_finalbattle_bag_item_2": {
+      "editor_name": "召唤亚瑟的道具ID",
+      "value": 104010
+    },
+    "a1_finalbattle_named_times": {
+      "editor_name": "唤名次数",
+      "value": 1
+    },
+    "a1_finalbattle_summon_failed": {
+      "editor_name": "召唤精灵失败时候的文本",
+      "value": []
+    },
+    "a1_finalbattle_autosummon_tips": {
+      "editor_name": "自动选择召唤精灵时候的提示",
+      "value": []
+    },
+    "a1_finalbattle_summonbox_text": {
+      "editor_name": "召唤精灵的文本框上的提示文本",
+      "value": []
+    },
+    "a1_finalbattle_sequence_arthur_path": {
+      "editor_name": "召唤亚瑟的关卡序列的路径",
+      "value": []
+    },
+    "a1_finalbattle_postsummon_dialogue_ID": {
+      "editor_name": "",
+      "value": 1302018
+    },
+    "a1_finalbattle_summon_dialogue_ID": {
+      "editor_name": "",
+      "value": 2550115
+    },
+    "a1_finalbattle_name_buff_ID": {
+      "editor_name": "失去名字的buff的ID",
+      "value": 20010745
+    },
+    "a1_finalbattle_introduce_turn": {
+      "editor_name": "引导出现的回合",
+      "value": 2
+    },
+    "a1_finalbattle_realname_color": {
+      "editor_name": "真名颜色",
+      "value": [
+        0,
+        0,
+        0
+      ]
+    },
+    "a1_finalbattle_energy_max": {
+      "editor_name": "愿力最大值",
+      "value": 24
+    },
+    "a1_finalbattle_energy_per_attack": {
+      "editor_name": "攻击恢复愿力",
+      "value": 2
+    },
+    "a1_finalbattle_energy_on_hit": {
+      "editor_name": "",
+      "value": []
+    },
+    "a1_finalbattle_max_summon_attempts": {
+      "editor_name": "",
+      "value": 10
+    },
+    "a1_finalbattle_magic_ID1": {
+      "editor_name": "共鸣魔法1（唤名）的ID",
+      "value": 7010075
+    },
+    "a1_finalbattle_magic_ID2": {
+      "editor_name": "共鸣魔法2（召唤亚瑟）的ID",
+      "value": 7010076
+    },
+    "pvp_rank_character1": {
+      "editor_name": "pvp排位赛主界面，编队按钮",
+      "value": []
+    },
+    "pvp_rank_character2": {
+      "editor_name": "pvp排位赛，点挑战时，队伍中没有任何精灵",
+      "value": []
+    },
+    "pvp_rank_character3": {
+      "editor_name": "pvp排位赛，结算无法挑战",
+      "value": []
+    },
+    "pvp_tips1": {
+      "editor_name": "pvp没有共鸣魔法时，点击共鸣魔法按钮弹出的提示",
+      "value": []
+    },
+    "pvp_rank_character4": {
+      "editor_name": "周任务，任务目标描述",
+      "value": []
+    },
+    "pvp_rank_character5": {
+      "editor_name": "排位赛名次显示",
+      "value": []
+    },
+    "pvp_rank_character6": {
+      "editor_name": "历史战绩底部胜场失败场数字符串",
+      "value": []
+    },
+    "pvp_rank_character7": {
+      "editor_name": "排位赛每周挑战UI底部文字",
+      "value": []
+    },
+    "pvp_rank_character8": {
+      "editor_name": "魔法手册，赛季倒计时文本描述",
+      "value": []
+    },
+    "pvp_rank_character9": {
+      "editor_name": "魔法手册，赛季名玩法名",
+      "value": []
+    },
+    "pvp_rank_character10": {
+      "editor_name": "主界面赛季结算阶段时间显示",
+      "value": []
+    },
+    "pvp_rank_character11": {
+      "editor_name": "快速编队按钮",
+      "value": []
+    },
+    "pvp_rank_character12": {
+      "editor_name": "魔法手册界面显示时间",
+      "value": []
+    },
+    "pvp_rank_character13": {
+      "editor_name": "升级达到了该段位时显示，在不会掉段的段位失败时显示的文字",
+      "value": []
+    },
+    "pvp_rank_character14": {
+      "editor_name": "赛季结算期间，点击挑战按钮文字提示",
+      "value": []
+    },
+    "pvp_character1": {
+      "editor_name": "战斗结算时，点数使用字符串",
+      "value": []
+    },
+    "pvp_rank_character15": {
+      "editor_name": "所有pvp战斗中，某一方加载时间过长，弹出的等待tips",
+      "value": []
+    },
+    "pvp_rank_character16": {
+      "editor_name": "pvp排位赛 编队界面快捷编队按钮文字",
+      "value": []
+    },
+    "pvp_rank_character17": {
+      "editor_name": "pvp排位赛 编队界面快捷编队按钮文字",
+      "value": []
+    },
+    "pvp_rank_character18": {
+      "editor_name": "随机精灵页签",
+      "value": []
+    },
+    "pvp_rank_character19": {
+      "editor_name": "排位赛禁止玩家携带奇异技能在编队界面的文字提示",
+      "value": []
+    },
+    "pvp_rank_dashi_initial_scroe": {
+      "editor_name": "pvp排位赛 大师分初始分",
+      "value": 500
+    },
+    "pvp_rank_dashi_min_scroe": {
+      "editor_name": "大师分最低分",
+      "value": []
+    },
+    "pvp_rank_dashi_scroe0": {
+      "editor_name": "大师段位胜利和失败获得的基础分",
+      "value": [
+        40,
+        -40
+      ]
+    },
+    "pvp_rank_dashi_scroe1": {
+      "editor_name": "胜利时每比对方多X大师分时，额外-N分",
+      "value": [
+        200,
+        -2
+      ]
+    },
+    "pvp_rank_dashi_scroe2": {
+      "editor_name": "失败时每比对方多X大师分时，额外-N分",
+      "value": [
+        200,
+        -2
+      ]
+    },
+    "pvp_rank_dashi_scroe3": {
+      "editor_name": "胜利时每比对方少X大师分时，额外+N分",
+      "value": [
+        200,
+        2
+      ]
+    },
+    "pvp_rank_dashi_scroe4": {
+      "editor_name": "失败时每比对方少X大师分时，额外+N分",
+      "value": [
+        200,
+        2
+      ]
+    },
+    "pvp_rank_dashi_scroe5": {
+      "editor_name": "连胜额外获得的分数，配几就是代表几连胜时的额外加分",
+      "value": [
+        0,
+        0,
+        1,
+        2,
+        3,
+        5,
+        7
+      ]
+    },
+    "pvp_rank_dashi_scroe6": {
+      "editor_name": "连败额外获得的分数，配几就是代表几连败时的额外加分",
+      "value": [
+        0,
+        0,
+        2,
+        4,
+        6,
+        10
+      ]
+    },
+    "pvp_rank_dashi_scroe7": {
+      "editor_name": "获得分数时的上限和下限",
+      "value": [
+        30,
+        50
+      ]
+    },
+    "pvp_rank_dashi_scroe8": {
+      "editor_name": "扣除大师分时的上限和下限",
+      "value": [
+        -30,
+        -50
+      ]
+    },
+    "pvp_rank_dashi_para1": {
+      "editor_name": "大于等于X时只能匹配到大师对手",
+      "value": []
+    },
+    "pvp_rank_dashi_para2": {
+      "editor_name": "大师分初始寻找范围±X",
+      "value": 50
+    },
+    "pvp_rank_dashi_para3": {
+      "editor_name": "大师分每X秒寻找不到对手则扩大X分",
+      "value": [
+        5,
+        200
+      ]
+    },
+    "pvp_para1": {
+      "editor_name": "pvp每日首胜获得的额外胜点（受周上限限制）",
+      "value": []
+    },
+    "pvp_para2": {
+      "editor_name": "pvp周末获得洛克贝的额外倍率",
+      "value": 12000
+    },
+    "pvp_para3": {
+      "editor_name": "pvp周末时胜利1场战斗，推进周任务进度的效率倍数",
+      "value": 2
+    },
+    "pvp_para4": {
+      "editor_name": "周末多倍任务完成效率，击败精灵获得额外制胜点数活动时间配置(起始时间，周X 几点开始）",
+      "value": []
+    },
+    "pvp_para5": {
+      "editor_name": "周末多倍任务完成效率，击败精灵获得额外制胜点数活动时间配置(结束时间，周X 几点开始）",
+      "value": []
+    },
+    "pvp_rank_battle1": {
+      "editor_name": "pvp排位赛，匹配到的战斗id",
+      "value": [
+        341001,
+        341002,
+        341003,
+        341004
+      ]
+    },
+    "pvp_rank_match_robot_time": {
+      "editor_name": "pvp排位赛，匹配到的机器人所用时间区间",
+      "value": [
+        3,
+        8
+      ]
+    },
+    "pvp_rank_match_robot_time1": {
+      "editor_name": "pvp排位赛，匹配到的机器人 机器人战前准备的随机时间",
+      "value": [
+        5,
+        20
+      ]
+    },
+    "pvp_rank_match_score_diff_r": {
+      "editor_name": "pvp排位赛，技巧分区间初始寻找范围 以及 每次扩大分的范围",
+      "value": [
+        200,
+        100
+      ]
+    },
+    "pvp_rank_match_score_time": {
+      "editor_name": "pvp排位赛，匹配分区扩大时间（秒）",
+      "value": 1
+    },
+    "pvp_rank_match_star_y": {
+      "editor_name": "pvp排位赛，星级初始寻找范围",
+      "value": 1
+    },
+    "pvp_rank_match_time": {
+      "editor_name": "pvp排位赛，多少秒搜不到对手的时候，扩大星级搜索范围",
+      "value": 1
+    },
+    "pvp_rank_match_star_y1": {
+      "editor_name": "pvp排位赛，pvp_rank_match_time_max秒搜不到后，星级范围扩大",
+      "value": 1
+    },
+    "pvp_rank_match_time_num": {
+      "editor_name": "pvp排位赛，扩大多少次星级后不再扩大",
+      "value": 30
+    },
+    "pvp_rank_fail_num": {
+      "editor_name": "pvp排位赛，连败多少次后匹配机器人",
+      "value": 3
+    },
+    "pvp_rank_win_num": {
+      "editor_name": "pvp排位赛，连胜多少次后胜利会获得2星级",
+      "value": 3
+    },
+    "pvp_rank_maxrank_diff_r": {
+      "editor_name": "pvp排位赛，最高段位技巧分区间初始寻找范围 以及 每次扩大分的范围",
+      "value": [
+        100,
+        100
+      ]
+    },
+    "pvp_rank_maxrank_time": {
+      "editor_name": "pvp排位赛，匹配分区扩大时间（秒）",
+      "value": 5
+    },
+    "pvp_rank_max_num": {
+      "editor_name": "pvp排位赛，最高段位显示的最多名次",
+      "value": 10000
+    },
+    "pvp_rank_week_reward_time1": {
+      "editor_name": "pvp排位赛，重置周期时长",
+      "value": []
+    },
+    "pvp_rank_week_reward_time2": {
+      "editor_name": "pvp排位赛，重置时间起点",
+      "value": []
+    },
+    "pvp_rank_battle_mappoint_random": {
+      "editor_name": "pvp排位赛，战场选点随机池子（废弃移步PVP_CONF）",
+      "value": [
+        1470
+      ]
+    },
+    "pvp_rank_battle_mappoint_1": {
+      "editor_name": "pvp排位赛，战场选点1",
+      "value": [
+        103,
+        -802979,
+        -778280,
+        29974
+      ]
+    },
+    "fake_standby": {
+      "editor_name": "无技能可用的假待机",
+      "value": 7000012
+    },
+    "starfall": {
+      "editor_name": "星陨伤害公式中二次项系数；一次项系数；常数",
+      "value": [
+        1,
+        24,
+        -24
+      ]
+    },
+    "battle_number": {
+      "editor_name": "剔除近似战斗的战斗场次",
+      "value": 5
+    },
+    "CR_SPECIES_STRENGTH": {
+      "editor_name": "属性差的范围",
+      "value": [
+        -9999,
+        0,
+        30,
+        90,
+        120,
+        150,
+        180,
+        210,
+        240,
+        270,
+        300,
+        999999
+      ]
+    },
+    "pvp_rank_week_reward_time3": {
+      "editor_name": "PVP排位赛商店刷新类型",
+      "value": []
+    },
+    "pvp_balance_effort_grow_level": {
+      "editor_name": "pvp属性平衡成长值成长次数",
+      "value": 50
+    },
+    "pvp_AI_pet": {
+      "editor_name": "pvp通用调用玩家数据行为树id",
+      "value": []
+    },
+    "pvp_AI_NPC": {
+      "editor_name": "pvp通用调用玩家数据行为树id",
+      "value": []
+    },
+    "pvp_battlewatch_character1": {
+      "editor_name": "观战对战，退出时弹窗字符串",
+      "value": []
+    },
+    "pvp_battlewatch_character2": {
+      "editor_name": "观战对战，退出时弹窗字符串",
+      "value": []
+    },
+    "pvp_battlewatch_character3": {
+      "editor_name": "观战对战，被观战移出",
+      "value": []
+    },
+    "pvp_battlewatch_character4": {
+      "editor_name": "观战对战，退出时弹窗字符串",
+      "value": []
+    },
+    "pvp_battlewatch_character5": {
+      "editor_name": "观战对战，退出时弹窗字符串",
+      "value": []
+    },
+    "pvp_battlewatch_character6": {
+      "editor_name": "好友列表观战状态",
+      "value": []
+    },
+    "pvp_battlewatch_character7": {
+      "editor_name": "对战时，有新的好友进行观战时的提示",
+      "value": []
+    },
+    "pvp_friend_battle": {
+      "editor_name": "好友对战的战斗类型及中文名，为了在好友列表观战状态可以显示玩法名",
+      "value": []
+    },
+    "pvp_rank_npc_position": {
+      "editor_name": "退出排位赛UI后，玩家回到的位置",
+      "value": [
+        103,
+        -803771,
+        -778112,
+        29967
+      ]
+    },
+    "yanhu_buff112": {
+      "editor_name": "掩护拉起特效",
+      "value": 791337
+    },
+    "pvp_battlewatch_num_max": {
+      "editor_name": "好友观战数,观战上限=此处数配置的参数n（万分比）*好友数量上限",
+      "value": 11000
+    },
+    "pvp_countdown": {
+      "editor_name": "pvp战斗失信状态考虑时间",
+      "value": 15
+    },
+    "pvp_wait_time": {
+      "editor_name": "所有pvp战斗中，某一方加载时间过长，等待对方的最大时长（单位秒）",
+      "value": 30
+    },
+    "pvp_rank_trial_pet_para1": {
+      "editor_name": "pvp排位赛，试用精灵重置刷新类型",
+      "value": []
+    },
+    "pvp_rank_trial_pet_para2": {
+      "editor_name": "pvp排位赛，试用精灵重置周期时长",
+      "value": []
+    },
+    "pvp_rank_trial_pet_para3": {
+      "editor_name": "pvp排位赛，试用精灵刷新周期时间起点",
+      "value": []
+    },
+    "pvp_rank_trial_pet_character1": {
+      "editor_name": "排位赛试用精灵，血脉/性格禁止修改文字显示",
+      "value": []
+    },
+    "pvp_ddl": {
+      "editor_name": "最大回合数倒计时回合",
+      "value": 10
+    },
+    "pvp_rank_task": {
+      "editor_name": "首次跳转排位赛，判断的storyflag",
+      "value": 11001
+    },
+    "pvp_rank_task_tips": {
+      "editor_name": "首次跳转排位赛，判断的任务id没完成时，需要弹出的提示",
+      "value": []
+    },
+    "pvp_rank_trial_pet_character2": {
+      "editor_name": "排位赛试用精灵，编队仓库时的页签文字",
+      "value": []
+    },
+    "pvp_rank_trial_pet_character3": {
+      "editor_name": "排位赛试用精灵，编队仓库时的页签文字",
+      "value": []
+    },
+    "pvp_rank_trial_pet_character4": {
+      "editor_name": "排位赛试用精灵，当页签内精灵已过期，并尝试编队已过期精灵",
+      "value": []
+    },
+    "pvp_rank_trial_pet_character5": {
+      "editor_name": "排位赛 对战记录为空时的文字",
+      "value": []
+    },
+    "npc_challenge_mappoint1": {
+      "editor_name": "对战剧场战场阶段1选点/时间",
+      "value": [
+        103,
+        440064,
+        524554,
+        34783
+      ]
+    },
+    "npc_challenge_mappoint2": {
+      "editor_name": "对战剧场战场阶段2选点/时间",
+      "value": [
+        103,
+        440064,
+        524554,
+        34783
+      ]
+    },
+    "npc_challenge_mappoint3": {
+      "editor_name": "对战剧场战场阶段3选点/时间",
+      "value": [
+        103,
+        440064,
+        524554,
+        34783
+      ]
+    },
+    "npc_challenge_mappoint4": {
+      "editor_name": "对战剧场战场阶段4选点/时间",
+      "value": [
+        103,
+        440064,
+        524554,
+        34783
+      ]
+    },
+    "npc_challenge_unlock_task": {
+      "editor_name": "对战剧场解锁任务id",
+      "value": 91000047
+    },
+    "boss_challenge_unlock_task": {
+      "editor_name": "首领角斗解锁任务id",
+      "value": 91000051
+    },
+    "battle_character1": {
+      "editor_name": "被萌化时技能禁用提示",
+      "value": []
+    },
+    "pvp_rank_param1": {
+      "editor_name": "pvp排位赛备战阶段显示规则：1原功能显示方式，即双方只要有一方处于显示双方阵容的段位中，则双方均展示阵容；2则为新的显示规则：双方均需要处于显示阵容的段位中时，才会在备战界面中展示双方阵容",
+      "value": 2
+    },
+    "pvp_win_rating_change_limit": {
+      "editor_name": "胜利时排位分变动上下限",
+      "value": [
+        15,
+        9999
+      ]
+    },
+    "pvp_lose_rating_change_limit": {
+      "editor_name": "失败时排位分变动上下限",
+      "value": [
+        15,
+        9999
+      ]
+    },
+    "pvp_rank_param2": {
+      "editor_name": "排位赛匹配：连续N场和同一玩家对战，近X场战斗不会再匹配，中的N",
+      "value": 9999
+    },
+    "pvp_rank_param3": {
+      "editor_name": "排位赛匹配：连续N场和同一玩家对战，近X场战斗不会再匹配，中的X",
+      "value": 1
+    },
+    "blood_team_battle_normal_model_scale": {
+      "editor_name": "配置a1,b1的常规精灵身高数组（用于血脉战）",
+      "value": [
+        30,
+        150
+      ]
+    },
+    "blood_team_battle_boss_model_scale": {
+      "editor_name": "配置a2,b2的BOSS身高数组（用于血脉战）",
+      "value": [
+        250,
+        350
+      ]
+    },
+    "team_battle_AI_wait_seconds": {
+      "editor_name": "进入团体战后，AI队友等待玩家出招时间",
+      "value": 10
+    },
+    "pvp_rank_match_fix_low_score": {
+      "editor_name": "排位赛中技巧分大于等于指定值，则固定在同一个服务器做匹配。0表示忽略此规则。",
+      "value": []
+    },
+    "pvp_rank_match_distance": {
+      "editor_name": "排位赛玩家匹配时校验和npc的距离，单位米（太远则无法发起匹配）",
+      "value": 35
+    },
+    "rogue_battle_id": {
+      "editor_name": "八大徽章battle id（对面2只）",
+      "value": 808236
+    },
+    "rogue_battle_id_2": {
+      "editor_name": "八大徽章battle id（对面1只）",
+      "value": 808237
+    },
+    "weekly_challenge_unlock_task": {
+      "editor_name": "星光对决解锁任务",
+      "value": []
+    },
+    "battle_interval_time": {
+      "editor_name": "战斗左侧item表演间隔时间",
+      "value": [
+        2,
+        3
+      ]
+    },
+    "battle_duration_time": {
+      "editor_name": "战斗左侧item表演速度",
+      "value": [
+        4,
+        3
+      ]
+    },
+    "battle_Transmission_speed": {
+      "editor_name": "传动动画表演速度",
+      "value": [
+        3,
+        2
+      ]
+    },
+    "battle_Random_speed": {
+      "editor_name": "随机技能表演速度",
+      "value": [
+        3,
+        2
+      ]
+    },
+    "peer_modify": {
+      "editor_name": "同行状态修正（捕捉公式）",
+      "value": 150000
+    },
+    "B1_finalbattle_loadlevel": {
+      "editor_name": "B1最终战sequence加载战场",
+      "value": 1611045
+    },
+    "quick_catch_trigger_rate": {
+      "editor_name": "触发会心捕捉所需要的捕捉成功率",
+      "value": 9000
+    },
+    "pve_challenge_battle_distance": {
+      "editor_name": "各类pve玩法在发起战斗时和进战npc的距离，单位米（太远则无法发起战斗）",
+      "value": 25
+    },
+    "weekly_challenge_entrence_refresh_id": {
+      "editor_name": "星光对决入口NPC刷新id（后台校验用）",
+      "value": 2400575
+    },
+    "pvp_rank_is_open_limit_fantastic": {
+      "editor_name": "pvp排位赛，是否开启携带禁止奇异技能的开关（1为打开）",
+      "value": 1
+    },
+    "pve_enter_battle_ban_untransform": {
+      "editor_name": "pve进战时不解除变形状态",
+      "value": [
+        32
+      ]
+    },
+    "pvp_rank_character20": {
+      "editor_name": "随机精灵功能加成文字1",
+      "value": []
+    },
+    "pvp_rank_character21": {
+      "editor_name": "随机精灵功能加成文字2",
+      "value": []
+    },
+    "pvp_rank_character22": {
+      "editor_name": "随机精灵功能加成文字3",
+      "value": []
+    },
+    "pvp_rank_param4": {
+      "editor_name": "赛季记录：统计几只携带次数最多的精灵",
+      "value": 6
+    },
+    "pvp_rank_param5": {
+      "editor_name": "赛季记录：统计展示几个最常用的血脉魔法",
+      "value": 1
+    },
+    "pvp_rank_param6": {
+      "editor_name": "赛季记录：统计展示精灵常使用技能次数",
+      "value": 1
+    },
+    "pvp_rank_param7": {
+      "editor_name": "随机精灵petbase起始id，用于对应上enum SkillDamType的所有系别",
+      "value": 10000
+    },
+    "pvp_rank_param8": {
+      "editor_name": "随机精灵友谊对决时，精灵强度评分（普通的精灵配置在petbase里）",
+      "value": 1500
+    },
+    "pvp_rank_character23": {
+      "editor_name": "首胜奖励提示文字（开始挑战按钮上方",
+      "value": []
+    },
+    "territory_trial_point_param": {
+      "editor_name": "领地试炼剩余回合数积分计算常量",
+      "value": 100
+    },
+    "territory_trial_countdown": {
+      "editor_name": "领地试炼主界面回合提示数参数",
+      "value": 5
+    },
+    "pvp_rank_character24": {
+      "editor_name": "赛季段位重置",
+      "value": []
+    },
+    "battle_train_skip_title": {
+      "editor_name": "战斗训练引导跳过页面标题",
+      "value": []
+    },
+    "battle_train_skip_display": {
+      "editor_name": "战斗训练引导跳过页面内容",
+      "value": []
+    },
+    "pvp_param1": {
+      "editor_name": "每1连胜阵容匹配区间+x",
+      "value": 30
+    },
+    "pvp_param2": {
+      "editor_name": "阵容匹配分最大连胜",
+      "value": 10
+    },
+    "pvp_param3": {
+      "editor_name": "对战及观战每秒获得星光（万分位）",
+      "value": 5000
+    },
+    "pvp_param4": {
+      "editor_name": "每场战斗星光上限",
+      "value": 3000000
+    },
+    "pvp_param5": {
+      "editor_name": "初始匹配区间±n",
+      "value": 40
+    },
+    "pvp_rank_character25": {
+      "editor_name": "单局战斗结算时，段位变化底部文字",
+      "value": []
+    },
+    "pvp_rank_character26": {
+      "editor_name": "单局战斗结算时，段位变化底部文字",
+      "value": []
+    },
+    "pvp_rank_character27": {
+      "editor_name": "单局战斗结算时，段位变化底部文字",
+      "value": []
+    },
+    "pvp_param6": {
+      "editor_name": "观战方战败，观战者是否可以获得星光",
+      "value": 1
+    },
+    "skill_damage_max": {
+      "editor_name": "技能威力最大值（不是伤害最大值）",
+      "value": 99999
+    }
+  }
+}

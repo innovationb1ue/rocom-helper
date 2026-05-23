@@ -47,7 +47,7 @@ class TestChartLoading:
 
 
 class TestSingleTypeMatchups:
-    """单属性克制关系测试 — 基于 BWIKI 权威数据。"""
+    """单属性克制关系测试 — 基于游戏解包权威数据。"""
 
     def test_fire_beats_grass(self, chart):
         assert chart.get_multiplier(1, [3]) == 2.0

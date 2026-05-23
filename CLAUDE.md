@@ -202,11 +202,16 @@ web/ (React SPA)
 静态游戏数据存放在 `data/game/` 目录，为 JSON 文件（约 24MB）。关键文件：
 
 **核心数据库：**
-- `pet_map.json` (706K) — 宠物定义（ID、名称、种族值、属性）
-- `skill_map.json` (1.2M) — 技能定义（威力、属性、能量消耗、目标类型）
-- `pet_skill_map.json` — 宠物与技能映射（每个宠物可学习的技能）
-- `type_chart.json` (2.8K) — 18 属性克制矩阵
+- `pet_map.json` — 宠物实例映射（instance_id → base_id、名称、属性、种族值）
+- `pet_species.json` — 宠物物种数据（1015 个物种：种族值、属性、特性技能、进化ID）
+- `skill_map.json` (1.2M) — 技能定义（威力、属性、能量消耗、目标类型、效果链）
+- `pet_skill_map.json` — 宠物与技能映射（每个宠物可学习的升级/技能石/血脉技能）
+- `type_chart.json` (2.8K) — 18 属性克制矩阵 + type_immunity
 - `attr_map.json` (12K) — 属性/类型名称查找
+- `nature_map.json` — 31 个性格定义（正负属性修正比例）
+- `evolution_map.json` — 309 条进化链（阶段、等级、进化条件）
+- `battle_config.json` — 战斗全局参数（克制倍率、能量规则、捕捉参数等）
+- `weather_map.json` — 13 种天气类型定义
 
 **协议与 schema：**
 - `proto_schema.json` (3.1M) — Protobuf 消息 schema 定义
@@ -214,17 +219,16 @@ web/ (React SPA)
 - `pb_message_index.json` (1.8M) — Protobuf 消息名称索引
 
 **战斗数据：**
-- `innate_skills.json` (4.5K) — 天赋技能定义，用于伤害 hook 系统
+- `innate_skills.json` (4.5K) — 天赋技能定义 + 宠物→特性映射（818 个宠物）
 - `buff_map.json` (891K) — Buff/效果定义（ID、名称、描述）
 - `buffbase_map.json` (1.1M) — 基础 buff 定义
 
-**怪物与 wiki 数据：**
+**怪物与特殊数据：**
 - `monster_map.json` (7.3M) — 游戏内怪物 ID 映射
-- `wiki_pets.json` (217K) — Wiki 来源的宠物数据（备用种族值）
-- `wiki_skills.json` (90K) — Wiki 来源的技能数据
 - `special_move_map.json` (86K) — 特殊招式定义
+- `monster_skillbank_map.json` — 怪物技能库
 
-`src/data/loader.py` 模块提供类型化数据访问；`src/data/scraper.py` 和 `src/data/updater.py` 负责从游戏 wiki 爬取数据。
+`src/data/loader.py` 模块提供类型化数据访问，数据来源于游戏 BinData 解包（`scripts/import_bin_data.py`）。
 
 ### 关键设计模式
 
@@ -284,6 +288,8 @@ idle → selecting（0x1316 battle_enter）→ resolving（0x131A round_start）
 ```
 
 **战斗提取：** 从抓包会话中检测战斗边界并提取到测试 fixture，详见 [`docs/extract_battle.md`](docs/extract_battle.md)。
+
+**游戏数据更新：** 游戏版本更新后，从客户端 PAK 提取最新配置数据并导入项目的完整流程，详见 [`docs/update_game_data.md`](docs/update_game_data.md)。
 
 **WebSocket 消息类型：**
 

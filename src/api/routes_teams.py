@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Body
 
-from src.data.loader import get_pet_meta, get_skill_meta, get_bundle, get_wiki_pet, get_wiki_skill
+from src.data.loader import get_pet_meta, get_skill_meta, get_bundle, get_wiki_pet_types, get_wiki_pet_stats
 from src.game.type_chart import TypeChart
 from src.analysis.team_builder import TeamBuilder
 from src.analysis.counter import CounterPicker
@@ -24,46 +24,34 @@ def _build_pet_info(pet_id: int) -> Dict[str, Any]:
     if meta is None:
         return {"id": pet_id, "name": f"Unknown({pet_id})", "types": [], "skills": [], "stats": {}}
     name = meta.get("name", "")
-    wiki = get_wiki_pet(name)
 
-    # 属性：优先 wiki
-    types = wiki.get("types", []) if wiki else []
+    # 属性：优先 BinData pet_species，回退游戏协议
+    types = get_wiki_pet_types(name)
     if not types:
         types = meta.get("types", [])
 
-    # 种族值：优先 wiki
-    stats = wiki.get("stats", {}) if wiki else {}
+    # 种族值：优先 BinData pet_species，回退游戏协议（key 为小写 hp/atk/spa/def/spd/spe）
+    stats = get_wiki_pet_stats(name)
     if not stats:
         stats = meta.get("stats", {})
 
-    # 技能：wiki 技能名 → 查 wiki_skills.json 获取 type_id
+    # 技能：从 pet_skill_map + skill_map（BinData）获取
     skills = []
-    if wiki and wiki.get("skills"):
-        for sk_name in wiki["skills"]:
-            ws = get_wiki_skill(sk_name)
-            skills.append({
-                "id": 0,
-                "name": sk_name,
-                "type_id": ws.get("type_id") if ws else None,
-                "power": ws.get("power", 0) if ws else 0,
-                "energy_cost": 0,
-            })
-    else:
-        bundle = get_bundle()
-        psk = bundle.get("pet_skill_meta", {}).get(str(meta.get("base_id", "")))
-        if psk:
-            for sk in psk.get("skills", []):
-                sk_id = sk.get("skill_id") or sk.get("id")
-                if sk_id:
-                    sm = get_skill_meta(sk_id)
-                    if sm:
-                        skills.append({
-                            "id": sk_id,
-                            "name": sm.get("name", ""),
-                            "type_id": sm.get("type"),
-                            "power": sm.get("dam_para", [0])[0] if sm.get("dam_para") else 0,
-                            "energy_cost": sm.get("energy_cost", [0])[0] if sm.get("energy_cost") else 0,
-                        })
+    bundle = get_bundle()
+    psk = bundle.get("pet_skill_meta", {}).get(str(meta.get("base_id", "")))
+    if psk:
+        for sk in psk.get("skills", []):
+            sk_id = sk.get("skill_id") or sk.get("id")
+            if sk_id:
+                sm = get_skill_meta(sk_id)
+                if sm:
+                    skills.append({
+                        "id": sk_id,
+                        "name": sm.get("name", ""),
+                        "type_id": sm.get("type"),
+                        "power": sm.get("dam_para", [0])[0] if sm.get("dam_para") else 0,
+                        "energy_cost": sm.get("energy_cost", [0])[0] if sm.get("energy_cost") else 0,
+                    })
 
     return {
         "id": pet_id,

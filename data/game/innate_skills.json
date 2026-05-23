@@ -2,7 +2,8 @@
   "_meta": {
     "description": "精灵先天技能/天赋效果定义。运行时通过 buff_id 查找效果参数，供伤害计算 hook 使用。",
     "version": 1,
-    "source": "游戏解包 BUFF_CONF.json / BUFFBASE_CONF.json"
+    "source": "游戏解包 BUFF_CONF.json / BUFFBASE_CONF.json",
+    "pet_mapping_source": "PETBASE_CONF.pet_feature / pet_glass_feature / pet_chaos_feature"
   },
   "skills": {
     "20030370": {
@@ -10,7 +11,9 @@
       "description": "免疫绝处逢生复活机制",
       "effect_type": "special",
       "effect_params": {
-        "block_buff_ids": [20380120]
+        "block_buff_ids": [
+          20380120
+        ]
       },
       "hook_stage": null,
       "category": "s2_talent"
@@ -67,7 +70,9 @@
       "effect_params": {
         "trigger": "per_poison_stack",
         "value": 1,
-        "poison_buff_ids": [20070010],
+        "poison_buff_ids": [
+          20070010
+        ],
         "scope": "attack_against_target"
       },
       "hook_stage": "post_calc",
@@ -198,5 +203,6613 @@
       "category": "combo"
     }
   },
-  "pets": {}
+  "pets": {
+    "3001": {
+      "base_id": 3001,
+      "name": "喵喵",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "3002": {
+      "base_id": 3002,
+      "name": "水蓝蓝",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "3003": {
+      "base_id": 3003,
+      "name": "火花",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "3004": {
+      "base_id": 3004,
+      "name": "迪莫",
+      "feature_skill_ids": [
+        200191
+      ],
+      "primary_feature": 200191
+    },
+    "3005": {
+      "base_id": 3005,
+      "name": "水灵",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "3006": {
+      "base_id": 3006,
+      "name": "火神",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "3007": {
+      "base_id": 3007,
+      "name": "魔力猫",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "3008": {
+      "base_id": 3008,
+      "name": "草头鸭",
+      "feature_skill_ids": [
+        200213
+      ],
+      "primary_feature": 200213
+    },
+    "3009": {
+      "base_id": 3009,
+      "name": "赤毛鸡仔",
+      "feature_skill_ids": [
+        200154
+      ],
+      "primary_feature": 200154
+    },
+    "3010": {
+      "base_id": 3010,
+      "name": "恶魔叮",
+      "feature_skill_ids": [
+        200139
+      ],
+      "primary_feature": 200139
+    },
+    "3011": {
+      "base_id": 3011,
+      "name": "恶魔狼",
+      "feature_skill_ids": [
+        200140
+      ],
+      "primary_feature": 200140
+    },
+    "3012": {
+      "base_id": 3012,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3013": {
+      "base_id": 3013,
+      "name": "铠甲虫",
+      "feature_skill_ids": [
+        200138
+      ],
+      "primary_feature": 200138
+    },
+    "3014": {
+      "base_id": 3014,
+      "name": "阿米亚特",
+      "feature_skill_ids": [
+        200100
+      ],
+      "primary_feature": 200100
+    },
+    "3015": {
+      "base_id": 3015,
+      "name": "阿米樱",
+      "feature_skill_ids": [
+        200100
+      ],
+      "primary_feature": 200100
+    },
+    "3016": {
+      "base_id": 3016,
+      "name": "罗隐",
+      "feature_skill_ids": [
+        200100
+      ],
+      "primary_feature": 200100
+    },
+    "3017": {
+      "base_id": 3017,
+      "name": "蹦蹦种子",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3018": {
+      "base_id": 3018,
+      "name": "蹦蹦草",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3019": {
+      "base_id": 3019,
+      "name": "蹦蹦花",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3020": {
+      "base_id": 3020,
+      "name": "地鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3021": {
+      "base_id": 3021,
+      "name": "遁鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3022": {
+      "base_id": 3022,
+      "name": "遁地鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3023": {
+      "base_id": 3023,
+      "name": "火云斗鸡",
+      "feature_skill_ids": [
+        200154
+      ],
+      "primary_feature": 200154
+    },
+    "3024": {
+      "base_id": 3024,
+      "name": "伊丽莎白",
+      "feature_skill_ids": [
+        200154
+      ],
+      "primary_feature": 200154
+    },
+    "3025": {
+      "base_id": 3025,
+      "name": "喵呜",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "3026": {
+      "base_id": 3026,
+      "name": "绿草精灵",
+      "feature_skill_ids": [
+        200082
+      ],
+      "primary_feature": 200082
+    },
+    "3027": {
+      "base_id": 3027,
+      "name": "蒲公英娃娃",
+      "feature_skill_ids": [
+        200077
+      ],
+      "primary_feature": 200077
+    },
+    "3028": {
+      "base_id": 3028,
+      "name": "冬羽雀",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3029": {
+      "base_id": 3029,
+      "name": "奇丽草",
+      "feature_skill_ids": [
+        200080
+      ],
+      "primary_feature": 200080
+    },
+    "3030": {
+      "base_id": 3030,
+      "name": "奇丽叶",
+      "feature_skill_ids": [
+        200080
+      ],
+      "primary_feature": 200080
+    },
+    "3031": {
+      "base_id": 3031,
+      "name": "奇丽花",
+      "feature_skill_ids": [
+        200080
+      ],
+      "primary_feature": 200080
+    },
+    "3032": {
+      "base_id": 3032,
+      "name": "焰火",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "3033": {
+      "base_id": 3033,
+      "name": "波波拉",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "3034": {
+      "base_id": 3034,
+      "name": "蒲公英",
+      "feature_skill_ids": [
+        200077
+      ],
+      "primary_feature": 200077
+    },
+    "3035": {
+      "base_id": 3035,
+      "name": "魔草巫灵",
+      "feature_skill_ids": [
+        200082
+      ],
+      "primary_feature": 200082
+    },
+    "3036": {
+      "base_id": 3036,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3037": {
+      "base_id": 3037,
+      "name": "岚鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3038": {
+      "base_id": 3038,
+      "name": "小甲虫",
+      "feature_skill_ids": [
+        200138
+      ],
+      "primary_feature": 200138
+    },
+    "3039": {
+      "base_id": 3039,
+      "name": "叮叮恶魔",
+      "feature_skill_ids": [
+        200139
+      ],
+      "primary_feature": 200139
+    },
+    "3040": {
+      "base_id": 3040,
+      "name": "丢丢",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3041": {
+      "base_id": 3041,
+      "name": "卡卡虫",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3042": {
+      "base_id": 3042,
+      "name": "卡瓦重",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3043": {
+      "base_id": 3043,
+      "name": "伊贝儿",
+      "feature_skill_ids": [
+        200083
+      ],
+      "primary_feature": 200083
+    },
+    "3044": {
+      "base_id": 3044,
+      "name": "伊贝粉粉",
+      "feature_skill_ids": [
+        200083
+      ],
+      "primary_feature": 200083
+    },
+    "3045": {
+      "base_id": 3045,
+      "name": "锥尾羊",
+      "feature_skill_ids": [
+        200089
+      ],
+      "primary_feature": 200089
+    },
+    "3046": {
+      "base_id": 3046,
+      "name": "铃兰羊",
+      "feature_skill_ids": [
+        200089
+      ],
+      "primary_feature": 200089
+    },
+    "3047": {
+      "base_id": 3047,
+      "name": "花影羚羊",
+      "feature_skill_ids": [
+        200089
+      ],
+      "primary_feature": 200089
+    },
+    "3048": {
+      "base_id": 3048,
+      "name": "圣光迪莫",
+      "feature_skill_ids": [
+        200191
+      ],
+      "primary_feature": 200191
+    },
+    "3049": {
+      "base_id": 3049,
+      "name": "白发懒人",
+      "feature_skill_ids": [
+        200177
+      ],
+      "primary_feature": 200177
+    },
+    "3050": {
+      "base_id": 3050,
+      "name": "记忆石",
+      "feature_skill_ids": [
+        200099
+      ],
+      "primary_feature": 200099
+    },
+    "3051": {
+      "base_id": 3051,
+      "name": "圣草迪莫",
+      "feature_skill_ids": [
+        200191
+      ],
+      "primary_feature": 200191
+    },
+    "3052": {
+      "base_id": 3052,
+      "name": "煤球憨憨",
+      "feature_skill_ids": [
+        200101
+      ],
+      "primary_feature": 200101
+    },
+    "3053": {
+      "base_id": 3053,
+      "name": "害羞球球",
+      "feature_skill_ids": [
+        200101
+      ],
+      "primary_feature": 200101
+    },
+    "3054": {
+      "base_id": 3054,
+      "name": "害羞球球",
+      "feature_skill_ids": [
+        200101
+      ],
+      "primary_feature": 200101
+    },
+    "3055": {
+      "base_id": 3055,
+      "name": "板板壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3056": {
+      "base_id": 3056,
+      "name": "咔咔壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3057": {
+      "base_id": 3057,
+      "name": "水泡壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3058": {
+      "base_id": 3058,
+      "name": "一窝蜂",
+      "feature_skill_ids": [
+        200132
+      ],
+      "primary_feature": 200132
+    },
+    "3059": {
+      "base_id": 3059,
+      "name": "黄蜂后",
+      "feature_skill_ids": [
+        200132
+      ],
+      "primary_feature": 200132
+    },
+    "3060": {
+      "base_id": 3060,
+      "name": "小灵面",
+      "feature_skill_ids": [
+        200157
+      ],
+      "primary_feature": 200157
+    },
+    "3061": {
+      "base_id": 3061,
+      "name": "暗影灵面",
+      "feature_skill_ids": [
+        200157
+      ],
+      "primary_feature": 200157
+    },
+    "3062": {
+      "base_id": 3062,
+      "name": "小独角兽",
+      "feature_skill_ids": [
+        200075
+      ],
+      "primary_feature": 200075
+    },
+    "3063": {
+      "base_id": 3063,
+      "name": "白金独角兽",
+      "feature_skill_ids": [
+        200075
+      ],
+      "primary_feature": 200075
+    },
+    "3064": {
+      "base_id": 3064,
+      "name": "幽影树",
+      "feature_skill_ids": [
+        200155
+      ],
+      "primary_feature": 200155
+    },
+    "3065": {
+      "base_id": 3065,
+      "name": "忽幽狸",
+      "feature_skill_ids": [
+        200156
+      ],
+      "primary_feature": 200156
+    },
+    "3066": {
+      "base_id": 3066,
+      "name": "影狸",
+      "feature_skill_ids": [
+        200156
+      ],
+      "primary_feature": 200156
+    },
+    "3067": {
+      "base_id": 3067,
+      "name": "卷毛鸭",
+      "feature_skill_ids": [
+        200213
+      ],
+      "primary_feature": 200213
+    },
+    "3069": {
+      "base_id": 3069,
+      "name": "锤头鹳",
+      "feature_skill_ids": [
+        200129
+      ],
+      "primary_feature": 200129
+    },
+    "3070": {
+      "base_id": 3070,
+      "name": "护主犬",
+      "feature_skill_ids": [
+        200149
+      ],
+      "primary_feature": 200149
+    },
+    "3071": {
+      "base_id": 3071,
+      "name": "音速犬",
+      "feature_skill_ids": [
+        200149
+      ],
+      "primary_feature": 200149
+    },
+    "3072": {
+      "base_id": 3072,
+      "name": "格兰种子",
+      "feature_skill_ids": [
+        200087
+      ],
+      "primary_feature": 200087
+    },
+    "3073": {
+      "base_id": 3073,
+      "name": "格兰花",
+      "feature_skill_ids": [
+        200087
+      ],
+      "primary_feature": 200087
+    },
+    "3074": {
+      "base_id": 3074,
+      "name": "格兰球",
+      "feature_skill_ids": [
+        200087
+      ],
+      "primary_feature": 200087
+    },
+    "3075": {
+      "base_id": 3075,
+      "name": "灵狐",
+      "feature_skill_ids": [
+        200150
+      ],
+      "primary_feature": 200150
+    },
+    "3076": {
+      "base_id": 3076,
+      "name": "九尾狐",
+      "feature_skill_ids": [
+        200150
+      ],
+      "primary_feature": 200150
+    },
+    "3077": {
+      "base_id": 3077,
+      "name": "尖嘴狐仙",
+      "feature_skill_ids": [
+        200150
+      ],
+      "primary_feature": 200150
+    },
+    "3078": {
+      "base_id": 3078,
+      "name": "烈钻鸟",
+      "feature_skill_ids": [
+        200151
+      ],
+      "primary_feature": 200151
+    },
+    "3079": {
+      "base_id": 3079,
+      "name": "长尾火鸟",
+      "feature_skill_ids": [
+        200151
+      ],
+      "primary_feature": 200151
+    },
+    "3080": {
+      "base_id": 3080,
+      "name": "火羽",
+      "feature_skill_ids": [
+        200151
+      ],
+      "primary_feature": 200151
+    },
+    "3081": {
+      "base_id": 3081,
+      "name": "治愈兔",
+      "feature_skill_ids": [
+        200152
+      ],
+      "primary_feature": 200152
+    },
+    "3082": {
+      "base_id": 3082,
+      "name": "红丝绒",
+      "feature_skill_ids": [
+        200152
+      ],
+      "primary_feature": 200152
+    },
+    "3083": {
+      "base_id": 3083,
+      "name": "可爱猿",
+      "feature_skill_ids": [
+        200147
+      ],
+      "primary_feature": 200147
+    },
+    "3084": {
+      "base_id": 3084,
+      "name": "炽热猿",
+      "feature_skill_ids": [
+        200147
+      ],
+      "primary_feature": 200147
+    },
+    "3085": {
+      "base_id": 3085,
+      "name": "火焰猿",
+      "feature_skill_ids": [
+        200147
+      ],
+      "primary_feature": 200147
+    },
+    "3086": {
+      "base_id": 3086,
+      "name": "可立鸡",
+      "feature_skill_ids": [
+        200148
+      ],
+      "primary_feature": 200148
+    },
+    "3087": {
+      "base_id": 3087,
+      "name": "晕晕鸡",
+      "feature_skill_ids": [
+        200148
+      ],
+      "primary_feature": 200148
+    },
+    "3088": {
+      "base_id": 3088,
+      "name": "绅士鸡",
+      "feature_skill_ids": [
+        200218
+      ],
+      "primary_feature": 200218
+    },
+    "3089": {
+      "base_id": 3089,
+      "name": "武者鸡",
+      "feature_skill_ids": [
+        200148
+      ],
+      "primary_feature": 200148
+    },
+    "3090": {
+      "base_id": 3090,
+      "name": "火尾瓦特",
+      "feature_skill_ids": [
+        200153
+      ],
+      "primary_feature": 200153
+    },
+    "3091": {
+      "base_id": 3091,
+      "name": "火尾战士",
+      "feature_skill_ids": [
+        200153
+      ],
+      "primary_feature": 200153
+    },
+    "3092": {
+      "base_id": 3092,
+      "name": "烈火守护",
+      "feature_skill_ids": [
+        200153
+      ],
+      "primary_feature": 200153
+    },
+    "3093": {
+      "base_id": 3093,
+      "name": "呆小路",
+      "feature_skill_ids": [
+        200084
+      ],
+      "primary_feature": 200084
+    },
+    "3094": {
+      "base_id": 3094,
+      "name": "舞动路路",
+      "feature_skill_ids": [
+        200084
+      ],
+      "primary_feature": 200084
+    },
+    "3095": {
+      "base_id": 3095,
+      "name": "白发路路",
+      "feature_skill_ids": [
+        200084
+      ],
+      "primary_feature": 200084
+    },
+    "3098": {
+      "base_id": 3098,
+      "name": "绿耳松鼠",
+      "feature_skill_ids": [
+        200091
+      ],
+      "primary_feature": 200091
+    },
+    "3099": {
+      "base_id": 3099,
+      "name": "抱枕松鼠",
+      "feature_skill_ids": [
+        200091
+      ],
+      "primary_feature": 200091
+    },
+    "3100": {
+      "base_id": 3100,
+      "name": "蹦床松鼠",
+      "feature_skill_ids": [
+        200091
+      ],
+      "primary_feature": 200091
+    },
+    "3101": {
+      "base_id": 3101,
+      "name": "动力猿",
+      "feature_skill_ids": [
+        200177
+      ],
+      "primary_feature": 200177
+    },
+    "3102": {
+      "base_id": 3102,
+      "name": "瞌睡王",
+      "feature_skill_ids": [
+        200177
+      ],
+      "primary_feature": 200177
+    },
+    "3103": {
+      "base_id": 3103,
+      "name": "布是石",
+      "feature_skill_ids": [
+        200102
+      ],
+      "primary_feature": 200102
+    },
+    "3104": {
+      "base_id": 3104,
+      "name": "布是岩",
+      "feature_skill_ids": [
+        200102
+      ],
+      "primary_feature": 200102
+    },
+    "3105": {
+      "base_id": 3105,
+      "name": "布克棱岩",
+      "feature_skill_ids": [
+        200102
+      ],
+      "primary_feature": 200102
+    },
+    "3106": {
+      "base_id": 3106,
+      "name": "石肤蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3107": {
+      "base_id": 3107,
+      "name": "石刺蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3108": {
+      "base_id": 3108,
+      "name": "石冠王蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3109": {
+      "base_id": 3109,
+      "name": "仪使者",
+      "feature_skill_ids": [
+        200106
+      ],
+      "primary_feature": 200106
+    },
+    "3110": {
+      "base_id": 3110,
+      "name": "仪式之星",
+      "feature_skill_ids": [
+        200106
+      ],
+      "primary_feature": 200106
+    },
+    "3111": {
+      "base_id": 3111,
+      "name": "仪式巨像",
+      "feature_skill_ids": [
+        200106
+      ],
+      "primary_feature": 200106
+    },
+    "3112": {
+      "base_id": 3112,
+      "name": "甜田螺",
+      "feature_skill_ids": [
+        200109
+      ],
+      "primary_feature": 200109
+    },
+    "3113": {
+      "base_id": 3113,
+      "name": "壳乙螺",
+      "feature_skill_ids": [
+        200109
+      ],
+      "primary_feature": 200109
+    },
+    "3114": {
+      "base_id": 3114,
+      "name": "卡洛儿",
+      "feature_skill_ids": [
+        200109
+      ],
+      "primary_feature": 200109
+    },
+    "3115": {
+      "base_id": 3115,
+      "name": "风铃鲨",
+      "feature_skill_ids": [
+        200110
+      ],
+      "primary_feature": 200110
+    },
+    "3116": {
+      "base_id": 3116,
+      "name": "蓝蝶鲨",
+      "feature_skill_ids": [
+        200110
+      ],
+      "primary_feature": 200110
+    },
+    "3117": {
+      "base_id": 3117,
+      "name": "彩蝶鲨",
+      "feature_skill_ids": [
+        200110
+      ],
+      "primary_feature": 200110
+    },
+    "3118": {
+      "base_id": 3118,
+      "name": "果冻",
+      "feature_skill_ids": [
+        200202
+      ],
+      "primary_feature": 200202
+    },
+    "3119": {
+      "base_id": 3119,
+      "name": "翡翠水母",
+      "feature_skill_ids": [
+        200115
+      ],
+      "primary_feature": 200115
+    },
+    "3120": {
+      "base_id": 3120,
+      "name": "琉璃水母",
+      "feature_skill_ids": [
+        200115
+      ],
+      "primary_feature": 200115
+    },
+    "3121": {
+      "base_id": 3121,
+      "name": "大耳帽兜",
+      "feature_skill_ids": [
+        200116
+      ],
+      "primary_feature": 200116
+    },
+    "3122": {
+      "base_id": 3122,
+      "name": "帽兜娃娃",
+      "feature_skill_ids": [
+        200116
+      ],
+      "primary_feature": 200116
+    },
+    "3123": {
+      "base_id": 3123,
+      "name": "雪影娃娃",
+      "feature_skill_ids": [
+        200116
+      ],
+      "primary_feature": 200116
+    },
+    "3124": {
+      "base_id": 3124,
+      "name": "脆筒甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3125": {
+      "base_id": 3125,
+      "name": "香草甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3126": {
+      "base_id": 3126,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3127": {
+      "base_id": 3127,
+      "name": "小狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3128": {
+      "base_id": 3128,
+      "name": "神圣狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3129": {
+      "base_id": 3129,
+      "name": "皇家狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3130": {
+      "base_id": 3130,
+      "name": "圆眼蜘蛛",
+      "feature_skill_ids": [
+        200131
+      ],
+      "primary_feature": 200131
+    },
+    "3131": {
+      "base_id": 3131,
+      "name": "尖角蜘蛛",
+      "feature_skill_ids": [
+        200131
+      ],
+      "primary_feature": 200131
+    },
+    "3132": {
+      "base_id": 3132,
+      "name": "芋香巨角蛛",
+      "feature_skill_ids": [
+        200131
+      ],
+      "primary_feature": 200131
+    },
+    "3133": {
+      "base_id": 3133,
+      "name": "小螂",
+      "feature_skill_ids": [
+        200134
+      ],
+      "primary_feature": 200134
+    },
+    "3134": {
+      "base_id": 3134,
+      "name": "兵螂",
+      "feature_skill_ids": [
+        200134
+      ],
+      "primary_feature": 200134
+    },
+    "3135": {
+      "base_id": 3135,
+      "name": "飞天刀螂",
+      "feature_skill_ids": [
+        200134
+      ],
+      "primary_feature": 200134
+    },
+    "3136": {
+      "base_id": 3136,
+      "name": "毛毛",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3137": {
+      "base_id": 3137,
+      "name": "爬爬",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3138": {
+      "base_id": 3138,
+      "name": "化蝶",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3139": {
+      "base_id": 3139,
+      "name": "小草虫",
+      "feature_skill_ids": [
+        200136
+      ],
+      "primary_feature": 200136
+    },
+    "3140": {
+      "base_id": 3140,
+      "name": "草衣虫",
+      "feature_skill_ids": [
+        200136
+      ],
+      "primary_feature": 200136
+    },
+    "3141": {
+      "base_id": 3141,
+      "name": "花衣蝶",
+      "feature_skill_ids": [
+        200136
+      ],
+      "primary_feature": 200136
+    },
+    "3142": {
+      "base_id": 3142,
+      "name": "小夜",
+      "feature_skill_ids": [
+        200143
+      ],
+      "primary_feature": 200143
+    },
+    "3143": {
+      "base_id": 3143,
+      "name": "紫夜",
+      "feature_skill_ids": [
+        200143
+      ],
+      "primary_feature": 200143
+    },
+    "3144": {
+      "base_id": 3144,
+      "name": "朔夜伊芙",
+      "feature_skill_ids": [
+        200143
+      ],
+      "primary_feature": 200143
+    },
+    "3145": {
+      "base_id": 3145,
+      "name": "小灵菇",
+      "feature_skill_ids": [
+        200158
+      ],
+      "primary_feature": 200158
+    },
+    "3146": {
+      "base_id": 3146,
+      "name": "幻灵菇",
+      "feature_skill_ids": [
+        200158
+      ],
+      "primary_feature": 200158
+    },
+    "3147": {
+      "base_id": 3147,
+      "name": "幻影灵菇",
+      "feature_skill_ids": [
+        200158
+      ],
+      "primary_feature": 200158
+    },
+    "3148": {
+      "base_id": 3148,
+      "name": "空空颅",
+      "feature_skill_ids": [
+        200160
+      ],
+      "primary_feature": 200160
+    },
+    "3149": {
+      "base_id": 3149,
+      "name": "夜宿颅",
+      "feature_skill_ids": [
+        200160
+      ],
+      "primary_feature": 200160
+    },
+    "3150": {
+      "base_id": 3150,
+      "name": "夜枭",
+      "feature_skill_ids": [
+        200160
+      ],
+      "primary_feature": 200160
+    },
+    "3151": {
+      "base_id": 3151,
+      "name": "多多",
+      "feature_skill_ids": [
+        200185
+      ],
+      "primary_feature": 200185
+    },
+    "3152": {
+      "base_id": 3152,
+      "name": "多啦多",
+      "feature_skill_ids": [
+        200185
+      ],
+      "primary_feature": 200185
+    },
+    "3153": {
+      "base_id": 3153,
+      "name": "古啦多",
+      "feature_skill_ids": [
+        200185
+      ],
+      "primary_feature": 200185
+    },
+    "3154": {
+      "base_id": 3154,
+      "name": "裘洛",
+      "feature_skill_ids": [
+        200187
+      ],
+      "primary_feature": 200187
+    },
+    "3155": {
+      "base_id": 3155,
+      "name": "裘力",
+      "feature_skill_ids": [
+        200187
+      ],
+      "primary_feature": 200187
+    },
+    "3156": {
+      "base_id": 3156,
+      "name": "裘卡",
+      "feature_skill_ids": [
+        200187
+      ],
+      "primary_feature": 200187
+    },
+    "3157": {
+      "base_id": 3157,
+      "name": "花魁蜂后",
+      "feature_skill_ids": [
+        200132
+      ],
+      "primary_feature": 200132
+    },
+    "3158": {
+      "base_id": 3158,
+      "name": "武斗酷猫",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "3161": {
+      "base_id": 3161,
+      "name": "春团",
+      "feature_skill_ids": [
+        200085
+      ],
+      "primary_feature": 200085
+    },
+    "3162": {
+      "base_id": 3162,
+      "name": "春兔",
+      "feature_skill_ids": [
+        200085
+      ],
+      "primary_feature": 200085
+    },
+    "3165": {
+      "base_id": 3165,
+      "name": "伏地兽",
+      "feature_skill_ids": [
+        200090
+      ],
+      "primary_feature": 200090
+    },
+    "3166": {
+      "base_id": 3166,
+      "name": "贪食鼹",
+      "feature_skill_ids": [
+        200090
+      ],
+      "primary_feature": 200090
+    },
+    "3167": {
+      "base_id": 3167,
+      "name": "巨噬针鼹",
+      "feature_skill_ids": [
+        200090
+      ],
+      "primary_feature": 200090
+    },
+    "3168": {
+      "base_id": 3168,
+      "name": "阿布",
+      "feature_skill_ids": [
+        200214
+      ],
+      "primary_feature": 200214
+    },
+    "3169": {
+      "base_id": 3169,
+      "name": "超能阿布",
+      "feature_skill_ids": [
+        200214
+      ],
+      "primary_feature": 200214
+    },
+    "3170": {
+      "base_id": 3170,
+      "name": "石石",
+      "feature_skill_ids": [
+        200104
+      ],
+      "primary_feature": 200104
+    },
+    "3171": {
+      "base_id": 3171,
+      "name": "巨灵石",
+      "feature_skill_ids": [
+        200104
+      ],
+      "primary_feature": 200104
+    },
+    "3172": {
+      "base_id": 3172,
+      "name": "雪豆丁",
+      "feature_skill_ids": [
+        200118
+      ],
+      "primary_feature": 200118
+    },
+    "3173": {
+      "base_id": 3173,
+      "name": "雪蛮人",
+      "feature_skill_ids": [
+        200118
+      ],
+      "primary_feature": 200118
+    },
+    "3174": {
+      "base_id": 3174,
+      "name": "雪巨人",
+      "feature_skill_ids": [
+        200118
+      ],
+      "primary_feature": 200118
+    },
+    "3175": {
+      "base_id": 3175,
+      "name": "咔咔羽毛",
+      "feature_skill_ids": [
+        200125
+      ],
+      "primary_feature": 200125
+    },
+    "3176": {
+      "base_id": 3176,
+      "name": "咔咔雀",
+      "feature_skill_ids": [
+        200125
+      ],
+      "primary_feature": 200125
+    },
+    "3177": {
+      "base_id": 3177,
+      "name": "咔咔鸟",
+      "feature_skill_ids": [
+        200125
+      ],
+      "primary_feature": 200125
+    },
+    "3178": {
+      "base_id": 3178,
+      "name": "矮脚爬爬",
+      "feature_skill_ids": [
+        200133
+      ],
+      "primary_feature": 200133
+    },
+    "3179": {
+      "base_id": 3179,
+      "name": "恶魔红钻",
+      "feature_skill_ids": [
+        200133
+      ],
+      "primary_feature": 200133
+    },
+    "3180": {
+      "base_id": 3180,
+      "name": "小帕尔",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "3181": {
+      "base_id": 3181,
+      "name": "帕尔萨斯",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "3182": {
+      "base_id": 3182,
+      "name": "龙息帕尔",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "3183": {
+      "base_id": 3183,
+      "name": "瑰眼仔",
+      "feature_skill_ids": [
+        200142
+      ],
+      "primary_feature": 200142
+    },
+    "3184": {
+      "base_id": 3184,
+      "name": "耳翎瑰魅",
+      "feature_skill_ids": [
+        200142
+      ],
+      "primary_feature": 200142
+    },
+    "3185": {
+      "base_id": 3185,
+      "name": "邪眼巨魔",
+      "feature_skill_ids": [
+        200142
+      ],
+      "primary_feature": 200142
+    },
+    "3186": {
+      "base_id": 3186,
+      "name": "小光",
+      "feature_skill_ids": [
+        200276
+      ],
+      "primary_feature": 200276
+    },
+    "3187": {
+      "base_id": 3187,
+      "name": "迷迷眼",
+      "feature_skill_ids": [
+        200159
+      ],
+      "primary_feature": 200159
+    },
+    "3188": {
+      "base_id": 3188,
+      "name": "拉特",
+      "feature_skill_ids": [
+        200162
+      ],
+      "primary_feature": 200162
+    },
+    "3189": {
+      "base_id": 3189,
+      "name": "酷拉",
+      "feature_skill_ids": [
+        200162
+      ],
+      "primary_feature": 200162
+    },
+    "3190": {
+      "base_id": 3190,
+      "name": "电咩咩",
+      "feature_skill_ids": [
+        200163
+      ],
+      "primary_feature": 200163
+    },
+    "3191": {
+      "base_id": 3191,
+      "name": "粉咩咩",
+      "feature_skill_ids": [
+        200163
+      ],
+      "primary_feature": 200163
+    },
+    "3192": {
+      "base_id": 3192,
+      "name": "电球咩咩",
+      "feature_skill_ids": [
+        200163
+      ],
+      "primary_feature": 200163
+    },
+    "3193": {
+      "base_id": 3193,
+      "name": "小星光",
+      "feature_skill_ids": [
+        200164
+      ],
+      "primary_feature": 200164
+    },
+    "3194": {
+      "base_id": 3194,
+      "name": "星光狮",
+      "feature_skill_ids": [
+        200164
+      ],
+      "primary_feature": 200164
+    },
+    "3195": {
+      "base_id": 3195,
+      "name": "闪电环",
+      "feature_skill_ids": [
+        200165
+      ],
+      "primary_feature": 200165
+    },
+    "3196": {
+      "base_id": 3196,
+      "name": "刺电环",
+      "feature_skill_ids": [
+        200165
+      ],
+      "primary_feature": 200165
+    },
+    "3197": {
+      "base_id": 3197,
+      "name": "荆棘电环",
+      "feature_skill_ids": [
+        200165
+      ],
+      "primary_feature": 200165
+    },
+    "3198": {
+      "base_id": 3198,
+      "name": "粉粉星",
+      "feature_skill_ids": [
+        200166
+      ],
+      "primary_feature": 200166
+    },
+    "3199": {
+      "base_id": 3199,
+      "name": "小皮球",
+      "feature_skill_ids": [
+        200166
+      ],
+      "primary_feature": 200166
+    },
+    "3200": {
+      "base_id": 3200,
+      "name": "机械方方",
+      "feature_skill_ids": [
+        200170
+      ],
+      "primary_feature": 200170
+    },
+    "3201": {
+      "base_id": 3201,
+      "name": "多彩方方",
+      "feature_skill_ids": [
+        200170
+      ],
+      "primary_feature": 200170
+    },
+    "3202": {
+      "base_id": 3202,
+      "name": "立方人",
+      "feature_skill_ids": [
+        200170
+      ],
+      "primary_feature": 200170
+    },
+    "3203": {
+      "base_id": 3203,
+      "name": "贝瑟",
+      "feature_skill_ids": [
+        200171
+      ],
+      "primary_feature": 200171
+    },
+    "3204": {
+      "base_id": 3204,
+      "name": "贝加尔",
+      "feature_skill_ids": [
+        200171
+      ],
+      "primary_feature": 200171
+    },
+    "3205": {
+      "base_id": 3205,
+      "name": "贝古斯",
+      "feature_skill_ids": [
+        200171
+      ],
+      "primary_feature": 200171
+    },
+    "3206": {
+      "base_id": 3206,
+      "name": "多西",
+      "feature_skill_ids": [
+        200172
+      ],
+      "primary_feature": 200172
+    },
+    "3207": {
+      "base_id": 3207,
+      "name": "库多西",
+      "feature_skill_ids": [
+        200172
+      ],
+      "primary_feature": 200172
+    },
+    "3208": {
+      "base_id": 3208,
+      "name": "波多西",
+      "feature_skill_ids": [
+        200172
+      ],
+      "primary_feature": 200172
+    },
+    "3209": {
+      "base_id": 3209,
+      "name": "小翼龙",
+      "feature_skill_ids": [
+        200173
+      ],
+      "primary_feature": 200173
+    },
+    "3210": {
+      "base_id": 3210,
+      "name": "翼龙",
+      "feature_skill_ids": [
+        200173
+      ],
+      "primary_feature": 200173
+    },
+    "3211": {
+      "base_id": 3211,
+      "name": "伊雷龙",
+      "feature_skill_ids": [
+        200174
+      ],
+      "primary_feature": 200174
+    },
+    "3213": {
+      "base_id": 3213,
+      "name": "黑炎宝宝",
+      "feature_skill_ids": [
+        200176
+      ],
+      "primary_feature": 200176
+    },
+    "3214": {
+      "base_id": 3214,
+      "name": "黑炎",
+      "feature_skill_ids": [
+        200176
+      ],
+      "primary_feature": 200176
+    },
+    "3215": {
+      "base_id": 3215,
+      "name": "海豹战士",
+      "feature_skill_ids": [
+        200178
+      ],
+      "primary_feature": 200178
+    },
+    "3216": {
+      "base_id": 3216,
+      "name": "海豹船长",
+      "feature_skill_ids": [
+        200178
+      ],
+      "primary_feature": 200178
+    },
+    "3217": {
+      "base_id": 3217,
+      "name": "呼拉猫",
+      "feature_skill_ids": [
+        200179
+      ],
+      "primary_feature": 200179
+    },
+    "3218": {
+      "base_id": 3218,
+      "name": "增肌猫",
+      "feature_skill_ids": [
+        200179
+      ],
+      "primary_feature": 200179
+    },
+    "3219": {
+      "base_id": 3219,
+      "name": "健猫教练",
+      "feature_skill_ids": [
+        200179
+      ],
+      "primary_feature": 200179
+    },
+    "3225": {
+      "base_id": 3225,
+      "name": "古钟蛇",
+      "feature_skill_ids": [
+        200181
+      ],
+      "primary_feature": 200181
+    },
+    "3226": {
+      "base_id": 3226,
+      "name": "寒音蛇",
+      "feature_skill_ids": [
+        200181
+      ],
+      "primary_feature": 200181
+    },
+    "3227": {
+      "base_id": 3227,
+      "name": "菊花梨",
+      "feature_skill_ids": [
+        200182
+      ],
+      "primary_feature": 200182
+    },
+    "3228": {
+      "base_id": 3228,
+      "name": "友爱天天",
+      "feature_skill_ids": [
+        200184
+      ],
+      "primary_feature": 200184
+    },
+    "3229": {
+      "base_id": 3229,
+      "name": "友爱星飞",
+      "feature_skill_ids": [
+        200184
+      ],
+      "primary_feature": 200184
+    },
+    "3234": {
+      "base_id": 3234,
+      "name": "牵线木偶",
+      "feature_skill_ids": [
+        200188
+      ],
+      "primary_feature": 200188
+    },
+    "3235": {
+      "base_id": 3235,
+      "name": "帅帅魔偶",
+      "feature_skill_ids": [
+        200188
+      ],
+      "primary_feature": 200188
+    },
+    "3236": {
+      "base_id": 3236,
+      "name": "超能球球",
+      "feature_skill_ids": [
+        200190
+      ],
+      "primary_feature": 200190
+    },
+    "3237": {
+      "base_id": 3237,
+      "name": "小怂猫",
+      "feature_skill_ids": [
+        200180
+      ],
+      "primary_feature": 200180
+    },
+    "3238": {
+      "base_id": 3238,
+      "name": "怒目怂猫",
+      "feature_skill_ids": [
+        200180
+      ],
+      "primary_feature": 200180
+    },
+    "3239": {
+      "base_id": 3239,
+      "name": "哭哭菇",
+      "feature_skill_ids": [
+        200189
+      ],
+      "primary_feature": 200189
+    },
+    "3240": {
+      "base_id": 3240,
+      "name": "怖须菇",
+      "feature_skill_ids": [
+        200189
+      ],
+      "primary_feature": 200189
+    },
+    "3241": {
+      "base_id": 3241,
+      "name": "怖哭菇",
+      "feature_skill_ids": [
+        200189
+      ],
+      "primary_feature": 200189
+    },
+    "3244": {
+      "base_id": 3244,
+      "name": "绒绒",
+      "feature_skill_ids": [
+        200192
+      ],
+      "primary_feature": 200192
+    },
+    "3245": {
+      "base_id": 3245,
+      "name": "小绒茧",
+      "feature_skill_ids": [
+        200192
+      ],
+      "primary_feature": 200192
+    },
+    "3246": {
+      "base_id": 3246,
+      "name": "绒仙子",
+      "feature_skill_ids": [
+        200192
+      ],
+      "primary_feature": 200192
+    },
+    "3248": {
+      "base_id": 3248,
+      "name": "绿洲象",
+      "feature_skill_ids": [
+        200086
+      ],
+      "primary_feature": 200086
+    },
+    "3249": {
+      "base_id": 3249,
+      "name": "流星猛犸",
+      "feature_skill_ids": [
+        200086
+      ],
+      "primary_feature": 200086
+    },
+    "3250": {
+      "base_id": 3250,
+      "name": "小鹬",
+      "feature_skill_ids": [
+        200093
+      ],
+      "primary_feature": 200093
+    },
+    "3251": {
+      "base_id": 3251,
+      "name": "鄙目鹬",
+      "feature_skill_ids": [
+        200093
+      ],
+      "primary_feature": 200093
+    },
+    "3252": {
+      "base_id": 3252,
+      "name": "高脚鹬",
+      "feature_skill_ids": [
+        200093
+      ],
+      "primary_feature": 200093
+    },
+    "3255": {
+      "base_id": 3255,
+      "name": "奔波鼠",
+      "feature_skill_ids": [
+        200105
+      ],
+      "primary_feature": 200105
+    },
+    "3256": {
+      "base_id": 3256,
+      "name": "流浪鼠",
+      "feature_skill_ids": [
+        200105
+      ],
+      "primary_feature": 200105
+    },
+    "3257": {
+      "base_id": 3257,
+      "name": "布鲁斯",
+      "feature_skill_ids": [
+        200117
+      ],
+      "primary_feature": 200117
+    },
+    "3258": {
+      "base_id": 3258,
+      "name": "雪顶布鲁斯",
+      "feature_skill_ids": [
+        200117
+      ],
+      "primary_feature": 200117
+    },
+    "3259": {
+      "base_id": 3259,
+      "name": "冰钻布鲁斯",
+      "feature_skill_ids": [
+        200117
+      ],
+      "primary_feature": 200117
+    },
+    "3260": {
+      "base_id": 3260,
+      "name": "古拉海象",
+      "feature_skill_ids": [
+        200119
+      ],
+      "primary_feature": 200119
+    },
+    "3261": {
+      "base_id": 3261,
+      "name": "大古拉海象",
+      "feature_skill_ids": [
+        200119
+      ],
+      "primary_feature": 200119
+    },
+    "3262": {
+      "base_id": 3262,
+      "name": "呼呼猪",
+      "feature_skill_ids": [
+        200120
+      ],
+      "primary_feature": 200120
+    },
+    "3263": {
+      "base_id": 3263,
+      "name": "獠牙猪",
+      "feature_skill_ids": [
+        200120
+      ],
+      "primary_feature": 200120
+    },
+    "3264": {
+      "base_id": 3264,
+      "name": "卡波",
+      "feature_skill_ids": [
+        200145
+      ],
+      "primary_feature": 200145
+    },
+    "3265": {
+      "base_id": 3265,
+      "name": "卡拉波斯",
+      "feature_skill_ids": [
+        200145
+      ],
+      "primary_feature": 200145
+    },
+    "3266": {
+      "base_id": 3266,
+      "name": "胆小鳗鱼",
+      "feature_skill_ids": [
+        200167
+      ],
+      "primary_feature": 200167
+    },
+    "3267": {
+      "base_id": 3267,
+      "name": "闪电鳗鱼",
+      "feature_skill_ids": [
+        200167
+      ],
+      "primary_feature": 200167
+    },
+    "3268": {
+      "base_id": 3268,
+      "name": "大头骨龙",
+      "feature_skill_ids": [
+        200230
+      ],
+      "primary_feature": 200230
+    },
+    "3269": {
+      "base_id": 3269,
+      "name": "寂灭骨龙",
+      "feature_skill_ids": [
+        200230
+      ],
+      "primary_feature": 200230
+    },
+    "3276": {
+      "base_id": 3276,
+      "name": "绿翼鸟",
+      "feature_skill_ids": [
+        200183
+      ],
+      "primary_feature": 200183
+    },
+    "3277": {
+      "base_id": 3277,
+      "name": "魔翼鸟",
+      "feature_skill_ids": [
+        200183
+      ],
+      "primary_feature": 200183
+    },
+    "3278": {
+      "base_id": 3278,
+      "name": "魔眷鸟",
+      "feature_skill_ids": [
+        200183
+      ],
+      "primary_feature": 200183
+    },
+    "3279": {
+      "base_id": 3279,
+      "name": "雪绒鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3280": {
+      "base_id": 3280,
+      "name": "雪绒鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3281": {
+      "base_id": 3281,
+      "name": "雪绒鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3282": {
+      "base_id": 3282,
+      "name": "冬羽雀",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3283": {
+      "base_id": 3283,
+      "name": "冬羽雀",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3284": {
+      "base_id": 3284,
+      "name": "冬羽雀",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3285": {
+      "base_id": 3285,
+      "name": "岚鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3286": {
+      "base_id": 3286,
+      "name": "岚鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3287": {
+      "base_id": 3287,
+      "name": "岚鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3288": {
+      "base_id": 3288,
+      "name": "丢丢",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3289": {
+      "base_id": 3289,
+      "name": "丢丢",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3290": {
+      "base_id": 3290,
+      "name": "丢丢",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3291": {
+      "base_id": 3291,
+      "name": "卡卡虫",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3292": {
+      "base_id": 3292,
+      "name": "卡卡虫",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3293": {
+      "base_id": 3293,
+      "name": "卡卡虫",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3294": {
+      "base_id": 3294,
+      "name": "卡瓦重",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3295": {
+      "base_id": 3295,
+      "name": "卡瓦重",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3296": {
+      "base_id": 3296,
+      "name": "卡瓦重",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "3297": {
+      "base_id": 3297,
+      "name": "蹦蹦种子",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3298": {
+      "base_id": 3298,
+      "name": "蹦蹦种子",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3299": {
+      "base_id": 3299,
+      "name": "蹦蹦种子",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3300": {
+      "base_id": 3300,
+      "name": "蹦蹦草",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3301": {
+      "base_id": 3301,
+      "name": "蹦蹦草",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3302": {
+      "base_id": 3302,
+      "name": "蹦蹦草",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3303": {
+      "base_id": 3303,
+      "name": "蹦蹦花",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3304": {
+      "base_id": 3304,
+      "name": "蹦蹦花",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3305": {
+      "base_id": 3305,
+      "name": "蹦蹦花",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "3307": {
+      "base_id": 3307,
+      "name": "矿晶虫",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3308": {
+      "base_id": 3308,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3309": {
+      "base_id": 3309,
+      "name": "犀角鸟",
+      "feature_skill_ids": [
+        200193
+      ],
+      "primary_feature": 200193
+    },
+    "3310": {
+      "base_id": 3310,
+      "name": "光纤兽",
+      "feature_skill_ids": [
+        200193
+      ],
+      "primary_feature": 200193
+    },
+    "3311": {
+      "base_id": 3311,
+      "name": "疾光千兽",
+      "feature_skill_ids": [
+        200193
+      ],
+      "primary_feature": 200193
+    },
+    "3315": {
+      "base_id": 3315,
+      "name": "小鼠獭",
+      "feature_skill_ids": [
+        200094
+      ],
+      "primary_feature": 200094
+    },
+    "3316": {
+      "base_id": 3316,
+      "name": "燕尾獭",
+      "feature_skill_ids": [
+        200094
+      ],
+      "primary_feature": 200094
+    },
+    "3317": {
+      "base_id": 3317,
+      "name": "卷胡巨獭",
+      "feature_skill_ids": [
+        200094
+      ],
+      "primary_feature": 200094
+    },
+    "3319": {
+      "base_id": 3319,
+      "name": "粉星仔",
+      "feature_skill_ids": [
+        200095
+      ],
+      "primary_feature": 200095
+    },
+    "3320": {
+      "base_id": 3320,
+      "name": "粉耳星兔",
+      "feature_skill_ids": [
+        200095
+      ],
+      "primary_feature": 200095
+    },
+    "3321": {
+      "base_id": 3321,
+      "name": "觅觅蝠",
+      "feature_skill_ids": [
+        200130
+      ],
+      "primary_feature": 200130
+    },
+    "3322": {
+      "base_id": 3322,
+      "name": "翻翻蝠",
+      "feature_skill_ids": [
+        200130
+      ],
+      "primary_feature": 200130
+    },
+    "3323": {
+      "base_id": 3323,
+      "name": "夜游魔",
+      "feature_skill_ids": [
+        200130
+      ],
+      "primary_feature": 200130
+    },
+    "3330": {
+      "base_id": 3330,
+      "name": "海盔虫",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3331": {
+      "base_id": 3331,
+      "name": "刺盔虫",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3332": {
+      "base_id": 3332,
+      "name": "千棘盔",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3333": {
+      "base_id": 3333,
+      "name": "雪娃娃",
+      "feature_skill_ids": [
+        200123
+      ],
+      "primary_feature": 200123
+    },
+    "3334": {
+      "base_id": 3334,
+      "name": "冰封怨灵",
+      "feature_skill_ids": [
+        200123
+      ],
+      "primary_feature": 200123
+    },
+    "3335": {
+      "base_id": 3335,
+      "name": "雪灵",
+      "feature_skill_ids": [
+        200123
+      ],
+      "primary_feature": 200123
+    },
+    "3338": {
+      "base_id": 3338,
+      "name": "冰虎宝",
+      "feature_skill_ids": [
+        200261
+      ],
+      "primary_feature": 200261
+    },
+    "3339": {
+      "base_id": 3339,
+      "name": "冰晶虎",
+      "feature_skill_ids": [
+        200261
+      ],
+      "primary_feature": 200261
+    },
+    "3340": {
+      "base_id": 3340,
+      "name": "古齿帝牙",
+      "feature_skill_ids": [
+        200261
+      ],
+      "primary_feature": 200261
+    },
+    "3344": {
+      "base_id": 3344,
+      "name": "乖乖鹄",
+      "feature_skill_ids": [
+        200126
+      ],
+      "primary_feature": 200126
+    },
+    "3345": {
+      "base_id": 3345,
+      "name": "蓝珠天鹅",
+      "feature_skill_ids": [
+        200126
+      ],
+      "primary_feature": 200126
+    },
+    "3346": {
+      "base_id": 3346,
+      "name": "翠顶夫人",
+      "feature_skill_ids": [
+        200126
+      ],
+      "primary_feature": 200126
+    },
+    "3347": {
+      "base_id": 3347,
+      "name": "芽眼魔",
+      "feature_skill_ids": [
+        200144
+      ],
+      "primary_feature": 200144
+    },
+    "3348": {
+      "base_id": 3348,
+      "name": "叶眼魔",
+      "feature_skill_ids": [
+        200144
+      ],
+      "primary_feature": 200144
+    },
+    "3349": {
+      "base_id": 3349,
+      "name": "障眼魔",
+      "feature_skill_ids": [
+        200144
+      ],
+      "primary_feature": 200144
+    },
+    "3350": {
+      "base_id": 3350,
+      "name": "红绒十字",
+      "feature_skill_ids": [
+        200152
+      ],
+      "primary_feature": 200152
+    },
+    "3351": {
+      "base_id": 3351,
+      "name": "霹雳宝宝",
+      "feature_skill_ids": [
+        200168
+      ],
+      "primary_feature": 200168
+    },
+    "3352": {
+      "base_id": 3352,
+      "name": "雷鸣小子",
+      "feature_skill_ids": [
+        200168
+      ],
+      "primary_feature": 200168
+    },
+    "3353": {
+      "base_id": 3353,
+      "name": "雷暴奔奔",
+      "feature_skill_ids": [
+        200168
+      ],
+      "primary_feature": 200168
+    },
+    "3357": {
+      "base_id": 3357,
+      "name": "电动长颈鹿",
+      "feature_skill_ids": [
+        200169
+      ],
+      "primary_feature": 200169
+    },
+    "3358": {
+      "base_id": 3358,
+      "name": "奔乐鹿",
+      "feature_skill_ids": [
+        200169
+      ],
+      "primary_feature": 200169
+    },
+    "3359": {
+      "base_id": 3359,
+      "name": "爵士鹿",
+      "feature_skill_ids": [
+        200169
+      ],
+      "primary_feature": 200169
+    },
+    "3367": {
+      "base_id": 3367,
+      "name": "嘟嘟煲",
+      "feature_skill_ids": [
+        200186
+      ],
+      "primary_feature": 200186
+    },
+    "3368": {
+      "base_id": 3368,
+      "name": "嘟嘟锅",
+      "feature_skill_ids": [
+        200186
+      ],
+      "primary_feature": 200186
+    },
+    "3369": {
+      "base_id": 3369,
+      "name": "幽星光",
+      "feature_skill_ids": [
+        200210
+      ],
+      "primary_feature": 200210
+    },
+    "3370": {
+      "base_id": 3370,
+      "name": "曜星光",
+      "feature_skill_ids": [
+        200210
+      ],
+      "primary_feature": 200210
+    },
+    "3371": {
+      "base_id": 3371,
+      "name": "暮星辰",
+      "feature_skill_ids": [
+        200210
+      ],
+      "primary_feature": 200210
+    },
+    "3372": {
+      "base_id": 3372,
+      "name": "春花兔",
+      "feature_skill_ids": [
+        200085
+      ],
+      "primary_feature": 200085
+    },
+    "3373": {
+      "base_id": 3373,
+      "name": "逗逗",
+      "feature_skill_ids": [
+        200096
+      ],
+      "primary_feature": 200096
+    },
+    "3374": {
+      "base_id": 3374,
+      "name": "气球猫",
+      "feature_skill_ids": [
+        200096
+      ],
+      "primary_feature": 200096
+    },
+    "3375": {
+      "base_id": 3375,
+      "name": "梦想三三",
+      "feature_skill_ids": [
+        200096
+      ],
+      "primary_feature": 200096
+    },
+    "3376": {
+      "base_id": 3376,
+      "name": "旋叶虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3377": {
+      "base_id": 3377,
+      "name": "风滚暮虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3378": {
+      "base_id": 3378,
+      "name": "菇菇丁",
+      "feature_skill_ids": [
+        200215
+      ],
+      "primary_feature": 200215
+    },
+    "3379": {
+      "base_id": 3379,
+      "name": "多菇丁",
+      "feature_skill_ids": [
+        200215
+      ],
+      "primary_feature": 200215
+    },
+    "3380": {
+      "base_id": 3380,
+      "name": "九幽菇",
+      "feature_skill_ids": [
+        200215
+      ],
+      "primary_feature": 200215
+    },
+    "3381": {
+      "base_id": 3381,
+      "name": "深蓝鲸",
+      "feature_skill_ids": [
+        200112
+      ],
+      "primary_feature": 200112
+    },
+    "3382": {
+      "base_id": 3382,
+      "name": "双灯鱼",
+      "feature_skill_ids": [
+        200113
+      ],
+      "primary_feature": 200113
+    },
+    "3383": {
+      "base_id": 3383,
+      "name": "利灯鱼",
+      "feature_skill_ids": [
+        200113
+      ],
+      "primary_feature": 200113
+    },
+    "3384": {
+      "base_id": 3384,
+      "name": "豆丁鱼",
+      "feature_skill_ids": [
+        200114
+      ],
+      "primary_feature": 200114
+    },
+    "3385": {
+      "base_id": 3385,
+      "name": "快鳍鱼",
+      "feature_skill_ids": [
+        200114
+      ],
+      "primary_feature": 200114
+    },
+    "3386": {
+      "base_id": 3386,
+      "name": "龙鱼",
+      "feature_skill_ids": [
+        200114
+      ],
+      "primary_feature": 200114
+    },
+    "3392": {
+      "base_id": 3392,
+      "name": "凡雀",
+      "feature_skill_ids": [
+        200127
+      ],
+      "primary_feature": 200127
+    },
+    "3393": {
+      "base_id": 3393,
+      "name": "紫翎鹰",
+      "feature_skill_ids": [
+        200127
+      ],
+      "primary_feature": 200127
+    },
+    "3394": {
+      "base_id": 3394,
+      "name": "凡鹰",
+      "feature_skill_ids": [
+        200127
+      ],
+      "primary_feature": 200127
+    },
+    "3395": {
+      "base_id": 3395,
+      "name": "里奥",
+      "feature_skill_ids": [
+        200211
+      ],
+      "primary_feature": 200211
+    },
+    "3396": {
+      "base_id": 3396,
+      "name": "灵羽勇士",
+      "feature_skill_ids": [
+        200211
+      ],
+      "primary_feature": 200211
+    },
+    "3397": {
+      "base_id": 3397,
+      "name": "圣羽翼王",
+      "feature_skill_ids": [
+        200211
+      ],
+      "primary_feature": 200211
+    },
+    "3398": {
+      "base_id": 3398,
+      "name": "星尘虫",
+      "feature_skill_ids": [
+        200137
+      ],
+      "primary_feature": 200137
+    },
+    "3399": {
+      "base_id": 3399,
+      "name": "落星虫",
+      "feature_skill_ids": [
+        200137
+      ],
+      "primary_feature": 200137
+    },
+    "3400": {
+      "base_id": 3400,
+      "name": "陨星虫",
+      "feature_skill_ids": [
+        200137
+      ],
+      "primary_feature": 200137
+    },
+    "3405": {
+      "base_id": 3405,
+      "name": "幽冥眼",
+      "feature_skill_ids": [
+        200157
+      ],
+      "primary_feature": 200157
+    },
+    "3406": {
+      "base_id": 3406,
+      "name": "缇塔",
+      "feature_skill_ids": [
+        200228
+      ],
+      "primary_feature": 200228
+    },
+    "3407": {
+      "base_id": 3407,
+      "name": "声波缇塔",
+      "feature_skill_ids": [
+        200228
+      ],
+      "primary_feature": 200228
+    },
+    "3408": {
+      "base_id": 3408,
+      "name": "齿轮小子",
+      "feature_skill_ids": [
+        200229
+      ],
+      "primary_feature": 200229
+    },
+    "3409": {
+      "base_id": 3409,
+      "name": "机甲小子",
+      "feature_skill_ids": [
+        200229
+      ],
+      "primary_feature": 200229
+    },
+    "3410": {
+      "base_id": 3410,
+      "name": "权杖-Ⅱ",
+      "feature_skill_ids": [
+        200197
+      ],
+      "primary_feature": 200197
+    },
+    "3411": {
+      "base_id": 3411,
+      "name": "权杖-V",
+      "feature_skill_ids": [
+        200197
+      ],
+      "primary_feature": 200197
+    },
+    "3412": {
+      "base_id": 3412,
+      "name": "伊兰亚龙",
+      "feature_skill_ids": [
+        200174
+      ],
+      "primary_feature": 200174
+    },
+    "3416": {
+      "base_id": 3416,
+      "name": "格斗小五",
+      "feature_skill_ids": [
+        200201
+      ],
+      "primary_feature": 200201
+    },
+    "3417": {
+      "base_id": 3417,
+      "name": "格斗小六",
+      "feature_skill_ids": [
+        200200
+      ],
+      "primary_feature": 200200
+    },
+    "3418": {
+      "base_id": 3418,
+      "name": "格斗小八",
+      "feature_skill_ids": [
+        200274
+      ],
+      "primary_feature": 200274
+    },
+    "3419": {
+      "base_id": 3419,
+      "name": "厉毒小萝",
+      "feature_skill_ids": [
+        200204
+      ],
+      "primary_feature": 200204
+    },
+    "3420": {
+      "base_id": 3420,
+      "name": "厉毒修萝",
+      "feature_skill_ids": [
+        200204
+      ],
+      "primary_feature": 200204
+    },
+    "3423": {
+      "base_id": 3423,
+      "name": "空灵兽",
+      "feature_skill_ids": [
+        200271
+      ],
+      "primary_feature": 200271
+    },
+    "3424": {
+      "base_id": 3424,
+      "name": "空灵斗士",
+      "feature_skill_ids": [
+        200271
+      ],
+      "primary_feature": 200271
+    },
+    "3427": {
+      "base_id": 3427,
+      "name": "麦香驼",
+      "feature_skill_ids": [
+        200266
+      ],
+      "primary_feature": 200266
+    },
+    "3430": {
+      "base_id": 3430,
+      "name": "海枝枝",
+      "feature_skill_ids": [
+        200216
+      ],
+      "primary_feature": 200216
+    },
+    "3431": {
+      "base_id": 3431,
+      "name": "海枝枝",
+      "feature_skill_ids": [
+        200216
+      ],
+      "primary_feature": 200216
+    },
+    "3432": {
+      "base_id": 3432,
+      "name": "海枝枝",
+      "feature_skill_ids": [
+        200216
+      ],
+      "primary_feature": 200216
+    },
+    "3433": {
+      "base_id": 3433,
+      "name": "海枝枝",
+      "feature_skill_ids": [
+        200216
+      ],
+      "primary_feature": 200216
+    },
+    "3434": {
+      "base_id": 3434,
+      "name": "小电企鹅",
+      "feature_skill_ids": [
+        200278
+      ],
+      "primary_feature": 200278
+    },
+    "3435": {
+      "base_id": 3435,
+      "name": "电企鹅",
+      "feature_skill_ids": [
+        200278
+      ],
+      "primary_feature": 200278
+    },
+    "3436": {
+      "base_id": 3436,
+      "name": "柴渣虫",
+      "feature_skill_ids": [
+        200203
+      ],
+      "primary_feature": 200203
+    },
+    "3437": {
+      "base_id": 3437,
+      "name": "燃薪虫",
+      "feature_skill_ids": [
+        200203
+      ],
+      "primary_feature": 200203
+    },
+    "3438": {
+      "base_id": 3438,
+      "name": "梦游",
+      "feature_skill_ids": [
+        200161
+      ],
+      "primary_feature": 200161
+    },
+    "3439": {
+      "base_id": 3439,
+      "name": "梦悠悠",
+      "feature_skill_ids": [
+        200161
+      ],
+      "primary_feature": 200161
+    },
+    "3440": {
+      "base_id": 3440,
+      "name": "梦游",
+      "feature_skill_ids": [
+        200161
+      ],
+      "primary_feature": 200161
+    },
+    "3441": {
+      "base_id": 3441,
+      "name": "梦悠悠",
+      "feature_skill_ids": [
+        200161
+      ],
+      "primary_feature": 200161
+    },
+    "3442": {
+      "base_id": 3442,
+      "name": "小星光",
+      "feature_skill_ids": [
+        200164
+      ],
+      "primary_feature": 200164
+    },
+    "3443": {
+      "base_id": 3443,
+      "name": "星光狮",
+      "feature_skill_ids": [
+        200164
+      ],
+      "primary_feature": 200164
+    },
+    "3444": {
+      "base_id": 3444,
+      "name": "噼啪鸟",
+      "feature_skill_ids": [
+        200219
+      ],
+      "primary_feature": 200219
+    },
+    "3445": {
+      "base_id": 3445,
+      "name": "雪毛角羚牛",
+      "feature_skill_ids": [
+        200121
+      ],
+      "primary_feature": 200121
+    },
+    "3446": {
+      "base_id": 3446,
+      "name": "雪毛角羚牛",
+      "feature_skill_ids": [
+        200121
+      ],
+      "primary_feature": 200121
+    },
+    "3447": {
+      "base_id": 3447,
+      "name": "雪毛角羚牛",
+      "feature_skill_ids": [
+        200121
+      ],
+      "primary_feature": 200121
+    },
+    "3448": {
+      "base_id": 3448,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3449": {
+      "base_id": 3449,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3450": {
+      "base_id": 3450,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3451": {
+      "base_id": 3451,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3452": {
+      "base_id": 3452,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3453": {
+      "base_id": 3453,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3454": {
+      "base_id": 3454,
+      "name": "地鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3455": {
+      "base_id": 3455,
+      "name": "遁鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3456": {
+      "base_id": 3456,
+      "name": "遁地鼠",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "3457": {
+      "base_id": 3457,
+      "name": "月牙雪熊",
+      "feature_skill_ids": [
+        200205
+      ],
+      "primary_feature": 200205
+    },
+    "3458": {
+      "base_id": 3458,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3459": {
+      "base_id": 3459,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3460": {
+      "base_id": 3460,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3461": {
+      "base_id": 3461,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3462": {
+      "base_id": 3462,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3463": {
+      "base_id": 3463,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3464": {
+      "base_id": 3464,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3465": {
+      "base_id": 3465,
+      "name": "圣代甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3466": {
+      "base_id": 3466,
+      "name": "星云旅者",
+      "feature_skill_ids": [
+        200217
+      ],
+      "primary_feature": 200217
+    },
+    "3467": {
+      "base_id": 3467,
+      "name": "小狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3468": {
+      "base_id": 3468,
+      "name": "神圣狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3469": {
+      "base_id": 3469,
+      "name": "皇家狮鹫",
+      "feature_skill_ids": [
+        200128
+      ],
+      "primary_feature": 200128
+    },
+    "3470": {
+      "base_id": 3470,
+      "name": "化蝶",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3471": {
+      "base_id": 3471,
+      "name": "化蝶",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3472": {
+      "base_id": 3472,
+      "name": "化蝶",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "3473": {
+      "base_id": 3473,
+      "name": "布瓜蝌",
+      "feature_skill_ids": [
+        200269
+      ],
+      "primary_feature": 200269
+    },
+    "3474": {
+      "base_id": 3474,
+      "name": "上岸蛙",
+      "feature_skill_ids": [
+        200269
+      ],
+      "primary_feature": 200269
+    },
+    "3475": {
+      "base_id": 3475,
+      "name": "海盔虫",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3476": {
+      "base_id": 3476,
+      "name": "刺盔虫",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3477": {
+      "base_id": 3477,
+      "name": "千棘盔",
+      "feature_skill_ids": [
+        200111
+      ],
+      "primary_feature": 200111
+    },
+    "3478": {
+      "base_id": 3478,
+      "name": "香草甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3479": {
+      "base_id": 3479,
+      "name": "香草甜甜",
+      "feature_skill_ids": [
+        200122
+      ],
+      "primary_feature": 200122
+    },
+    "3480": {
+      "base_id": 3480,
+      "name": "圣羽翼王",
+      "feature_skill_ids": [
+        200211
+      ],
+      "primary_feature": 200211
+    },
+    "3481": {
+      "base_id": 3481,
+      "name": "暗影灵面",
+      "feature_skill_ids": [
+        200157
+      ],
+      "primary_feature": 200157
+    },
+    "3482": {
+      "base_id": 3482,
+      "name": "幽冥眼",
+      "feature_skill_ids": [
+        200157
+      ],
+      "primary_feature": 200157
+    },
+    "3483": {
+      "base_id": 3483,
+      "name": "蓬叶虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3484": {
+      "base_id": 3484,
+      "name": "螺旋帕帕",
+      "feature_skill_ids": [
+        200234
+      ],
+      "primary_feature": 200234
+    },
+    "3485": {
+      "base_id": 3485,
+      "name": "落陨星兔",
+      "feature_skill_ids": [
+        200241
+      ],
+      "primary_feature": 200241
+    },
+    "3486": {
+      "base_id": 3486,
+      "name": "晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "3487": {
+      "base_id": 3487,
+      "name": "小丑豆豆",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3488": {
+      "base_id": 3488,
+      "name": "小丑兔",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3489": {
+      "base_id": 3489,
+      "name": "小丑公爵",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3490": {
+      "base_id": 3490,
+      "name": "吸泥鸥",
+      "feature_skill_ids": [
+        200209
+      ],
+      "primary_feature": 200209
+    },
+    "3491": {
+      "base_id": 3491,
+      "name": "泥吼牙",
+      "feature_skill_ids": [
+        200209
+      ],
+      "primary_feature": 200209
+    },
+    "3492": {
+      "base_id": 3492,
+      "name": "兽花蕾",
+      "feature_skill_ids": [
+        200220
+      ],
+      "primary_feature": 200220
+    },
+    "3495": {
+      "base_id": 3495,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3496": {
+      "base_id": 3496,
+      "name": "旋叶虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3497": {
+      "base_id": 3497,
+      "name": "蓬叶虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3498": {
+      "base_id": 3498,
+      "name": "风滚暮虫",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3499": {
+      "base_id": 3499,
+      "name": "公平鸽",
+      "feature_skill_ids": [
+        200221
+      ],
+      "primary_feature": 200221
+    },
+    "3500": {
+      "base_id": 3500,
+      "name": "石肤蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3501": {
+      "base_id": 3501,
+      "name": "石刺蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3502": {
+      "base_id": 3502,
+      "name": "石冠王蜥",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "3503": {
+      "base_id": 3503,
+      "name": "线球鼠",
+      "feature_skill_ids": [
+        200263
+      ],
+      "primary_feature": 200263
+    },
+    "3504": {
+      "base_id": 3504,
+      "name": "慈母鼠",
+      "feature_skill_ids": [
+        200263
+      ],
+      "primary_feature": 200263
+    },
+    "3505": {
+      "base_id": 3505,
+      "name": "夜回犀牛",
+      "feature_skill_ids": [
+        200260
+      ],
+      "primary_feature": 200260
+    },
+    "3506": {
+      "base_id": 3506,
+      "name": "花怨鳗",
+      "feature_skill_ids": [
+        200223
+      ],
+      "primary_feature": 200223
+    },
+    "3507": {
+      "base_id": 3507,
+      "name": "鳗尾兽",
+      "feature_skill_ids": [
+        200223
+      ],
+      "primary_feature": 200223
+    },
+    "3508": {
+      "base_id": 3508,
+      "name": "波波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3509": {
+      "base_id": 3509,
+      "name": "消波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3510": {
+      "base_id": 3510,
+      "name": "嗜波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3511": {
+      "base_id": 3511,
+      "name": "波波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3512": {
+      "base_id": 3512,
+      "name": "消波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3513": {
+      "base_id": 3513,
+      "name": "嗜波螺",
+      "feature_skill_ids": [
+        200224
+      ],
+      "primary_feature": 200224
+    },
+    "3514": {
+      "base_id": 3514,
+      "name": "圣水迪莫",
+      "feature_skill_ids": [
+        200191
+      ],
+      "primary_feature": 200191
+    },
+    "3515": {
+      "base_id": 3515,
+      "name": "圣火迪莫",
+      "feature_skill_ids": [
+        200191
+      ],
+      "primary_feature": 200191
+    },
+    "3516": {
+      "base_id": 3516,
+      "name": "板板壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3517": {
+      "base_id": 3517,
+      "name": "咔咔壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3518": {
+      "base_id": 3518,
+      "name": "水泡壳",
+      "feature_skill_ids": [
+        200108
+      ],
+      "primary_feature": 200108
+    },
+    "3521": {
+      "base_id": 3521,
+      "name": "里拉鳐",
+      "feature_skill_ids": [
+        200225
+      ],
+      "primary_feature": 200225
+    },
+    "3522": {
+      "base_id": 3522,
+      "name": "水星尾",
+      "feature_skill_ids": [
+        200226
+      ],
+      "primary_feature": 200226
+    },
+    "3523": {
+      "base_id": 3523,
+      "name": "水星龙弦",
+      "feature_skill_ids": [
+        200226
+      ],
+      "primary_feature": 200226
+    },
+    "3526": {
+      "base_id": 3526,
+      "name": "抹茶布丁",
+      "feature_skill_ids": [
+        200202
+      ],
+      "primary_feature": 200202
+    },
+    "3527": {
+      "base_id": 3527,
+      "name": "椰浆布丁",
+      "feature_skill_ids": [
+        200253
+      ],
+      "primary_feature": 200253
+    },
+    "3528": {
+      "base_id": 3528,
+      "name": "熔岩布丁",
+      "feature_skill_ids": [
+        200254
+      ],
+      "primary_feature": 200254
+    },
+    "3529": {
+      "base_id": 3529,
+      "name": "号儿鱼",
+      "feature_skill_ids": [
+        200227
+      ],
+      "primary_feature": 200227
+    },
+    "3530": {
+      "base_id": 3530,
+      "name": "圆号鱼",
+      "feature_skill_ids": [
+        200227
+      ],
+      "primary_feature": 200227
+    },
+    "3531": {
+      "base_id": 3531,
+      "name": "小雪人",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3532": {
+      "base_id": 3532,
+      "name": "雪怪",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3533": {
+      "base_id": 3533,
+      "name": "雪绒鸟",
+      "feature_skill_ids": [
+        200124
+      ],
+      "primary_feature": 200124
+    },
+    "3534": {
+      "base_id": 3534,
+      "name": "斑斑",
+      "feature_skill_ids": [
+        200232
+      ],
+      "primary_feature": 200232
+    },
+    "3535": {
+      "base_id": 3535,
+      "name": "斑枭",
+      "feature_skill_ids": [
+        200232
+      ],
+      "primary_feature": 200232
+    },
+    "3536": {
+      "base_id": 3536,
+      "name": "乌达",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3537": {
+      "base_id": 3537,
+      "name": "迷你乌",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3538": {
+      "base_id": 3538,
+      "name": "乌拉塔",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3539": {
+      "base_id": 3539,
+      "name": "乌达",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3540": {
+      "base_id": 3540,
+      "name": "迷你乌",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3541": {
+      "base_id": 3541,
+      "name": "乌拉塔",
+      "feature_skill_ids": [
+        200257
+      ],
+      "primary_feature": 200257
+    },
+    "3543": {
+      "base_id": 3543,
+      "name": "多灵",
+      "feature_skill_ids": [
+        200233
+      ],
+      "primary_feature": 200233
+    },
+    "3544": {
+      "base_id": 3544,
+      "name": "多灵主",
+      "feature_skill_ids": [
+        200233
+      ],
+      "primary_feature": 200233
+    },
+    "3545": {
+      "base_id": 3545,
+      "name": "圣剑侍从",
+      "feature_skill_ids": [
+        200208
+      ],
+      "primary_feature": 200208
+    },
+    "3546": {
+      "base_id": 3546,
+      "name": "圣剑-X",
+      "feature_skill_ids": [
+        200208
+      ],
+      "primary_feature": 200208
+    },
+    "3547": {
+      "base_id": 3547,
+      "name": "帕帕斯卡",
+      "feature_skill_ids": [
+        200234
+      ],
+      "primary_feature": 200234
+    },
+    "3548": {
+      "base_id": 3548,
+      "name": "小银翼龙",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3549": {
+      "base_id": 3549,
+      "name": "银翼龙",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3550": {
+      "base_id": 3550,
+      "name": "棋棋",
+      "feature_skill_ids": [
+        200281
+      ],
+      "primary_feature": 200281
+    },
+    "3551": {
+      "base_id": 3551,
+      "name": "棋骑士",
+      "feature_skill_ids": [
+        200281
+      ],
+      "primary_feature": 200281
+    },
+    "3552": {
+      "base_id": 3552,
+      "name": "棋绮后",
+      "feature_skill_ids": [
+        200212
+      ],
+      "primary_feature": 200212
+    },
+    "3553": {
+      "base_id": 3553,
+      "name": "棋齐垒",
+      "feature_skill_ids": [
+        200282
+      ],
+      "primary_feature": 200282
+    },
+    "3554": {
+      "base_id": 3554,
+      "name": "棋祈督",
+      "feature_skill_ids": [
+        200283
+      ],
+      "primary_feature": 200283
+    },
+    "3555": {
+      "base_id": 3555,
+      "name": "棋棋",
+      "feature_skill_ids": [
+        200236
+      ],
+      "primary_feature": 200236
+    },
+    "3556": {
+      "base_id": 3556,
+      "name": "棋骑士",
+      "feature_skill_ids": [
+        200236
+      ],
+      "primary_feature": 200236
+    },
+    "3557": {
+      "base_id": 3557,
+      "name": "棋绮后",
+      "feature_skill_ids": [
+        200212
+      ],
+      "primary_feature": 200212
+    },
+    "3558": {
+      "base_id": 3558,
+      "name": "棋齐垒",
+      "feature_skill_ids": [
+        200237
+      ],
+      "primary_feature": 200237
+    },
+    "3559": {
+      "base_id": 3559,
+      "name": "棋祈督",
+      "feature_skill_ids": [
+        200238
+      ],
+      "primary_feature": 200238
+    },
+    "3560": {
+      "base_id": 3560,
+      "name": "乌咩",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3561": {
+      "base_id": 3561,
+      "name": "乌角驮驮",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3562": {
+      "base_id": 3562,
+      "name": "堇楹苞",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3563": {
+      "base_id": 3563,
+      "name": "蔓羽兽",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3564": {
+      "base_id": 3564,
+      "name": "厉毒鸩兽",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3565": {
+      "base_id": 3565,
+      "name": "栗鼠",
+      "feature_skill_ids": [
+        200239
+      ],
+      "primary_feature": 200239
+    },
+    "3566": {
+      "base_id": 3566,
+      "name": "壳栗丝鼠",
+      "feature_skill_ids": [
+        200239
+      ],
+      "primary_feature": 200239
+    },
+    "3567": {
+      "base_id": 3567,
+      "name": "落陨星兔",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3568": {
+      "base_id": 3568,
+      "name": "小黑猫",
+      "feature_skill_ids": [
+        200222
+      ],
+      "primary_feature": 200222
+    },
+    "3569": {
+      "base_id": 3569,
+      "name": "黑猫巫师",
+      "feature_skill_ids": [
+        200222
+      ],
+      "primary_feature": 200222
+    },
+    "3570": {
+      "base_id": 3570,
+      "name": "河马巴斯",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3571": {
+      "base_id": 3571,
+      "name": "黑羽夫人",
+      "feature_skill_ids": [
+        200231
+      ],
+      "primary_feature": 200231
+    },
+    "3572": {
+      "base_id": 3572,
+      "name": "爆焰仔",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3573": {
+      "base_id": 3573,
+      "name": "爆焰喷喷",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3574": {
+      "base_id": 3574,
+      "name": "热团团",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3575": {
+      "base_id": 3575,
+      "name": "焰米龙",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3576": {
+      "base_id": 3576,
+      "name": "圣凯布米龙",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3577": {
+      "base_id": 3577,
+      "name": "墨鱿士",
+      "feature_skill_ids": [
+        200267
+      ],
+      "primary_feature": 200267
+    },
+    "3578": {
+      "base_id": 3578,
+      "name": "混乱鱿彩",
+      "feature_skill_ids": [
+        200267
+      ],
+      "primary_feature": 200267
+    },
+    "3579": {
+      "base_id": 3579,
+      "name": "秩序鱿墨",
+      "feature_skill_ids": [
+        200268
+      ],
+      "primary_feature": 200268
+    },
+    "3580": {
+      "base_id": 3580,
+      "name": "利刺毒蝎",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3581": {
+      "base_id": 3581,
+      "name": "剧毒魔蝎",
+      "feature_skill_ids": [
+        200098
+      ],
+      "primary_feature": 200098
+    },
+    "3582": {
+      "base_id": 3582,
+      "name": "刺轮砣",
+      "feature_skill_ids": [
+        200240
+      ],
+      "primary_feature": 200240
+    },
+    "3583": {
+      "base_id": 3583,
+      "name": "月亮砣",
+      "feature_skill_ids": [
+        200240
+      ],
+      "primary_feature": 200240
+    },
+    "3584": {
+      "base_id": 3584,
+      "name": "刺轮砣",
+      "feature_skill_ids": [
+        200240
+      ],
+      "primary_feature": 200240
+    },
+    "3585": {
+      "base_id": 3585,
+      "name": "月亮砣",
+      "feature_skill_ids": [
+        200240
+      ],
+      "primary_feature": 200240
+    },
+    "3589": {
+      "base_id": 3589,
+      "name": "玳龟",
+      "feature_skill_ids": [
+        200284
+      ],
+      "primary_feature": 200284
+    },
+    "3590": {
+      "base_id": 3590,
+      "name": "玳塔",
+      "feature_skill_ids": [
+        200284
+      ],
+      "primary_feature": 200284
+    },
+    "3594": {
+      "base_id": 3594,
+      "name": "松仔",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3595": {
+      "base_id": 3595,
+      "name": "松叶羊",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3596": {
+      "base_id": 3596,
+      "name": "针叶巡林",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3597": {
+      "base_id": 3597,
+      "name": "水滴蛇",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3598": {
+      "base_id": 3598,
+      "name": "水蛇锁",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3599": {
+      "base_id": 3599,
+      "name": "游蛇魔使",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3600": {
+      "base_id": 3600,
+      "name": "小勇狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3601": {
+      "base_id": 3601,
+      "name": "炽焰狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3602": {
+      "base_id": 3602,
+      "name": "炽心勇狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3603": {
+      "base_id": 3603,
+      "name": "毛头小蛛",
+      "feature_skill_ids": [
+        200255
+      ],
+      "primary_feature": 200255
+    },
+    "3604": {
+      "base_id": 3604,
+      "name": "捕尘长绒",
+      "feature_skill_ids": [
+        200255
+      ],
+      "primary_feature": 200255
+    },
+    "3605": {
+      "base_id": 3605,
+      "name": "食尘短绒",
+      "feature_skill_ids": [
+        200256
+      ],
+      "primary_feature": 200256
+    },
+    "3606": {
+      "base_id": 3606,
+      "name": "画精灵",
+      "feature_skill_ids": [
+        200242
+      ],
+      "primary_feature": 200242
+    },
+    "3607": {
+      "base_id": 3607,
+      "name": "画像守护",
+      "feature_skill_ids": [
+        200242
+      ],
+      "primary_feature": 200242
+    },
+    "3608": {
+      "base_id": 3608,
+      "name": "画间法师手",
+      "feature_skill_ids": [
+        200242
+      ],
+      "primary_feature": 200242
+    },
+    "3609": {
+      "base_id": 3609,
+      "name": "画间沉铁兽",
+      "feature_skill_ids": [
+        200243
+      ],
+      "primary_feature": 200243
+    },
+    "3610": {
+      "base_id": 3610,
+      "name": "书魔虫",
+      "feature_skill_ids": [
+        200244
+      ],
+      "primary_feature": 200244
+    },
+    "3611": {
+      "base_id": 3611,
+      "name": "书卷守护",
+      "feature_skill_ids": [
+        200244
+      ],
+      "primary_feature": 200244
+    },
+    "3612": {
+      "base_id": 3612,
+      "name": "古卷执政官",
+      "feature_skill_ids": [
+        200244
+      ],
+      "primary_feature": 200244
+    },
+    "3613": {
+      "base_id": 3613,
+      "name": "古卷匣魔像",
+      "feature_skill_ids": [
+        200245
+      ],
+      "primary_feature": 200245
+    },
+    "3614": {
+      "base_id": 3614,
+      "name": "嗜光嗡嗡",
+      "feature_skill_ids": [
+        200251
+      ],
+      "primary_feature": 200251
+    },
+    "3615": {
+      "base_id": 3615,
+      "name": "窃光蚊",
+      "feature_skill_ids": [
+        200251
+      ],
+      "primary_feature": 200251
+    },
+    "3616": {
+      "base_id": 3616,
+      "name": "不咕钟",
+      "feature_skill_ids": [
+        200246
+      ],
+      "primary_feature": 200246
+    },
+    "3617": {
+      "base_id": 3617,
+      "name": "溯源钟",
+      "feature_skill_ids": [
+        200246
+      ],
+      "primary_feature": 200246
+    },
+    "3618": {
+      "base_id": 3618,
+      "name": "小箱怪",
+      "feature_skill_ids": [
+        200235
+      ],
+      "primary_feature": 200235
+    },
+    "3619": {
+      "base_id": 3619,
+      "name": "迷迷箱怪",
+      "feature_skill_ids": [
+        200235
+      ],
+      "primary_feature": 200235
+    },
+    "3620": {
+      "base_id": 3620,
+      "name": "学院呱呱",
+      "feature_skill_ids": [
+        200252
+      ],
+      "primary_feature": 200252
+    },
+    "3621": {
+      "base_id": 3621,
+      "name": "古钟蛇",
+      "feature_skill_ids": [
+        200181
+      ],
+      "primary_feature": 200181
+    },
+    "3622": {
+      "base_id": 3622,
+      "name": "寒音蛇",
+      "feature_skill_ids": [
+        200181
+      ],
+      "primary_feature": 200181
+    },
+    "3626": {
+      "base_id": 3626,
+      "name": "冥古龙",
+      "feature_skill_ids": [
+        200279
+      ],
+      "primary_feature": 200279
+    },
+    "3656": {
+      "base_id": 3656,
+      "name": "海豚宝",
+      "feature_skill_ids": [
+        200280
+      ],
+      "primary_feature": 200280
+    },
+    "3657": {
+      "base_id": 3657,
+      "name": "泡泡豚",
+      "feature_skill_ids": [
+        200280
+      ],
+      "primary_feature": 200280
+    },
+    "3658": {
+      "base_id": 3658,
+      "name": "海豚勇士",
+      "feature_skill_ids": [
+        200280
+      ],
+      "primary_feature": 200280
+    },
+    "3677": {
+      "base_id": 3677,
+      "name": "烟花团",
+      "feature_skill_ids": [
+        200273
+      ],
+      "primary_feature": 200273
+    },
+    "3678": {
+      "base_id": 3678,
+      "name": "烟花伯爵",
+      "feature_skill_ids": [
+        200273
+      ],
+      "primary_feature": 200273
+    },
+    "3683": {
+      "base_id": 3683,
+      "name": "咕咕帽",
+      "feature_skill_ids": [
+        200272
+      ],
+      "primary_feature": 200272
+    },
+    "3684": {
+      "base_id": 3684,
+      "name": "咕德帽帽",
+      "feature_skill_ids": [
+        200272
+      ],
+      "primary_feature": 200272
+    },
+    "3704": {
+      "base_id": 3704,
+      "name": "优优",
+      "feature_skill_ids": [
+        200262
+      ],
+      "primary_feature": 200262
+    },
+    "3705": {
+      "base_id": 3705,
+      "name": "绒光优优",
+      "feature_skill_ids": [
+        200262
+      ],
+      "primary_feature": 200262
+    },
+    "3706": {
+      "base_id": 3706,
+      "name": "蜜果骸",
+      "feature_skill_ids": [
+        200264
+      ],
+      "primary_feature": 200264
+    },
+    "3707": {
+      "base_id": 3707,
+      "name": "半朽蜜果灵",
+      "feature_skill_ids": [
+        200264
+      ],
+      "primary_feature": 200264
+    },
+    "3708": {
+      "base_id": 3708,
+      "name": "小鼓象",
+      "feature_skill_ids": [
+        200275
+      ],
+      "primary_feature": 200275
+    },
+    "3709": {
+      "base_id": 3709,
+      "name": "巨鼓象",
+      "feature_skill_ids": [
+        200275
+      ],
+      "primary_feature": 200275
+    },
+    "3712": {
+      "base_id": 3712,
+      "name": "封印守卫",
+      "feature_skill_ids": [
+        200265
+      ],
+      "primary_feature": 200265
+    },
+    "3713": {
+      "base_id": 3713,
+      "name": "封印使者",
+      "feature_skill_ids": [
+        200265
+      ],
+      "primary_feature": 200265
+    },
+    "3714": {
+      "base_id": 3714,
+      "name": "上古战龙",
+      "feature_skill_ids": [
+        200265
+      ],
+      "primary_feature": 200265
+    },
+    "3715": {
+      "base_id": 3715,
+      "name": "格斗小七",
+      "feature_skill_ids": [
+        200199
+      ],
+      "primary_feature": 200199
+    },
+    "3716": {
+      "base_id": 3716,
+      "name": "糖串串",
+      "feature_skill_ids": [
+        200270
+      ],
+      "primary_feature": 200270
+    },
+    "3717": {
+      "base_id": 3717,
+      "name": "可烤汪",
+      "feature_skill_ids": [
+        200270
+      ],
+      "primary_feature": 200270
+    },
+    "3720": {
+      "base_id": 3720,
+      "name": "松仔",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3721": {
+      "base_id": 3721,
+      "name": "松叶羊",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3722": {
+      "base_id": 3722,
+      "name": "针叶巡林",
+      "feature_skill_ids": [
+        200249
+      ],
+      "primary_feature": 200249
+    },
+    "3723": {
+      "base_id": 3723,
+      "name": "水滴蛇",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3724": {
+      "base_id": 3724,
+      "name": "水蛇锁",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3725": {
+      "base_id": 3725,
+      "name": "游蛇魔使",
+      "feature_skill_ids": [
+        200248
+      ],
+      "primary_feature": 200248
+    },
+    "3726": {
+      "base_id": 3726,
+      "name": "小勇狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3727": {
+      "base_id": 3727,
+      "name": "炽焰狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3728": {
+      "base_id": 3728,
+      "name": "炽心勇狮",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3729": {
+      "base_id": 3729,
+      "name": "猴唛仔",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3730": {
+      "base_id": 3730,
+      "name": "音碟吼",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3731": {
+      "base_id": 3731,
+      "name": "骨朵鸟",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3732": {
+      "base_id": 3732,
+      "name": "紫花雀",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3733": {
+      "base_id": 3733,
+      "name": "钨丝贝贝",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3734": {
+      "base_id": 3734,
+      "name": "辉光幕机",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3735": {
+      "base_id": 3735,
+      "name": "机墓方舟",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3736": {
+      "base_id": 3736,
+      "name": "炫光迪迪",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3737": {
+      "base_id": 3737,
+      "name": "​​霹雳迪迪",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3738": {
+      "base_id": 3738,
+      "name": "小怂猫",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3739": {
+      "base_id": 3739,
+      "name": "怒目怂猫",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3740": {
+      "base_id": 3740,
+      "name": "方方狐",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3741": {
+      "base_id": 3741,
+      "name": "狐脸擦擦",
+      "feature_skill_ids": [
+        200247
+      ],
+      "primary_feature": 200247
+    },
+    "3742": {
+      "base_id": 3742,
+      "name": "鸭吉吉",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "3744": {
+      "base_id": 3744,
+      "name": "火红尾",
+      "feature_skill_ids": [
+        200285
+      ],
+      "primary_feature": 200285
+    },
+    "3745": {
+      "base_id": 3745,
+      "name": "雅丹鬃",
+      "feature_skill_ids": [
+        200285
+      ],
+      "primary_feature": 200285
+    },
+    "3746": {
+      "base_id": 3746,
+      "name": "雪影娃娃·春日",
+      "feature_skill_ids": [
+        200116
+      ],
+      "primary_feature": 200116
+    },
+    "4005": {
+      "base_id": 4005,
+      "name": "圣水守护",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4006": {
+      "base_id": 4006,
+      "name": "烈火战神",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4007": {
+      "base_id": 4007,
+      "name": "叶冕魔力猫",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4011": {
+      "base_id": 4011,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4012": {
+      "base_id": 4012,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "4019": {
+      "base_id": 4019,
+      "name": "蹦蹦果",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4020": {
+      "base_id": 4020,
+      "name": "千棘海针",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4021": {
+      "base_id": 4021,
+      "name": "女王蜂",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4022": {
+      "base_id": 4022,
+      "name": "奇丽果",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4050": {
+      "base_id": 4050,
+      "name": "首领-记忆石",
+      "feature_skill_ids": [
+        200099
+      ],
+      "primary_feature": 200099
+    },
+    "4064": {
+      "base_id": 4064,
+      "name": "幻影荆棘",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4069": {
+      "base_id": 4069,
+      "name": "首领-锤头鹳",
+      "feature_skill_ids": [
+        200129
+      ],
+      "primary_feature": 200129
+    },
+    "4070": {
+      "base_id": 4070,
+      "name": "首领-火羽",
+      "feature_skill_ids": [
+        200151
+      ],
+      "primary_feature": 200151
+    },
+    "4071": {
+      "base_id": 4071,
+      "name": "首领-蒲公英",
+      "feature_skill_ids": [
+        7800240
+      ],
+      "primary_feature": 7800240
+    },
+    "4072": {
+      "base_id": 4072,
+      "name": "迷嶂布莱克",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4073": {
+      "base_id": 4073,
+      "name": "神谕鲨",
+      "feature_skill_ids": [
+        200110
+      ],
+      "primary_feature": 200110
+    },
+    "4074": {
+      "base_id": 4074,
+      "name": "霜翼领主",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4075": {
+      "base_id": 4075,
+      "name": "首领-罗隐",
+      "feature_skill_ids": [
+        200100
+      ],
+      "primary_feature": 200100
+    },
+    "4076": {
+      "base_id": 4076,
+      "name": "伊里斯",
+      "feature_skill_ids": [
+        280009
+      ],
+      "primary_feature": 280009
+    },
+    "4077": {
+      "base_id": 4077,
+      "name": "噜噜",
+      "feature_skill_ids": [
+        299002
+      ],
+      "primary_feature": 299002
+    },
+    "4078": {
+      "base_id": 4078,
+      "name": "风暴战犬",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4079": {
+      "base_id": 4079,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4080": {
+      "base_id": 4080,
+      "name": "首领-瞌睡王",
+      "feature_skill_ids": [
+        200177
+      ],
+      "primary_feature": 200177
+    },
+    "4081": {
+      "base_id": 4081,
+      "name": "首领-獠牙猪",
+      "feature_skill_ids": [
+        200120
+      ],
+      "primary_feature": 200120
+    },
+    "4082": {
+      "base_id": 4082,
+      "name": "首领-魔眷鸟",
+      "feature_skill_ids": [
+        200183
+      ],
+      "primary_feature": 200183
+    },
+    "4083": {
+      "base_id": 4083,
+      "name": "黑猫密探",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4084": {
+      "base_id": 4084,
+      "name": "祭礼巨像",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4085": {
+      "base_id": 4085,
+      "name": "雪影冰灵",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4086": {
+      "base_id": 4086,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4087": {
+      "base_id": 4087,
+      "name": "奇梦咪",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4088": {
+      "base_id": 4088,
+      "name": "波普鹿",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4089": {
+      "base_id": 4089,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4090": {
+      "base_id": 4090,
+      "name": "伊兰龙",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4091": {
+      "base_id": 4091,
+      "name": "裘卡老师",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4092": {
+      "base_id": 4092,
+      "name": "首领-厉毒修萝",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4093": {
+      "base_id": 4093,
+      "name": "公平鸽",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4094": {
+      "base_id": 4094,
+      "name": "琉璃君主",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4095": {
+      "base_id": 4095,
+      "name": "饮雪狂兽",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4096": {
+      "base_id": 4096,
+      "name": "奇梦咪",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4097": {
+      "base_id": 4097,
+      "name": "奇梦咪",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4098": {
+      "base_id": 4098,
+      "name": "雪影冰灵",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4099": {
+      "base_id": 4099,
+      "name": "雪影冰灵",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4100": {
+      "base_id": 4100,
+      "name": "古齿帝牙",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4101": {
+      "base_id": 4101,
+      "name": "暮风隐者",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4102": {
+      "base_id": 4102,
+      "name": "淤泥乌泽",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "4103": {
+      "base_id": 4103,
+      "name": "卷发巨獭",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "5001": {
+      "base_id": 5001,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5002": {
+      "base_id": 5002,
+      "name": "彩虹独角兽",
+      "feature_skill_ids": [
+        280009
+      ],
+      "primary_feature": 280009
+    },
+    "5003": {
+      "base_id": 5003,
+      "name": "叶冕魔力猫",
+      "feature_skill_ids": [
+        280002
+      ],
+      "primary_feature": 280002
+    },
+    "5004": {
+      "base_id": 5004,
+      "name": "蹦蹦果",
+      "feature_skill_ids": [
+        280008
+      ],
+      "primary_feature": 280008
+    },
+    "5005": {
+      "base_id": 5005,
+      "name": "奇丽果",
+      "feature_skill_ids": [
+        280013
+      ],
+      "primary_feature": 280013
+    },
+    "5006": {
+      "base_id": 5006,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "5007": {
+      "base_id": 5007,
+      "name": "黑猫密探",
+      "feature_skill_ids": [
+        280021
+      ],
+      "primary_feature": 280021
+    },
+    "5008": {
+      "base_id": 5008,
+      "name": "迷嶂布莱克",
+      "feature_skill_ids": [
+        280007
+      ],
+      "primary_feature": 280007
+    },
+    "5009": {
+      "base_id": 5009,
+      "name": "祭礼巨像",
+      "feature_skill_ids": [
+        280011
+      ],
+      "primary_feature": 280011
+    },
+    "5010": {
+      "base_id": 5010,
+      "name": "圣水守护",
+      "feature_skill_ids": [
+        280001
+      ],
+      "primary_feature": 280001
+    },
+    "5011": {
+      "base_id": 5011,
+      "name": "神谕鲨",
+      "feature_skill_ids": [
+        280005
+      ],
+      "primary_feature": 280005
+    },
+    "5012": {
+      "base_id": 5012,
+      "name": "千棘海针",
+      "feature_skill_ids": [
+        280022
+      ],
+      "primary_feature": 280022
+    },
+    "5013": {
+      "base_id": 5013,
+      "name": "雪影冰灵",
+      "feature_skill_ids": [
+        280012
+      ],
+      "primary_feature": 280012
+    },
+    "5014": {
+      "base_id": 5014,
+      "name": "霜翼领主",
+      "feature_skill_ids": [
+        280023
+      ],
+      "primary_feature": 280023
+    },
+    "5015": {
+      "base_id": 5015,
+      "name": "女王蜂",
+      "feature_skill_ids": [
+        280006
+      ],
+      "primary_feature": 280006
+    },
+    "5016": {
+      "base_id": 5016,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        280024
+      ],
+      "primary_feature": 280024
+    },
+    "5017": {
+      "base_id": 5017,
+      "name": "烈火战神",
+      "feature_skill_ids": [
+        280003
+      ],
+      "primary_feature": 280003
+    },
+    "5018": {
+      "base_id": 5018,
+      "name": "风暴战犬",
+      "feature_skill_ids": [
+        280014
+      ],
+      "primary_feature": 280014
+    },
+    "5019": {
+      "base_id": 5019,
+      "name": "幻影荆棘",
+      "feature_skill_ids": [
+        280015
+      ],
+      "primary_feature": 280015
+    },
+    "5020": {
+      "base_id": 5020,
+      "name": "波普鹿",
+      "feature_skill_ids": [
+        280016
+      ],
+      "primary_feature": 280016
+    },
+    "5021": {
+      "base_id": 5021,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        280017
+      ],
+      "primary_feature": 280017
+    },
+    "5022": {
+      "base_id": 5022,
+      "name": "伊兰龙",
+      "feature_skill_ids": [
+        280018
+      ],
+      "primary_feature": 280018
+    },
+    "5023": {
+      "base_id": 5023,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5024": {
+      "base_id": 5024,
+      "name": "奇梦咪",
+      "feature_skill_ids": [
+        280020
+      ],
+      "primary_feature": 280020
+    },
+    "5025": {
+      "base_id": 5025,
+      "name": "圣光迪莫",
+      "feature_skill_ids": [
+        280025
+      ],
+      "primary_feature": 280025
+    },
+    "5026": {
+      "base_id": 5026,
+      "name": "圣草迪莫",
+      "feature_skill_ids": [
+        280026
+      ],
+      "primary_feature": 280026
+    },
+    "5027": {
+      "base_id": 5027,
+      "name": "圣火迪莫",
+      "feature_skill_ids": [
+        280027
+      ],
+      "primary_feature": 280027
+    },
+    "5028": {
+      "base_id": 5028,
+      "name": "圣水迪莫",
+      "feature_skill_ids": [
+        280028
+      ],
+      "primary_feature": 280028
+    },
+    "5029": {
+      "base_id": 5029,
+      "name": "千棘海针",
+      "feature_skill_ids": [
+        280022
+      ],
+      "primary_feature": 280022
+    },
+    "5030": {
+      "base_id": 5030,
+      "name": "霜翼领主",
+      "feature_skill_ids": [
+        280023
+      ],
+      "primary_feature": 280023
+    },
+    "5031": {
+      "base_id": 5031,
+      "name": "霜翼领主",
+      "feature_skill_ids": [
+        280023
+      ],
+      "primary_feature": 280023
+    },
+    "5032": {
+      "base_id": 5032,
+      "name": "霜翼领主",
+      "feature_skill_ids": [
+        280023
+      ],
+      "primary_feature": 280023
+    },
+    "5033": {
+      "base_id": 5033,
+      "name": "蹦蹦果",
+      "feature_skill_ids": [
+        280008
+      ],
+      "primary_feature": 280008
+    },
+    "5034": {
+      "base_id": 5034,
+      "name": "蹦蹦果",
+      "feature_skill_ids": [
+        280008
+      ],
+      "primary_feature": 280008
+    },
+    "5035": {
+      "base_id": 5035,
+      "name": "蹦蹦果",
+      "feature_skill_ids": [
+        280008
+      ],
+      "primary_feature": 280008
+    },
+    "5036": {
+      "base_id": 5036,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "5037": {
+      "base_id": 5037,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "5038": {
+      "base_id": 5038,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "5039": {
+      "base_id": 5039,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "5040": {
+      "base_id": 5040,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5041": {
+      "base_id": 5041,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5042": {
+      "base_id": 5042,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5043": {
+      "base_id": 5043,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5044": {
+      "base_id": 5044,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5045": {
+      "base_id": 5045,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5046": {
+      "base_id": 5046,
+      "name": "棋契陛下",
+      "feature_skill_ids": [
+        280019
+      ],
+      "primary_feature": 280019
+    },
+    "5047": {
+      "base_id": 5047,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5048": {
+      "base_id": 5048,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5049": {
+      "base_id": 5049,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5050": {
+      "base_id": 5050,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5051": {
+      "base_id": 5051,
+      "name": "钻石蜗",
+      "feature_skill_ids": [
+        280010
+      ],
+      "primary_feature": 280010
+    },
+    "5052": {
+      "base_id": 5052,
+      "name": "鸭吉吉国王",
+      "feature_skill_ids": [
+        280004
+      ],
+      "primary_feature": 280004
+    },
+    "6001": {
+      "base_id": 6001,
+      "name": "小咪",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6002": {
+      "base_id": 6002,
+      "name": "卡图斯（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6003": {
+      "base_id": 6003,
+      "name": "卡图斯（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6004": {
+      "base_id": 6004,
+      "name": "卡图斯（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6005": {
+      "base_id": 6005,
+      "name": "戴蒙德（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6006": {
+      "base_id": 6006,
+      "name": "戴蒙德（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6007": {
+      "base_id": 6007,
+      "name": "戴蒙德（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6008": {
+      "base_id": 6008,
+      "name": "阿克娅（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6009": {
+      "base_id": 6009,
+      "name": "阿克娅（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6010": {
+      "base_id": 6010,
+      "name": "阿克娅（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6011": {
+      "base_id": 6011,
+      "name": "朵蕾丝（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6012": {
+      "base_id": 6012,
+      "name": "朵蕾丝（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6013": {
+      "base_id": 6013,
+      "name": "朵蕾丝（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6014": {
+      "base_id": 6014,
+      "name": "希尔（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6015": {
+      "base_id": 6015,
+      "name": "希尔（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6016": {
+      "base_id": 6016,
+      "name": "希尔（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6017": {
+      "base_id": 6017,
+      "name": "希巴尔巴（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6018": {
+      "base_id": 6018,
+      "name": "希巴尔巴（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6019": {
+      "base_id": 6019,
+      "name": "希巴尔巴（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6020": {
+      "base_id": 6020,
+      "name": "艾诺菈（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6021": {
+      "base_id": 6021,
+      "name": "艾诺菈（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6022": {
+      "base_id": 6022,
+      "name": "艾诺菈（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6023": {
+      "base_id": 6023,
+      "name": "斯皮德（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6024": {
+      "base_id": 6024,
+      "name": "斯皮德（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6025": {
+      "base_id": 6025,
+      "name": "斯皮德（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6026": {
+      "base_id": 6026,
+      "name": "玛努斯（初级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6027": {
+      "base_id": 6027,
+      "name": "玛努斯（中级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "6028": {
+      "base_id": 6028,
+      "name": "玛努斯（高级）",
+      "feature_skill_ids": [
+        299002,
+        7800241
+      ],
+      "primary_feature": 299002
+    },
+    "7001": {
+      "base_id": 7001,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7002": {
+      "base_id": 7002,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7003": {
+      "base_id": 7003,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7004": {
+      "base_id": 7004,
+      "name": "恶魔狼王",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7005": {
+      "base_id": 7005,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7006": {
+      "base_id": 7006,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7007": {
+      "base_id": 7007,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "7008": {
+      "base_id": 7008,
+      "name": "圣剑骑士",
+      "feature_skill_ids": [
+        7800241
+      ],
+      "primary_feature": 7800241
+    },
+    "8001": {
+      "base_id": 8001,
+      "name": "魔力喵",
+      "feature_skill_ids": [
+        7800240
+      ],
+      "primary_feature": 7800240
+    },
+    "8002": {
+      "base_id": 8002,
+      "name": "道馆绿草精灵",
+      "feature_skill_ids": [
+        200082
+      ],
+      "primary_feature": 200082
+    },
+    "8003": {
+      "base_id": 8003,
+      "name": "道馆魔草巫灵",
+      "feature_skill_ids": [
+        200082
+      ],
+      "primary_feature": 200082
+    },
+    "8004": {
+      "base_id": 8004,
+      "name": "道馆丢丢",
+      "feature_skill_ids": [
+        200081
+      ],
+      "primary_feature": 200081
+    },
+    "8005": {
+      "base_id": 8005,
+      "name": "道馆记忆石",
+      "feature_skill_ids": [
+        200099
+      ],
+      "primary_feature": 200099
+    },
+    "8006": {
+      "base_id": 8006,
+      "name": "道馆幽影树",
+      "feature_skill_ids": [
+        200155
+      ],
+      "primary_feature": 200155
+    },
+    "8007": {
+      "base_id": 8007,
+      "name": "迪莫",
+      "feature_skill_ids": [
+        200001
+      ],
+      "primary_feature": 200001
+    },
+    "8008": {
+      "base_id": 8008,
+      "name": "珂赛特老师",
+      "feature_skill_ids": [
+        7000335
+      ],
+      "primary_feature": 7000335
+    },
+    "8009": {
+      "base_id": 8009,
+      "name": "药炉",
+      "feature_skill_ids": [
+        7000337
+      ],
+      "primary_feature": 7000337
+    },
+    "8010": {
+      "base_id": 8010,
+      "name": "希露德老师",
+      "feature_skill_ids": [
+        7000336
+      ],
+      "primary_feature": 7000336
+    },
+    "8011": {
+      "base_id": 8011,
+      "name": "翼龙",
+      "feature_skill_ids": [
+        270001
+      ],
+      "primary_feature": 270001
+    },
+    "8012": {
+      "base_id": 8012,
+      "name": "记忆石",
+      "feature_skill_ids": [
+        200099
+      ],
+      "primary_feature": 200099
+    },
+    "8013": {
+      "base_id": 8013,
+      "name": "冥古龙",
+      "feature_skill_ids": [
+        7000353
+      ],
+      "primary_feature": 7000353
+    },
+    "8016": {
+      "base_id": 8016,
+      "name": "巡天幻星",
+      "feature_skill_ids": [
+        7000358
+      ],
+      "primary_feature": 7000358
+    },
+    "8017": {
+      "base_id": 8017,
+      "name": "冥古龙",
+      "feature_skill_ids": [
+        7000354
+      ],
+      "primary_feature": 7000354
+    },
+    "9801": {
+      "base_id": 9801,
+      "name": "鸭吉吉_普通",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9802": {
+      "base_id": 9802,
+      "name": "鸭吉吉_草",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9803": {
+      "base_id": 9803,
+      "name": "鸭吉吉_火",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9804": {
+      "base_id": 9804,
+      "name": "鸭吉吉_水",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9805": {
+      "base_id": 9805,
+      "name": "鸭吉吉_光",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9806": {
+      "base_id": 9806,
+      "name": "鸭吉吉_地",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9807": {
+      "base_id": 9807,
+      "name": "鸭吉吉_冰",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9808": {
+      "base_id": 9808,
+      "name": "鸭吉吉_龙",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9809": {
+      "base_id": 9809,
+      "name": "鸭吉吉_电",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9810": {
+      "base_id": 9810,
+      "name": "鸭吉吉_毒",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9811": {
+      "base_id": 9811,
+      "name": "鸭吉吉_虫",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9812": {
+      "base_id": 9812,
+      "name": "鸭吉吉_武",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9813": {
+      "base_id": 9813,
+      "name": "鸭吉吉_翼",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9814": {
+      "base_id": 9814,
+      "name": "鸭吉吉_萌",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9815": {
+      "base_id": 9815,
+      "name": "鸭吉吉_幽",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9816": {
+      "base_id": 9816,
+      "name": "鸭吉吉_恶魔",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9817": {
+      "base_id": 9817,
+      "name": "鸭吉吉_机械",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9818": {
+      "base_id": 9818,
+      "name": "鸭吉吉_幻",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9819": {
+      "base_id": 9819,
+      "name": "木桶",
+      "feature_skill_ids": [
+        200277
+      ],
+      "primary_feature": 200277
+    },
+    "9901": {
+      "base_id": 9901,
+      "name": "测试喵喵1",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "9902": {
+      "base_id": 9902,
+      "name": "测试水蓝蓝1",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "9903": {
+      "base_id": 9903,
+      "name": "测试火花1",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "9904": {
+      "base_id": 9904,
+      "name": "测试喵喵2",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "9905": {
+      "base_id": 9905,
+      "name": "测试水蓝蓝2",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "9906": {
+      "base_id": 9906,
+      "name": "测试火花2（百分百闪避）",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "9907": {
+      "base_id": 9907,
+      "name": "无敌魔力猫",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9908": {
+      "base_id": 9908,
+      "name": "无敌焰火",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9909": {
+      "base_id": 9909,
+      "name": "无敌水蓝蓝",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9910": {
+      "base_id": 9910,
+      "name": "被克制测试喵喵",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "9911": {
+      "base_id": 9911,
+      "name": "抵抗测试喵喵",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "9912": {
+      "base_id": 9912,
+      "name": "大世界BUFF喵喵",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "9913": {
+      "base_id": 9913,
+      "name": "大世界BUFF水蓝蓝",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "9914": {
+      "base_id": 9914,
+      "name": "大世界BUFF火花",
+      "feature_skill_ids": [
+        200146
+      ],
+      "primary_feature": 200146
+    },
+    "9987": {
+      "base_id": 9987,
+      "name": "技能鸭吉吉5(布石）",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9992": {
+      "base_id": 9992,
+      "name": "不死鸭吉吉",
+      "feature_skill_ids": [
+        200002
+      ],
+      "primary_feature": 200002
+    },
+    "9993": {
+      "base_id": 9993,
+      "name": "技能音速犬4",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9994": {
+      "base_id": 9994,
+      "name": "技能鸭吉吉3",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9995": {
+      "base_id": 9995,
+      "name": "技能鸭吉吉2",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9997": {
+      "base_id": 9997,
+      "name": "技能鸭吉吉1（贪吃）",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9998": {
+      "base_id": 9998,
+      "name": "击退鸭吉吉",
+      "feature_skill_ids": [
+        200000
+      ],
+      "primary_feature": 200000
+    },
+    "9999": {
+      "base_id": 9999,
+      "name": "无敌鸭吉吉(测试用)",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "103004": {
+      "base_id": 103004,
+      "name": "迪莫",
+      "feature_skill_ids": [
+        7000280
+      ],
+      "primary_feature": 7000280
+    },
+    "103005": {
+      "base_id": 103005,
+      "name": "圣光迪莫",
+      "feature_skill_ids": [
+        7000280
+      ],
+      "primary_feature": 7000280
+    },
+    "103011": {
+      "base_id": 103011,
+      "name": "恶魔狼",
+      "feature_skill_ids": [
+        200066
+      ],
+      "primary_feature": 200066
+    },
+    "103012": {
+      "base_id": 103012,
+      "name": "恶魔狼",
+      "feature_skill_ids": [
+        200066
+      ],
+      "primary_feature": 200066
+    },
+    "103061": {
+      "base_id": 103061,
+      "name": "小灵面",
+      "feature_skill_ids": [
+        200016
+      ],
+      "primary_feature": 200016
+    },
+    "103142": {
+      "base_id": 103142,
+      "name": "小夜",
+      "feature_skill_ids": [
+        200065
+      ],
+      "primary_feature": 200065
+    },
+    "103143": {
+      "base_id": 103143,
+      "name": "紫夜",
+      "feature_skill_ids": [
+        200065
+      ],
+      "primary_feature": 200065
+    },
+    "103149": {
+      "base_id": 103149,
+      "name": "空空颅",
+      "feature_skill_ids": [
+        200010
+      ],
+      "primary_feature": 200010
+    },
+    "103154": {
+      "base_id": 103154,
+      "name": "裘洛",
+      "feature_skill_ids": [
+        200068
+      ],
+      "primary_feature": 200068
+    },
+    "440302": {
+      "base_id": 440302,
+      "name": "库伦boss战——恶魔叮",
+      "feature_skill_ids": [
+        7800506
+      ],
+      "primary_feature": 7800506
+    },
+    "440303": {
+      "base_id": 440303,
+      "name": "库伦booss战——雪蛮人",
+      "feature_skill_ids": [
+        7800507,
+        200118
+      ],
+      "primary_feature": 7800507
+    },
+    "440304": {
+      "base_id": 440304,
+      "name": "库伦boss战——库多西",
+      "feature_skill_ids": [
+        200172
+      ],
+      "primary_feature": 200172
+    },
+    "13000150": {
+      "base_id": 13000150,
+      "name": "技能鸭吉吉5（水灵）",
+      "feature_skill_ids": [
+        200107
+      ],
+      "primary_feature": 200107
+    },
+    "13000151": {
+      "base_id": 13000151,
+      "name": "首领-魔力猫",
+      "feature_skill_ids": [
+        200076
+      ],
+      "primary_feature": 200076
+    },
+    "13000152": {
+      "base_id": 13000152,
+      "name": "首领-恶魔狼",
+      "feature_skill_ids": [
+        200140
+      ],
+      "primary_feature": 200140
+    },
+    "13000153": {
+      "base_id": 13000153,
+      "name": "首领-奇丽花",
+      "feature_skill_ids": [
+        7800240
+      ],
+      "primary_feature": 7800240
+    },
+    "13000154": {
+      "base_id": 13000154,
+      "name": "首领-布克棱岩",
+      "feature_skill_ids": [
+        7800030
+      ],
+      "primary_feature": 7800030
+    },
+    "13000155": {
+      "base_id": 13000155,
+      "name": "首领-岚鸟",
+      "feature_skill_ids": [
+        7800190
+      ],
+      "primary_feature": 7800190
+    },
+    "13000156": {
+      "base_id": 13000156,
+      "name": "首领-千棘盔",
+      "feature_skill_ids": [
+        7800240
+      ],
+      "primary_feature": 7800240
+    },
+    "13000157": {
+      "base_id": 13000157,
+      "name": "首领-花魁蜂后",
+      "feature_skill_ids": [
+        7800240
+      ],
+      "primary_feature": 7800240
+    },
+    "13000158": {
+      "base_id": 13000158,
+      "name": "首领-伊里斯",
+      "feature_skill_ids": [
+        7800030
+      ],
+      "primary_feature": 7800030
+    },
+    "13000159": {
+      "base_id": 13000159,
+      "name": "首领-恶魔狼",
+      "feature_skill_ids": [
+        200140
+      ],
+      "primary_feature": 200140
+    },
+    "13000160": {
+      "base_id": 13000160,
+      "name": "首领-音速犬",
+      "feature_skill_ids": [
+        200149
+      ],
+      "primary_feature": 200149
+    },
+    "13000161": {
+      "base_id": 13000161,
+      "name": "首领-蹦蹦花",
+      "feature_skill_ids": [
+        200078
+      ],
+      "primary_feature": 200078
+    },
+    "13000162": {
+      "base_id": 13000162,
+      "name": "首领-晶石蜗",
+      "feature_skill_ids": [
+        200074
+      ],
+      "primary_feature": 200074
+    },
+    "13000163": {
+      "base_id": 13000163,
+      "name": "首领-瞌睡王",
+      "feature_skill_ids": [
+        200177
+      ],
+      "primary_feature": 200177
+    },
+    "13000164": {
+      "base_id": 13000164,
+      "name": "首领-獠牙猪",
+      "feature_skill_ids": [
+        200120
+      ],
+      "primary_feature": 200120
+    },
+    "13000165": {
+      "base_id": 13000165,
+      "name": "首领-魔眷鸟",
+      "feature_skill_ids": [
+        200183
+      ],
+      "primary_feature": 200183
+    },
+    "13000166": {
+      "base_id": 13000166,
+      "name": "首领-仪式巨像",
+      "feature_skill_ids": [
+        7800496
+      ],
+      "primary_feature": 7800496
+    },
+    "13000167": {
+      "base_id": 13000167,
+      "name": "法瑞莎莎",
+      "feature_skill_ids": [
+        280005
+      ],
+      "primary_feature": 280005
+    },
+    "13000168": {
+      "base_id": 13000168,
+      "name": "麦克达克",
+      "feature_skill_ids": [
+        200088
+      ],
+      "primary_feature": 200088
+    },
+    "14000001": {
+      "base_id": 14000001,
+      "name": "果冻-剧情变形用",
+      "feature_skill_ids": [
+        200202
+      ],
+      "primary_feature": 200202
+    },
+    "14000002": {
+      "base_id": 14000002,
+      "name": "自动变形测试-斑斑",
+      "feature_skill_ids": [
+        200232
+      ],
+      "primary_feature": 200232
+    },
+    "15000001": {
+      "base_id": 15000001,
+      "name": "斑斑 - （玩法用）",
+      "feature_skill_ids": [
+        200232
+      ],
+      "primary_feature": 200232
+    },
+    "16000001": {
+      "base_id": 16000001,
+      "name": "春团-B1小游戏变形用",
+      "feature_skill_ids": [
+        200085
+      ],
+      "primary_feature": 200085
+    },
+    "16000002": {
+      "base_id": 16000002,
+      "name": "厉毒修萝-B1小游戏变形用",
+      "feature_skill_ids": [
+        200204
+      ],
+      "primary_feature": 200204
+    },
+    "16000003": {
+      "base_id": 16000003,
+      "name": "地鼠-A2拾遗变形任务用",
+      "feature_skill_ids": [
+        200092
+      ],
+      "primary_feature": 200092
+    },
+    "17000001": {
+      "base_id": 17000001,
+      "name": "小帕尔-变形测试用",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "17000002": {
+      "base_id": 17000002,
+      "name": "帕尔萨斯-变形测试用",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "17000003": {
+      "base_id": 17000003,
+      "name": "龙息帕尔-变形测试用",
+      "feature_skill_ids": [
+        200141
+      ],
+      "primary_feature": 200141
+    },
+    "17000004": {
+      "base_id": 17000004,
+      "name": "石肤蜥-极化钝化测试用",
+      "feature_skill_ids": [
+        200103
+      ],
+      "primary_feature": 200103
+    },
+    "18000001": {
+      "base_id": 18000001,
+      "name": "化蝶",
+      "feature_skill_ids": [
+        200195
+      ],
+      "primary_feature": 200195
+    },
+    "18000002": {
+      "base_id": 18000002,
+      "name": "寒音蛇",
+      "feature_skill_ids": [
+        200181
+      ],
+      "primary_feature": 200181
+    },
+    "18000003": {
+      "base_id": 18000003,
+      "name": "武者鸡",
+      "feature_skill_ids": [
+        200148
+      ],
+      "primary_feature": 200148
+    },
+    "18000004": {
+      "base_id": 18000004,
+      "name": "嘟嘟煲",
+      "feature_skill_ids": [
+        200186
+      ],
+      "primary_feature": 200186
+    }
+  }
 }

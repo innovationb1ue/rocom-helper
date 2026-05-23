@@ -353,7 +353,7 @@ class BattleAdvisor:
                 seen_names.add(name)
                 traits.append({"name": name, "description": description})
 
-        # Source 1: wiki_pets.json — authoritative pet → trait mapping
+        # Source 1: pet_species.pet_feature → skill_map.name (authoritative trait mapping)
         wiki_trait = get_pet_innate_trait(pet.get("name", ""))
         if wiki_trait:
             _add(wiki_trait["name"], wiki_trait.get("description", ""))

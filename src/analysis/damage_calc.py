@@ -20,8 +20,8 @@ from src.data.loader import (
     get_buff_stat_modifiers,
     get_skill_meta,
     get_skill_name,
+    get_pet_species_stats,
     get_weather_damage_mult,
-    get_wiki_pet_stats,
 )
 from src.game.type_chart import TypeChart
 from src.analysis.constants import SDT_TO_TYPE
@@ -446,14 +446,19 @@ class DamageCalculator:
 
     @staticmethod
     def _get_wiki_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
-        """从 wiki 种族值估算竞技场平衡后属性值。"""
-        name = pet.get("name")
-        if not name:
+        """从 pet_species 种族值估算竞技场平衡后属性值。
+
+        stat_name 使用小写 key (hp/atk/spa/def/spd/spe) 以匹配 BinData。
+        """
+        base_id = pet.get("base_id")
+        if not base_id:
             return None
-        wiki_stats = get_wiki_pet_stats(name)
-        if wiki_stats and stat_name in wiki_stats:
-            race = int(wiki_stats[stat_name])
-            return DamageCalculator._calc_arena_stat(race, stat_name)
+        species_stats = get_pet_species_stats(base_id)
+        # 兼容大小写: 先查小写，再查大写
+        key = stat_name.lower() if stat_name.isupper() else stat_name
+        race = species_stats.get(key) or species_stats.get(stat_name.upper())
+        if race:
+            return DamageCalculator._calc_arena_stat(int(race), stat_name)
         return None
 
     @staticmethod
