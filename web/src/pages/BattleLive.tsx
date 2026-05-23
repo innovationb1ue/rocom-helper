@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Row, Col, Button, Space, Tag, Alert, Badge } from 'antd';
 import {
   ApiOutlined, CheckCircleOutlined, WarningOutlined,
-  CloseCircleOutlined, SearchOutlined, StopOutlined,
+  CloseCircleOutlined, SearchOutlined, StopOutlined, ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useBattle } from '../hooks/useBattle';
 import { useBattleStore } from '../stores/battleStore';
@@ -22,6 +22,8 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; text:
   connected: { color: 'warning', icon: <WarningOutlined />, text: '游戏已连接' },
   key_captured: { color: 'success', icon: <CheckCircleOutlined />, text: '密钥已获取' },
   disconnected: { color: 'error', icon: <CloseCircleOutlined />, text: '游戏已断开' },
+  decrypt_fail: { color: 'error', icon: <ExclamationCircleOutlined />, text: '解密失败' },
+  parse_fail: { color: 'error', icon: <ExclamationCircleOutlined />, text: '解析失败' },
 };
 
 const BattleLive: React.FC = () => {

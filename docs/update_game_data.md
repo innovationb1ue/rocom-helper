@@ -7,8 +7,7 @@
 ```
 游戏客户端 PAK 文件 (AES 加密)
   │
-  ├── Step 1: 解包 PAK → 提取 .bytes 文件
-  │          quickBMS + unreal_tournament_4_0.4.27e_roco_kingdom_world.bms
+  ├── Step 1: FModel 解包 → 提取 .bytes / .non 文件
   │
   ├── Step 2: 解码 .bytes → JSON (scripts/decode_bin.py)
   │
@@ -21,79 +20,64 @@
 
 ---
 
-## Step 1: 从 PAK 提取 .bytes 二进制配置表
+## Step 1: 使用 FModel 解包游戏数据
 
-游戏数据存储在 UE4 `.pak` 封包中，文件使用 **AES 加密**，需专用 BMS 脚本解密后提取。
+FModel 是一个 UE4 游戏资源查看器，可以直接解析 AES 加密的 PAK 文件并导出数据。
 
-### 1.1 下载 quickBMS
+### 1.1 下载 FModel
 
-quickBMS 是一个通用的游戏资源提取工具。
+- **下载**: https://github.com/fortify/fmodel/releases
+- 下载最新版本的 `FModel.exe`（Windows 版）
+- 放到任意目录，如 `D:\Tools\FModel\`
 
-- **下载**: https://aluigi.altervista.org/quickbms.htm
-- 下载 `quickbms.exe`（Windows 版）
-- 放到任意目录，如 `D:\Tools\quickbms\`
+### 1.2 配置 FModel
 
-### 1.2 获取 BMS 脚本
+启动 FModel，按以下步骤配置：
 
-BMS 脚本告知 quickBMS 如何解析本游戏特有的 PAK 格式，脚本内嵌了解密所需的 **AES key**。
+#### Directory 设置
 
-- **来源**: https://cs.rin.ru/forum/viewtopic.php?t=100672
-- **脚本名**: `unreal_tournament_4_0.4.27e_roco_kingdom_world.bms`
-- 放到 quickBMS 同目录下
+1. 点击顶部 **Directory** 标签
+2. 设置以下参数：
+   - **UE Versions**: `GAME_RocoKingdomWorld`
+   - **Directory**: `D:\Program Files\洛克王国：世界(2002304)\Win64\NRC\Content`
 
-> 论坛可能需要注册才能下载附件。AES key 内嵌在 BMS 脚本中，无需单独配置。
+#### AES 配置
 
-### 1.3 执行解包
+1. 点击顶部 **AES** 标签
+2. 点击 **Keys** 旁边的 **+** 按钮
+3. 添加 AES Key（咨询游戏数据社区获取当前 key）
+4. 建议将 key 保存下来备用
 
-游戏 PAK 文件位于游戏安装目录的 `Win64/NRC/Content/Paks/` 下。
+#### 连接
 
-```cmd
-quickbms.exe ^
-  unreal_tournament_4_0.4.27e_roco_kingdom_world.bms ^
-  "D:\Program Files\洛克王国：世界(2002304)\Win64\NRC\Content\Paks\pakchunk0-WindowsNoEditor.pak" ^
-  D:\GameExtract
-```
+点击 **Connect** 连接到游戏 pak 文件。
 
-解包多个 pak（所有 chunk）的批处理：
+### 1.3 提取数据文件
 
-```bat
-@echo off
-set SCRIPT=D:\Tools\quickbms\unreal_tournament_4_0.4.27e_roco_kingdom_world.bms
-set PAK_DIR=D:\Program Files\洛克王国：世界(2002304)\Win64\NRC\Content\Paks
-set OUT_DIR=D:\GameExtract
+成功连接后，使用 FModel 浏览并导出文件。
 
-for %%f in ("%PAK_DIR%\*.pak") do (
-    echo 正在解包: %%f
-    quickbms.exe "%SCRIPT%" "%%f" "%OUT_DIR%"
-)
-```
+#### 目录结构
 
-### 1.4 整理提取物
-
-quickBMS 解包后，输出目录结构会镜像游戏内部的 Content 树。需要找到三个关键目录并复制到统一位置：
+在 FModel 中导航到以下路径，导出对应的 `.bytes` 或 `.non` 文件：
 
 ```
-<解包根目录>/
-  .../Raw/BinConf/              .non 格式的 schema 文件 (约 91 个)
-  .../Raw/BinDataCompressed/    压缩二进制表 .bytes (约 400+ 个) — 大部分核心数据
-  .../Raw/BinLocalize/          本地化字符串 (zh_CN/)
+<游戏目录>/
+  Raw/BinConf/              .non 格式的 schema 文件 (约 91 个)
+  Raw/BinDataCompressed/    压缩二进制表 .bytes (约 400+ 个) — 大部分核心数据
+  Raw/BinLocalize/          本地化字符串 (zh_CN/)
 ```
 
-> 如果目录结构与上述不同，在解包根目录搜索 `*.bytes` 和 `*.non` 文件来定位实际路径。
+#### 批量导出
 
-整理到统一位置：
+1. 在 FModel 左上角搜索框输入 `BinConf` 过滤
+2. 右键点击 BinConf 文件夹，选择 **Export folder**
+3. 导出到 `D:\GameExtract\BinConf\`
 
-```cmd
-mkdir D:\GameExtract\BinConf
-mkdir D:\GameExtract\BinDataCompressed
-mkdir D:\GameExtract\BinLocalize
+4. 同样方法导出：
+   - `BinDataCompressed` → `D:\GameExtract\BinDataCompressed\`
+   - `BinLocalize/zh_CN` → `D:\GameExtract\BinLocalize\zh_CN\`
 
-xcopy /E <解包根目录>\...\Raw\BinConf\*           D:\GameExtract\BinConf\
-xcopy /E <解包根目录>\...\Raw\BinDataCompressed\* D:\GameExtract\BinDataCompressed\
-xcopy /E <解包根目录>\...\Raw\BinLocalize\*       D:\GameExtract\BinLocalize\
-```
-
-### 1.5 核心文件清单
+### 1.4 核心文件清单
 
 必须确认提取到以下文件：
 
@@ -122,7 +106,7 @@ xcopy /E <解包根目录>\...\Raw\BinLocalize\*       D:\GameExtract\BinLocaliz
 | `BinLocalize/zh_CN/PETBASE_CONF.bytes` | 宠物名中文本地化 |
 | `BinLocalize/zh_CN/SKILL_CONF.bytes` | 技能名中文本地化 |
 
-### 1.6 预期目录结构
+### 1.5 预期目录结构
 
 整理后的 `D:\GameExtract\` 应如下：
 
@@ -271,8 +255,8 @@ echo === 更新完成 ===
 
 | 依赖 | 位置 | 说明 |
 |------|------|------|
-| quickBMS | 外部工具 | PAK 解包引擎，从 https://aluigi.altervista.org/quickbms.htm 下载 |
-| BMS 脚本 | 外部文件 | `unreal_tournament_4_0.4.27e_roco_kingdom_world.bms`，从 cs.rin.ru 论坛获取（内嵌 AES key） |
+| FModel | 外部工具 | UE4 游戏资源查看器，从 https://github.com/fortify/fmodel/releases 下载 |
+| AES Key | 外部配置 | 需要咨询游戏数据社区获取当前 key |
 | `scripts/decode_bin.py` | 项目内 | .bytes 二进制解码器，纯 Python 标准库 |
 | `scripts/import_bin_data.py` | 项目内 | JSON → data/game/ 导入器 |
 
@@ -282,5 +266,4 @@ echo === 更新完成 ===
 
 | 资源 | 链接 |
 |------|------|
-| quickBMS 下载 | https://aluigi.altervista.org/quickbms.htm |
-| AES key / BMS 脚本 | https://cs.rin.ru/forum/viewtopic.php?t=100672 |
+| FModel 下载 | https://github.com/fortify/fmodel/releases |

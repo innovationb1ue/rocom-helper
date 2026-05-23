@@ -113,6 +113,10 @@ class SnifferManager:
             self._save_key(data.get("key_hex"), data.get("flow_id", ""))
             self._set_state("key_captured", "密钥已捕获，正在监听数据")
             self._push({"type": "key_captured", **data})
+        elif event_type == "decrypt_fail":
+            self._push({"type": "decrypt_fail", **data})
+        elif event_type == "parse_fail":
+            self._push({"type": "parse_fail", **data})
         elif event_type == "record":
             full_record = data.get("record")
             if full_record is not None:
@@ -249,12 +253,17 @@ class SnifferManager:
         self._set_state("idle", "已停止")
 
     def get_status(self) -> Dict[str, Any]:
+        stats = {}
+        if self._sniffer is not None and self._sniffer.is_running:
+            stats = self._sniffer.stats
         return {
             "status": self._state,
             "message": self._state_message,
             "flow_count": self._flow_count,
             "key_hex": self._key_hex,
             "sniffer_running": self._sniffer is not None and self._sniffer.is_running,
+            "decrypt_fail": stats.get("decrypt_fail", 0),
+            "parse_fail": stats.get("parse_fail", 0),
         }
 
     def _save_key(self, key_hex: Optional[str], flow_id: str) -> None:

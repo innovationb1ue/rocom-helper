@@ -43,6 +43,10 @@ logs/
 session_key.txt
 *.pcap
 *.pcapng
+BinDataCompressed/
+BinLocalize/
+BinData/
+resources/
 
 # Node.js (frontend)
 node_modules/

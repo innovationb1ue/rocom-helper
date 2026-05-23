@@ -364,7 +364,7 @@
   },
   "9": {
     "id": 9,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（蓬松的样子）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,
@@ -494,7 +494,7 @@
   },
   "12": {
     "id": 12,
-    "name": "蹦蹦种子进化链",
+    "name": "蹦蹦种子进化链（海神球形态）",
     "pvp_mute_group": 12,
     "evolution_group": 1002,
     "handbook_evolution_group": 1002,
@@ -556,7 +556,7 @@
   },
   "13": {
     "id": 13,
-    "name": "地鼠进化链",
+    "name": "地鼠进化链（枯水期的样子）",
     "pvp_mute_group": 13,
     "evolution_group": 1007,
     "handbook_evolution_group": 1007,
@@ -705,7 +705,7 @@
   },
   "16": {
     "id": 16,
-    "name": "雪绒鸟进化链",
+    "name": "冬羽雀进化链（本来的样子）",
     "pvp_mute_group": 16,
     "evolution_group": 1010,
     "handbook_evolution_group": 1010,
@@ -823,7 +823,7 @@
   },
   "18": {
     "id": 18,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（紧实的样子）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,
@@ -850,7 +850,7 @@
   },
   "19": {
     "id": 19,
-    "name": "丢丢进化链",
+    "name": "丢丢进化链（草地附近的样子）",
     "pvp_mute_group": 18,
     "evolution_group": 1009,
     "handbook_evolution_group": 1009,
@@ -1162,7 +1162,7 @@
   },
   "25": {
     "id": 25,
-    "name": "板板壳进化链",
+    "name": "板板壳进化链（本来的样子）",
     "pvp_mute_group": 24,
     "evolution_group": 1001,
     "handbook_evolution_group": 1001,
@@ -1283,7 +1283,7 @@
   },
   "27": {
     "id": 27,
-    "name": "小灵面进化链",
+    "name": "小灵面进化链（睁眼的样子）",
     "pvp_mute_group": 26,
     "evolution_group": 1023,
     "handbook_evolution_group": 1023,
@@ -1833,7 +1833,7 @@
   },
   "38": {
     "id": 38,
-    "name": "可立鸡进化链",
+    "name": "可立鸡进化链（绅士鸡分支）",
     "pvp_mute_group": 37,
     "evolution_group": 2007,
     "handbook_evolution_group": 2007,
@@ -2191,7 +2191,7 @@
   },
   "44": {
     "id": 44,
-    "name": "石肤蜥进化链",
+    "name": "石肤蜥进化链（本来的样子）",
     "pvp_mute_group": 43,
     "evolution_group": 1018,
     "handbook_evolution_group": 1018,
@@ -2436,7 +2436,7 @@
   },
   "48": {
     "id": 48,
-    "name": "果冻进化链",
+    "name": "果冻进化链（抹茶布丁分支）",
     "pvp_mute_group": 47,
     "evolution_group": 2004,
     "handbook_evolution_group": 2004,
@@ -2542,7 +2542,7 @@
   },
   "50": {
     "id": 50,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（樱桃巧克力口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -2601,7 +2601,7 @@
   },
   "51": {
     "id": 51,
-    "name": "小狮鹫进化链",
+    "name": "小狮鹫进化链（崖间地的样子）",
     "pvp_mute_group": 50,
     "evolution_group": 1024,
     "handbook_evolution_group": 1024,
@@ -2782,7 +2782,7 @@
   },
   "54": {
     "id": 54,
-    "name": "毛毛进化链",
+    "name": "毛毛进化链（平常的样子）",
     "pvp_mute_group": 53,
     "evolution_group": 1016,
     "handbook_evolution_group": 1016,
@@ -3853,7 +3853,7 @@
   },
   "74": {
     "id": 74,
-    "name": "小星光进化链",
+    "name": "小星光进化链（星光能量的样子）",
     "pvp_mute_group": 73,
     "evolution_group": 1026,
     "handbook_evolution_group": 1026,
@@ -4420,7 +4420,7 @@
   },
   "85": {
     "id": 85,
-    "name": "古钟蛇进化链",
+    "name": "古钟蛇进化链（本来的样子）",
     "pvp_mute_group": 84,
     "evolution_group": 1012,
     "handbook_evolution_group": 1012,
@@ -5422,7 +5422,7 @@
   },
   "109": {
     "id": 109,
-    "name": "雪绒鸟进化链",
+    "name": "冬羽雀进化链（春天的样子）",
     "pvp_mute_group": 16,
     "evolution_group": 1010,
     "handbook_evolution_group": 1010,
@@ -5481,7 +5481,7 @@
   },
   "110": {
     "id": 110,
-    "name": "雪绒鸟进化链",
+    "name": "冬羽雀进化链（夏天的样子）",
     "pvp_mute_group": 16,
     "evolution_group": 1010,
     "handbook_evolution_group": 1010,
@@ -5540,7 +5540,7 @@
   },
   "111": {
     "id": 111,
-    "name": "雪绒鸟进化链",
+    "name": "冬羽雀进化链（秋天的样子）",
     "pvp_mute_group": 16,
     "evolution_group": 1010,
     "handbook_evolution_group": 1010,
@@ -5599,7 +5599,7 @@
   },
   "112": {
     "id": 112,
-    "name": "丢丢进化链",
+    "name": "丢丢进化链（火山附近的样子）",
     "pvp_mute_group": 18,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -5658,7 +5658,7 @@
   },
   "113": {
     "id": 113,
-    "name": "丢丢进化链",
+    "name": "丢丢进化链（沙地附近的样子）",
     "pvp_mute_group": 18,
     "evolution_group": 1009,
     "handbook_evolution_group": 1009,
@@ -5720,7 +5720,7 @@
   },
   "114": {
     "id": 114,
-    "name": "丢丢进化链",
+    "name": "丢丢进化链（雪山附近的样子）",
     "pvp_mute_group": 18,
     "evolution_group": 1009,
     "handbook_evolution_group": 1009,
@@ -5782,7 +5782,7 @@
   },
   "115": {
     "id": 115,
-    "name": "蹦蹦种子进化链",
+    "name": "蹦蹦种子进化链（彩玉球形态）",
     "pvp_mute_group": 12,
     "evolution_group": 1002,
     "handbook_evolution_group": 1002,
@@ -5844,7 +5844,7 @@
   },
   "116": {
     "id": 116,
-    "name": "蹦蹦种子进化链",
+    "name": "蹦蹦种子进化链（短毛球形态）",
     "pvp_mute_group": 12,
     "evolution_group": 1002,
     "handbook_evolution_group": 1002,
@@ -5906,7 +5906,7 @@
   },
   "117": {
     "id": 117,
-    "name": "蹦蹦种子进化链",
+    "name": "蹦蹦种子进化链（象牙球形态）",
     "pvp_mute_group": 12,
     "evolution_group": 1002,
     "handbook_evolution_group": 1002,
@@ -5968,7 +5968,7 @@
   },
   "118": {
     "id": 118,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（西瓜碧玺的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -6134,7 +6134,7 @@
   },
   "121": {
     "id": 121,
-    "name": "粉星仔进化链",
+    "name": "粉星仔进化链（粉耳星兔分支）",
     "pvp_mute_group": 108,
     "evolution_group": 2002,
     "handbook_evolution_group": 2002,
@@ -6204,7 +6204,7 @@
   },
   "123": {
     "id": 123,
-    "name": "海盔虫进化链",
+    "name": "海盔虫进化链（本来的样子）",
     "pvp_mute_group": 110,
     "evolution_group": 1013,
     "handbook_evolution_group": 1013,
@@ -6325,7 +6325,7 @@
   },
   "125": {
     "id": 125,
-    "name": "乖乖鹄进化链",
+    "name": "乖乖鹄进化链（翠顶夫人分支）",
     "pvp_mute_group": 112,
     "evolution_group": 2003,
     "handbook_evolution_group": 2003,
@@ -6387,7 +6387,7 @@
   },
   "126": {
     "id": 126,
-    "name": "叶眼魔进化链",
+    "name": "芽眼魔进化链",
     "pvp_mute_group": 113,
     "evolution_group": 94,
     "handbook_evolution_group": 94,
@@ -6646,7 +6646,7 @@
   },
   "132": {
     "id": 132,
-    "name": "旋叶虫进化链",
+    "name": "旋叶虫进化链（金黄的样子）",
     "pvp_mute_group": 119,
     "evolution_group": 1028,
     "handbook_evolution_group": 1028,
@@ -7655,7 +7655,7 @@
   },
   "155": {
     "id": 155,
-    "name": "海枝枝进化链",
+    "name": "海枝枝进化链（碧蓝珊瑚）",
     "pvp_mute_group": 142,
     "evolution_group": 1014,
     "handbook_evolution_group": 1014,
@@ -7683,7 +7683,7 @@
   },
   "156": {
     "id": 156,
-    "name": "海枝枝进化链",
+    "name": "海枝枝进化链（杏黄百合）",
     "pvp_mute_group": 142,
     "evolution_group": 1014,
     "handbook_evolution_group": 1014,
@@ -7711,7 +7711,7 @@
   },
   "157": {
     "id": 157,
-    "name": "海枝枝进化链",
+    "name": "海枝枝进化链（洋红沙丁）",
     "pvp_mute_group": 142,
     "evolution_group": 1014,
     "handbook_evolution_group": 1014,
@@ -7739,7 +7739,7 @@
   },
   "158": {
     "id": 158,
-    "name": "海枝枝进化链",
+    "name": "海枝枝进化链（翠绿纶布）",
     "pvp_mute_group": 142,
     "evolution_group": 1014,
     "handbook_evolution_group": 1014,
@@ -7857,7 +7857,7 @@
   },
   "161": {
     "id": 161,
-    "name": "梦游进化链",
+    "name": "梦游进化链（穿旧睡衣的样子）",
     "pvp_mute_group": 145,
     "evolution_group": 1017,
     "handbook_evolution_group": 1017,
@@ -7900,7 +7900,7 @@
   },
   "162": {
     "id": 162,
-    "name": "梦游进化链",
+    "name": "梦游进化链（穿星星睡衣的样子）",
     "pvp_mute_group": 145,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -7945,7 +7945,7 @@
   },
   "163": {
     "id": 163,
-    "name": "小星光进化链",
+    "name": "小星光进化链（月光能量的样子）",
     "pvp_mute_group": 73,
     "evolution_group": 1026,
     "handbook_evolution_group": 1026,
@@ -8018,7 +8018,7 @@
   },
   "165": {
     "id": 165,
-    "name": "雪毛角羚牛进化链",
+    "name": "雪毛角羚牛进化链（本来的样子）",
     "pvp_mute_group": 147,
     "evolution_group": 1029,
     "handbook_evolution_group": 1029,
@@ -8045,7 +8045,7 @@
   },
   "166": {
     "id": 166,
-    "name": "雪毛角羚牛进化链",
+    "name": "雪毛角羚牛进化链（卷角的样子）",
     "pvp_mute_group": 147,
     "evolution_group": 1029,
     "handbook_evolution_group": 1029,
@@ -8072,7 +8072,7 @@
   },
   "167": {
     "id": 167,
-    "name": "雪毛角羚牛进化链",
+    "name": "雪毛角羚牛进化链（换角时的样子）",
     "pvp_mute_group": 147,
     "evolution_group": 1029,
     "handbook_evolution_group": 1029,
@@ -8305,7 +8305,7 @@
   },
   "173": {
     "id": 173,
-    "name": "地鼠进化链",
+    "name": "地鼠进化链（储水时的样子）",
     "pvp_mute_group": 13,
     "evolution_group": 1007,
     "handbook_evolution_group": 1007,
@@ -8364,7 +8364,7 @@
   },
   "174": {
     "id": 174,
-    "name": "小狮鹫进化链",
+    "name": "小狮鹫进化链（高山地的样子）",
     "pvp_mute_group": 50,
     "evolution_group": 1024,
     "handbook_evolution_group": 1024,
@@ -8423,7 +8423,7 @@
   },
   "175": {
     "id": 175,
-    "name": "海盔虫进化链",
+    "name": "海盔虫进化链（磨损的样子）",
     "pvp_mute_group": 110,
     "evolution_group": 1013,
     "handbook_evolution_group": 1013,
@@ -8485,7 +8485,7 @@
   },
   "176": {
     "id": 176,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（急急急鸭）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,
@@ -8512,7 +8512,7 @@
   },
   "177": {
     "id": 177,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（等一等鸭）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,
@@ -8539,7 +8539,7 @@
   },
   "178": {
     "id": 178,
-    "name": "板板壳进化链",
+    "name": "板板壳进化链（蜕皮时的样子）",
     "pvp_mute_group": 24,
     "evolution_group": 1001,
     "handbook_evolution_group": 1001,
@@ -9425,7 +9425,7 @@
   },
   "197": {
     "id": 197,
-    "name": "毛头小蛛进化链",
+    "name": "毛头小蛛进化链（捕尘长绒分支）",
     "pvp_mute_group": 171,
     "evolution_group": 2008,
     "handbook_evolution_group": 2008,
@@ -9605,7 +9605,7 @@
   },
   "201": {
     "id": 201,
-    "name": "可立鸡进化链",
+    "name": "可立鸡进化链（武者鸡分支）",
     "pvp_mute_group": 37,
     "evolution_group": 2007,
     "handbook_evolution_group": 2007,
@@ -9665,7 +9665,7 @@
   },
   "202": {
     "id": 202,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（莲花刚玉的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -9710,7 +9710,7 @@
   },
   "203": {
     "id": 203,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（星彩榴石的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -9755,7 +9755,7 @@
   },
   "204": {
     "id": 204,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（火山琉璃的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -9800,7 +9800,7 @@
   },
   "205": {
     "id": 205,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（蓝锥矿的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -9845,7 +9845,7 @@
   },
   "206": {
     "id": 206,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（樱桃草莓口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -9904,7 +9904,7 @@
   },
   "207": {
     "id": 207,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（樱桃抹茶口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -9963,7 +9963,7 @@
   },
   "208": {
     "id": 208,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（蓝莓巧克力口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10022,7 +10022,7 @@
   },
   "209": {
     "id": 209,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（蓝莓草莓口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10081,7 +10081,7 @@
   },
   "210": {
     "id": 210,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（蓝莓抹茶口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10140,7 +10140,7 @@
   },
   "211": {
     "id": 211,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（杨桃巧克力口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10199,7 +10199,7 @@
   },
   "212": {
     "id": 212,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（杨桃草莓口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10258,7 +10258,7 @@
   },
   "213": {
     "id": 213,
-    "name": "脆筒甜甜进化链",
+    "name": "脆筒甜甜进化链（杨桃抹茶口味）",
     "pvp_mute_group": 49,
     "evolution_group": 1005,
     "handbook_evolution_group": 1005,
@@ -10317,7 +10317,7 @@
   },
   "214": {
     "id": 214,
-    "name": "毛毛进化链",
+    "name": "毛毛进化链（幽冥眼的样子）",
     "pvp_mute_group": 53,
     "evolution_group": 1016,
     "handbook_evolution_group": 1016,
@@ -10377,7 +10377,7 @@
   },
   "215": {
     "id": 215,
-    "name": "毛毛进化链",
+    "name": "毛毛进化链（喵喵的样子）",
     "pvp_mute_group": 53,
     "evolution_group": 1016,
     "handbook_evolution_group": 1016,
@@ -10437,7 +10437,7 @@
   },
   "216": {
     "id": 216,
-    "name": "毛毛进化链",
+    "name": "毛毛进化链（奇丽花的样子）",
     "pvp_mute_group": 53,
     "evolution_group": 1016,
     "handbook_evolution_group": 1016,
@@ -10497,7 +10497,7 @@
   },
   "217": {
     "id": 217,
-    "name": "小灵面进化链",
+    "name": "小灵面进化链（闭眼的样子）",
     "pvp_mute_group": 26,
     "evolution_group": 1023,
     "handbook_evolution_group": 1023,
@@ -10556,7 +10556,7 @@
   },
   "218": {
     "id": 218,
-    "name": "矿晶虫进化链",
+    "name": "矿晶虫进化链（烧蓝黄金的样子）",
     "pvp_mute_group": 105,
     "evolution_group": 1015,
     "handbook_evolution_group": 1015,
@@ -10601,7 +10601,7 @@
   },
   "219": {
     "id": 219,
-    "name": "旋叶虫进化链",
+    "name": "旋叶虫进化链（枯叶的样子）",
     "pvp_mute_group": 119,
     "evolution_group": 1028,
     "handbook_evolution_group": 1028,
@@ -10663,7 +10663,7 @@
   },
   "220": {
     "id": 220,
-    "name": "石肤蜥进化链",
+    "name": "石肤蜥进化链（球球尾巴的样子）",
     "pvp_mute_group": 43,
     "evolution_group": 1018,
     "handbook_evolution_group": 1018,
@@ -10722,7 +10722,7 @@
   },
   "221": {
     "id": 221,
-    "name": "果冻进化链",
+    "name": "果冻进化链（椰浆布丁分支）",
     "pvp_mute_group": 47,
     "evolution_group": 2004,
     "handbook_evolution_group": 2004,
@@ -10766,7 +10766,7 @@
   },
   "222": {
     "id": 222,
-    "name": "果冻进化链",
+    "name": "果冻进化链（熔岩布丁分支）",
     "pvp_mute_group": 47,
     "evolution_group": 2004,
     "handbook_evolution_group": 2004,
@@ -10810,7 +10810,7 @@
   },
   "223": {
     "id": 223,
-    "name": "乌达进化链",
+    "name": "乌达进化链（极昼的样子）",
     "pvp_mute_group": 175,
     "evolution_group": 1022,
     "handbook_evolution_group": 1022,
@@ -10872,7 +10872,7 @@
   },
   "224": {
     "id": 224,
-    "name": "乌达进化链",
+    "name": "乌达进化链（极夜的样子）",
     "pvp_mute_group": 175,
     "evolution_group": 1022,
     "handbook_evolution_group": 1022,
@@ -10934,7 +10934,7 @@
   },
   "225": {
     "id": 225,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（白棋棋骑士分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -10979,7 +10979,7 @@
   },
   "226": {
     "id": 226,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（白棋棋绮后分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11024,7 +11024,7 @@
   },
   "227": {
     "id": 227,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（白棋棋齐垒分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11069,7 +11069,7 @@
   },
   "228": {
     "id": 228,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（白棋棋祈督分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11114,7 +11114,7 @@
   },
   "229": {
     "id": 229,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（黑棋棋骑士分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11159,7 +11159,7 @@
   },
   "230": {
     "id": 230,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（黑棋棋绮后分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11204,7 +11204,7 @@
   },
   "231": {
     "id": 231,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（黑棋棋齐垒分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11249,7 +11249,7 @@
   },
   "232": {
     "id": 232,
-    "name": "棋棋进化链",
+    "name": "棋棋进化链（黑棋棋祈督分支）",
     "pvp_mute_group": 176,
     "evolution_group": 2011,
     "handbook_evolution_group": 2011,
@@ -11294,7 +11294,7 @@
   },
   "233": {
     "id": 233,
-    "name": "乖乖鹄进化链",
+    "name": "乖乖鹄进化链（黑羽夫人分支）",
     "pvp_mute_group": 112,
     "evolution_group": 2003,
     "handbook_evolution_group": 2003,
@@ -11356,7 +11356,7 @@
   },
   "234": {
     "id": 234,
-    "name": "刺轮砣进化链",
+    "name": "刺轮砣进化链（上弦的样子）",
     "pvp_mute_group": 177,
     "evolution_group": 1004,
     "handbook_evolution_group": 1004,
@@ -11401,7 +11401,7 @@
   },
   "235": {
     "id": 235,
-    "name": "刺轮砣进化链",
+    "name": "刺轮砣进化链（下弦的样子）",
     "pvp_mute_group": 177,
     "evolution_group": 1004,
     "handbook_evolution_group": 1004,
@@ -11446,7 +11446,7 @@
   },
   "236": {
     "id": 236,
-    "name": "画精灵进化链",
+    "name": "画精灵进化链（画间法师手分支）",
     "pvp_mute_group": 178,
     "evolution_group": 2005,
     "handbook_evolution_group": 2005,
@@ -11506,7 +11506,7 @@
   },
   "237": {
     "id": 237,
-    "name": "画精灵进化链",
+    "name": "画精灵进化链（画间沉铁兽分支）",
     "pvp_mute_group": 178,
     "evolution_group": 2005,
     "handbook_evolution_group": 2005,
@@ -11566,7 +11566,7 @@
   },
   "238": {
     "id": 238,
-    "name": "书魔虫进化链",
+    "name": "书魔虫进化链（古卷执政官分支）",
     "pvp_mute_group": 179,
     "evolution_group": 2013,
     "handbook_evolution_group": 2013,
@@ -11626,7 +11626,7 @@
   },
   "239": {
     "id": 239,
-    "name": "书魔虫进化链",
+    "name": "书魔虫进化链（古卷匣魔像分支）",
     "pvp_mute_group": 179,
     "evolution_group": 2013,
     "handbook_evolution_group": 2013,
@@ -11686,7 +11686,7 @@
   },
   "240": {
     "id": 240,
-    "name": "学院呱呱进化链",
+    "name": "呱呱进化链（学院呱呱）",
     "pvp_mute_group": 180,
     "evolution_group": 1011,
     "handbook_evolution_group": 1011,
@@ -11713,7 +11713,7 @@
   },
   "241": {
     "id": 241,
-    "name": "古钟蛇进化链",
+    "name": "古钟蛇进化链（本命年的样子）",
     "pvp_mute_group": 84,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -11758,7 +11758,7 @@
   },
   "242": {
     "id": 242,
-    "name": "粉星仔进化链",
+    "name": "粉星仔进化链（落陨星兔分支）",
     "pvp_mute_group": 108,
     "evolution_group": 2002,
     "handbook_evolution_group": 2002,
@@ -11802,7 +11802,7 @@
   },
   "244": {
     "id": 244,
-    "name": "毛头小蛛进化链",
+    "name": "毛头小蛛进化链（食尘短绒分支）",
     "pvp_mute_group": 171,
     "evolution_group": 2008,
     "handbook_evolution_group": 2008,
@@ -11996,7 +11996,7 @@
   },
   "248": {
     "id": 248,
-    "name": "逗逗进化链",
+    "name": "野外首领梦想三三进化链（废弃）",
     "pvp_mute_group": 118,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -12055,7 +12055,7 @@
   },
   "249": {
     "id": 249,
-    "name": "大耳帽兜进化链",
+    "name": "野外首领雪影娃娃进化链（废弃）",
     "pvp_mute_group": 48,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -12117,7 +12117,7 @@
   },
   "250": {
     "id": 250,
-    "name": "地银链进化链",
+    "name": "地银链进化链（单头的样子）",
     "pvp_mute_group": 184,
     "evolution_group": 1008,
     "handbook_evolution_group": 1008,
@@ -12160,7 +12160,7 @@
   },
   "251": {
     "id": 251,
-    "name": "地银链进化链",
+    "name": "地银链进化链（多头的样子）",
     "pvp_mute_group": 184,
     "evolution_group": 1008,
     "handbook_evolution_group": 1008,
@@ -12352,7 +12352,7 @@
   },
   "255": {
     "id": 255,
-    "name": "菌宝进化链",
+    "name": "菌宝进化链（竹笙仔分支）",
     "pvp_mute_group": 188,
     "evolution_group": 2006,
     "handbook_evolution_group": 2006,
@@ -12411,7 +12411,7 @@
   },
   "256": {
     "id": 256,
-    "name": "菌宝进化链",
+    "name": "菌宝进化链（芝芝酥分支）",
     "pvp_mute_group": 188,
     "evolution_group": 2006,
     "handbook_evolution_group": 2006,
@@ -12470,7 +12470,7 @@
   },
   "257": {
     "id": 257,
-    "name": "菌宝进化链",
+    "name": "菌宝进化链（三坛枞分支）",
     "pvp_mute_group": 188,
     "evolution_group": 2006,
     "handbook_evolution_group": 2006,
@@ -12529,7 +12529,7 @@
   },
   "258": {
     "id": 258,
-    "name": "菌宝进化链",
+    "name": "菌宝进化链（小红侍分支）",
     "pvp_mute_group": 188,
     "evolution_group": 2006,
     "handbook_evolution_group": 2006,
@@ -13031,7 +13031,7 @@
   },
   "268": {
     "id": 268,
-    "name": "蛐曲儿进化链",
+    "name": "蛐曲儿进化链（长翎将军分支）",
     "pvp_mute_group": 198,
     "evolution_group": 2012,
     "handbook_evolution_group": 2012,
@@ -13075,7 +13075,7 @@
   },
   "269": {
     "id": 269,
-    "name": "蛐曲儿进化链",
+    "name": "蛐曲儿进化链（曲鸣大将分支）",
     "pvp_mute_group": 198,
     "evolution_group": 2012,
     "handbook_evolution_group": 2012,
@@ -13571,7 +13571,7 @@
   },
   "280": {
     "id": 280,
-    "name": "毛线虫进化链",
+    "name": "毛线虫进化链（梭织团团分支）",
     "pvp_mute_group": 209,
     "evolution_group": 2009,
     "handbook_evolution_group": 2009,
@@ -13615,7 +13615,7 @@
   },
   "281": {
     "id": 281,
-    "name": "毛线虫进化链",
+    "name": "毛线虫进化链（针织哼哼分支）",
     "pvp_mute_group": 209,
     "evolution_group": 2009,
     "handbook_evolution_group": 2009,
@@ -13704,7 +13704,7 @@
   },
   "283": {
     "id": 283,
-    "name": "不香芋进化链",
+    "name": "不香芋进化链（去污香芋分支）",
     "pvp_mute_group": 211,
     "evolution_group": 2001,
     "handbook_evolution_group": 2001,
@@ -13749,7 +13749,7 @@
   },
   "284": {
     "id": 284,
-    "name": "不香芋进化链",
+    "name": "不香芋进化链（嗜污香芋分支）",
     "pvp_mute_group": 211,
     "evolution_group": 2001,
     "handbook_evolution_group": 2001,
@@ -14383,7 +14383,7 @@
   },
   "298": {
     "id": 298,
-    "name": "小怂猫进化链",
+    "name": "小怂猫进化链（山间竹林的样子）",
     "pvp_mute_group": 90,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -14426,7 +14426,7 @@
   },
   "299": {
     "id": 299,
-    "name": "松仔进化链",
+    "name": "松仔进化链（悲鸣的样子）",
     "pvp_mute_group": 168,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -14488,7 +14488,7 @@
   },
   "300": {
     "id": 300,
-    "name": "水滴蛇进化链",
+    "name": "水滴蛇进化链（悲鸣的样子）",
     "pvp_mute_group": 169,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -14550,7 +14550,7 @@
   },
   "301": {
     "id": 301,
-    "name": "小勇狮进化链",
+    "name": "小勇狮进化链（悲鸣的样子）",
     "pvp_mute_group": 170,
     "evolution_group": null,
     "handbook_evolution_group": null,
@@ -14612,7 +14612,7 @@
   },
   "302": {
     "id": 302,
-    "name": "波波螺进化链",
+    "name": "波波螺进化链（被污染的样子）",
     "pvp_mute_group": 159,
     "evolution_group": 1003,
     "handbook_evolution_group": 1003,
@@ -14734,7 +14734,7 @@
   },
   "304": {
     "id": 304,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（燃了鸭）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,
@@ -14908,7 +14908,7 @@
   },
   "308": {
     "id": 308,
-    "name": "墨鱿士进化链",
+    "name": "墨鱿士进化链（混乱鱿彩分支）",
     "pvp_mute_group": 229,
     "evolution_group": 2010,
     "handbook_evolution_group": 2010,
@@ -14951,7 +14951,7 @@
   },
   "309": {
     "id": 309,
-    "name": "墨鱿士进化链",
+    "name": "墨鱿士进化链（秩序鱿墨分支）",
     "pvp_mute_group": 229,
     "evolution_group": 2010,
     "handbook_evolution_group": 2010,
@@ -15053,7 +15053,7 @@
   },
   "311": {
     "id": 311,
-    "name": "鸭吉吉进化链",
+    "name": "鸭吉吉进化链（起来鸭）",
     "pvp_mute_group": 9,
     "evolution_group": 1030,
     "handbook_evolution_group": 1030,

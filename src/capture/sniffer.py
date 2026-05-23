@@ -68,7 +68,7 @@ class Sniffer:
         self._sniffer: Optional[AsyncSniffer] = None
         self._running = False
         self._lock = threading.Lock()
-        self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0}
+        self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0, "parse_fail": 0}
 
     def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
         if self.on_event:
@@ -201,6 +201,14 @@ class Sniffer:
                     be21.header_extra, be21.body,
                     error=f"解密失败: {exc}",
                 )
+            self._emit("decrypt_fail", {
+                "flow_id": flow.flow_id,
+                "cmd": be21.cmd,
+                "seq": be21.seq,
+                "reason": str(exc),
+                "key_hex": flow.key.hex() if flow.key else None,
+                "count": self.stats["decrypt_fail"],
+            })
             return
 
         pkt_dict = {
@@ -212,6 +220,7 @@ class Sniffer:
         }
         record = parse_record(pkt_dict)
         if record is None:
+            self.stats["parse_fail"] += 1
             if plog:
                 plog.log_be21_frame(
                     flow.flow_id, be21.direction, be21.cmd, be21.seq,
@@ -219,6 +228,11 @@ class Sniffer:
                     decrypted_body=plain,
                     error="parse_record 返回 None",
                 )
+            self._emit("parse_fail", {
+                "flow_id": flow.flow_id,
+                "seq": be21.seq,
+                "count": self.stats["parse_fail"],
+            })
             return
 
         if record.get("opcode") == 0x0414:

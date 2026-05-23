@@ -24,7 +24,7 @@ import json
 import logging
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Tuple
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_OUTPUT = _PROJECT_ROOT / "data" / "game"
@@ -134,7 +134,9 @@ def build_type_map(bdata_dir: Path, project_dir: Path) -> Dict[int, int]:
 
     # 匹配
     mapping: Dict[int, int] = {}
-    # 直接名称匹配
+    # 直接名称匹配（BinData type_name → 项目 name）
+    # type_name 可能是 "火系"（带"系"后缀）或 "草"（直接名称）
+    # 注意："地"（raw_id=3）、"无系别"（raw_id=1）需要单独处理
     name_match_map = {
         "普通系": "普通",
         "火系": "火",
@@ -154,12 +156,33 @@ def build_type_map(bdata_dir: Path, project_dir: Path) -> Dict[int, int]:
         "龙系": "龙",
         "恶系": "恶",
         "光系": "光",
+        # 直接名称（无"系"后缀）
+        "普通": "普通",
+        "草": "草",
+        "火": "火",
+        "水": "水",
+        "光": "光",
+        "土": "土",
+        "冰": "冰",
+        "龙": "龙",
+        "电": "电",
+        "毒": "毒",
+        "虫": "虫",
+        "武": "武",
+        "飞": "翼",
+        "萌": "萌",
+        "暗": "恶",
+        "幻": "幻",
+        "机械": "机械",
+        "鬼": "幽",
+        # 地（raw_id=3）
+        "地": "土",
     }
 
     for raw_id, type_name in raw_to_name.items():
-        proj_name = name_match_map.get(type_name)
+        proj_name = name_match_map.get(type_name)        # "火系" → "火"
         if proj_name and proj_name in proj_name_to_id:
-            mapping[raw_id] = proj_name_to_id[proj_name]
+            mapping[raw_id] = proj_name_to_id[proj_name]  # raw_id=4 → proj_id=4
 
     log.info("类型映射: %d 个 raw ID → 项目 ID", len(mapping))
     for raw_id, proj_id in sorted(mapping.items()):
@@ -205,7 +228,14 @@ def build_pet_species(bdata_dir: Path, type_map: Dict[int, int]) -> Dict[str, An
 
         # 类型: unit_type 是 raw type ID 数组
         raw_types = normalize_array(row.get("unit_type", []))
-        types = [type_map[rt] for rt in raw_types if rt in type_map]
+        # 映射：尝试用 type_map，若无映射则保留原始值（fallback to original type system）
+        types = []
+        for rt in raw_types:
+            if rt in type_map:
+                types.append(type_map[rt])
+            else:
+                # 无映射时直接用原始值（部分 BinData type ID 与项目 ID 重叠）
+                types.append(rt)
         type_names = [id_to_name.get(t, "") for t in types]
 
         # 种族值
@@ -515,10 +545,22 @@ def build_nature_map(bdata_dir: Path) -> Dict[str, Any]:
 
 # ── evolution_map.json 生成 ───────────────────────────────────
 
-def build_evolution_map(bdata_dir: Path) -> Dict[str, Any]:
-    """从 PET_EVOLUTION_CONF 构建进化链数据。"""
+def build_evolution_map(bdata_dir: Path, pet_species_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """从 PET_EVOLUTION_CONF 构建进化链数据。
+
+    pet_species_data: 可选，从 PETBASE_CONF 生成的宠物物种数据，用于回填 pet_name。
+    BinData 解码后的 evolution_chain 通常不含 pet_name，需从 pet_species 查找。
+    """
     evolution = load_bin_table(bdata_dir, "PET_EVOLUTION_CONF")
     result: Dict[str, Any] = {}
+
+    # 构建 petbase_id → name 查表（用于回填空的 pet_name）
+    species_id_to_name: Dict[int, str] = {}
+    if pet_species_data:
+        for v in pet_species_data.values():
+            pid = v.get("id")
+            if pid:
+                species_id_to_name[int(pid)] = v.get("name", "")
 
     for k, row in evolution.items():
         eid = row.get("id")
@@ -530,9 +572,13 @@ def build_evolution_map(bdata_dir: Path) -> Dict[str, Any]:
         for stage in normalize_array(row.get("evolution_chain", [])):
             if not isinstance(stage, dict):
                 continue
+            petbase_id = stage.get("petbase_id")
+            # pet_name 可能为空，回填：从 pet_species 按 petbase_id 查找
+            pet_name_raw = clean_text(stage.get("pet_name"))
+            pet_name = pet_name_raw if pet_name_raw else species_id_to_name.get(petbase_id, "")
             chain.append({
-                "petbase_id": stage.get("petbase_id"),
-                "pet_name": clean_text(stage.get("pet_name")) or "",
+                "petbase_id": petbase_id,
+                "pet_name": pet_name,
                 "stage": stage.get("stage"),
                 "level": stage.get("level", 0),
                 "unit_type": normalize_array(stage.get("unit_type", [])),
@@ -545,9 +591,14 @@ def build_evolution_map(bdata_dir: Path) -> Dict[str, Any]:
                 "evolution_need_items": normalize_array(stage.get("evolution_need_items", [])),
             })
 
+        # 从第一条宠物名字派生 name，保证与 evolution_chain 一致
+        # chain[0].pet_name 已通过 species_id_to_name 回填（BinData 的 pet_name 为空时）
+        first_pet_name = chain[0]["pet_name"] if chain else ""
+        derived_name = (first_pet_name + "进化链") if first_pet_name else ""
+
         entry = {
             "id": eid,
-            "name": clean_text(row.get("name")) or "",
+            "name": derived_name,
             "pvp_mute_group": row.get("pvp_mute_group"),
             "evolution_group": row.get("evolution_group"),
             "handbook_evolution_group": row.get("handbook_evolution_group"),
@@ -587,18 +638,37 @@ def build_battle_config(bdata_dir: Path) -> Dict[str, Any]:
         # 按 key 字段匹配
         for k, v in config.items():
             if v.get("key") == row_key:
+                new_en = clean_text(v.get("editor_name"))
+                # 如果 BinData 无 editor_name，用预设的 editor_label
+                en = new_en if new_en else editor_label
                 result[row_key] = {
-                    "editor_name": clean_text(v.get("editor_name")) or editor_label,
+                    "editor_name": en,
                     "value": v.get("num") if v.get("num") is not None else v.get("numList", []),
                 }
                 break
 
     # 直接存储所有全局配置
+    # 注意：BinData 的 BATTLE_GLOBAL_CONFIG entries 有 is_loc=2 (editor_name 本地化)，
+    # 解码后 editor_name=None，无法从 BinData 恢复。因此：
+    # - 只在 BinData 提供非空 editor_name 时更新，否则保留原文件内容
+    existing_all = {}
+    try:
+        existing_bc = load_project_json(out_path / "battle_config.json")
+        existing_all = existing_bc.get("_all", {})
+    except Exception:
+        pass
+
     result["_all"] = {}
     for k, v in config.items():
         key = v.get("key", k)
+        new_editor_name = clean_text(v.get("editor_name")) or ""
+        # 如果 BinData 的 editor_name 为空但原文件有值，保留原值
+        if not new_editor_name and key in existing_all:
+            existing_en = existing_all[key].get("editor_name", "")
+            if existing_en:
+                new_editor_name = existing_en
         result["_all"][key] = {
-            "editor_name": clean_text(v.get("editor_name")) or "",
+            "editor_name": new_editor_name,
             "value": v.get("num") if v.get("num") is not None else v.get("numList", []),
         }
 
@@ -637,18 +707,25 @@ def build_weather_map(bdata_dir: Path) -> Dict[str, Any]:
 
 # ── type_chart.json 增强 ──────────────────────────────────────
 
-def build_type_chart_enhancement(bdata_dir: Path) -> Dict[str, Any]:
-    """从 TYPE_DICTIONARY 提取 immunity 数据用于增强 type_chart。"""
+def build_type_chart_enhancement(bdata_dir: Path) -> Tuple[Dict[int, List[int]], Dict[int, str]]:
+    """从 TYPE_DICTIONARY 提取 immunity 数据和 raw_to_name 映射。
+
+    Returns:
+        immunity_map: raw_id → List[immune_buff_id]
+        raw_to_name: raw_id → type_name
+    """
     type_dict = load_bin_table(bdata_dir, "TYPE_DICTIONARY")
     immunity_map: Dict[int, List[int]] = {}
+    raw_to_name: Dict[int, str] = {}
 
     for k, v in type_dict.items():
         rid = int(k)
+        raw_to_name[rid] = v.get("type_name", "") or ""
         immunity = v.get("type_immunity", [])
         if immunity:
             immunity_map[rid] = normalize_array(immunity)
 
-    return immunity_map
+    return immunity_map, raw_to_name
 
 
 # ── innate_skills 增强 ────────────────────────────────────────
@@ -760,7 +837,7 @@ def import_all(bdata_dir: str, output_dir: str, dry_run: bool = False) -> Dict[s
 
     # ── 5. evolution_map.json (新文件) ──
     log.info("--- [5/9] evolution_map ---")
-    new_evo = build_evolution_map(bdata_path)
+    new_evo = build_evolution_map(bdata_path, pet_species_data=new_species)
     changes["evolution_map"] = {"new_count": len(new_evo), "new_file": True}
     if not dry_run:
         save_json(out_path / "evolution_map.json", new_evo)
@@ -797,25 +874,10 @@ def import_all(bdata_dir: str, output_dir: str, dry_run: bool = False) -> Dict[s
         log.info("innate_skills.json: pets 映射已填充 (%d 个宠物)", len(pet_trait_map))
 
     # ── 9. type_chart 增强 ──
-    log.info("--- [9/9] type_chart immunity ---")
-    immunity_map = build_type_chart_enhancement(bdata_path)
-    if not dry_run:
-        type_chart_path = out_path / "type_chart.json"
-        tc = load_project_json(type_chart_path)
-        # 添加 immunity 数据
-        for t in tc.get("types", []):
-            t_name = t.get("name", "")
-            # 反查 raw ID
-            for raw_id, type_name_parts in {
-                2: "普通", 3: "草", 4: "火", 5: "水", 6: "光", 8: "土",
-                9: "冰", 10: "龙", 11: "电", 12: "毒", 13: "虫", 14: "武",
-                15: "飞", 16: "萌", 17: "暗", 18: "幻", 19: "机械", 20: "鬼",
-            }.items():
-                if type_name_parts == t_name and raw_id in immunity_map:
-                    t["type_immunity"] = immunity_map[raw_id]
-                    break
-        save_json(type_chart_path, tc)
-        changes["type_chart"] = {"enhanced": True, "immunity_types": len(immunity_map)}
+    # 注：type_chart.json 原有的 immunity 数据是正确的，不从 BinData 覆盖
+    # 只记录本次处理了 immunity_map 中的多少条（不作写入）
+    immunity_map, raw_to_name = build_type_chart_enhancement(bdata_path)
+    changes["type_chart"] = {"note": "immunity 数据保留原文件，不从 BinData 覆盖"}
 
     # ── 打印摘要 ──
     log.info("=== 导入完成 ===")
