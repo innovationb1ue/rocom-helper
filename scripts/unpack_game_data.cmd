@@ -1,0 +1,1 @@
+quickbms_4gb_files.exe unreal_tournament_4_0.4.27e_roco_kingdom_world.bms "D:\Program Files\洛克王国：世界(2002304)\Win64\NRC\Content\Paks"  "D:\Program Files\Roco"

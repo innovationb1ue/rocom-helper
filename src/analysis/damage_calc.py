@@ -194,22 +194,33 @@ class DamageCalculator:
 
         atk_name = _ATK_STAT[damage_type]
         def_name = _DEF_STAT[damage_type]
-        base_atk = self._get_stat(attacker, atk_name)
-        base_def = self._get_stat(defender, def_name)
+        base_atk, atk_source = self._get_stat_with_source(attacker, atk_name)
+        base_def, def_source = self._get_stat_with_source(defender, def_name)
 
         if base_atk is None:
             base_atk = self._get_wiki_stat(attacker, atk_name)
-            if base_atk is not None:
-                confidence = "medium"
-                warnings.append("攻击属性来自 wiki 估算")
+            atk_source = "wiki"
         if base_def is None:
             base_def = self._get_wiki_stat(defender, def_name)
-            if base_def is not None:
-                confidence = "medium"
-                warnings.append("防御属性来自 wiki 估算")
+            def_source = "wiki"
 
         if base_atk is None or base_def is None:
             return None
+
+        # 置信度分级: high(total 存在) / medium(calc+bonus) / low(wiki 估算)
+        sources = {atk_source, def_source}
+        if "wiki" in sources:
+            confidence = "low"
+            if atk_source == "wiki":
+                warnings.append("攻击属性来自 wiki 估算")
+            if def_source == "wiki":
+                warnings.append("防御属性来自 wiki 估算")
+        elif "calc_bonus" in sources:
+            confidence = "medium"
+            if atk_source == "calc_bonus":
+                warnings.append("攻击属性来自 calc+bonus 估算")
+            if def_source == "calc_bonus":
+                warnings.append("防御属性来自 calc+bonus 估算")
 
         atk_mods = get_buff_stat_modifiers(attacker.get("buffs", []))
         def_mods = get_buff_stat_modifiers(defender.get("buffs", []))
@@ -403,18 +414,24 @@ class DamageCalculator:
         return 0
 
     @staticmethod
-    def _get_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
-        """从抓包数据中提取属性值。"""
+    def _get_stat_with_source(pet: Dict[str, Any], stat_name: str) -> Tuple[Optional[int], str]:
+        """从抓包数据中提取属性值和来源。来源: 'total', 'calc_bonus', ''。"""
         stats = pet.get("stats", [])
         for s in stats:
             if s.get("name") == stat_name:
                 total = s.get("total")
                 if total is not None:
-                    return int(total)
+                    return int(total), "total"
                 calc = s.get("calc") or 0
                 bonus = s.get("bonus") or 0
-                return calc + bonus
-        return None
+                return calc + bonus, "calc_bonus"
+        return None, ""
+
+    @staticmethod
+    def _get_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
+        """从抓包数据中提取属性值。"""
+        val, _ = DamageCalculator._get_stat_with_source(pet, stat_name)
+        return val
 
     @staticmethod
     def _calc_arena_stat(race_value: int, stat_name: str) -> int:

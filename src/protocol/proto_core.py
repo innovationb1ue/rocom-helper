@@ -300,7 +300,7 @@ def pick_first(values: List[int], *, low: Optional[int] = None, high: Optional[i
     for v in values:
         if (low is None or v >= low) and (high is None or v <= high):
             return v
-    return values[0] if values else None
+    return None
 
 # --- 精灵/状态提取 ---
 # extract_creature 从单个 protobuf 消息中提取完整的精灵信息。

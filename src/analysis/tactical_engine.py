@@ -14,6 +14,10 @@ from typing import Any, Dict, List, Optional, Tuple
 from src.analysis.damage_calc import DamageCalculator, DamageResult
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
+from src.analysis.skill_classifier import classify_skill_effect
+from src.analysis.counter import CounterPicker
+from src.analysis.pet_identity import same_battle_pet
+from src.analysis.threat import ThreatAssessor
 from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills, get_pet_skill_meta
 from src.game.type_chart import TypeChart
 
@@ -50,6 +54,8 @@ class ResolvedOutcome:
     type_matchup_after: float = 1.0
     energy_after: int = 0
     pet_count_delta: int = 0
+    incoming_energy: int = 0
+    incoming_has_buffs: bool = False
 
 
 @dataclass
@@ -115,6 +121,8 @@ class TacticalEngine:
         self.chart = type_chart or TypeChart()
         self._damage_calc = DamageCalculator(self.chart)
         register_innate_hooks(self._damage_calc)
+        self._threat = ThreatAssessor(self.chart)
+        self._counter = CounterPicker(self.chart)
 
     # ------------------------------------------------------------------
     # Public API
@@ -137,11 +145,18 @@ class TacticalEngine:
         if not opp_predicted:
             return None
 
+        top_threat_name = None
+        if opp_pets:
+            norm_my_active = self._normalize_pet_for_analysis(my_active)
+            target_order = self._threat.suggest_target_order(opp_pets, norm_my_active)
+            if target_order:
+                top_threat_name = target_order[0]["name"]
+
         scored: List[ActionScore] = []
         for our_action in our_actions:
             score, reason, detail = self._score_action(
                 our_action, my_active, opp_active, my_pets, opp_pets,
-                opp_predicted, state,
+                opp_predicted, state, top_threat_name,
             )
             scored.append(ActionScore(
                 action_type=our_action["action_type"],
@@ -221,11 +236,10 @@ class TacticalEngine:
             })
 
         # 换宠
-        active_pet_id = my_active.get("pet_id")
         for pet in my_pets:
             if pet.get("current_hp", 1) <= 0:
                 continue
-            if pet.get("pet_id") == active_pet_id:
+            if same_battle_pet(pet, my_active):
                 continue
             actions.append({
                 "action_type": "switch",
@@ -273,7 +287,7 @@ class TacticalEngine:
         if switch_prob > 0:
             living_bench = [
                 p for p in opp_pets
-                if p.get("current_hp", 1) > 0 and p.get("pet_id") != opp_active.get("pet_id")
+                if p.get("current_hp", 1) > 0 and not same_battle_pet(p, opp_active)
             ]
             if living_bench:
                 per_pet = switch_prob / len(living_bench)
@@ -494,6 +508,8 @@ class TacticalEngine:
             type_matchup_after=self._type_matchup_score(incoming, opp_active),
             energy_after=incoming.get("energy", 10),
             pet_count_delta=-1 if our_remaining <= 0 else 0,
+            incoming_energy=incoming.get("energy", 10),
+            incoming_has_buffs=bool(incoming.get("buffs")),
         )
 
     def _resolve_opp_switch_outcome(
@@ -536,7 +552,7 @@ class TacticalEngine:
         self, our_action: Dict[str, Any], my_active: Dict[str, Any],
         opp_active: Dict[str, Any], my_pets: List[Dict[str, Any]],
         opp_pets: List[Dict[str, Any]], opp_predicted: List[OpponentAction],
-        state: Dict[str, Any],
+        state: Dict[str, Any], top_threat_name: Optional[str] = None,
     ) -> Tuple[float, str, Dict[str, Any]]:
         """对单个操作计算期望得分。"""
         # 非伤害技能走简化路径
@@ -563,6 +579,22 @@ class TacticalEngine:
             if outcome.we_ko:
                 can_ko = True
 
+        # 威胁加成：能击杀最高威胁对手时提升评分
+        if top_threat_name and opp_active.get("name") == top_threat_name and can_ko:
+            total_score *= 1.15
+
+        # Hook 信号修饰
+        hook_signals = state.get("_hook_signals", [])
+        for signal in hook_signals:
+            if signal.get("signal_type") == "prefer_switch" and our_action["action_type"] == "switch":
+                total_score *= 1.2
+            elif signal.get("signal_type") == "avoid_skill" and our_action["action_type"] == "skill":
+                energy_cost = our_action.get("energy_cost", 0)
+                if energy_cost >= 3:
+                    total_score *= 0.5
+                elif energy_cost >= 1:
+                    total_score *= 0.8
+
         reason = self._generate_reason(our_action, best_damage_dealt, worst_damage_taken, can_ko)
         detail = {
             "damage_dealt": best_damage_dealt if best_damage_dealt > 0 else None,
@@ -588,32 +620,73 @@ class TacticalEngine:
             + W_ENERGY * _clamp01(outcome.energy_after / 10.0)
             + W_COUNT_ADV * outcome.pet_count_delta * 0.15
         )
+
+        # 换宠动量奖励：入场宠物有能量和 buff 时更有利
+        if outcome.incoming_energy > 0:
+            score += 0.02 * _clamp01(outcome.incoming_energy / 10.0)
+        if outcome.incoming_has_buffs:
+            score += 0.03
+
         return score
 
     def _score_non_damage_skill(
         self, our_action: Dict[str, Any],
         my_active: Dict[str, Any], opp_active: Dict[str, Any],
     ) -> Tuple[float, str, Dict[str, Any]]:
-        """V1: 非伤害技能的保守评分。"""
+        """非伤害技能的结构化评分。"""
         base = 0.15
         meta = our_action.get("meta", {})
-        desc = (meta.get("desc") or "").lower()
+        tags = classify_skill_effect(meta)
 
         hp_pct = my_active.get("hp_pct", 1.0)
+        our_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
+        opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
+        we_outspeed = our_speed >= opp_speed
 
-        if any(kw in desc for kw in ("速度", "提升", "强化")):
+        if "stat_up" in tags:
+            if "spd_up" in tags or "speed" in tags:
+                base += 0.08
+            elif we_outspeed:
+                base += 0.06
+            else:
+                base += 0.04
+
+        if "stat_down" in tags:
             base += 0.05
-        if any(kw in desc for kw in ("恢复", "治疗", "回血")):
-            if hp_pct < 0.4:
-                base += 0.10
+
+        if "heal" in tags:
+            if hp_pct < 0.3:
+                base += 0.12
+            elif hp_pct < 0.5:
+                base += 0.08
             else:
                 base += 0.03
 
+        if "shield" in tags:
+            if hp_pct < 0.5:
+                base += 0.07
+            else:
+                base += 0.04
+
+        if "damage_reduce" in tags:
+            base += 0.05
+
+        if "cleanse" in tags:
+            buffs = my_active.get("buffs", [])
+            negative_buffs = [b for b in buffs if b.get("stage", 0) < 0]
+            if negative_buffs:
+                base += 0.06
+
+        if "hazard" in tags:
+            base += 0.04
+
         energy_cost = our_action.get("energy_cost", 0)
-        base -= 0.02 * energy_cost
+        base -= 0.015 * energy_cost
         base = max(0.05, base)
 
         reason = our_action.get("skill_name", "辅助技能")
+        if tags:
+            reason += f" ({','.join(tags[:3])})"
         return base, reason, {"damage_dealt": None, "damage_taken": None, "can_ko": False}
 
     # ------------------------------------------------------------------
@@ -689,20 +762,67 @@ class TacticalEngine:
         return best
 
     @staticmethod
+    def _normalize_pet_for_analysis(pet: Dict[str, Any]) -> Dict[str, Any]:
+        """将战斗状态宠物转换为 ThreatAssessor / CounterPicker 期望的格式。"""
+        normalized = dict(pet)
+
+        stats = pet.get("stats", [])
+        if isinstance(stats, list):
+            stats_dict: Dict[str, Any] = {}
+            for s in stats:
+                name = s.get("name")
+                val = s.get("total") or s.get("calc") or 0
+                if name:
+                    stats_dict[name] = val
+            normalized["stats"] = stats_dict
+        elif isinstance(stats, dict):
+            normalized["stats"] = stats
+
+        if "base_speed" in pet and "SPE" not in normalized.get("stats", {}):
+            normalized.setdefault("stats", {})["SPE"] = pet["base_speed"]
+
+        skills = pet.get("equipped_skills") or pet.get("skills") or []
+        normalized_skills: List[Dict[str, Any]] = []
+        for s in skills:
+            ns = dict(s)
+            if "skill_element" in s and "type_id" not in s:
+                ns["type_id"] = s["skill_element"]
+            if "skill_name" in s and "name" not in s:
+                ns["name"] = s["skill_name"]
+            normalized_skills.append(ns)
+        normalized["skills"] = normalized_skills
+
+        return normalized
+
     def _most_likely_switch_target(
+        self,
         opp_action: OpponentAction, opp_pets: List[Dict[str, Any]],
         my_active: Dict[str, Any],
     ) -> Optional[Dict[str, Any]]:
-        """猜测对手最可能换上的宠物（按名称匹配或按属性优势）。"""
+        """猜测对手最可能换上的宠物（按名称匹配或按反制优势）。"""
         target_name = opp_action.switch_to_name
         for pet in opp_pets:
             if pet.get("name") == target_name and pet.get("current_hp", 1) > 0:
                 return pet
-        # 回退：选第一个存活的非 active 宠物
-        for pet in opp_pets:
-            if pet.get("current_hp", 1) > 0:
-                return pet
-        return None
+
+        living_bench = [
+            p for p in opp_pets
+            if p.get("current_hp", 1) > 0
+        ]
+        if not living_bench:
+            return None
+
+        # 对手换宠时通常换上克制我方的宠物
+        norm_my_active = self._normalize_pet_for_analysis(my_active)
+        norm_bench = [self._normalize_pet_for_analysis(p) for p in living_bench]
+        counters = self._counter.find_counters([norm_my_active], norm_bench, top_n=1)
+        if counters:
+            counter = counters[0]
+            for p in living_bench:
+                if same_battle_pet(p, counter):
+                    return p
+
+        return living_bench[0]
 
     @staticmethod
     def _assess_confidence(opp_active: Dict[str, Any]) -> str:

@@ -11,17 +11,38 @@ interface Props {
   label: string;
 }
 
-const TeamRoster: React.FC<Props> = ({ pets, activePet, label }) => {
+const HIDDEN_OPPONENT_PET_ID = 20000000;
+
+function isSameBattlePet(activePet: BattlePet | null, pet: BattlePet): boolean {
+  if (!activePet) return false;
+  if (activePet.battle_uid && pet.battle_uid) {
+    return activePet.battle_uid === pet.battle_uid;
+  }
+  if (activePet.slot != null && pet.slot != null) {
+    return activePet.slot === pet.slot;
+  }
+  if (activePet.base_conf_id != null && pet.base_conf_id != null) {
+    return activePet.base_conf_id === pet.base_conf_id;
+  }
+  return (
+    activePet.pet_id != null &&
+    pet.pet_id != null &&
+    activePet.pet_id !== HIDDEN_OPPONENT_PET_ID &&
+    activePet.pet_id === pet.pet_id
+  );
+}
+
+const TeamRoster: React.FC<Props> = ({ pets, activePet, side, label }) => {
   return (
     <Card size="small" title={label} style={{ height: '100%' }}>
       {pets.length === 0 && <div style={{ color: '#999', fontSize: 13 }}>暂无精灵</div>}
-      {pets.map((pet) => {
-        const isActive = activePet?.pet_id === pet.pet_id;
+      {pets.map((pet, index) => {
+        const isActive = isSameBattlePet(activePet, pet);
         const isDefeated = pet.current_hp <= 0;
         const pct = Math.round(pet.hp_pct * 100);
         return (
           <div
-            key={pet.pet_id}
+            key={`${side}-${pet.pet_id}-${pet.name}-${index}`}
             style={{
               display: 'flex',
               alignItems: 'center',

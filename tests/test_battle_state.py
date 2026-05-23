@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import pytest
 from src.analysis.battle_state import BattleStateTracker
+from src.analysis.pet_identity import same_battle_pet
 
 
 @pytest.fixture
@@ -293,6 +294,39 @@ class TestChangePet:
         ]))
         assert state["opp_active"]["name"] == "神秘宠"
         assert len(state["opp_pets"]) == 2
+
+    def test_hidden_opponent_pet_id_uses_stable_identity(self, tracker):
+        tracker.handle_event(0x1316, {
+            "battle_id": 1,
+            "battle_mode": 1,
+            "round": 0,
+            "max_round": 30,
+            "wrappers": [
+                {"pet_id": 100, "pet_name": "my", "side": 1, "slot": 1, "hp": 300, "max_hp": 300},
+                {
+                    "pet_id": 20000000, "pet_name": "opp-a", "side": 401,
+                    "slot": 401, "base_conf_id": 9001, "hp": 300, "max_hp": 300,
+                },
+                {
+                    "pet_id": 20000000, "pet_name": "opp-b", "side": 401,
+                    "slot": 402, "base_conf_id": 9002, "hp": 300, "max_hp": 300,
+                },
+            ],
+        })
+
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {
+                "kind": "change_pet",
+                "battle_pet_id": 402,
+                "new_pet_name": "opp-b",
+                "new_pet_id": 20000000,
+                "new_pet_base_conf_id": 9002,
+            }
+        ]))
+
+        assert state["opp_active"]["name"] == "opp-b"
+        assert state["opp_active"]["battle_uid"] == "opp:slot:402"
+        assert sum(1 for p in state["opp_pets"] if same_battle_pet(p, state["opp_active"])) == 1
 
     def test_switch_clears_buffs(self, tracker):
         """换宠时清除 buffs。"""
@@ -855,4 +889,3 @@ class TestEffectiveSpeed:
         state = tracker.get_state()
         my = state["my_active"]
         assert my.get("effective_speed") is None
-

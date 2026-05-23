@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Row, Col, Card, List, Input, Button, Tag, Space, Empty, message,
   Popconfirm, Typography, Spin, Checkbox, Tooltip,
@@ -16,9 +16,8 @@ const { Text } = Typography;
 const SkillPresets: React.FC = () => {
   // 左侧：精灵列表
   const [pets, setPets] = useState<PetWithSkills[]>([]);
-  const [filteredPets, setFilteredPets] = useState<PetWithSkills[]>([]);
   const [searchText, setSearchText] = useState('');
-  const [petsLoading, setPetsLoading] = useState(false);
+  const [petsLoading, setPetsLoading] = useState(true);
 
   // 右侧：选中精灵的技能配置
   const [selectedPet, setSelectedPet] = useState<PetWithSkills | null>(null);
@@ -30,35 +29,43 @@ const SkillPresets: React.FC = () => {
   // 预设数据
   const [presets, setPresets] = useState<Record<string, PopularSkillPreset>>({});
 
-  // 加载数据
-  const loadData = useCallback(async () => {
-    setPetsLoading(true);
-    try {
-      const [petsRes, presetsRes] = await Promise.all([
-        fetchPetsWithSkills(),
-        fetchPopularSkills(),
-      ]);
-      setPets(petsRes.pets);
-      setFilteredPets(petsRes.pets);
-      setPresets(presetsRes.presets || {});
-    } catch {
-      message.error('加载数据失败');
-    } finally {
-      setPetsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { loadData(); }, [loadData]);
-
-  // 搜索过滤
-  useEffect(() => {
+  const filteredPets = useMemo(() => {
     if (!searchText) {
-      setFilteredPets(pets);
-    } else {
-      const lower = searchText.toLowerCase();
-      setFilteredPets(pets.filter(p => p.name.toLowerCase().includes(lower)));
+      return pets;
     }
+    const lower = searchText.toLowerCase();
+    return pets.filter(p => p.name.toLowerCase().includes(lower));
   }, [searchText, pets]);
+
+  // 加载数据
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        const [petsRes, presetsRes] = await Promise.all([
+          fetchPetsWithSkills(),
+          fetchPopularSkills(),
+        ]);
+        if (cancelled) return;
+        setPets(petsRes.pets);
+        setPresets(presetsRes.presets || {});
+      } catch {
+        if (!cancelled) {
+          message.error('加载数据失败');
+        }
+      } finally {
+        if (!cancelled) {
+          setPetsLoading(false);
+        }
+      }
+    }
+
+    void loadData();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 选中精灵
   const handleSelectPet = useCallback(async (pet: PetWithSkills) => {

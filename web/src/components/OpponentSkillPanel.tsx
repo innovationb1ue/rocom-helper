@@ -1,4 +1,4 @@
-import { Card, Tag, Typography, Tooltip } from 'antd';
+import { Card, Tag, Typography } from 'antd';
 import type { SkillAnalysis, BattlePet } from '../stores/battleStore';
 import { TYPE_COLORS, TYPE_NAMES, textColorFor } from '../utils/typeColors';
 

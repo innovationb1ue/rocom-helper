@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from src.analysis.replay_runner import BattleReplayRunner
+from src.analysis.pet_identity import same_battle_pet
 from tests.packet_reader import load_battle_packets
 
 SESSION2_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_2"
@@ -80,6 +81,21 @@ class TestReplayRunnerPerRound:
             max_hp = opp_after.get("max_hp", 1)
             if hp is not None and max_hp > 0:
                 assert 0 <= hp <= max_hp
+
+    def test_opp_active_matches_one_pet_by_stable_identity(self, session1_runner_result):
+        for rs in session1_runner_result.rounds:
+            state = rs.state_at_end
+            opp_active = state.get("opp_active")
+            if not opp_active:
+                continue
+            matches = [
+                p for p in state.get("opp_pets", [])
+                if same_battle_pet(p, opp_active)
+            ]
+            assert len(matches) <= 1, (
+                f"round {rs.round_num} active={opp_active.get('name')} "
+                f"matched {[p.get('name') for p in matches]}"
+            )
 
 
 # ---------------------------------------------------------------------------
