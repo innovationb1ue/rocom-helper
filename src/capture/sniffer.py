@@ -220,7 +220,6 @@ class Sniffer:
         }
         record = parse_record(pkt_dict)
         if record is None:
-            self.stats["parse_fail"] += 1
             if plog:
                 plog.log_be21_frame(
                     flow.flow_id, be21.direction, be21.cmd, be21.seq,
@@ -228,11 +227,15 @@ class Sniffer:
                     decrypted_body=plain,
                     error="parse_record 返回 None",
                 )
-            self._emit("parse_fail", {
-                "flow_id": flow.flow_id,
-                "seq": be21.seq,
-                "count": self.stats["parse_fail"],
-            })
+            if be21.direction == "s2c":
+                # s2c parse_fail 才是真正的协议问题（可能是未知格式）
+                self.stats["parse_fail"] += 1
+                self._emit("parse_fail", {
+                    "flow_id": flow.flow_id,
+                    "seq": be21.seq,
+                    "count": self.stats["parse_fail"],
+                })
+            # c2s 非战斗包（握手/心跳等）不符合已知格式是正常的，不上报
             return
 
         if record.get("opcode") == 0x0414:
