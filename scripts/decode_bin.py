@@ -28,6 +28,10 @@ import argparse
 from pathlib import Path
 from typing import Any, Optional
 
+# Ensure UTF-8 output on Windows
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 MAGIC = 0x53DF17BE
 
 FOOTER_SIZES = {

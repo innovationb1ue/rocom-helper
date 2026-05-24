@@ -22,6 +22,10 @@ import argparse
 from pathlib import Path
 from google.protobuf import descriptor_pb2
 
+# Ensure UTF-8 output on Windows
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 RESOURCES_DIR = Path("resources")
 REFERENCES_DIR = Path("references/Roco-Kingdom-World-Data/PB")
 OUTPUT_DIR = Path("data/game")

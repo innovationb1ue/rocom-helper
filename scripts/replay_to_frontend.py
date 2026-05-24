@@ -17,6 +17,10 @@ import urllib.request
 import urllib.error
 import json
 
+# Ensure UTF-8 output on Windows (Claude Code terminal)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 
 API_BASE = "http://localhost:8000"
 

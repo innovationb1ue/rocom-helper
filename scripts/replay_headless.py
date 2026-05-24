@@ -16,6 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.analysis.replay_runner import BattleReplayRunner
 
+# Ensure UTF-8 output on Windows (Claude Code terminal)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 
 def _session_dir(name: str) -> Path:
     return Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "packets" / name

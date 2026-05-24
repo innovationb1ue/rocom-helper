@@ -14,6 +14,10 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+# Ensure UTF-8 output on Windows (Claude Code terminal)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 from typing import Any, Dict, List, Optional
 
 # Ensure project root is on sys.path

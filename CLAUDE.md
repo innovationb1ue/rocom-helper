@@ -11,6 +11,12 @@
 - **生产运行环境**：Windows — 工具和游戏都在 Windows 上运行
 - **开发环境**：可能在 macOS 上开发，但**所有代码必须以 Windows 为基准**
 - **注意事项**：使用 Windows 兼容的 API、路径和命令。Scapy 抓包在 Windows 上需要安装 Npcap。使用 `py`（不是 `python`）作为 Python 启动器。功能完成前必须在 Windows 上测试。
+- **编码约定**：所有脚本在文件开头必须配置 UTF-8 输出编码：
+  ```python
+  if sys.stdout.encoding != 'utf-8':
+      sys.stdout.reconfigure(encoding='utf-8')
+  ```
+  涉及中文字段读写的脚本还需在 `open()` 时指定 `encoding="utf-8"`。
 
 ## 技术栈
 

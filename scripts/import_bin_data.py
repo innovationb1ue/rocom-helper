@@ -23,8 +23,13 @@ import argparse
 import json
 import logging
 import re
+import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+
+# Ensure UTF-8 output on Windows
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_OUTPUT = _PROJECT_ROOT / "data" / "game"
