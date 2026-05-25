@@ -216,7 +216,7 @@ class TestSuggestions:
 
 class TestTraits:
     def test_no_traits_when_no_buffs(self, advisor):
-        """无 buffs 且不在 wiki 数据中时 traits 为空。"""
+        """无 buffs 且不在 pet_species 中时 traits 为空。"""
         my = _make_pet(used_skills=[{"skill_id": 7000170}])
         opp = _make_pet(types=[0])
         result = advisor.analyze(_battle_state(my, opp))
@@ -244,8 +244,8 @@ class TestTraits:
         assert len(result.traits) == 1
         assert result.traits[0]["name"] == "临界防御"
 
-    def test_wiki_pet_trait_lookup(self, advisor):
-        """wiki 数据中精灵名的特性能正确查找。"""
+    def test_pet_trait_lookup_from_species(self, advisor):
+        """pet_species 数据中精灵名的特性能正确查找。"""
         my = _make_pet(
             name="厉毒修萝",
             used_skills=[{"skill_id": 7000170}],
@@ -255,8 +255,8 @@ class TestTraits:
         names = [t["name"] for t in result.traits]
         assert "侵蚀" in names
 
-    def test_wiki_pet_trait_not_contaminated_by_buffs(self, advisor):
-        """wiki 特性 + 战斗效果 buff 不应产生多余 traits。"""
+    def test_pet_trait_not_contaminated_by_buffs(self, advisor):
+        """物种特性 + 战斗效果 buff 不应产生多余 traits。"""
         my = _make_pet(
             name="厉毒修萝",
             used_skills=[{"skill_id": 7000170}],

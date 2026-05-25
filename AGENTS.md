@@ -218,13 +218,11 @@ web/ (React SPA)
 - `buff_map.json` (891K) — Buff/效果定义（ID、名称、描述）
 - `buffbase_map.json` (1.1M) — 基础 buff 定义
 
-**怪物与 wiki 数据：**
+**怪物与特殊数据：**
 - `monster_map.json` (7.3M) — 游戏内怪物 ID 映射
-- `wiki_pets.json` (217K) — Wiki 来源的宠物数据（备用种族值）
-- `wiki_skills.json` (90K) — Wiki 来源的技能数据
 - `special_move_map.json` (86K) — 特殊招式定义
 
-`src/data/loader.py` 模块提供类型化数据访问；`src/data/scraper.py` 和 `src/data/updater.py` 负责从游戏 wiki 爬取数据。
+`src/data/loader.py` 模块提供类型化数据访问，数据来源于游戏 BinData 解包（`scripts/import_bin_data.py`）。
 
 ### 关键设计模式
 

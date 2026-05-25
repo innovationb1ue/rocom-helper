@@ -13,70 +13,19 @@ BattleAdvisor 是伤害分析的入口点，它:
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional
 
-from src.analysis.damage_calc import DamageCalculator, DamageResult
+from src.analysis.damage_calc import DamageCalculator
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
+from src.analysis.models import BattleAdvice, SkillAnalysis
 from src.analysis.pet_identity import same_battle_pet
-from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills
+from src.analysis.skill_resolver import resolve_equipped_or_pool, resolve_opponent_skills, skills_from_pool
+from src.analysis.suggestions import build_state_suggestions
+from src.data.loader import get_skill_meta, get_skill_name
 from src.game.type_chart import TypeChart
 from src.game.skill_eval import score_skill
 from src.analysis.counter import CounterPicker
-
-
-@dataclass
-class SkillAnalysis:
-    """单个技能的完整分析（基础信息 + 伤害预测）。"""
-    skill_id: int
-    skill_name: str
-    equipped_slot: int
-    skill_element: int
-    skill_damage_type: int
-    energy_cost: int
-    skill_desc: Optional[str] = None
-    power: Optional[int] = None
-    effective_power: Optional[int] = None
-    expected_damage: Optional[int] = None
-    min_damage: Optional[int] = None
-    max_damage: Optional[int] = None
-    total_min_damage: Optional[int] = None
-    total_max_damage: Optional[int] = None
-    effectiveness: Optional[float] = None
-    effectiveness_label: Optional[str] = None
-    is_stab: Optional[bool] = None
-    can_ko: Optional[bool] = None
-    hit_count: int = 1
-    confidence: Optional[str] = None
-    power_mult: Optional[float] = None
-    weather_mult: Optional[float] = None
-    damage_breakdown: Optional[Dict[str, Any]] = None
-    warnings: List[str] = field(default_factory=list)
-    _quality_score: float = 0.0
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass
-class BattleAdvice:
-    skill_analysis: List[SkillAnalysis] = field(default_factory=list)
-    suggestions: List[Dict[str, str]] = field(default_factory=list)
-    traits: List[Dict[str, str]] = field(default_factory=list)
-    opp_traits: List[Dict[str, str]] = field(default_factory=list)
-    opp_skill_analysis: List[SkillAnalysis] = field(default_factory=list)
-    opp_skill_source: str = ""  # "protocol" | "preset" | ""
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "skill_analysis": [s.to_dict() for s in self.skill_analysis],
-            "suggestions": self.suggestions,
-            "traits": self.traits,
-            "opp_traits": self.opp_traits,
-            "opp_skill_analysis": [s.to_dict() for s in self.opp_skill_analysis],
-            "opp_skill_source": self.opp_skill_source,
-        }
 
 
 class BattleAdvisor:
@@ -91,9 +40,7 @@ class BattleAdvisor:
         if not my_active or not opp_active:
             return BattleAdvice()
 
-        equipped = my_active.get("equipped_skills") or my_active.get("skills") or my_active.get("used_skills") or []
-        if not equipped:
-            equipped = self._skills_from_pool(my_active)
+        equipped = resolve_equipped_or_pool(my_active)
 
         weather = state.get("weather")
         skill_analysis = self._build_skill_analysis(my_active, opp_active, equipped, weather)
@@ -103,7 +50,7 @@ class BattleAdvisor:
         opp_traits = self._extract_traits(opp_active)
 
         # 对手技能分析：优先协议数据，回退到热门预设
-        opp_equipped, opp_source = self._resolve_opp_skills(opp_active)
+        opp_equipped, opp_source = resolve_opponent_skills(opp_active)
         opp_skill_analysis: List[SkillAnalysis] = []
         if opp_equipped:
             raw = self._build_skill_analysis(
@@ -299,48 +246,11 @@ class BattleAdvisor:
 
     @staticmethod
     def _skills_from_pool(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
-        pool = pet.get("base_skill_pool")
-        if not pool:
-            return []
-        skills = []
-        for entry in pool:
-            skill_id = entry.get("skill_id")
-            if skill_id is None:
-                continue
-            skills.append({"skill_id": skill_id})
-        return skills
+        return skills_from_pool(pet)
 
     @staticmethod
     def _resolve_opp_skills(opp_active: Dict[str, Any]) -> tuple:
-        """解析对手技能：优先协议装备技能 → 已使用技能 → 热门预设。
-
-        Returns:
-            (skill_list, source) — source 为 "protocol" | "used" | "preset" | ""
-        """
-        # 1. 优先使用协议中的装备技能
-        equipped = (
-            opp_active.get("equipped_skills")
-            or opp_active.get("skills")
-            or []
-        )
-        if equipped:
-            return equipped, "protocol"
-
-        # 2. 回退到对手已使用过的技能（从战斗事件中追踪）
-        used = opp_active.get("used_skills") or []
-        if used:
-            return used, "used"
-
-        # 3. 回退到热门技能预设
-        base_id = opp_active.get("base_id")
-        if base_id:
-            preset = get_popular_skills(base_id)
-            if preset and preset.get("skills"):
-                return [
-                    {"skill_id": sid} for sid in preset["skills"]
-                ], "preset"
-
-        return [], ""
+        return resolve_opponent_skills(opp_active)
 
     @staticmethod
     def _extract_traits(pet: Dict[str, Any]) -> List[Dict[str, str]]:
@@ -353,7 +263,7 @@ class BattleAdvisor:
                 seen_names.add(name)
                 traits.append({"name": name, "description": description})
 
-        # Source 1: wiki_pets.json — authoritative pet → trait mapping
+        # Source 1: pet_species.pet_feature → skill_map.name (authoritative trait mapping)
         wiki_trait = get_pet_innate_trait(pet.get("name", ""))
         if wiki_trait:
             _add(wiki_trait["name"], wiki_trait.get("description", ""))
@@ -375,38 +285,3 @@ class BattleAdvisor:
                 _add(innate.get("name", "?"), innate.get("description", ""))
 
         return traits
-
-
-def build_state_suggestions(state: Dict[str, Any]) -> List[Dict[str, str]]:
-    """基于当前战斗状态的实时建议（低血量、击杀机会、能量不足、负面状态）。"""
-    suggestions: List[Dict[str, str]] = []
-    seen: set = set()
-    my_active = state.get("my_active")
-    opp_active = state.get("opp_active")
-
-    if my_active is None or opp_active is None:
-        return suggestions
-
-    my_hp_pct = my_active.get("hp_pct", 1.0)
-    if my_hp_pct < 0.25:
-        suggestions.append({"type": "low_hp", "message": "我方精灵HP过低，考虑换宠"})
-
-    opp_hp_pct = opp_active.get("hp_pct", 1.0)
-    if opp_hp_pct < 0.25:
-        suggestions.append({"type": "finish_off", "message": "对手精灵HP极低，可尝试击杀"})
-
-    if my_active.get("energy", 0) < 2:
-        suggestions.append({"type": "low_energy", "message": "能量不足，考虑使用低能耗技能或能量瓶"})
-
-    my_buffs = my_active.get("buffs", [])
-    negative_buffs = [b for b in my_buffs if b.get("stacks", 0) < 0]
-    if len(negative_buffs) >= 2:
-        suggestions.append({"type": "debuffed", "message": "我方精灵有多个负面状态"})
-
-    unique: List[Dict[str, str]] = []
-    for s in suggestions:
-        key = (s["type"], s["message"])
-        if key not in seen:
-            seen.add(key)
-            unique.append(s)
-    return unique

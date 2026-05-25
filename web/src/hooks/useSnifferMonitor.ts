@@ -1,15 +1,15 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useSnifferStore } from '../stores/snifferStore';
 import type { SnifferStatus, SlimRecord } from '../stores/snifferStore';
+import { backendWsUrl } from '../config';
 import api from '../utils/api';
 
 export function useSnifferMonitor() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateStatus, addRecord, setWsConnected, reset } = useSnifferStore();
+  const { updateStatus, addRecord, setWsConnected, setDecryptFail, setParseFail, reset } = useSnifferStore();
 
   const connectWs = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.hostname}:8000/api/sniffer/ws/monitor`;
+    const url = backendWsUrl('/api/sniffer/ws/monitor');
     console.log('[sniffer] connecting WebSocket:', url);
     const ws = new WebSocket(url);
     wsRef.current = ws;
@@ -36,10 +36,14 @@ export function useSnifferMonitor() {
           updateStatus(msg.status as SnifferStatus, msg.message, msg.flow_count, msg.key_hex);
         } else if (msg.type === 'record') {
           addRecord(msg.record as SlimRecord);
+        } else if (msg.type === 'decrypt_fail') {
+          setDecryptFail(msg.count);
+        } else if (msg.type === 'parse_fail') {
+          setParseFail(msg.count);
         }
       } catch { /* ignore */ }
     };
-  }, [updateStatus, addRecord, setWsConnected]);
+  }, [updateStatus, addRecord, setWsConnected, setDecryptFail, setParseFail]);
 
   const startMonitoring = useCallback(async () => {
     console.log('[sniffer] startMonitoring called');

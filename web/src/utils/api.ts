@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+import { apiBaseUrl } from '../config';
+
+const api = axios.create({ baseURL: apiBaseUrl() });
 
 export interface Pet {
   id: number;

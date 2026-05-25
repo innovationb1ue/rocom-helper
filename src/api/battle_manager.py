@@ -17,13 +17,16 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import WebSocket
 
-from src.analysis.battle_processor import BattleProcessor, ProcessResult, compute_battle_summary
+from src.analysis.battle_processor import BattleProcessor
+from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.constants import (
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
     OPCODE_BATTLE_FINISH,
 )
 from src.analysis.battle_state import BattleStateTracker
+from src.analysis.models import ProcessResult
+from src.analysis.replay_messages import build_battle_messages
 
 logger = logging.getLogger(__name__)
 
@@ -107,24 +110,8 @@ class BattleManager:
     async def process_event(self, opcode: int, detail: Dict[str, Any]) -> ProcessResult:
         async with self._process_lock:
             result = self._processor.process_event(opcode, detail)
-
-            if result.formatted_events:
-                await self._push_events(result.formatted_events)
-
-            await self._push_state(result.state, result.suggestions)
-
-            if opcode == OPCODE_BATTLE_FINISH:
-                summary = compute_battle_summary(result.state)
-                await self._push_summary(summary)
-
-            if result.battle_advice:
-                await self._push_damage_analysis_dict(result.battle_advice, result.state)
-
-            if result.hook_advice:
-                await self._push_hook_advice_dicts(result.hook_advice)
-
-            if result.tactical:
-                await self._push_tactical(result.tactical)
+            for message in build_battle_messages(opcode, result):
+                await self._push_message(message)
 
             return result
 
@@ -132,104 +119,12 @@ class BattleManager:
     # WebSocket push helpers
     # ------------------------------------------------------------------
 
-    async def _push_state(
-        self, state: Dict[str, Any], suggestions: Optional[List[Dict[str, str]]] = None,
-    ) -> None:
-        text = json.dumps({"type": "state_update", "state": state}, ensure_ascii=False)
+    async def _push_message(self, message: Dict[str, Any]) -> None:
+        text = json.dumps(message, ensure_ascii=False)
         dead: List[WebSocket] = []
         for ws in self._ws_clients:
             try:
                 await ws.send_text(text)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
-
-        if suggestions:
-            sug_text = json.dumps({"type": "suggestions", "suggestions": suggestions}, ensure_ascii=False)
-            for ws in self._ws_clients:
-                try:
-                    await ws.send_text(sug_text)
-                except Exception:
-                    pass
-
-    async def _push_events(self, events: list) -> None:
-        if len(events) == 1:
-            msg = json.dumps(
-                {"type": "battle_event", "event": events[0].to_dict()},
-                ensure_ascii=False,
-            )
-        else:
-            msg = json.dumps(
-                {"type": "battle_events", "events": [e.to_dict() for e in events]},
-                ensure_ascii=False,
-            )
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(msg)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
-
-    async def _push_summary(self, summary: Dict[str, Any]) -> None:
-        msg = json.dumps({"type": "battle_summary", "summary": summary}, ensure_ascii=False)
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(msg)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
-
-    async def _push_damage_analysis_dict(
-        self, advice_dict: Dict[str, Any], state: Dict[str, Any],
-    ) -> None:
-        msg = json.dumps(
-            {
-                "type": "skill_analysis",
-                "skills": advice_dict.get("skill_analysis", []),
-                "traits": advice_dict.get("traits", []),
-                "opp_traits": advice_dict.get("opp_traits", []),
-                "opp_skill_analysis": advice_dict.get("opp_skill_analysis", []),
-                "opp_skill_source": advice_dict.get("opp_skill_source", ""),
-            },
-            ensure_ascii=False,
-        )
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(msg)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
-
-    async def _push_hook_advice_dicts(self, advice_list: List[Dict[str, Any]]) -> None:
-        msg = json.dumps(
-            {"type": "hook_advice", "advice": advice_list},
-            ensure_ascii=False,
-        )
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(msg)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
-
-    async def _push_tactical(self, rec_dict: Dict[str, Any]) -> None:
-        msg = json.dumps(
-            {"type": "tactical_recommendations", **rec_dict},
-            ensure_ascii=False,
-        )
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(msg)
             except Exception:
                 dead.append(ws)
         for ws in dead:

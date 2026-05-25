@@ -2,7 +2,7 @@
 name = "roco-pvp-helper"
 version = "0.1.0"
 description = "Roco Kingdom PvP Helper - 属性克制分析、队伍构建、实时战斗追踪"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 dependencies = [
     "scapy>=2.5.0",
     "pycryptodome>=3.19",

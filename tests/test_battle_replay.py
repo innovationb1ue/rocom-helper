@@ -356,3 +356,59 @@ class TestBattleSummaryReplay:
         assert len(summary["event_stats"]) > 0
         total = sum(summary["event_stats"].values())
         assert total == len(state["events"])
+
+
+class TestBattleSession8Regression:
+    def _pet_by_name(self, state, name):
+        for pet in state["my_pets"] + state["opp_pets"]:
+            if pet.get("name") == name:
+                return pet
+        raise AssertionError(f"Pet not found: {name}")
+
+    def test_kakabird_survives_and_four_opponents_are_defeated(self, session8_runner_result):
+        state = session8_runner_result.final_state
+
+        assert self._pet_by_name(state, "咔咔鸟")["current_hp"] == 335
+        assert self._pet_by_name(state, "伊兰亚龙")["current_hp"] == 0
+        assert self._pet_by_name(state, "罗隐")["current_hp"] == 0
+        assert self._pet_by_name(state, "白发路路")["current_hp"] == 0
+        assert self._pet_by_name(state, "迪莫")["current_hp"] == 0
+
+    @pytest.mark.parametrize(
+        ("round_num", "defeated_name"),
+        [
+            (3, "伊兰亚龙"),
+            (7, "罗隐"),
+            (9, "白发路路"),
+            (10, "迪莫"),
+        ],
+    )
+    def test_session8_defeats_are_assigned_to_exact_battle_side(self, session8_runner_result, round_num, defeated_name):
+        round_snapshot = next(rs for rs in session8_runner_result.rounds if rs.round_num == round_num)
+        defeated = self._pet_by_name(round_snapshot.state_at_end, defeated_name)
+        kakabird = self._pet_by_name(round_snapshot.state_at_end, "咔咔鸟")
+
+        assert defeated["current_hp"] == 0
+        assert kakabird["current_hp"] == 335
+
+    def test_session8_change_model_entries_are_recognized(self, session8_packets):
+        change_model_entries = []
+        unknown_type_24_entries = []
+
+        for item in session8_packets:
+            _, payload = summarize(item["record"])
+            if not isinstance(payload, dict):
+                continue
+            detail = payload.get("detail", payload)
+            if not isinstance(detail, dict):
+                continue
+            for entry in detail.get("entries", []):
+                if entry.get("type") == 24:
+                    change_model_entries.append(entry)
+                if entry.get("kind") == "unknown_type_24":
+                    unknown_type_24_entries.append(entry)
+
+        assert len(change_model_entries) == 3
+        assert not unknown_type_24_entries
+        assert {entry["kind"] for entry in change_model_entries} == {"change_model"}
+        assert all(entry.get("model_pet_name") for entry in change_model_entries)

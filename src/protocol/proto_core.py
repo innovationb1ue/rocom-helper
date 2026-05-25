@@ -13,7 +13,7 @@ import logging
 import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
-from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_wiki_pet_types
+from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_pet_species_types
 
 logger = logging.getLogger(__name__)
 
@@ -459,10 +459,12 @@ def extract_creature(msg: Dict[str, Any], *, path: str, record: Dict[str, Any]) 
         skill_pool = get_pet_skill_meta(out["base_id"])
         if isinstance(skill_pool, dict):
             out["base_skill_pool"] = skill_pool.get("level_skills") or []
-    wiki_types = get_wiki_pet_types(name)
-    if wiki_types and wiki_types != out["types"]:
-        logger.debug("Type mismatch for %s: protocol=%s, wiki=%s",
-                     name, out["types"], wiki_types)
+    base_id = out.get("base_id")
+    if base_id:
+        species_types = get_pet_species_types(base_id)
+        if species_types and species_types != out["types"]:
+            logger.debug("Type mismatch for %s (base_id=%s): protocol=%s, species=%s",
+                         name, base_id, out["types"], species_types)
     return out
 
 _RE_BATTLE_ENTER_SIDE = re.compile(r"\.6\[\d+\]\.(\d+)\[")

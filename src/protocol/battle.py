@@ -689,6 +689,43 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                 out["params"] = params
             out["uin"] = pick_first(collect_varints(nm, 5))
 
+    elif entry_type == 24:
+        # BPT_CHANGE_MODEL - from field 32 sub (BattleChangeModel)
+        out["kind"] = "change_model"
+        cm = first_sub(sg.get(32, []))
+        if cm:
+            pet_id = pick_first(collect_varints(cm, 1))
+            out["pet_id"] = pet_id
+            out["actor_side"] = pet_id
+            out["actor_side_name"] = side_name(pet_id)
+            out["target_side"] = pet_id
+            out["target_side_name"] = side_name(pet_id)
+            out["old_base_id"] = pick_first(collect_varints(cm, 2))
+            out["role_magic_flag"] = pick_first(collect_varints(cm, 4))
+
+            pet_wrapper = first_sub(field_groups(cm).get(3, []))
+            if pet_wrapper:
+                pwg = field_groups(pet_wrapper)
+                state_sub = first_sub(pwg.get(1, []))
+                if state_sub:
+                    out["model_pet_id"] = pick_first(collect_varints(state_sub, 21), low=1)
+                    out["model_base_id"] = pick_first(collect_varints(state_sub, 22), low=1)
+                    out["model_pet_name"] = first_text(state_sub, 23)
+                    ds = collect_varints(state_sub, 6)
+                    if len(ds) >= 7:
+                        out["model_battle_stats"] = ds[1:7]
+                    if len(ds) >= 26:
+                        out["model_current_hp"] = ds[25]
+                        out["model_max_hp"] = ds[1]
+
+                info_sub = first_sub(pwg.get(2, []))
+                if info_sub:
+                    out["original_pet_id"] = pick_first(collect_varints(info_sub, 2), low=1)
+                    out["original_pet_name"] = first_text(info_sub, 3)
+                    out["original_pet_types"] = [SDT_TO_TYPE.get(v, v) for v in collect_varints(info_sub, 6)]
+                    out["original_pet_level"] = pick_first(collect_varints(info_sub, 10), low=1, high=100)
+                    out["original_base_conf_id"] = pick_first(collect_varints(info_sub, 15))
+
     elif entry_type == 29:
         # BPT_ROLE_SKILL_CAST — from field 37 sub (BattleRoleSkillCast)
         out["kind"] = "role_skill_cast"

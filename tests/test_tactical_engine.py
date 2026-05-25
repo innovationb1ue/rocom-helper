@@ -344,6 +344,7 @@ class TestRecommendation:
         """集成测试：用真实回放数据验证引擎不崩溃。"""
         from pathlib import Path
         from tests.packet_reader import load_battle_packets
+        from src.analysis.battle_advisor import BattleAdvisor
         from src.analysis.replay_runner import BattleReplayRunner
 
         packets = load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
@@ -356,3 +357,35 @@ class TestRecommendation:
             rec = engine.recommend(state)
             assert rec is not None
             assert len(rec.actions) > 0
+
+    def test_round_8_damage_scores_match_replay_state(self):
+        from pathlib import Path
+        from tests.packet_reader import load_battle_packets
+        from src.analysis.battle_advisor import BattleAdvisor
+        from src.analysis.replay_runner import BattleReplayRunner
+
+        packets = load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
+        result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+            packets, stop_round=8
+        )
+        state = result.rounds[-1].state_at_end
+
+        rec = TacticalEngine().recommend(state)
+        assert rec is not None
+
+        skill_actions = {
+            action.skill_name: action
+            for action in rec.actions
+            if action.action_type == "skill" and action.damage_dealt is not None
+        }
+        advice = BattleAdvisor().analyze(state)
+        expected_by_skill = {
+            skill.skill_name: skill.expected_damage
+            for skill in advice.skill_analysis
+            if skill.skill_damage_type in (2, 3) and skill.expected_damage is not None
+        }
+        assert expected_by_skill
+        for skill_name, expected_damage in expected_by_skill.items():
+            assert skill_name in skill_actions
+            assert skill_actions[skill_name].damage_dealt == expected_damage
+        assert max(action.damage_dealt for action in skill_actions.values()) < 1000

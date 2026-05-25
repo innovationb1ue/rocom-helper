@@ -20,6 +20,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+# Ensure UTF-8 output on Windows
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.analysis.constants import OPCODE_BATTLE_ENTER, OPCODE_BATTLE_FINISH

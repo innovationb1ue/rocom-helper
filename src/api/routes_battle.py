@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from src.analysis.battle_processor import compute_battle_summary
+from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.constants import OPCODE_ROUND_START
 from src.api.battle_manager import get_battle_manager

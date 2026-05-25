@@ -14,6 +14,10 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+# Ensure UTF-8 output on Windows (Claude Code terminal)
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 from typing import Any, Dict, List, Optional
 
 # Ensure project root is on sys.path
@@ -193,6 +197,29 @@ def generate_report(session_dir: Path, stop_round: Optional[int] = None) -> str:
                 for w in pred.get("warnings", []):
                     lines.append(f"      ⚠ {w}")
 
+        if rs.opp_skill_analysis:
+            lines.append("")
+            lines.append(f"  瀵规墜鎶€鑳藉垎鏋? (source={rs.opp_skill_source or 'unknown'}):")
+            for pred in rs.opp_skill_analysis:
+                name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
+                exp_dmg = pred.get("expected_damage")
+                ko_mark = " 鈽匥O" if pred.get("can_ko") else ""
+                eff = pred.get("effectiveness_label", "") or ""
+                lines.append(
+                    f"    {name:20s}  dmg: {exp_dmg!s:>5}  "
+                    f"eff: {eff}{ko_mark}"
+                )
+
+        if rs.tactical_recommendations:
+            lines.append("")
+            rec = rs.tactical_recommendations
+            lines.append(f"  鎴樻湳鎺ㄨ崘 ({rec.get('confidence', '?')}):")
+            for action in rec.get("actions", [])[:5]:
+                label = action.get("skill_name") or action.get("switch_to_name") or action.get("action_type")
+                lines.append(
+                    f"    {label}: {action.get('reason', '')} score={action.get('score')}"
+                )
+
         # Hook advice for this round
         round_hooks = []
         for ev in rs.events:
@@ -293,11 +320,32 @@ if __name__ == "__main__":
                     "suggestions": rs.suggestions,
                     "damage_predictions": rs.damage_predictions,
                     "battle_advice": rs.battle_advice,
+                    "traits": rs.traits,
+                    "opp_traits": rs.opp_traits,
+                    "opp_skill_analysis": rs.opp_skill_analysis,
+                    "opp_skill_source": rs.opp_skill_source,
+                    "tactical_recommendations": rs.tactical_recommendations,
+                    "messages": rs.messages,
                 }
                 for rs in result.rounds
             ],
+            "events": [
+                {
+                    "index": ev.index,
+                    "opcode": ev.opcode,
+                    "kind": ev.kind,
+                    "formatted_events": ev.formatted_events,
+                    "battle_advice": ev.battle_advice,
+                    "hook_advice": ev.hook_advice,
+                    "suggestions": ev.suggestions,
+                    "tactical": ev.tactical,
+                    "messages": ev.messages,
+                }
+                for ev in result.events
+            ],
             "final_state": result.final_state,
             "battle_summary": result.battle_summary,
+            "messages": result.messages,
         }
         sys.stdout.buffer.write(
             _json.dumps(output, default=str, ensure_ascii=False, indent=2).encode("utf-8")

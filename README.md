@@ -64,9 +64,7 @@
 
 ### 数据管理
 
-- **BWIKI 数据爬取** — 从游戏 Wiki 自动爬取宠物和技能数据（httpx + BeautifulSoup）
-- **增量数据更新** — 字段级 diff 引擎，交互式确认后应用变更，支持 dry-run
-- **Wiki 技能导入** — 从 NRC_AI Wiki CSV 导入宠物可学习技能
+- **BinData 导入** — 从游戏解包数据（BinData JSON）导入宠物/技能/性格/进化链/天气/战斗配置
 - **热门技能预设** — 按宠物保存常用技能配置，用于对手技能推断
 
 ### 前端界面
@@ -350,9 +348,7 @@ raco-helper/
 │   │   ├── routes_pets.py        # 宠物查询 API
 │   │   └── routes_data.py        # 静态数据 API
 │   └── data/                     # 数据加载
-│       ├── loader.py             # 类型化数据访问（13 个 JSON 表）
-│       ├── scraper.py            # BWIKI 数据爬取
-│       └── updater.py            # 数据更新
+│       └── loader.py             # 类型化数据访问（BinData + JSON）
 ├── web/                          # React 前端
 │   ├── src/
 │   │   ├── pages/                # 7 个页面组件
@@ -393,8 +389,7 @@ raco-helper/
 │   ├── replay_to_frontend.py     # 前端回放
 │   ├── extract_battle.py         # 战斗提取
 │   ├── generate_battle_report.py # 战斗报告
-│   ├── update_data.py            # 数据更新
-│   ├── import_wiki_skills.py     # Wiki 技能导入
+│   ├── import_bin_data.py         # BinData 数据导入
 │   └── ...
 ├── references/                   # 参考仓库
 │   ├── Roco-Kingdom-Protocol-Parser/  # 协议解析参考
@@ -505,11 +500,10 @@ ON_BATTLE_ENTER → ON_ROUND_START → ON_ACTION_RESOLVE → ON_SPECIAL_REFRESH 
 
 ## 数据来源
 
-游戏数据来自多个来源，按权威性排序：
+游戏数据来自 BinData 解包，按权威性排序：
 
 1. **官方解包数据** (`references/Roco-Kingdom-World-Data/`) — 游戏本地配置文件，最权威
-2. **Wiki 爬取** (`src/data/scraper.py`) — 游戏 BWIKI 数据，作为补充
-3. **内置数据** (`data/game/`) — 预处理的 JSON 数据文件
+2. **内置数据** (`data/game/`) — 通过 `scripts/import_bin_data.py` 从 BinData 导入的预处理 JSON 数据文件
 
 ### 核心数据文件
 

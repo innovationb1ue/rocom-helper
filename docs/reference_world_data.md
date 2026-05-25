@@ -106,19 +106,22 @@
 
 | World-Data 文件 | 项目文件 | 关系 |
 |-----------------|---------|------|
-| `PETBASE_CONF.json` | `data/game/pet_map.json` | 官方解包 vs wiki 数据，PETBASE 更权威 |
-| `SKILL_CONF.json` | `data/game/skill_map.json` | SKILL_CONF 含完整 skill_result 效果链 |
-| `TYPE_DICTIONARY.json` | `data/game/type_chart.json` | 同源数据，可互相验证 |
+| `PETBASE_CONF.json` | `data/game/pet_species.json` | 已导入：1015 个物种完整数据（种族值/属性/特性/进化ID） |
+| `SKILL_CONF.json` | `data/game/skill_map.json` | 已导入：含完整 skill_result 效果链 |
+| `LEVEL_SKILL_CONF.json` | `data/game/pet_skill_map.json` | 已导入：升级/技能石/血脉技能完整映射 |
+| `TYPE_DICTIONARY.json` | `data/game/type_chart.json` | 已导入：含 type_immunity 数据 |
 | `BUFFBASE_CONF.json` | `data/game/buffbase_map.json` | 官方 buff 参数定义 |
 | `BUFF_CONF.json` | `data/game/buff_map.json` | buff 完整配置 |
-| `PET_EVOLUTION_CONF.json` | 无 | 进化链数据，尚未导入 |
-| `NATURE_CONF.json` | 无 | 性格效果数据，尚未导入 |
+| `PET_EVOLUTION_CONF.json` | `data/game/evolution_map.json` | 已导入：309 条进化链 |
+| `NATURE_CONF.json` | `data/game/nature_map.json` | 已导入：31 个性格定义 |
+| `BATTLE_GLOBAL_CONFIG.json` | `data/game/battle_config.json` | 已导入：528 个战斗全局参数 |
+| `WEATHER_CONF.json` | `data/game/weather_map.json` | 已导入：13 种天气类型 |
 | `battle_data.proto` | `data/game/proto_schema.json` | protobuf 结构权威定义 |
 | `PB/proto_out/*.proto` | `protocol/proto_core.py` | 协议解析字段级参考 |
 
 #### 何时参考此仓库
 
-- **验证或补充宠物/技能数据**：PETBASE_CONF 和 SKILL_CONF 是最权威的数据源，比 wiki 数据更准确完整
+- **验证或补充宠物/技能数据**：PETBASE_CONF 和 SKILL_CONF 是最权威的数据源，已通过 `scripts/import_bin_data.py` 全量导入
 - **扩展技能效果解析**：`skill_result` 数组包含完整的效果链（effect_id + success_rate + cast_moment），是伤害计算 hook 系统的核心参考
 - **理解 buff 叠加规则**：`buff_groupsigns`（同组互斥）、`buff_list_priority`（优先级）、`add_max`（叠加上限）、`connect_buff`（联动）
 - **解析新协议字段**：.proto 文件提供完整的 protobuf 字段定义和编号，是 `proto_core.py` 和 `battle.py` 的权威参考

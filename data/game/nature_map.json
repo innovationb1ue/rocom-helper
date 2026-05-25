@@ -1,0 +1,1220 @@
+{
+  "1": {
+    "id": 1,
+    "name": "大胆",
+    "is_player_pet_nature": true,
+    "positive_effect": 80,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 82,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "atk",
+    "negative_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 1,
+        "desc": "喜欢独处",
+        "weight": 2000
+      },
+      {
+        "nature_id": 2,
+        "desc": "警惕性强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 3,
+        "desc": "有些敏感",
+        "weight": 2000
+      },
+      {
+        "nature_id": 4,
+        "desc": "独立自主",
+        "weight": 2000
+      },
+      {
+        "nature_id": 5,
+        "desc": "似乎有点黏人",
+        "weight": 2000
+      }
+    ]
+  },
+  "2": {
+    "id": 2,
+    "name": "固执",
+    "is_player_pet_nature": true,
+    "positive_effect": 80,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 81,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "atk",
+    "negative_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 6,
+        "desc": "喜欢随心所欲",
+        "weight": 2000
+      },
+      {
+        "nature_id": 7,
+        "desc": "有点倔强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 8,
+        "desc": "不服输",
+        "weight": 2000
+      },
+      {
+        "nature_id": 9,
+        "desc": "领地意识强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 10,
+        "desc": "坚持自我",
+        "weight": 2000
+      }
+    ]
+  },
+  "3": {
+    "id": 3,
+    "name": "调皮",
+    "is_player_pet_nature": true,
+    "positive_effect": 80,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 83,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "atk",
+    "negative_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 11,
+        "desc": "喜欢捣乱",
+        "weight": 2000
+      },
+      {
+        "nature_id": 12,
+        "desc": "精力充沛",
+        "weight": 2000
+      },
+      {
+        "nature_id": 13,
+        "desc": "活泼好动",
+        "weight": 2000
+      },
+      {
+        "nature_id": 14,
+        "desc": "偶尔会闯祸",
+        "weight": 2000
+      },
+      {
+        "nature_id": 15,
+        "desc": "经常撒娇",
+        "weight": 2000
+      }
+    ]
+  },
+  "4": {
+    "id": 4,
+    "name": "勇敢",
+    "is_player_pet_nature": true,
+    "positive_effect": 80,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 84,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 16,
+        "desc": "喜欢挑战",
+        "weight": 2000
+      },
+      {
+        "nature_id": 17,
+        "desc": "好奇心旺盛",
+        "weight": 2000
+      },
+      {
+        "nature_id": 18,
+        "desc": "无所畏惧",
+        "weight": 2000
+      },
+      {
+        "nature_id": 19,
+        "desc": "偶尔会冲动",
+        "weight": 2000
+      },
+      {
+        "nature_id": 20,
+        "desc": "坚韧不屈",
+        "weight": 2000
+      }
+    ]
+  },
+  "5": {
+    "id": 5,
+    "name": "逞强",
+    "is_player_pet_nature": true,
+    "positive_effect": 80,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 21,
+        "desc": "喜欢交朋友",
+        "weight": 2000
+      },
+      {
+        "nature_id": 22,
+        "desc": "自由自在",
+        "weight": 2000
+      },
+      {
+        "nature_id": 23,
+        "desc": "常与同伴打闹",
+        "weight": 2000
+      },
+      {
+        "nature_id": 24,
+        "desc": "偶尔会任性",
+        "weight": 2000
+      },
+      {
+        "nature_id": 25,
+        "desc": "经常撒娇",
+        "weight": 2000
+      }
+    ]
+  },
+  "6": {
+    "id": 6,
+    "name": "稳重",
+    "is_player_pet_nature": true,
+    "positive_effect": 82,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 80,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spa",
+    "negative_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 26,
+        "desc": "喜欢探险",
+        "weight": 2000
+      },
+      {
+        "nature_id": 27,
+        "desc": "有些冒失",
+        "weight": 2000
+      },
+      {
+        "nature_id": 28,
+        "desc": "总是一往直前",
+        "weight": 2000
+      },
+      {
+        "nature_id": 29,
+        "desc": "行动有些冲动",
+        "weight": 2000
+      },
+      {
+        "nature_id": 30,
+        "desc": "喜欢新鲜事物",
+        "weight": 2000
+      }
+    ]
+  },
+  "7": {
+    "id": 7,
+    "name": "天真",
+    "is_player_pet_nature": true,
+    "positive_effect": 82,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 81,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spa",
+    "negative_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 31,
+        "desc": "喜欢胡闹",
+        "weight": 2000
+      },
+      {
+        "nature_id": 32,
+        "desc": "好奇心旺盛",
+        "weight": 2000
+      },
+      {
+        "nature_id": 33,
+        "desc": "有些粗心",
+        "weight": 2000
+      },
+      {
+        "nature_id": 34,
+        "desc": "偶尔会恶作剧",
+        "weight": 2000
+      },
+      {
+        "nature_id": 35,
+        "desc": "喜欢寻求关注",
+        "weight": 2000
+      }
+    ]
+  },
+  "8": {
+    "id": 8,
+    "name": "懒散",
+    "is_player_pet_nature": true,
+    "positive_effect": 82,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 83,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spa",
+    "negative_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 36,
+        "desc": "喜欢打瞌睡",
+        "weight": 2000
+      },
+      {
+        "nature_id": 37,
+        "desc": "常常偷懒",
+        "weight": 2000
+      },
+      {
+        "nature_id": 38,
+        "desc": "有些迟钝",
+        "weight": 2000
+      },
+      {
+        "nature_id": 39,
+        "desc": "偶尔会打呼噜",
+        "weight": 2000
+      },
+      {
+        "nature_id": 40,
+        "desc": "总是漫不经心",
+        "weight": 2000
+      }
+    ]
+  },
+  "9": {
+    "id": 9,
+    "name": "悠闲",
+    "is_player_pet_nature": true,
+    "positive_effect": 82,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 84,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 41,
+        "desc": "喜欢看风景",
+        "weight": 2000
+      },
+      {
+        "nature_id": 42,
+        "desc": "从容不迫",
+        "weight": 2000
+      },
+      {
+        "nature_id": 43,
+        "desc": "悠然自得",
+        "weight": 2000
+      },
+      {
+        "nature_id": 44,
+        "desc": "偶尔会发呆",
+        "weight": 2000
+      },
+      {
+        "nature_id": 45,
+        "desc": "总是慢吞吞",
+        "weight": 2000
+      }
+    ]
+  },
+  "10": {
+    "id": 10,
+    "name": "坦率",
+    "is_player_pet_nature": true,
+    "positive_effect": 82,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 46,
+        "desc": "喜欢宁静",
+        "weight": 2000
+      },
+      {
+        "nature_id": 47,
+        "desc": "善于忍耐",
+        "weight": 2000
+      },
+      {
+        "nature_id": 48,
+        "desc": "害怕陌生事物",
+        "weight": 2000
+      },
+      {
+        "nature_id": 49,
+        "desc": "行动谨慎",
+        "weight": 2000
+      },
+      {
+        "nature_id": 50,
+        "desc": "非常黏人",
+        "weight": 2000
+      }
+    ]
+  },
+  "11": {
+    "id": 11,
+    "name": "聪明",
+    "is_player_pet_nature": true,
+    "positive_effect": 81,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 80,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "def",
+    "negative_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 51,
+        "desc": "喜欢独处",
+        "weight": 2000
+      },
+      {
+        "nature_id": 52,
+        "desc": "享受安静",
+        "weight": 2000
+      },
+      {
+        "nature_id": 53,
+        "desc": "谨小慎微",
+        "weight": 2000
+      },
+      {
+        "nature_id": 54,
+        "desc": "行动谨慎",
+        "weight": 2000
+      },
+      {
+        "nature_id": 55,
+        "desc": "总是一板一眼",
+        "weight": 2000
+      }
+    ]
+  },
+  "12": {
+    "id": 12,
+    "name": "专注",
+    "is_player_pet_nature": true,
+    "positive_effect": 81,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 82,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "def",
+    "negative_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 56,
+        "desc": "非常可靠",
+        "weight": 2000
+      },
+      {
+        "nature_id": 57,
+        "desc": "经常思考",
+        "weight": 2000
+      },
+      {
+        "nature_id": 58,
+        "desc": "一丝不苟",
+        "weight": 2000
+      },
+      {
+        "nature_id": 59,
+        "desc": "决策慎重",
+        "weight": 2000
+      },
+      {
+        "nature_id": 60,
+        "desc": "总是不慌不忙",
+        "weight": 2000
+      }
+    ]
+  },
+  "13": {
+    "id": 13,
+    "name": "偏执",
+    "is_player_pet_nature": true,
+    "positive_effect": 81,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 83,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "def",
+    "negative_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 61,
+        "desc": "喜欢玩闹",
+        "weight": 2000
+      },
+      {
+        "nature_id": 62,
+        "desc": "不拘小节",
+        "weight": 2000
+      },
+      {
+        "nature_id": 63,
+        "desc": "丢三落四",
+        "weight": 2000
+      },
+      {
+        "nature_id": 64,
+        "desc": "常常闯祸",
+        "weight": 2000
+      },
+      {
+        "nature_id": 65,
+        "desc": "活泼好动",
+        "weight": 2000
+      }
+    ]
+  },
+  "14": {
+    "id": 14,
+    "name": "冷静",
+    "is_player_pet_nature": true,
+    "positive_effect": 81,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 84,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 66,
+        "desc": "喜欢思考",
+        "weight": 2000
+      },
+      {
+        "nature_id": 67,
+        "desc": "临危不乱",
+        "weight": 2000
+      },
+      {
+        "nature_id": 68,
+        "desc": "行动谨慎",
+        "weight": 2000
+      },
+      {
+        "nature_id": 69,
+        "desc": "有些迟钝",
+        "weight": 2000
+      },
+      {
+        "nature_id": 70,
+        "desc": "总是慢条斯理",
+        "weight": 2000
+      }
+    ]
+  },
+  "15": {
+    "id": 15,
+    "name": "理性",
+    "is_player_pet_nature": true,
+    "positive_effect": 81,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 71,
+        "desc": "非常敏锐",
+        "weight": 2000
+      },
+      {
+        "nature_id": 72,
+        "desc": "专注力强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 73,
+        "desc": "有些偏执",
+        "weight": 2000
+      },
+      {
+        "nature_id": 74,
+        "desc": "专心致志",
+        "weight": 2000
+      },
+      {
+        "nature_id": 75,
+        "desc": "一丝不苟",
+        "weight": 2000
+      }
+    ]
+  },
+  "16": {
+    "id": 16,
+    "name": "警惕",
+    "is_player_pet_nature": true,
+    "positive_effect": 83,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 80,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spd",
+    "negative_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 76,
+        "desc": "喜欢思考",
+        "weight": 2000
+      },
+      {
+        "nature_id": 77,
+        "desc": "偶尔会任性",
+        "weight": 2000
+      },
+      {
+        "nature_id": 78,
+        "desc": "行动谨慎",
+        "weight": 2000
+      },
+      {
+        "nature_id": 79,
+        "desc": "总是有条不紊",
+        "weight": 2000
+      },
+      {
+        "nature_id": 80,
+        "desc": "总是深思熟虑",
+        "weight": 2000
+      }
+    ]
+  },
+  "17": {
+    "id": 17,
+    "name": "温顺",
+    "is_player_pet_nature": true,
+    "positive_effect": 83,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 82,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spd",
+    "negative_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 81,
+        "desc": "喜欢撒娇",
+        "weight": 2000
+      },
+      {
+        "nature_id": 82,
+        "desc": "乖巧听话",
+        "weight": 2000
+      },
+      {
+        "nature_id": 83,
+        "desc": "友善宽和",
+        "weight": 2000
+      },
+      {
+        "nature_id": 84,
+        "desc": "善于忍耐",
+        "weight": 2000
+      },
+      {
+        "nature_id": 85,
+        "desc": "温柔体贴",
+        "weight": 2000
+      }
+    ]
+  },
+  "18": {
+    "id": 18,
+    "name": "害羞",
+    "is_player_pet_nature": true,
+    "positive_effect": 83,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 81,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spd",
+    "negative_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 86,
+        "desc": "行动谨慎",
+        "weight": 2000
+      },
+      {
+        "nature_id": 87,
+        "desc": "有一点任性",
+        "weight": 2000
+      },
+      {
+        "nature_id": 88,
+        "desc": "偶尔会不听指令",
+        "weight": 2000
+      },
+      {
+        "nature_id": 89,
+        "desc": "善于忍耐",
+        "weight": 2000
+      },
+      {
+        "nature_id": 90,
+        "desc": "谨小慎微",
+        "weight": 2000
+      }
+    ]
+  },
+  "19": {
+    "id": 19,
+    "name": "慎重",
+    "is_player_pet_nature": true,
+    "positive_effect": 83,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 84,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 91,
+        "desc": "争强好胜",
+        "weight": 2000
+      },
+      {
+        "nature_id": 92,
+        "desc": "经常吵闹",
+        "weight": 2000
+      },
+      {
+        "nature_id": 93,
+        "desc": "行为强势",
+        "weight": 2000
+      },
+      {
+        "nature_id": 94,
+        "desc": "不轻易放弃",
+        "weight": 2000
+      },
+      {
+        "nature_id": 95,
+        "desc": "容易得意忘形",
+        "weight": 2000
+      }
+    ]
+  },
+  "20": {
+    "id": 20,
+    "name": "焦虑",
+    "is_player_pet_nature": true,
+    "positive_effect": 83,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "positive_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 96,
+        "desc": "善于抗压",
+        "weight": 2000
+      },
+      {
+        "nature_id": 97,
+        "desc": "非常勤奋",
+        "weight": 2000
+      },
+      {
+        "nature_id": 98,
+        "desc": "吃苦耐劳",
+        "weight": 2000
+      },
+      {
+        "nature_id": 99,
+        "desc": "意志坚强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 100,
+        "desc": "有些执拗",
+        "weight": 2000
+      }
+    ]
+  },
+  "21": {
+    "id": 21,
+    "name": "胆小",
+    "is_player_pet_nature": true,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 80,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 101,
+        "desc": "对动静非常敏感",
+        "weight": 2000
+      },
+      {
+        "nature_id": 102,
+        "desc": "逃跑飞快",
+        "weight": 2000
+      },
+      {
+        "nature_id": 103,
+        "desc": "警惕性强",
+        "weight": 2000
+      },
+      {
+        "nature_id": 104,
+        "desc": "总是小心翼翼",
+        "weight": 2000
+      },
+      {
+        "nature_id": 105,
+        "desc": "有些粘人",
+        "weight": 2000
+      }
+    ]
+  },
+  "22": {
+    "id": 22,
+    "name": "急躁",
+    "is_player_pet_nature": true,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 82,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 106,
+        "desc": "容易生气",
+        "weight": 2000
+      },
+      {
+        "nature_id": 107,
+        "desc": "喜欢赛跑",
+        "weight": 2000
+      },
+      {
+        "nature_id": 108,
+        "desc": "迅疾如风",
+        "weight": 2000
+      },
+      {
+        "nature_id": 109,
+        "desc": "有些莽撞",
+        "weight": 2000
+      },
+      {
+        "nature_id": 110,
+        "desc": "行动迅捷",
+        "weight": 2000
+      }
+    ]
+  },
+  "23": {
+    "id": 23,
+    "name": "开朗",
+    "is_player_pet_nature": true,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 81,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 111,
+        "desc": "爱与同伴嬉闹",
+        "weight": 2000
+      },
+      {
+        "nature_id": 112,
+        "desc": "热情阳光",
+        "weight": 2000
+      },
+      {
+        "nature_id": 113,
+        "desc": "喜欢自由驰骋",
+        "weight": 2000
+      },
+      {
+        "nature_id": 114,
+        "desc": "有些冲动",
+        "weight": 2000
+      },
+      {
+        "nature_id": 115,
+        "desc": "有时会心不在焉",
+        "weight": 2000
+      }
+    ]
+  },
+  "24": {
+    "id": 24,
+    "name": "莽撞",
+    "is_player_pet_nature": true,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 83,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 116,
+        "desc": "喜欢新奇事物",
+        "weight": 2000
+      },
+      {
+        "nature_id": 117,
+        "desc": "偶尔惹祸",
+        "weight": 2000
+      },
+      {
+        "nature_id": 118,
+        "desc": "总是三心二意",
+        "weight": 2000
+      },
+      {
+        "nature_id": 119,
+        "desc": "喜欢被夸奖",
+        "weight": 2000
+      },
+      {
+        "nature_id": 120,
+        "desc": "非常粘人",
+        "weight": 2000
+      }
+    ]
+  },
+  "25": {
+    "id": 25,
+    "name": "热情",
+    "is_player_pet_nature": true,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "random_descs": [
+      {
+        "nature_id": 121,
+        "desc": "容易生气",
+        "weight": 2000
+      },
+      {
+        "nature_id": 122,
+        "desc": "缺乏耐心",
+        "weight": 2000
+      },
+      {
+        "nature_id": 123,
+        "desc": "喜欢赛跑",
+        "weight": 2000
+      },
+      {
+        "nature_id": 124,
+        "desc": "反应迅速",
+        "weight": 2000
+      },
+      {
+        "nature_id": 125,
+        "desc": "有点容易得意忘形",
+        "weight": 2000
+      }
+    ]
+  },
+  "26": {
+    "id": 26,
+    "name": "沉默",
+    "is_player_pet_nature": true,
+    "positive_effect": 79,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 80,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "atk",
+    "random_descs": [
+      {
+        "nature_id": 126,
+        "desc": "喜欢独自沉思",
+        "weight": 2000
+      },
+      {
+        "nature_id": 127,
+        "desc": "总是默默无闻",
+        "weight": 2000
+      },
+      {
+        "nature_id": 128,
+        "desc": "总是十分被动",
+        "weight": 2000
+      },
+      {
+        "nature_id": 129,
+        "desc": "疏于交朋友",
+        "weight": 2000
+      },
+      {
+        "nature_id": 130,
+        "desc": "缺乏自信",
+        "weight": 2000
+      }
+    ]
+  },
+  "27": {
+    "id": 27,
+    "name": "忧郁",
+    "is_player_pet_nature": true,
+    "positive_effect": 79,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 82,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "spa",
+    "random_descs": [
+      {
+        "nature_id": 131,
+        "desc": "喜欢独自沉思",
+        "weight": 2000
+      },
+      {
+        "nature_id": 132,
+        "desc": "有些冷漠",
+        "weight": 2000
+      },
+      {
+        "nature_id": 133,
+        "desc": "善于观察",
+        "weight": 2000
+      },
+      {
+        "nature_id": 134,
+        "desc": "思维敏捷",
+        "weight": 2000
+      },
+      {
+        "nature_id": 135,
+        "desc": "总是深思熟虑",
+        "weight": 2000
+      }
+    ]
+  },
+  "28": {
+    "id": 28,
+    "name": "平和",
+    "is_player_pet_nature": true,
+    "positive_effect": 79,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 81,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "def",
+    "random_descs": [
+      {
+        "nature_id": 136,
+        "desc": "情绪稳定",
+        "weight": 2000
+      },
+      {
+        "nature_id": 137,
+        "desc": "喜欢拥抱",
+        "weight": 2000
+      },
+      {
+        "nature_id": 138,
+        "desc": "悠闲自在",
+        "weight": 2000
+      },
+      {
+        "nature_id": 139,
+        "desc": "值得信任",
+        "weight": 2000
+      },
+      {
+        "nature_id": 140,
+        "desc": "偶尔会偷吃",
+        "weight": 2000
+      }
+    ]
+  },
+  "29": {
+    "id": 29,
+    "name": "粗心",
+    "is_player_pet_nature": true,
+    "positive_effect": 79,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 83,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "negative_stat": "spd",
+    "random_descs": [
+      {
+        "nature_id": 141,
+        "desc": "喜欢发呆",
+        "weight": 2000
+      },
+      {
+        "nature_id": 142,
+        "desc": "无精打采",
+        "weight": 2000
+      },
+      {
+        "nature_id": 143,
+        "desc": "有些消极",
+        "weight": 2000
+      },
+      {
+        "nature_id": 144,
+        "desc": "总是闷闷不乐",
+        "weight": 2000
+      },
+      {
+        "nature_id": 145,
+        "desc": "善于观察",
+        "weight": 2000
+      }
+    ]
+  },
+  "30": {
+    "id": 30,
+    "name": "踏实",
+    "is_player_pet_nature": true,
+    "positive_effect": 79,
+    "positive_effect_proportion": 1000,
+    "positive_effect_grow": 200,
+    "negative_effect": 84,
+    "negative_effect_proportion": 1000,
+    "prob": 1,
+    "random_descs": [
+      {
+        "nature_id": 146,
+        "desc": "喜欢独处",
+        "weight": 2000
+      },
+      {
+        "nature_id": 147,
+        "desc": "非常黏人",
+        "weight": 2000
+      },
+      {
+        "nature_id": 148,
+        "desc": "缺乏安全感",
+        "weight": 2000
+      },
+      {
+        "nature_id": 149,
+        "desc": "总是忐忑不安",
+        "weight": 2000
+      },
+      {
+        "nature_id": 150,
+        "desc": "善于观察",
+        "weight": 2000
+      }
+    ]
+  },
+  "31": {
+    "id": 31,
+    "name": "平和",
+    "is_player_pet_nature": false,
+    "positive_effect": 84,
+    "positive_effect_proportion": 1,
+    "positive_effect_grow": 1,
+    "negative_effect": 79,
+    "negative_effect_proportion": 1,
+    "prob": null,
+    "random_descs": [
+      {
+        "nature_id": 151,
+        "desc": "喜欢撒娇",
+        "weight": 1000
+      },
+      {
+        "nature_id": 152,
+        "desc": "喜欢撒娇",
+        "weight": 1000
+      },
+      {
+        "nature_id": 153,
+        "desc": "喜欢撒娇",
+        "weight": 1000
+      },
+      {
+        "nature_id": 154,
+        "desc": "喜欢撒娇",
+        "weight": 1000
+      },
+      {
+        "nature_id": 155,
+        "desc": "喜欢撒娇",
+        "weight": 1000
+      }
+    ]
+  }
+}

@@ -18,11 +18,12 @@ from src.capture.frame import Be21Packet
 from src.capture.reassembly import FlowState
 from src.capture.key_capture import extract_key_from_ack, is_ack_packet
 from src.capture.crypto import decrypt_4013_body, write_key_file, printable_ascii
+from src.config import settings
 from src.protocol.proto_core import parse_record, parse_tgcp_control_packet, extract_inner_message
 from src.protocol.opcodes import summarize
 
-_DEFAULT_PORT = 8195
-_DEFAULT_BPF = "tcp port 8195"
+_DEFAULT_PORT = settings.capture_port
+_DEFAULT_BPF = f"tcp port {_DEFAULT_PORT}"
 
 
 def _flow_key_from_packet(packet: Any, port: int) -> Optional[Tuple[str, int, str, int]]:
@@ -68,7 +69,7 @@ class Sniffer:
         self._sniffer: Optional[AsyncSniffer] = None
         self._running = False
         self._lock = threading.Lock()
-        self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0}
+        self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0, "parse_fail": 0}
 
     def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
         if self.on_event:
@@ -201,6 +202,14 @@ class Sniffer:
                     be21.header_extra, be21.body,
                     error=f"解密失败: {exc}",
                 )
+            self._emit("decrypt_fail", {
+                "flow_id": flow.flow_id,
+                "cmd": be21.cmd,
+                "seq": be21.seq,
+                "reason": str(exc),
+                "key_hex": flow.key.hex() if flow.key else None,
+                "count": self.stats["decrypt_fail"],
+            })
             return
 
         pkt_dict = {
@@ -219,6 +228,15 @@ class Sniffer:
                     decrypted_body=plain,
                     error="parse_record 返回 None",
                 )
+            if be21.direction == "s2c":
+                # s2c parse_fail 才是真正的协议问题（可能是未知格式）
+                self.stats["parse_fail"] += 1
+                self._emit("parse_fail", {
+                    "flow_id": flow.flow_id,
+                    "seq": be21.seq,
+                    "count": self.stats["parse_fail"],
+                })
+            # c2s 非战斗包（握手/心跳等）不符合已知格式是正常的，不上报
             return
 
         if record.get("opcode") == 0x0414:
