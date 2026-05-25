@@ -556,6 +556,25 @@ class TestDefeatAndReplacement:
         assert state["opp_active"]["name"] == "电鼠"
 
 
+    def test_round_start_multiple_wrappers_keeps_first_alive_active(self, tracker):
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+
+        state = tracker.handle_event(0x131A, {
+            "opcode": 0x131A,
+            "round": 1,
+            "wrappers": [
+                {"pet_id": 200, "pet_name": "姘撮緹", "types": [2], "side": 401,
+                 "slot": 401, "hp": 0, "max_hp": 350},
+                {"pet_id": 201, "pet_name": "鐢甸紶", "types": [4], "side": 401,
+                 "slot": 402, "hp": 280, "max_hp": 280},
+                {"pet_id": 202, "pet_name": "鍐扮嫄", "types": [5], "side": 401,
+                 "slot": 403, "hp": 260, "max_hp": 260},
+            ],
+        })
+
+        assert state["opp_active"]["pet_id"] == 201
+
+
 class TestBattleFinish:
     def test_result_recorded(self, tracker):
         tracker.handle_event(0x1316, _enter_event())

@@ -69,6 +69,7 @@ class BattleStateTracker:
         # battle slot IDs whose ownership has been established
         self._opponent_slots: set = set()
         self._player_slots: set = set()
+        self._battle_side_pets: Dict[int, Dict[str, Any]] = {}
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         """处理协议事件，更新状态，返回最新快照。
@@ -118,6 +119,11 @@ class BattleStateTracker:
         return state
 
     def pet_name_by_slot(self, slot: Any, is_mine: bool) -> Optional[str]:
+        side_num = self._side_int(slot)
+        if side_num is not None:
+            pet = self._battle_side_pets.get(side_num)
+            if pet is not None:
+                return pet.get("name")
         pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
         for pet in pet_list:
             if pet.get("slot") == slot or pet.get("pet_id") == slot:
@@ -151,6 +157,7 @@ class BattleStateTracker:
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
         self._opponent_slots.clear()
         self._player_slots.clear()
+        self._battle_side_pets.clear()
 
         self.state["battle_id"] = detail.get("battle_id")
         self.state["battle_mode"] = detail.get("battle_mode")
@@ -189,11 +196,11 @@ class BattleStateTracker:
             if side == 1 or side == "我方":
                 my_pets.append(pet_info)
                 if pet_info.get("slot") is not None:
-                    self._player_slots.add(int(pet_info["slot"]))
+                    self._bind_battle_side(pet_info["slot"], pet_info, is_mine=True)
             else:
                 opp_pets.append(pet_info)
                 if pet_info.get("slot") is not None:
-                    self._opponent_slots.add(int(pet_info["slot"]))
+                    self._bind_battle_side(pet_info["slot"], pet_info, is_mine=False)
 
         self.state["my_pets"] = my_pets
         self.state["opp_pets"] = opp_pets
@@ -203,8 +210,10 @@ class BattleStateTracker:
             refresh_battle_uid(pet, side=401)
         if my_pets:
             self.state["my_active"] = my_pets[0]
+            self._bind_battle_side(1, my_pets[0], is_mine=True)
         if opp_pets:
             self.state["opp_active"] = opp_pets[0]
+            self._bind_battle_side(401, opp_pets[0], is_mine=False)
 
     def _handle_round_start(self, detail: Dict[str, Any]) -> None:
         self.state["round"] = detail.get("round", self.state["round"] + 1)
@@ -219,12 +228,61 @@ class BattleStateTracker:
         if isinstance(side_value, str):
             return side_value == "我方"
         v = int(side_value)
+        pet = self._battle_side_pets.get(v)
+        if pet is not None:
+            return pet in self.state["my_pets"]
         if v in self._opponent_slots:
             return False
         if v in self._player_slots:
             return True
         # Fallback: numeric range when slot mapping is not yet established
         return 1 <= v <= 6
+
+    @staticmethod
+    def _side_int(side_value: Any) -> Optional[int]:
+        try:
+            return int(side_value)
+        except (TypeError, ValueError):
+            return None
+
+    def _bind_battle_side(self, side_value: Any, pet: Optional[Dict[str, Any]], *, is_mine: Optional[bool] = None) -> None:
+        side_num = self._side_int(side_value)
+        if side_num is None or pet is None:
+            return
+        if is_mine is None:
+            is_mine = pet in self.state["my_pets"]
+        self._battle_side_pets[side_num] = pet
+        if is_mine:
+            self._player_slots.add(side_num)
+            self._opponent_slots.discard(side_num)
+        else:
+            self._opponent_slots.add(side_num)
+            self._player_slots.discard(side_num)
+
+    def _set_active_pet(self, pet: Dict[str, Any]) -> None:
+        if pet in self.state["my_pets"]:
+            self.state["my_active"] = pet
+        elif pet in self.state["opp_pets"]:
+            self.state["opp_active"] = pet
+
+    def _resolve_pet_for_side(self, side_value: Any, *, bind_fallback: bool = False) -> Optional[Dict[str, Any]]:
+        side_num = self._side_int(side_value)
+        if side_num is not None:
+            pet = self._battle_side_pets.get(side_num)
+            if pet is not None:
+                return pet
+            for candidate in self.state["my_pets"] + self.state["opp_pets"]:
+                if candidate.get("slot") == side_num:
+                    self._bind_battle_side(side_num, candidate)
+                    return candidate
+
+        active_key = "my_active" if self._is_mine(side_value) else "opp_active"
+        active = self.state[active_key]
+        if bind_fallback and side_num is not None and active is not None and active.get("current_hp", 0) <= 0:
+            return None
+        if bind_fallback and side_num is not None and active is not None:
+            self._bind_battle_side(side_num, active, is_mine=(active_key == "my_active"))
+        return active
 
     # _handle_action_resolve 是最复杂的状态更新函数。
     # 遍历 detail["entries"] 列表，按 entry.kind 分派处理:
@@ -267,8 +325,7 @@ class BattleStateTracker:
 
     def _get_active_for_side(self, side_value: Any) -> Optional[Dict[str, Any]]:
         """根据 side 值获取对应的活跃宠物字典。"""
-        active_key = "my_active" if self._is_mine(side_value) else "opp_active"
-        return self.state[active_key]
+        return self._resolve_pet_for_side(side_value, bind_fallback=True)
 
     def _handle_damage_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("damage_target_side")
@@ -277,8 +334,7 @@ class BattleStateTracker:
         if target_side is None:
             return
         # damage_target_side is the pet receiving damage — route to its active
-        active_key = "my_active" if self._is_mine(target_side) else "opp_active"
-        active = self.state[active_key]
+        active = self._resolve_pet_for_side(target_side, bind_fallback=True)
         if active is not None:
             # Use target_hp_after only if it's valid (not exceeding max_hp)
             max_hp = active.get("max_hp", 0)
@@ -290,6 +346,7 @@ class BattleStateTracker:
                 active["hp_pct"] = active["current_hp"] / active["max_hp"]
             else:
                 active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
+            self._set_active_pet(active)
 
     def _handle_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
         actor_side = entry.get("actor_side", "")
@@ -471,6 +528,7 @@ class BattleStateTracker:
                 matched["base_conf_id"] = new_base_conf_id
             refresh_battle_uid(matched, side=401 if is_opp else 1)
             self.state[active_key] = matched
+            self._bind_battle_side(battle_pet_id, matched, is_mine=not is_opp)
             matched["buffs"] = []
             matched["combo_bonus"] = 0
             matched["poison_stacks"] = 0
@@ -706,6 +764,7 @@ class BattleStateTracker:
     #   2. 未匹配则创建新条目
     # 活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
     def _update_pets_from_wrappers(self, wrappers: List[Dict[str, Any]]) -> None:
+        active_candidates: Dict[str, Dict[str, Any]] = {}
         for w in wrappers:
             side = w.get("side")
             is_mine = (side == 1 or side == "我方")
@@ -779,4 +838,10 @@ class BattleStateTracker:
             # round_start wrapper 仅包含当前出战精灵，是活跃指针的权威数据
             active_key = "my_active" if is_mine else "opp_active"
             if matched is not None:
-                self.state[active_key] = matched
+                current_candidate = active_candidates.get(active_key)
+                if current_candidate is None:
+                    active_candidates[active_key] = matched
+                elif current_candidate.get("current_hp", 0) <= 0 and matched.get("current_hp", 0) > 0:
+                    active_candidates[active_key] = matched
+        for active_key, pet in active_candidates.items():
+            self.state[active_key] = pet

@@ -184,8 +184,10 @@ class BattleReplayRunner:
                 rs.damage_predictions = battle_advice_dict.get("skill_analysis", [])
                 rs.traits = battle_advice_dict.get("traits", [])
                 rs.opp_traits = battle_advice_dict.get("opp_traits", [])
-                rs.opp_skill_analysis = battle_advice_dict.get("opp_skill_analysis", [])
-                rs.opp_skill_source = battle_advice_dict.get("opp_skill_source", "")
+                opp_skill_analysis = battle_advice_dict.get("opp_skill_analysis", [])
+                if opp_skill_analysis:
+                    rs.opp_skill_analysis = opp_skill_analysis
+                    rs.opp_skill_source = battle_advice_dict.get("opp_skill_source", "")
             if filtered_result.tactical:
                 rs.tactical_recommendations = filtered_result.tactical
 

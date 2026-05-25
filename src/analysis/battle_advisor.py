@@ -333,6 +333,10 @@ class BattleAdvisor:
 
         # 3. 回退到热门技能预设
         base_id = opp_active.get("base_id") or opp_active.get("base_conf_id")
+        pool = BattleAdvisor._skills_from_pool(opp_active)
+        if pool:
+            return pool, "protocol"
+
         if base_id:
             preset = get_popular_skills(base_id)
             if preset and preset.get("skills"):
