@@ -127,9 +127,21 @@ def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent
     )
 
 
-def _fmt_defeat(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+def _fmt_defeat(entry: Dict[str, Any], state: Dict[str, Any]) -> FormattedEvent:
     winner = side_label(entry.get("actor_side"))
-    defeated = side_label(entry.get("target_side"))
+    defeated_side = entry.get("target_side")
+    defeated = side_label(defeated_side)
+
+    # 解析被击败宠物的真实名称
+    if defeated_side is not None:
+        is_mine = _is_mine(defeated_side)
+        pet_list = state.get("my_pets", []) if is_mine else state.get("opp_pets", [])
+        v = int(defeated_side)
+        for pet in pet_list:
+            if pet.get("slot") == v:
+                defeated = pet.get("name", defeated)
+                break
+
     return FormattedEvent(
         kind="defeat",
         round=0,
@@ -307,10 +319,10 @@ def _fmt_ai_action(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEv
 def _fmt_pvp_perform_marker(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
     pvp_type = entry.get("pvp_type", "?")
     return FormattedEvent(
-        kind="pvp_perform_marker",
+        kind="pvp_perform",
         round=0,
         summary=f"PVP演出 type={pvp_type}",
-        detail={"pvp_type": pvp_type},
+        detail={"pvp_type": pvp_type, "raw_kind": "pvp_perform_marker"},
         icon="star",
         color="purple",
     )
@@ -320,10 +332,10 @@ def _fmt_supply_pet(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedE
     pets = entry.get("supply_pets", [])
     count = len(pets) if pets else 1
     return FormattedEvent(
-        kind="supply_pet",
+        kind="reinforcement",
         round=0,
         summary=f"补宠: {count}只",
-        detail={"supply_count": count},
+        detail={"supply_count": count, "raw_kind": "supply_pet"},
         icon="plus",
         color="cyan",
     )

@@ -81,6 +81,25 @@ def _print_summary(result) -> None:
                 max_d = pred.get("max_damage", "?")
                 print(f"  {name:20s}  dmg: {exp_dmg!s:>5}  range: [{min_d!s}-{max_d!s}]  eff: {eff}{ko_mark}")
 
+        if rs.opp_skill_analysis:
+            source = rs.opp_skill_source or "unknown"
+            print(f"  Opponent skills ({source}):")
+            for pred in rs.opp_skill_analysis:
+                ko_mark = " [KO]" if pred.get("can_ko") else ""
+                eff = pred.get("effectiveness_label", "") or ""
+                name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
+                exp_dmg = pred.get("expected_damage", "?")
+                min_d = pred.get("min_damage", "?")
+                max_d = pred.get("max_damage", "?")
+                print(f"    {name:18s} dmg: {exp_dmg!s:>5}  range: [{min_d!s}-{max_d!s}]  eff: {eff}{ko_mark}")
+
+        if rs.tactical_recommendations:
+            rec = rs.tactical_recommendations
+            print(f"  Tactical ({rec.get('confidence', '?')}):")
+            for action in rec.get("actions", [])[:3]:
+                label = action.get("skill_name") or action.get("switch_to_name") or action.get("action_type")
+                print(f"    {label}: {action.get('reason', '')} score={action.get('score')}")
+
         # Hook advice for this round
         for ev in rs.events:
             for ha in ev.hook_advice:
@@ -138,11 +157,33 @@ def main():
                     "suggestions": rs.suggestions,
                     "damage_predictions": rs.damage_predictions,
                     "battle_advice": rs.battle_advice,
+                    "traits": rs.traits,
+                    "opp_traits": rs.opp_traits,
+                    "opp_skill_analysis": rs.opp_skill_analysis,
+                    "opp_skill_source": rs.opp_skill_source,
+                    "tactical_recommendations": rs.tactical_recommendations,
+                    "messages": rs.messages,
                 }
                 for rs in result.rounds
             ],
+            "events": [
+                {
+                    "index": ev.index,
+                    "opcode": ev.opcode,
+                    "kind": ev.kind,
+                    "round_num": ev.round_num,
+                    "formatted_events": ev.formatted_events,
+                    "battle_advice": ev.battle_advice,
+                    "hook_advice": ev.hook_advice,
+                    "suggestions": ev.suggestions,
+                    "tactical": ev.tactical,
+                    "messages": ev.messages,
+                }
+                for ev in result.events
+            ],
             "final_state": result.final_state,
             "battle_summary": result.battle_summary,
+            "messages": result.messages,
         }
         tmp_dir = Path("tmp")
         tmp_dir.mkdir(exist_ok=True)

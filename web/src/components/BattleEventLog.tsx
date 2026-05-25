@@ -23,6 +23,8 @@ const KIND_LABELS: Record<string, string> = {
   special_refresh: '特殊刷新',
   round_flow: '回合流',
   ai_action: 'AI行动',
+  pvp_perform: 'PVP演出',
+  reinforcement: '补宠',
 };
 
 const KIND_COLORS: Record<string, string> = {
@@ -34,6 +36,8 @@ const KIND_COLORS: Record<string, string> = {
   change_pet: '#13c2c2',
   skill_cast: '#1890ff',
   energy: '#faad14',
+  pvp_perform: '#722ed1',
+  reinforcement: '#13c2c2',
 };
 
 interface Props {

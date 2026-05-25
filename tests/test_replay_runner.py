@@ -131,6 +131,17 @@ class TestReplayRunnerDamagePrediction:
         else:
             pytest.fail("No battle_advice found in replay events")
 
+    def test_attack_predictions_have_damage_values(self, session1_runner_result):
+        found_attack = False
+        for rs in session1_runner_result.rounds:
+            for pred in rs.damage_predictions:
+                if pred.get("skill_damage_type") not in (2, 3):
+                    continue
+                found_attack = True
+                assert pred["expected_damage"] is not None
+                assert pred["expected_damage"] >= 0
+        assert found_attack
+
 
 # ---------------------------------------------------------------------------
 # Formatting
@@ -209,6 +220,61 @@ class TestReplayRunnerSerialization:
 
     def test_battle_summary_serializable(self, session1_runner_result):
         json.dumps(session1_runner_result.battle_summary, default=str)
+
+    def test_messages_json_serializable(self, session1_runner_result):
+        json.dumps(session1_runner_result.messages, default=str)
+
+
+# ---------------------------------------------------------------------------
+# Browser parity
+# ---------------------------------------------------------------------------
+
+
+class TestReplayRunnerBrowserParity:
+    def test_message_sequence_contains_browser_payloads(self, session1_runner_result):
+        msg_types = {msg["type"] for msg in session1_runner_result.messages}
+        assert "state_update" in msg_types
+        assert "skill_analysis" in msg_types
+        assert "hook_advice" in msg_types
+        assert "suggestions" in msg_types
+        assert "battle_summary" in msg_types
+        assert "tactical_recommendations" in msg_types
+
+    def test_round_8_contains_tactical_and_opponent_skill_analysis(self, session1_runner_result):
+        rs = next(round_ for round_ in session1_runner_result.rounds if round_.round_num == 8)
+        assert rs.tactical_recommendations is not None
+        assert rs.opp_skill_source in {"protocol", "used", "preset"}
+        assert rs.opp_skill_analysis
+
+    def test_round_17_contains_tactical_and_opponent_skill_analysis(self, session1_runner_result):
+        rs = next(round_ for round_ in session1_runner_result.rounds if round_.round_num == 17)
+        assert rs.tactical_recommendations is not None
+        assert rs.opp_skill_analysis
+
+    def test_no_unknown_skill_names_in_replay_outputs(self, session1_runner_result):
+        for rs in session1_runner_result.rounds:
+            for pred in rs.damage_predictions + rs.opp_skill_analysis:
+                assert pred.get("skill_name")
+                assert pred["skill_name"] != "?"
+                assert "未知技能" not in pred["skill_name"]
+
+    def test_internal_event_kinds_are_not_exposed_directly(self, session1_runner_result):
+        all_kinds = [
+            fe["kind"]
+            for rs in session1_runner_result.rounds
+            for fe in rs.formatted_events
+        ]
+        assert "pvp_perform_marker" not in all_kinds
+        assert "supply_pet" not in all_kinds
+
+    def test_tactical_damage_is_reasonable(self, session1_runner_result):
+        rs = next(round_ for round_ in session1_runner_result.rounds if round_.round_num == 8)
+        skill_actions = [
+            action for action in rs.tactical_recommendations.get("actions", [])
+            if action.get("action_type") == "skill" and action.get("damage_dealt") is not None
+        ]
+        assert skill_actions
+        assert max(action["damage_dealt"] for action in skill_actions) < 1000
 
 
 # ---------------------------------------------------------------------------

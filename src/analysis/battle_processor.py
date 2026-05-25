@@ -88,6 +88,8 @@ class BattleProcessor:
                 from src.analysis.state_projector import project_state_after_entries
                 projected = project_state_after_entries(state_before, detail.get("entries", []))
                 battle_advice_dict = self._compute_damage_analysis(projected)
+                if not self._has_usable_damage_predictions(battle_advice_dict):
+                    battle_advice_dict = self._compute_damage_analysis(state)
             else:
                 battle_advice_dict = self._compute_damage_analysis(state)
 
@@ -128,6 +130,17 @@ class BattleProcessor:
         if not advice.skill_analysis:
             return None
         return advice.to_dict()
+
+    @staticmethod
+    def _has_usable_damage_predictions(advice: Optional[Dict[str, Any]]) -> bool:
+        if not advice:
+            return False
+        for skill in advice.get("skill_analysis", []):
+            if skill.get("skill_damage_type") not in (2, 3):
+                continue
+            if skill.get("expected_damage") is not None:
+                return True
+        return False
 
     # ------------------------------------------------------------------
     # Tactical recommendations

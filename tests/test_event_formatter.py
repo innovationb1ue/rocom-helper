@@ -197,7 +197,7 @@ class TestFormatDefeat:
         ev = format_action_entry(entry, _state_after_enter())
         assert ev.kind == "defeat"
         assert "我方" in ev.summary
-        assert "敌方" in ev.summary
+        assert "水龟" in ev.summary
         assert "击败" in ev.summary
         assert ev.color == "red"
 
@@ -326,13 +326,15 @@ class TestFormatUnknown:
     def test_pvp_perform_marker(self):
         entry = {"kind": "pvp_perform_marker", "pvp_type": 1}
         ev = format_action_entry(entry, _state_after_enter())
-        assert ev.kind == "pvp_perform_marker"
+        assert ev.kind == "pvp_perform"
         assert "PVP演出" in ev.summary
         assert ev.color == "purple"
+        assert ev.detail["raw_kind"] == "pvp_perform_marker"
 
     def test_supply_pet(self):
         entry = {"kind": "supply_pet", "supply_pets": [{"pet_id": 1}, {"pet_id": 2}]}
         ev = format_action_entry(entry, _state_after_enter())
+        assert ev.kind == "reinforcement"
         assert "补宠" in ev.summary
         assert "2只" in ev.summary
 

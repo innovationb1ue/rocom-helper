@@ -60,22 +60,25 @@ def refresh_battle_uid(pet: Dict[str, Any], *, side: Any = None) -> Optional[str
 def same_battle_pet(left: Dict[str, Any], right: Dict[str, Any]) -> bool:
     left_uid = left.get("battle_uid") or battle_uid(left)
     right_uid = right.get("battle_uid") or battle_uid(right)
-    if left_uid and right_uid:
-        return left_uid == right_uid
+    if left_uid and right_uid and left_uid == right_uid:
+        return True
 
     left_slot = left.get("slot")
     right_slot = right.get("slot")
     if left_slot is not None and right_slot is not None:
-        return side_key(left.get("side")) == side_key(right.get("side")) and left_slot == right_slot
+        if side_key(left.get("side")) == side_key(right.get("side")) and left_slot == right_slot:
+            return True
 
     left_base = left.get("base_conf_id")
     right_base = right.get("base_conf_id")
     if left_base is not None and right_base is not None:
-        return side_key(left.get("side")) == side_key(right.get("side")) and left_base == right_base
+        if side_key(left.get("side")) == side_key(right.get("side")) and left_base == right_base:
+            return True
 
     left_id = left.get("pet_id")
     right_id = right.get("pet_id")
     if left_id is not None and right_id is not None and not is_hidden_pet_id(left_id):
-        return left_id == right_id
+        if left_id == right_id:
+            return True
 
     return False

@@ -6,6 +6,16 @@ export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
   const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations } = useBattleStore();
 
+  const sendIfOpen = useCallback((payload: unknown) => {
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      setConnected(false);
+      return false;
+    }
+    ws.send(JSON.stringify(payload));
+    return true;
+  }, [setConnected]);
+
   const connect = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const ws = new WebSocket(`${protocol}//${window.location.hostname}:8000/ws/battle`);
@@ -52,17 +62,17 @@ export function useBattle() {
   }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
-    wsRef.current?.send(JSON.stringify({ type: 'event', opcode, detail }));
-  }, []);
+    sendIfOpen({ type: 'event', opcode, detail });
+  }, [sendIfOpen]);
 
   const resetBattle = useCallback(() => {
-    wsRef.current?.send(JSON.stringify({ type: 'reset' }));
+    sendIfOpen({ type: 'reset' });
     reset();
-  }, [reset]);
+  }, [reset, sendIfOpen]);
 
   const getState = useCallback(() => {
-    wsRef.current?.send(JSON.stringify({ type: 'get_state' }));
-  }, []);
+    sendIfOpen({ type: 'get_state' });
+  }, [sendIfOpen]);
 
   useEffect(() => {
     return () => { wsRef.current?.close(); };

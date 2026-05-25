@@ -140,12 +140,7 @@ def _project_change_pet(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
     active_key = "opp_active" if is_opp else "my_active"
 
     matched = None
-    if new_base_conf_id is not None:
-        for pet in pet_list:
-            if pet.get("base_conf_id") == new_base_conf_id:
-                matched = pet
-                break
-    if matched is None and new_pet_id is not None and new_pet_id != 20000000:
+    if new_pet_id is not None and new_pet_id != 20000000:
         for pet in pet_list:
             if pet.get("pet_id") == new_pet_id:
                 matched = pet
@@ -155,6 +150,16 @@ def _project_change_pet(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
             if pet.get("name") == new_pet_name:
                 matched = pet
                 break
+    if matched is None and new_base_conf_id is not None:
+        for pet in pet_list:
+            if pet.get("base_conf_id") != new_base_conf_id:
+                continue
+            # Prefer fully materialized pets over placeholder pet_id=20000000 entries.
+            if pet.get("pet_id") != 20000000 or pet.get("stats") or pet.get("equipped_skills"):
+                matched = pet
+                break
+            if matched is None:
+                matched = pet
     if matched is None and not is_opp:
         idx = int(battle_pet_id) - 1
         if 0 <= idx < len(pet_list):

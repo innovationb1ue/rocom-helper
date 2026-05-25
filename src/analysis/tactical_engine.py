@@ -563,6 +563,15 @@ class TacticalEngine:
         best_damage_dealt = 0
         worst_damage_taken = 0
         can_ko = False
+        display_damage_dealt: Optional[int] = None
+        display_can_ko = False
+
+        if our_action["action_type"] == "skill" and our_action.get("is_damage_skill", False):
+            display_damage_dealt = self._calc_damage(
+                my_active, opp_active, our_action.get("meta"), state.get("weather")
+            )
+            if display_damage_dealt > 0:
+                display_can_ko = display_damage_dealt >= opp_active.get("current_hp", 0)
 
         for opp_act in opp_predicted:
             outcome = self._resolve_outcome(
@@ -595,11 +604,16 @@ class TacticalEngine:
                 elif energy_cost >= 1:
                     total_score *= 0.8
 
-        reason = self._generate_reason(our_action, best_damage_dealt, worst_damage_taken, can_ko)
+        reason = self._generate_reason(
+            our_action,
+            display_damage_dealt or best_damage_dealt,
+            worst_damage_taken,
+            display_can_ko or can_ko,
+        )
         detail = {
-            "damage_dealt": best_damage_dealt if best_damage_dealt > 0 else None,
+            "damage_dealt": display_damage_dealt if display_damage_dealt and display_damage_dealt > 0 else None,
             "damage_taken": worst_damage_taken if worst_damage_taken > 0 else None,
-            "can_ko": can_ko,
+            "can_ko": display_can_ko or can_ko,
         }
         return total_score, reason, detail
 
@@ -735,7 +749,7 @@ class TacticalEngine:
         self, attacker: Dict[str, Any], defender: Dict[str, Any],
         skill_meta: Optional[Dict[str, Any]], weather: Optional[Dict[str, Any]],
     ) -> int:
-        """用 DamageCalculator 计算伤害，返回总伤害。"""
+        """用 DamageCalculator 计算伤害，返回与技能分析面板一致的期望伤害口径。"""
         if skill_meta is None:
             return 0
         damage_type = skill_meta.get("damage_type", 0)
@@ -744,7 +758,7 @@ class TacticalEngine:
         dr = self._damage_calc.calculate(attacker, defender, skill_meta, weather=weather)
         if dr is None:
             return 0
-        return dr.expected_damage * dr.hit_count
+        return dr.expected_damage
 
     def _type_matchup_score(
         self, our_pet: Dict[str, Any], opp_pet: Dict[str, Any],

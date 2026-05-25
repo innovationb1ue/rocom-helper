@@ -95,6 +95,13 @@ _ATK_STAT = {2: "ATK", 3: "SPA"}  # damage_type → 攻击属性
 _DEF_STAT = {2: "DEF", 3: "SPD"}  # damage_type → 防御属性
 
 # STAB 倍率
+_STAT_NAME_ALIASES = {
+    "ATK": ("ATK", "ATTACK"),
+    "DEF": ("DEF", "DEFENSE"),
+    "SPA": ("SPA", "SPATK", "SP_ATTACK", "SPECIAL_ATTACK"),
+    "SPD": ("SPD", "SPDEF", "SP_DEFENSE", "SPECIAL_DEFENSE"),
+    "SPE": ("SPE", "SPEED", "SPD_SPEED"),
+}
 _STAB_MULTIPLIER = 1.5
 
 
@@ -417,14 +424,20 @@ class DamageCalculator:
     def _get_stat_with_source(pet: Dict[str, Any], stat_name: str) -> Tuple[Optional[int], str]:
         """从抓包数据中提取属性值和来源。来源: 'total', 'calc_bonus', ''。"""
         stats = pet.get("stats", [])
+        aliases = _STAT_NAME_ALIASES.get(stat_name, (stat_name,))
         for s in stats:
-            if s.get("name") == stat_name:
-                total = s.get("total")
-                if total is not None:
-                    return int(total), "total"
-                calc = s.get("calc") or 0
-                bonus = s.get("bonus") or 0
-                return calc + bonus, "calc_bonus"
+            if s.get("name") not in aliases:
+                continue
+            total = s.get("total")
+            if total is not None:
+                if stat_name != "HP" and total <= 0:
+                    break
+                return int(total), "total"
+            calc = s.get("calc") or 0
+            bonus = s.get("bonus") or 0
+            if stat_name != "HP" and calc + bonus <= 0:
+                break
+            return calc + bonus, "calc_bonus"
         return None, ""
 
     @staticmethod
@@ -450,7 +463,7 @@ class DamageCalculator:
 
         stat_name 使用小写 key (hp/atk/spa/def/spd/spe) 以匹配 BinData。
         """
-        base_id = pet.get("base_id")
+        base_id = pet.get("base_id") or pet.get("base_conf_id")
         if not base_id:
             return None
         species_stats = get_pet_species_stats(base_id)
