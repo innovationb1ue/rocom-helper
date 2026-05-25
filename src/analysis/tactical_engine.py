@@ -8,89 +8,21 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.analysis.damage_calc import DamageCalculator, DamageResult
+from src.analysis.damage_calc import DamageCalculator
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
 from src.analysis.skill_classifier import classify_skill_effect
+from src.analysis.models import ActionScore, OpponentAction, ResolvedOutcome, TacticalRecommendation
 from src.analysis.counter import CounterPicker
 from src.analysis.pet_identity import same_battle_pet
+from src.analysis.skill_resolver import resolve_opponent_skills, skills_from_pool
 from src.analysis.threat import ThreatAssessor
-from src.data.loader import get_skill_meta, get_skill_name, get_popular_skills, get_pet_skill_meta
+from src.data.loader import get_skill_meta
 from src.game.type_chart import TypeChart
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Data structures
-# ---------------------------------------------------------------------------
-
-@dataclass
-class OpponentAction:
-    """对手可能的行动及概率。"""
-    action_type: str          # "skill" | "switch"
-    skill_id: Optional[int] = None
-    skill_name: Optional[str] = None
-    switch_to_name: Optional[str] = None
-    probability: float = 0.0
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass
-class ResolvedOutcome:
-    """一对 (our_action, opp_action) 的推演结果。"""
-    our_damage_dealt: int = 0
-    opp_damage_dealt: int = 0
-    we_ko: bool = False
-    opp_kos_us: bool = False
-    we_act_first: bool = True
-    our_remaining_hp: int = 0
-    opp_remaining_hp: int = 0
-    type_matchup_after: float = 1.0
-    energy_after: int = 0
-    pet_count_delta: int = 0
-    incoming_energy: int = 0
-    incoming_has_buffs: bool = False
-
-
-@dataclass
-class ActionScore:
-    """单个操作的评分与理由。"""
-    action_type: str          # "skill" | "switch"
-    skill_id: Optional[int] = None
-    skill_name: Optional[str] = None
-    switch_to_name: Optional[str] = None
-    score: float = 0.0
-    reason: str = ""
-    damage_dealt: Optional[int] = None
-    damage_taken: Optional[int] = None
-    can_ko: bool = False
-    energy_cost: int = 0
-
-    def to_dict(self) -> Dict[str, Any]:
-        return asdict(self)
-
-
-@dataclass
-class TacticalRecommendation:
-    """完整推荐输出。"""
-    actions: List[ActionScore] = field(default_factory=list)
-    opp_predicted: List[OpponentAction] = field(default_factory=list)
-    round_number: int = 0
-    confidence: str = "medium"  # "high" | "medium" | "low"
-
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            "actions": [a.to_dict() for a in self.actions],
-            "opp_predicted": [o.to_dict() for o in self.opp_predicted],
-            "round_number": self.round_number,
-            "confidence": self.confidence,
-        }
 
 
 # ---------------------------------------------------------------------------
@@ -252,10 +184,7 @@ class TacticalEngine:
 
     @staticmethod
     def _skills_from_pool(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
-        pool = pet.get("base_skill_pool")
-        if not pool:
-            return []
-        return [{"skill_id": e.get("skill_id")} for e in pool if e.get("skill_id")]
+        return skills_from_pool(pet)
 
     # ------------------------------------------------------------------
     # Opponent prediction
@@ -315,22 +244,9 @@ class TacticalEngine:
 
     @staticmethod
     def _resolve_opp_skills(opp_active: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """三层回退解析对手技能（复用 BattleAdvisor 模式）。"""
-        equipped = opp_active.get("equipped_skills") or opp_active.get("skills") or []
-        if equipped:
-            return equipped
-
-        used = opp_active.get("used_skills") or []
-        if used:
-            return used
-
-        base_id = opp_active.get("base_id")
-        if base_id:
-            preset = get_popular_skills(base_id)
-            if preset and preset.get("skills"):
-                return [{"skill_id": sid} for sid in preset["skills"]]
-
-        return []
+        """Resolve opponent skill candidates without owning the fallback policy."""
+        skills, _source = resolve_opponent_skills(opp_active)
+        return skills
 
     def _compute_skill_probabilities(
         self, opp_skills: List[Dict[str, Any]], opp_energy: int,

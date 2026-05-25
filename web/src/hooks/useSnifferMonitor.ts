@@ -1,6 +1,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useSnifferStore } from '../stores/snifferStore';
 import type { SnifferStatus, SlimRecord } from '../stores/snifferStore';
+import { backendWsUrl } from '../config';
 import api from '../utils/api';
 
 export function useSnifferMonitor() {
@@ -8,8 +9,7 @@ export function useSnifferMonitor() {
   const { updateStatus, addRecord, setWsConnected, setDecryptFail, setParseFail, reset } = useSnifferStore();
 
   const connectWs = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const url = `${protocol}//${window.location.hostname}:8000/api/sniffer/ws/monitor`;
+    const url = backendWsUrl('/api/sniffer/ws/monitor');
     console.log('[sniffer] connecting WebSocket:', url);
     const ws = new WebSocket(url);
     wsRef.current = ws;

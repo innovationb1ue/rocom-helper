@@ -447,6 +447,30 @@ def _fmt_notify_perform(entry: Dict[str, Any], _state: Dict[str, Any]) -> Format
     )
 
 
+def _fmt_change_model(entry: Dict[str, Any], state: Dict[str, Any]) -> FormattedEvent:
+    actor_side = entry.get("actor_side") or entry.get("pet_id")
+    actor = side_label(actor_side)
+    original = entry.get("original_pet_name")
+    model = entry.get("model_pet_name")
+    if original is None and actor_side is not None:
+        original = _resolve_pet_name(actor_side, _is_mine(actor_side), state)
+
+    if original and model and original != model:
+        summary = f"模型变化: {actor} {original} -> {model}"
+    elif model:
+        summary = f"模型变化: {actor} -> {model}"
+    else:
+        summary = f"模型变化: {actor}"
+    return FormattedEvent(
+        kind="change_model",
+        round=0,
+        summary=summary,
+        detail=entry,
+        icon="skin",
+        color="purple",
+    )
+
+
 _SUPPRESSED_KINDS = {"data_update"}
 
 _ENTRY_FORMATTERS: Dict[str, Any] = {
@@ -473,6 +497,7 @@ _ENTRY_FORMATTERS: Dict[str, Any] = {
     "sp_energy_trigger": _fmt_sp_energy_trigger,
     "idle": _fmt_idle,
     "notify_perform": _fmt_notify_perform,
+    "change_model": _fmt_change_model,
 }
 
 

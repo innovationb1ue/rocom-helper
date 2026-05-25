@@ -390,3 +390,25 @@ class TestBattleSession8Regression:
 
         assert defeated["current_hp"] == 0
         assert kakabird["current_hp"] == 335
+
+    def test_session8_change_model_entries_are_recognized(self, session8_packets):
+        change_model_entries = []
+        unknown_type_24_entries = []
+
+        for item in session8_packets:
+            _, payload = summarize(item["record"])
+            if not isinstance(payload, dict):
+                continue
+            detail = payload.get("detail", payload)
+            if not isinstance(detail, dict):
+                continue
+            for entry in detail.get("entries", []):
+                if entry.get("type") == 24:
+                    change_model_entries.append(entry)
+                if entry.get("kind") == "unknown_type_24":
+                    unknown_type_24_entries.append(entry)
+
+        assert len(change_model_entries) == 3
+        assert not unknown_type_24_entries
+        assert {entry["kind"] for entry in change_model_entries} == {"change_model"}
+        assert all(entry.get("model_pet_name") for entry in change_model_entries)

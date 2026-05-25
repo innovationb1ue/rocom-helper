@@ -3,7 +3,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from src.analysis.battle_processor import ProcessResult, compute_battle_summary
+from src.analysis.battle_summary import compute_battle_summary
+from src.analysis.constants import OPCODE_BATTLE_FINISH
+from src.analysis.models import ProcessResult
 
 
 def build_battle_messages(
@@ -49,7 +51,7 @@ def build_battle_messages(
     if result.tactical:
         messages.append({"type": "tactical_recommendations", **result.tactical})
 
-    if opcode == 0x132C:
+    if opcode == OPCODE_BATTLE_FINISH:
         messages.append(
             {"type": "battle_summary", "summary": compute_battle_summary(result.state)}
         )

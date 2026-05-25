@@ -18,7 +18,9 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from src.analysis.battle_processor import BattleProcessor, ProcessResult, compute_battle_summary
+from src.analysis.battle_processor import BattleProcessor
+from src.analysis.battle_summary import compute_battle_summary
+from src.analysis.models import ProcessResult
 from src.analysis.constants import OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START
 from src.analysis.replay_messages import build_battle_messages
 from src.protocol.opcodes import summarize
@@ -97,7 +99,11 @@ class BattleReplayRunner:
         packets: List[Dict[str, Any]],
         stop_round: Optional[int] = None,
     ) -> ReplayResult:
-        processor = BattleProcessor()
+        processor = BattleProcessor(
+            include_analysis=self._include_analysis,
+            include_hooks=self._include_hooks,
+            include_formatting=self._include_formatting,
+        )
         event_snapshots: List[ReplayEventSnapshot] = []
         round_map: Dict[int, RoundSnapshot] = {}
         message_sequence: List[Dict[str, Any]] = []

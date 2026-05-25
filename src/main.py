@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import uvicorn
 
+from src.config import settings
+
 
 def main():
     uvicorn.run(
         "src.api.app:app",
-        host="0.0.0.0",
-        port=8000,
+        host=settings.api_host,
+        port=settings.api_port,
         reload=True,
     )
 

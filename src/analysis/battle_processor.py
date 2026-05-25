@@ -11,37 +11,29 @@ BattleManager 和 BattleReplayRunner 都委托给此类，消除重复编排逻�
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from src.analysis.battle_advisor import BattleAdvisor, build_state_suggestions
+from src.analysis.battle_advisor import BattleAdvisor
+from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.constants import (
     DAMAGE_OPCODES,
     OPCODE_ACTION_RESOLVE,
     OPCODE_BATTLE_ENTER,
     OPCODE_BATTLE_FINISH,
-    OPCODE_LABELS,
     OPCODE_ROUND_START,
     OPCODE_SPECIAL_REFRESH,
 )
-from src.analysis.event_formatter import format_battle_event, FormattedEvent
+from src.analysis.event_formatter import format_battle_event
 from src.analysis.hook_registry import HookContext, HookRegistry, HookTrigger
 from src.analysis.hooks import create_default_hooks
+from src.analysis.models import ProcessResult
+from src.analysis.suggestions import build_state_suggestions
 from src.analysis.tactical_engine import TacticalEngine
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class ProcessResult:
-    """process_event 的返回值 — 单个事件的所有计算输出。"""
-    state: Dict[str, Any]
-    formatted_events: List[FormattedEvent] = field(default_factory=list)
-    battle_advice: Optional[Dict[str, Any]] = None
-    hook_advice: List[Dict[str, Any]] = field(default_factory=list)
-    suggestions: List[Dict[str, str]] = field(default_factory=list)
-    tactical: Optional[Dict[str, Any]] = None
 
 
 # ---------------------------------------------------------------------------
@@ -61,11 +53,24 @@ class BattleProcessor:
 
     _DAMAGE_OPCODES = DAMAGE_OPCODES
 
-    def __init__(self) -> None:
-        self.tracker = BattleStateTracker()
-        self._advisor: Optional[BattleAdvisor] = None
-        self._hook_registry: Optional[HookRegistry] = None
-        self._tactical_engine: Optional[TacticalEngine] = None
+    def __init__(
+        self,
+        *,
+        tracker: Optional[BattleStateTracker] = None,
+        advisor: Optional[BattleAdvisor] = None,
+        hook_registry: Optional[HookRegistry] = None,
+        tactical_engine: Optional[TacticalEngine] = None,
+        include_analysis: bool = True,
+        include_hooks: bool = True,
+        include_formatting: bool = True,
+    ) -> None:
+        self.tracker = tracker or BattleStateTracker()
+        self._advisor = advisor
+        self._hook_registry = hook_registry
+        self._tactical_engine = tactical_engine
+        self._include_analysis = include_analysis
+        self._include_hooks = include_hooks
+        self._include_formatting = include_formatting
 
     # ------------------------------------------------------------------
     # Core processing
@@ -78,11 +83,13 @@ class BattleProcessor:
         round_num = state.get("round", 0)
 
         # 1. 事件格式化
-        formatted = format_battle_event(opcode, detail, state, round_num)
+        formatted = []
+        if self._include_formatting:
+            formatted = format_battle_event(opcode, detail, state, round_num)
 
         # 2. 伤害预测
         battle_advice_dict: Optional[Dict[str, Any]] = None
-        if self.battle_active() and opcode in self._DAMAGE_OPCODES:
+        if self._include_analysis and self.battle_active() and opcode in self._DAMAGE_OPCODES:
             if opcode == OPCODE_ACTION_RESOLVE:
                 # 对 action_resolve 使用投影状态：buff/能量/换宠已生效但 HP 未扣减
                 from src.analysis.state_projector import project_state_after_entries
@@ -95,12 +102,12 @@ class BattleProcessor:
 
         # 2.5 战术推荐
         tactical_dict: Optional[Dict[str, Any]] = None
-        if self.battle_active() and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
+        if self._include_analysis and self.battle_active() and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
             tactical_dict = self._compute_tactical(state)
 
         # 3. Hook 分析
         hook_advice_dicts: List[Dict[str, Any]] = []
-        if self.battle_active():
+        if self._include_hooks and self.battle_active():
             hook_advice_dicts = self._run_hooks(opcode, detail, state)
 
         # 4. 建议
@@ -230,42 +237,3 @@ class BattleProcessor:
     def battle_active(self) -> bool:
         state = self.tracker.get_state()
         return state.get("battle_id") is not None and state.get("result") is None
-
-
-# ---------------------------------------------------------------------------
-# Battle summary computation
-# ---------------------------------------------------------------------------
-
-def compute_battle_summary(state: Dict[str, Any]) -> Dict[str, Any]:
-    """根据最终战斗状态生成摘要（双方宠物存活、事件统计）。"""
-    my_pets_final = []
-    for p in state.get("my_pets", []):
-        my_pets_final.append({
-            "name": p.get("name", "?"),
-            "hp": p.get("current_hp", 0),
-            "max_hp": p.get("max_hp", 0),
-            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
-        })
-    opp_pets_final = []
-    for p in state.get("opp_pets", []):
-        opp_pets_final.append({
-            "name": p.get("name", "?"),
-            "hp": p.get("current_hp", 0),
-            "max_hp": p.get("max_hp", 0),
-            "status": "战败" if p.get("current_hp", 0) <= 0 else "存活",
-        })
-
-    raw_events = state.get("events", [])
-    event_stats: Dict[str, int] = {}
-    for e in raw_events:
-        opc = e.get("opcode", 0)
-        key = OPCODE_LABELS.get(opc, hex(opc))
-        event_stats[key] = event_stats.get(key, 0) + 1
-
-    return {
-        "result": state.get("result"),
-        "rounds": state.get("round"),
-        "my_pets_final": my_pets_final,
-        "opp_pets_final": opp_pets_final,
-        "event_stats": event_stats,
-    }

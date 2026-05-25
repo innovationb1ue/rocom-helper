@@ -18,11 +18,12 @@ from src.capture.frame import Be21Packet
 from src.capture.reassembly import FlowState
 from src.capture.key_capture import extract_key_from_ack, is_ack_packet
 from src.capture.crypto import decrypt_4013_body, write_key_file, printable_ascii
+from src.config import settings
 from src.protocol.proto_core import parse_record, parse_tgcp_control_packet, extract_inner_message
 from src.protocol.opcodes import summarize
 
-_DEFAULT_PORT = 8195
-_DEFAULT_BPF = "tcp port 8195"
+_DEFAULT_PORT = settings.capture_port
+_DEFAULT_BPF = f"tcp port {_DEFAULT_PORT}"
 
 
 def _flow_key_from_packet(packet: Any, port: int) -> Optional[Tuple[str, int, str, int]]:

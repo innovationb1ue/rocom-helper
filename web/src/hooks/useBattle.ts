@@ -1,6 +1,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { useBattleStore } from '../stores/battleStore';
 import type { FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice, TacticalRecommendation } from '../stores/battleStore';
+import { backendWsUrl } from '../config';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -17,8 +18,7 @@ export function useBattle() {
   }, [setConnected]);
 
   const connect = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.hostname}:8000/ws/battle`);
+    const ws = new WebSocket(backendWsUrl('/ws/battle'));
     wsRef.current = ws;
 
     ws.onopen = () => setConnected(true);

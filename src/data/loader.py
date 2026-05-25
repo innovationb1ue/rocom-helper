@@ -6,11 +6,13 @@ import threading
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
+from src.config import settings
+
 logger = logging.getLogger(__name__)
 
 # 项目根目录
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-DATA_DIR = PROJECT_ROOT / "data" / "game"
+PROJECT_ROOT = settings.project_root
+DATA_DIR = settings.data_dir
 
 _JSON_PATHS: Dict[str, Path] = {
     "attr_meta": DATA_DIR / "attr_map.json",
@@ -615,7 +617,7 @@ def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: in
 
 # ── 热门技能预设 ──────────────────────────────────────────────
 
-CONFIG_DIR = PROJECT_ROOT / "data" / "config"
+CONFIG_DIR = settings.config_dir
 _POPULAR_SKILLS_PATH = CONFIG_DIR / "popular_skills.json"
 _popular_skills_cache: Optional[Dict[str, Any]] = None
 

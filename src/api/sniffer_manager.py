@@ -6,17 +6,16 @@ import json
 import logging
 import threading
 from datetime import datetime
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from fastapi import WebSocket
 
+from src.config import settings
 from src.protocol.proto_core import TGCP_COMMAND_NAMES
 
 logger = logging.getLogger(__name__)
 
-_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-_PERSISTENT_KEY_FILE = _PROJECT_ROOT / "logs" / "session_key.txt"
+_PERSISTENT_KEY_FILE = settings.session_key_file
 
 
 class SnifferManager:

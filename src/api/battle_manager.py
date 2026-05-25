@@ -17,13 +17,15 @@ from typing import Any, Dict, List, Optional
 
 from fastapi import WebSocket
 
-from src.analysis.battle_processor import BattleProcessor, ProcessResult, compute_battle_summary
+from src.analysis.battle_processor import BattleProcessor
+from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.constants import (
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
     OPCODE_BATTLE_FINISH,
 )
 from src.analysis.battle_state import BattleStateTracker
+from src.analysis.models import ProcessResult
 from src.analysis.replay_messages import build_battle_messages
 
 logger = logging.getLogger(__name__)

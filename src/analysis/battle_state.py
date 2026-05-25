@@ -151,7 +151,7 @@ class BattleStateTracker:
 
     def get_suggestions(self) -> List[Dict[str, str]]:
         """基于当前状态给出实时建议。委托给 battle_advisor.build_state_suggestions。"""
-        from src.analysis.battle_advisor import build_state_suggestions
+        from src.analysis.suggestions import build_state_suggestions
         return build_state_suggestions(self.state)
 
     def _handle_battle_enter(self, detail: Dict[str, Any]) -> None:
