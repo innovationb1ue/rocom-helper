@@ -695,6 +695,14 @@ class TestSuggestions:
 # ---------------------------------------------------------------------------
 
 class TestWeatherChange:
+    def test_battle_enter_initializes_field_context_weather(self, tracker):
+        state = tracker.handle_event(0x1316, {**_enter_event(), "weather_id": 3})
+        ctx = state["field_context"]
+        assert ctx["weather_current"]["id"] == 3
+        assert ctx["weather_current"]["name"] == "小雨"
+        assert ctx["weather_history"][0]["source"] == "battle_enter"
+        assert state["weather"] == ctx["weather_current"]
+
     def test_weather_updated(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
@@ -702,9 +710,12 @@ class TestWeatherChange:
              "skill_name": "Sunny Day", "expire_round": 5},
         ]))
         assert state["weather"]["id"] == 3
-        assert state["weather"]["name"] == "草"
+        assert state["weather"]["name"] == "小雨"
         assert state["weather"]["expire_round"] == 5
         assert state["weather"]["changed_by_skill"] == "Sunny Day"
+        assert state["field_context"]["weather_current"] == state["weather"]
+        assert state["field_context"]["weather_history"][-1]["name"] == "小雨"
+        assert state["field_context"]["global_events"][-1]["kind"] == "weather_change"
 
     def test_weather_overwrite(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
@@ -717,7 +728,9 @@ class TestWeatherChange:
              "expire_round": 8},
         ]))
         assert state["weather"]["id"] == 4
+        assert state["weather"]["name"] == "大雨"
         assert state["weather"]["expire_round"] == 8
+        assert [w["id"] for w in state["field_context"]["weather_history"]] == [0, 3, 4]
 
 
 class TestSkillState:
@@ -831,6 +844,50 @@ class TestNotifyPerform:
         assert len(notifs) == 1
         assert notifs[0]["notify_type"] == 1
         assert notifs[0]["notify_data"] == [3, 5]
+        global_events = state["field_context"]["global_events"]
+        assert global_events[-1]["kind"] == "notify_perform"
+        assert global_events[-1]["tips_id"] == "weather_reject"
+
+
+class TestGlobalFieldContext:
+    def test_global_event_kinds_are_preserved(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, {
+            "opcode": 0x1324,
+            "packet_index": 7,
+            "parse_quality": "schema_postprocess",
+            "entries": [
+                {"kind": "change_model", "event_ordinal": 1, "pet_id": 100,
+                 "model_pet_name": "Model", "model_base_id": 999},
+                {"kind": "data_update", "event_ordinal": 2, "uin": 123, "pet_id": 100},
+                {"kind": "ai_action", "event_ordinal": 3, "pet_id": 200, "ai_type": 4},
+                {"kind": "supply_pet", "event_ordinal": 4, "player_id": 123,
+                 "supply_pets": [{"pet_id": 1}]},
+            ],
+        })
+        global_events = state["field_context"]["global_events"]
+        assert [event["kind"] for event in global_events[-4:]] == [
+            "change_model", "data_update", "ai_action", "supply_pet",
+        ]
+        assert all(event["packet_index"] == 7 for event in global_events[-4:])
+        assert state["my_active"]["model_name"] == "Model"
+        assert state["data_updates"][-1]["pet_id"] == 100
+        assert state["ai_actions"][-1]["ai_type"] == 4
+        assert state["supply_pet_events"][-1]["supply_pets"] == [{"pet_id": 1}]
+
+    def test_effect_link_and_trigger_history_are_preserved(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_link", "actor_side": 1, "target_side": 401,
+             "effect_id": 11, "effect_name": "Link"},
+            {"kind": "effect_trigger", "actor_side": 401, "target_side": 1,
+             "effect_id": 12, "effect_name": "Trigger"},
+        ]))
+        assert [e["kind"] for e in state["field_context"]["global_events"][-2:]] == [
+            "effect_link", "effect_trigger",
+        ]
+        assert state["opp_active"]["effect_history"][-1]["kind"] == "effect_link"
+        assert state["my_active"]["effect_history"][-1]["kind"] == "effect_trigger"
 
 
 # ── 有效速度计算测试 ──────────────────────────────────────────────

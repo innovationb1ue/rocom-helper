@@ -8,9 +8,12 @@ import pytest
 
 from src.analysis.replay_runner import BattleReplayRunner
 from src.analysis.pet_identity import same_battle_pet
+from src.protocol.opcodes import summarize
 from tests.packet_reader import load_battle_packets
 
 SESSION2_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_2"
+SESSION4_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_4"
+SPECTATE1_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "spectate_session_1"
 
 
 # ---------------------------------------------------------------------------
@@ -275,6 +278,57 @@ class TestReplayRunnerBrowserParity:
         ]
         assert skill_actions
         assert max(action["damage_dealt"] for action in skill_actions) < 1000
+
+
+class TestReplayRunnerFieldContext:
+    def _weather_subset(self, packets):
+        subset = []
+        weather_count = 0
+        for item in packets:
+            if item["opcode"] == 0x1316 and not subset:
+                subset.append(item)
+                continue
+            if item["opcode"] != 0x1324:
+                continue
+            _, payload = summarize(item["record"])
+            detail = payload.get("detail", payload) if isinstance(payload, dict) else {}
+            entries = detail.get("entries", []) if isinstance(detail, dict) else []
+            if any(entry.get("kind") == "weather_change" for entry in entries):
+                subset.append(item)
+                weather_count += sum(1 for entry in entries if entry.get("kind") == "weather_change")
+        return subset, weather_count
+
+    @pytest.mark.parametrize("session_dir", [SESSION4_DIR, SPECTATE1_DIR])
+    def test_real_weather_changes_are_recorded_in_history(self, session_dir):
+        if not session_dir.exists():
+            pytest.skip(f"{session_dir.name} not found")
+        packets, expected_weather_changes = self._weather_subset(load_battle_packets(session_dir))
+        assert expected_weather_changes > 0
+        runner = BattleReplayRunner(
+            include_analysis=False,
+            include_hooks=False,
+            include_formatting=False,
+        )
+        result = runner.run(packets)
+        history = result.final_state.get("field_context", {}).get("weather_history", [])
+        weather_changes = [
+            event for event in result.final_state.get("field_context", {}).get("global_events", [])
+            if event.get("kind") == "weather_change"
+        ]
+        assert weather_changes
+        assert len(weather_changes) == expected_weather_changes
+        assert len(history) >= len(weather_changes)
+        assert all(item.get("name") for item in history)
+        assert result.battle_summary["weather_history"] == history
+        assert result.battle_summary["global_event_stats"]["weather_change"] == len(weather_changes)
+
+    def test_state_update_messages_include_field_context(self, session1_runner_result):
+        state_messages = [
+            msg for msg in session1_runner_result.messages
+            if msg.get("type") == "state_update"
+        ]
+        assert state_messages
+        assert "field_context" in state_messages[-1]["state"]
 
 
 # ---------------------------------------------------------------------------

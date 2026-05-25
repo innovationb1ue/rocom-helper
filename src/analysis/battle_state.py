@@ -33,6 +33,16 @@ from src.analysis.constants import (
 logger = logging.getLogger(__name__)
 
 POISON_BUFF_IDS = {20070010}
+GLOBAL_EVENT_KINDS = {
+    "weather_change",
+    "notify_perform",
+    "change_model",
+    "data_update",
+    "ai_action",
+    "supply_pet",
+    "effect_trigger",
+    "effect_link",
+}
 
 
 def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
@@ -52,12 +62,18 @@ def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
 
 class BattleStateTracker:
     def __init__(self) -> None:
+        initial_weather = {"id": None, "name": None, "expire_round": None}
         self.state: Dict[str, Any] = {
             "battle_id": None,
             "battle_mode": None,
             "round": 0,
             "max_round": 0,
-            "weather": {"id": None, "name": None, "expire_round": None},
+            "weather": initial_weather,
+            "field_context": {
+                "weather_current": initial_weather,
+                "weather_history": [],
+                "global_events": [],
+            },
             "phase": "idle",
             "my_pets": [],
             "opp_pets": [],
@@ -70,6 +86,8 @@ class BattleStateTracker:
         self._opponent_slots: set = set()
         self._player_slots: set = set()
         self._battle_side_pets: Dict[int, Dict[str, Any]] = {}
+        self._current_opcode: Optional[int] = None
+        self._current_event_detail: Dict[str, Any] = {}
 
     def handle_event(self, opcode: int, detail: Dict[str, Any]) -> Dict[str, Any]:
         """处理协议事件，更新状态，返回最新快照。
@@ -88,22 +106,28 @@ class BattleStateTracker:
         event.update(detail)
         self.state["events"].append(event)
 
-        if opcode == OPCODE_BATTLE_ENTER:
-            self._handle_battle_enter(detail)
-        elif opcode == OPCODE_ROUND_START:
-            self._handle_round_start(detail)
-        elif opcode == OPCODE_ACTION_RESOLVE:
-            self._handle_action_resolve(detail)
-        elif opcode == OPCODE_BATTLE_FINISH:
-            self._handle_battle_finish(detail)
-        elif opcode == OPCODE_SKILL_SELECT:
-            self._handle_skill_select(detail)
-        elif opcode == OPCODE_SPECIAL_REFRESH:
-            self._handle_special_refresh(detail)
-        elif opcode == OPCODE_SKILL_DECLARE:
-            self._handle_skill_declare(detail)
-        elif opcode == OPCODE_ROUND_FLOW:
-            self._handle_round_flow(detail)
+        self._current_opcode = opcode
+        self._current_event_detail = detail
+        try:
+            if opcode == OPCODE_BATTLE_ENTER:
+                self._handle_battle_enter(detail)
+            elif opcode == OPCODE_ROUND_START:
+                self._handle_round_start(detail)
+            elif opcode == OPCODE_ACTION_RESOLVE:
+                self._handle_action_resolve(detail)
+            elif opcode == OPCODE_BATTLE_FINISH:
+                self._handle_battle_finish(detail)
+            elif opcode == OPCODE_SKILL_SELECT:
+                self._handle_skill_select(detail)
+            elif opcode == OPCODE_SPECIAL_REFRESH:
+                self._handle_special_refresh(detail)
+            elif opcode == OPCODE_SKILL_DECLARE:
+                self._handle_skill_declare(detail)
+            elif opcode == OPCODE_ROUND_FLOW:
+                self._handle_round_flow(detail)
+        finally:
+            self._current_opcode = None
+            self._current_event_detail = {}
 
         return self.get_state()
 
@@ -117,6 +141,94 @@ class BattleStateTracker:
             if active:
                 active["effective_speed"] = _compute_effective_speed(active)
         return state
+
+    def _field_context(self) -> Dict[str, Any]:
+        return self.state.setdefault("field_context", {
+            "weather_current": self.state.get("weather"),
+            "weather_history": [],
+            "global_events": [],
+        })
+
+    @staticmethod
+    def _weather_name(weather_id: Any, fallback: Any = None) -> Any:
+        if weather_id is not None:
+            try:
+                from src.data.loader import get_weather
+                weather = get_weather(int(weather_id))
+            except (TypeError, ValueError):
+                weather = None
+            if isinstance(weather, dict) and weather.get("name"):
+                return weather["name"]
+        return fallback
+
+    def _set_weather_current(self, weather: Dict[str, Any]) -> None:
+        self.state["weather"] = weather
+        self._field_context()["weather_current"] = weather
+
+    def _global_event_base(self, kind: str, entry: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        entry = entry or {}
+        detail = self._current_event_detail or {}
+        out = {
+            "round": self.state.get("round", 0),
+            "opcode": self._current_opcode if self._current_opcode is not None else detail.get("opcode"),
+            "packet_index": detail.get("packet_index", entry.get("packet_index")),
+            "event_ordinal": entry.get("event_ordinal"),
+            "kind": kind,
+            "parse_quality": detail.get("parse_quality") or entry.get("parse_quality"),
+            "source": detail.get("schema_message") or detail.get("semantic_level") or entry.get("source"),
+        }
+        return {k: v for k, v in out.items() if v is not None}
+
+    def _record_global_event(
+        self,
+        kind: str,
+        entry: Dict[str, Any],
+        *,
+        payload: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        record = self._global_event_base(kind, entry)
+        record.update(payload if payload is not None else self._global_event_payload(kind, entry))
+        self._field_context().setdefault("global_events", []).append(record)
+        return record
+
+    @staticmethod
+    def _pick(entry: Dict[str, Any], keys: List[str]) -> Dict[str, Any]:
+        return {key: entry.get(key) for key in keys if entry.get(key) is not None}
+
+    def _global_event_payload(self, kind: str, entry: Dict[str, Any]) -> Dict[str, Any]:
+        common = ["type", "index", "phase_arg", "state_arg", "extra_arg"]
+        by_kind = {
+            "weather_change": common + [
+                "skill_id", "skill_name", "weather_id", "weather_name", "expire_round",
+            ],
+            "notify_perform": common + [
+                "notify_type", "notify_data", "tips_id", "params", "uin",
+            ],
+            "change_model": common + [
+                "pet_id", "old_base_id", "role_magic_flag", "model_pet_id",
+                "model_base_id", "model_pet_name", "model_battle_stats",
+                "model_current_hp", "model_max_hp", "original_pet_id",
+                "original_pet_name", "original_pet_types", "original_pet_level",
+                "original_base_conf_id",
+            ],
+            "data_update": common + ["uin", "pet_id"],
+            "ai_action": common + ["pet_id", "uin", "ai_type", "param"],
+            "supply_pet": common + ["player_id", "supply_pets"],
+            "effect_trigger": common + [
+                "actor_side", "actor_side_name", "target_side", "target_side_name",
+                "effect_id", "effect_name",
+            ],
+            "effect_link": common + [
+                "actor_side", "actor_side_name", "target_side", "target_side_name",
+                "effect_id", "effect_name",
+            ],
+        }
+        payload = self._pick(entry, by_kind.get(kind, common))
+        if kind == "weather_change":
+            payload["weather_name"] = self._weather_name(
+                payload.get("weather_id"), payload.get("weather_name")
+            )
+        return payload
 
     def pet_name_by_slot(self, slot: Any, is_mine: bool) -> Optional[str]:
         side_num = self._side_int(slot)
@@ -169,15 +281,20 @@ class BattleStateTracker:
 
         # Weather
         weather_id = detail.get("weather_id")
-        weather_name = None
-        if weather_id is not None:
-            from src.data.loader import get_attr_name
-            weather_name = get_attr_name(weather_id)
-        self.state["weather"] = {
+        weather_name = self._weather_name(weather_id)
+        weather = {
             "id": weather_id,
             "name": weather_name,
             "expire_round": detail.get("weather_expire_round"),
+            "changed_at_round": self.state["round"],
+            "source": "battle_enter",
         }
+        self.state["field_context"] = {
+            "weather_current": weather,
+            "weather_history": [copy.deepcopy(weather)] if weather_id is not None else [],
+            "global_events": [],
+        }
+        self._set_weather_current(weather)
 
         wrappers = detail.get("wrappers", [])
         my_pets = []
@@ -306,6 +423,8 @@ class BattleStateTracker:
         "change_pet": "_handle_change_pet_entry",
         "effect_apply": "_handle_effect_apply_entry",
         "effect_stage": "_handle_effect_stage_entry",
+        "effect_link": "_handle_effect_link_entry",
+        "effect_trigger": "_handle_effect_trigger_entry",
         "weather_change": "_handle_weather_change_entry",
         "skill_state": "_handle_skill_state_entry",
         "role_skill_cast": "_handle_role_skill_cast_entry",
@@ -315,10 +434,16 @@ class BattleStateTracker:
         "sp_energy_trigger": "_handle_sp_energy_trigger_entry",
         "idle": "_handle_idle_entry",
         "notify_perform": "_handle_notify_perform_entry",
+        "change_model": "_handle_change_model_entry",
+        "data_update": "_handle_data_update_entry",
+        "ai_action": "_handle_ai_action_entry",
+        "supply_pet": "_handle_supply_pet_entry",
     }
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         for entry in detail.get("entries", []):
+            if entry.get("kind") in GLOBAL_EVENT_KINDS:
+                self._record_global_event(entry["kind"], entry)
             handler_name = self._ENTRY_HANDLERS.get(entry.get("kind"))
             if handler_name:
                 getattr(self, handler_name)(entry)
@@ -593,19 +718,48 @@ class BattleStateTracker:
             if existing and new_stage is not None:
                 existing["stage"] = new_stage
 
+    def _append_pet_effect_history(self, entry: Dict[str, Any], event_kind: str) -> None:
+        side = entry.get("target_side") or entry.get("actor_side")
+        active = self._get_active_for_side(side) if side is not None else None
+        target = active if active is not None else self.state
+        target.setdefault("effect_history", []).append({
+            "kind": event_kind,
+            "effect_id": entry.get("effect_id"),
+            "effect_name": entry.get("effect_name"),
+            "effect_base": entry.get("effect_base"),
+            "actor_side": entry.get("actor_side"),
+            "target_side": entry.get("target_side"),
+            "round": self.state["round"],
+            "event_ordinal": entry.get("event_ordinal"),
+        })
+
+    def _handle_effect_link_entry(self, entry: Dict[str, Any]) -> None:
+        self._append_pet_effect_history(entry, "effect_link")
+
+    def _handle_effect_trigger_entry(self, entry: Dict[str, Any]) -> None:
+        self._append_pet_effect_history(entry, "effect_trigger")
+
     def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
         weather_id = entry.get("weather_id")
-        weather_name = entry.get("weather_name")
-        if weather_id is not None and weather_name is None:
-            from src.data.loader import get_attr_name
-            weather_name = get_attr_name(weather_id)
-        self.state["weather"] = {
+        weather_name = self._weather_name(weather_id, entry.get("weather_name"))
+        weather = {
             "id": weather_id,
             "name": weather_name,
             "expire_round": entry.get("expire_round"),
             "changed_by_skill": entry.get("skill_name") or entry.get("skill_id"),
             "changed_at_round": self.state["round"],
+            "skill_id": entry.get("skill_id"),
+            "skill_name": entry.get("skill_name"),
+            "packet_index": (self._current_event_detail or {}).get("packet_index"),
+            "event_ordinal": entry.get("event_ordinal"),
+            "opcode": self._current_opcode,
+            "parse_quality": (self._current_event_detail or {}).get("parse_quality"),
+            "source": (self._current_event_detail or {}).get("schema_message")
+                or (self._current_event_detail or {}).get("semantic_level"),
         }
+        weather = {k: v for k, v in weather.items() if v is not None}
+        self._set_weather_current(weather)
+        self._field_context().setdefault("weather_history", []).append(copy.deepcopy(weather))
 
     def _handle_skill_state_entry(self, entry: Dict[str, Any]) -> None:
         caster_pet_id = entry.get("caster_pet_id")
@@ -695,6 +849,69 @@ class BattleStateTracker:
             "notify_type": entry.get("notify_type"),
             "notify_data": entry.get("notify_data"),
             "tips_id": entry.get("tips_id"),
+            "params": entry.get("params"),
+            "uin": entry.get("uin"),
+            "round": self.state["round"],
+        })
+
+    def _handle_change_model_entry(self, entry: Dict[str, Any]) -> None:
+        pet_id = entry.get("pet_id") or entry.get("original_pet_id")
+        model = {
+            "kind": "change_model",
+            "pet_id": pet_id,
+            "old_base_id": entry.get("old_base_id") or entry.get("original_base_conf_id"),
+            "model_pet_id": entry.get("model_pet_id"),
+            "model_base_id": entry.get("model_base_id"),
+            "model_pet_name": entry.get("model_pet_name"),
+            "model_battle_stats": entry.get("model_battle_stats"),
+            "model_current_hp": entry.get("model_current_hp"),
+            "model_max_hp": entry.get("model_max_hp"),
+            "role_magic_flag": entry.get("role_magic_flag"),
+            "round": self.state["round"],
+        }
+        model = {k: v for k, v in model.items() if v is not None}
+        self.state.setdefault("model_changes", []).append(model)
+        if pet_id is None:
+            return
+        for active_key in ("my_active", "opp_active"):
+            active = self.state.get(active_key)
+            if active and active.get("pet_id") == pet_id:
+                active.setdefault("model_history", []).append(model)
+                if entry.get("model_pet_name"):
+                    active["model_name"] = entry["model_pet_name"]
+                if entry.get("model_base_id") is not None:
+                    active["model_base_id"] = entry["model_base_id"]
+                stats = entry.get("model_battle_stats") or []
+                if len(stats) >= 6 and stats[5]:
+                    active["base_speed"] = stats[5]
+                if entry.get("model_current_hp") is not None:
+                    active["current_hp"] = entry["model_current_hp"]
+                if entry.get("model_max_hp") is not None:
+                    active["max_hp"] = entry["model_max_hp"]
+                if active.get("max_hp", 0) > 0 and active.get("current_hp") is not None:
+                    active["hp_pct"] = active["current_hp"] / active["max_hp"]
+                break
+
+    def _handle_data_update_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("data_updates", []).append({
+            "uin": entry.get("uin"),
+            "pet_id": entry.get("pet_id"),
+            "round": self.state["round"],
+        })
+
+    def _handle_ai_action_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("ai_actions", []).append({
+            "pet_id": entry.get("pet_id"),
+            "uin": entry.get("uin"),
+            "ai_type": entry.get("ai_type"),
+            "param": entry.get("param"),
+            "round": self.state["round"],
+        })
+
+    def _handle_supply_pet_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("supply_pet_events", []).append({
+            "player_id": entry.get("player_id"),
+            "supply_pets": entry.get("supply_pets", []),
             "round": self.state["round"],
         })
 
