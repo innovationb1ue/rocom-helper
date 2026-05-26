@@ -58,6 +58,73 @@ def build_damage_audit(result: ReplayResult) -> Dict[str, Any]:
     }
 
 
+def build_multi_session_damage_audit(reports: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """Aggregate several damage-audit reports without losing per-session detail."""
+    all_samples: List[Dict[str, Any]] = []
+    for session, report in reports.items():
+        for sample in report.get("samples", []):
+            all_samples.append({"session": session, **sample})
+
+    matched = [s for s in all_samples if s.get("predicted_total") is not None]
+    abs_errors = [s["abs_error"] for s in matched if s.get("abs_error") is not None]
+    pct_errors = [s["pct_error"] for s in matched if s.get("pct_error") is not None]
+
+    return {
+        "sessions": list(reports.keys()),
+        "session_count": len(reports),
+        "total_direct_damage": len(all_samples),
+        "matched_predictions": len(matched),
+        "mae": round(mean(abs_errors), 2) if abs_errors else None,
+        "mape": round(mean(pct_errors), 4) if pct_errors else None,
+        "within_10pct": sum(1 for s in matched if s.get("pct_error") is not None and s["pct_error"] <= 0.10),
+        "within_25pct": sum(1 for s in matched if s.get("pct_error") is not None and s["pct_error"] <= 0.25),
+        "by_skill": _group_samples(all_samples, "skill_name"),
+        "by_session": {
+            session: {
+                "total_direct_damage": report.get("total_direct_damage", 0),
+                "matched_predictions": report.get("matched_predictions", 0),
+                "mae": report.get("mae"),
+                "mape": report.get("mape"),
+                "within_10pct": report.get("within_10pct", 0),
+                "within_25pct": report.get("within_25pct", 0),
+            }
+            for session, report in reports.items()
+        },
+        "missing_prediction_samples": [
+            s for s in all_samples
+            if s.get("predicted_total") is None
+        ][:20],
+        "catastrophic_high_confidence": [
+            s for s in matched
+            if s.get("confidence") == "high"
+            and s.get("pct_error") is not None
+            and s["pct_error"] > 0.5
+        ],
+    }
+
+
+def _group_samples(samples: List[Dict[str, Any]], key: str) -> Dict[str, Dict[str, Any]]:
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for sample in samples:
+        name = str(sample.get(key) or "?")
+        grouped.setdefault(name, []).append(sample)
+
+    out: Dict[str, Dict[str, Any]] = {}
+    for name, items in grouped.items():
+        matched = [s for s in items if s.get("predicted_total") is not None]
+        abs_errors = [s["abs_error"] for s in matched if s.get("abs_error") is not None]
+        pct_errors = [s["pct_error"] for s in matched if s.get("pct_error") is not None]
+        out[name] = {
+            "total": len(items),
+            "matched": len(matched),
+            "mae": round(mean(abs_errors), 2) if abs_errors else None,
+            "mape": round(mean(pct_errors), 4) if pct_errors else None,
+            "within_25pct": sum(1 for s in matched if s.get("pct_error") is not None and s["pct_error"] <= 0.25),
+            "sessions": sorted({str(s.get("session")) for s in items if s.get("session")}),
+        }
+    return dict(sorted(out.items(), key=lambda item: item[1]["total"], reverse=True))
+
+
 def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSample]:
     latest_advice: Optional[Dict[str, Any]] = None
     for event in result.events:

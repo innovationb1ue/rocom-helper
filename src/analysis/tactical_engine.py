@@ -75,6 +75,7 @@ class TacticalEngine:
         if not our_actions:
             return None
 
+        opp_skill_source = self._opp_skill_source(opp_active)
         opp_predicted = self._predict_opp_actions(opp_active, opp_pets, state)
         if not opp_predicted:
             return None
@@ -99,21 +100,32 @@ class TacticalEngine:
                 switch_to_name=our_action.get("switch_to_name"),
                 score=round(score, 4),
                 reason=reason,
+                category=detail.get("category", "balanced"),
+                expected_gain=detail.get("expected_gain", ""),
+                risk=detail.get("risk", ""),
+                confidence=detail.get("confidence", "medium"),
                 damage_dealt=detail.get("damage_dealt"),
                 damage_taken=detail.get("damage_taken"),
                 can_ko=detail.get("can_ko", False),
                 energy_cost=our_action.get("energy_cost", 0),
+                metrics=detail.get("metrics", {}),
+                unknowns=detail.get("unknowns", []),
             ))
 
         scored.sort(key=lambda a: a.score, reverse=True)
 
         confidence = self._assess_confidence(opp_active)
+        warnings = self._build_warnings(scored, opp_predicted, confidence, opp_skill_source)
 
         return TacticalRecommendation(
             actions=scored,
             opp_predicted=opp_predicted,
             round_number=state.get("round", 0),
             confidence=confidence,
+            primary_plan=self._primary_plan(scored),
+            warnings=warnings,
+            metrics=self._battle_metrics(my_active, opp_active, my_pets, opp_pets),
+            opponent_profile=self._opponent_profile(opp_active, opp_predicted, opp_skill_source),
         )
 
     # ------------------------------------------------------------------
@@ -201,7 +213,7 @@ class TacticalEngine:
         opp_energy = opp_active.get("energy", 10)
 
         # 解析对手技能
-        opp_skills = self._resolve_opp_skills(opp_active)
+        opp_skills, opp_source = resolve_opponent_skills(opp_active)
 
         # 技能概率
         skill_probs = self._compute_skill_probabilities(opp_skills, opp_energy, opp_active)
@@ -211,6 +223,8 @@ class TacticalEngine:
                 skill_id=skill_id,
                 skill_name=skill_name,
                 probability=prob,
+                source=opp_source,
+                reason=self._opp_action_reason(skill_id, prob, opp_active),
             ))
 
         # 换宠概率
@@ -227,6 +241,8 @@ class TacticalEngine:
                         action_type="switch",
                         switch_to_name=pet.get("name", "?"),
                         probability=per_pet,
+                        source="state",
+                        reason="低血量或对位不利时的换宠候选",
                     ))
 
         # 归一化
@@ -241,6 +257,8 @@ class TacticalEngine:
         else:
             for a in actions:
                 a.probability /= total
+
+        self._annotate_opp_threat(actions, opp_active, state)
 
         return actions
 
@@ -528,10 +546,25 @@ class TacticalEngine:
             worst_damage_taken,
             display_can_ko or can_ko,
         )
+        metrics = self._action_metrics(
+            our_action=our_action,
+            my_active=my_active,
+            opp_active=opp_active,
+            damage_dealt=display_damage_dealt or best_damage_dealt,
+            damage_taken=worst_damage_taken,
+            can_ko=display_can_ko or can_ko,
+        )
+        unknowns = self._action_unknowns(our_action, opp_active, state)
         detail = {
             "damage_dealt": display_damage_dealt if display_damage_dealt and display_damage_dealt > 0 else None,
             "damage_taken": worst_damage_taken if worst_damage_taken > 0 else None,
             "can_ko": display_can_ko or can_ko,
+            "category": self._action_category(our_action, total_score, display_can_ko or can_ko, worst_damage_taken, my_active),
+            "expected_gain": self._expected_gain(our_action, display_damage_dealt or best_damage_dealt, display_can_ko or can_ko, metrics),
+            "risk": self._risk_summary(our_action, worst_damage_taken, my_active, unknowns),
+            "confidence": self._action_confidence(unknowns, opp_active),
+            "metrics": metrics,
+            "unknowns": unknowns,
         }
         return total_score, reason, detail
 
@@ -619,7 +652,22 @@ class TacticalEngine:
         reason = our_action.get("skill_name", "辅助技能")
         if tags:
             reason += f" ({','.join(tags[:3])})"
-        return base, reason, {"damage_dealt": None, "damage_taken": None, "can_ko": False}
+        unknowns = self._action_unknowns(our_action, opp_active, {})
+        detail = {
+            "damage_dealt": None,
+            "damage_taken": None,
+            "can_ko": False,
+            "category": "conservative" if "heal" in tags or "shield" in tags else "setup",
+            "expected_gain": "强化/回复类收益，适合拉长回合",
+            "risk": "直接输出较低，若对手爆发可能亏节奏",
+            "confidence": self._action_confidence(unknowns, opp_active),
+            "metrics": {
+                "energy_after": max(0, my_active.get("energy", 10) - our_action.get("energy_cost", 0)),
+                "effect_tags": tags,
+            },
+            "unknowns": unknowns,
+        }
+        return base, reason, detail
 
     # ------------------------------------------------------------------
     # Reason generation
@@ -658,6 +706,239 @@ class TacticalEngine:
             reasons.append(f"承受 {damage_taken}")
 
         return f"{skill_name}：{'，'.join(reasons)}" if reasons else skill_name
+
+    # ------------------------------------------------------------------
+    # Decision cockpit helpers
+    # ------------------------------------------------------------------
+
+    def _action_metrics(
+        self,
+        *,
+        our_action: Dict[str, Any],
+        my_active: Dict[str, Any],
+        opp_active: Dict[str, Any],
+        damage_dealt: int,
+        damage_taken: int,
+        can_ko: bool,
+    ) -> Dict[str, Any]:
+        my_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
+        opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
+        energy_after = max(0, my_active.get("energy", 10) - our_action.get("energy_cost", 0))
+        my_hp = my_active.get("current_hp", 0)
+        opp_hp = opp_active.get("current_hp", 0)
+        return {
+            "speed_order": "先手" if my_speed >= opp_speed else "后手",
+            "my_speed": my_speed,
+            "opp_speed": opp_speed,
+            "energy_after": energy_after,
+            "kill_line": max(0, opp_hp - max(0, damage_dealt)),
+            "survival_line": max(0, my_hp - max(0, damage_taken)),
+            "damage_pct": round(damage_dealt / max(1, opp_active.get("max_hp", 1)), 3) if damage_dealt else 0,
+            "incoming_pct": round(damage_taken / max(1, my_active.get("max_hp", 1)), 3) if damage_taken else 0,
+            "can_ko": can_ko,
+            "switch_penalty": our_action["action_type"] == "switch" and damage_taken > 0,
+            "type_matchup": self._type_matchup_score(
+                our_action.get("switch_to_pet", my_active), opp_active
+            ),
+        }
+
+    @staticmethod
+    def _action_category(
+        our_action: Dict[str, Any],
+        score: float,
+        can_ko: bool,
+        damage_taken: int,
+        my_active: Dict[str, Any],
+    ) -> str:
+        if our_action["action_type"] == "switch":
+            return "switch"
+        if can_ko:
+            return "finisher"
+        if damage_taken >= my_active.get("current_hp", 0) * 0.8:
+            return "gamble"
+        if score >= 0.28:
+            return "pressure"
+        if our_action.get("energy_cost", 0) <= 1:
+            return "conservative"
+        return "balanced"
+
+    @staticmethod
+    def _expected_gain(
+        our_action: Dict[str, Any],
+        damage_dealt: int,
+        can_ko: bool,
+        metrics: Dict[str, Any],
+    ) -> str:
+        if our_action["action_type"] == "switch":
+            return f"换入后对位倍率 x{metrics.get('type_matchup', 1.0)}，剩余生存线 {metrics.get('survival_line', 0)}"
+        if can_ko:
+            return "本回合有击杀线，成功后取得宠物数优势"
+        if damage_dealt > 0:
+            return f"预计压低 {damage_dealt} HP，敌方剩余约 {metrics.get('kill_line', 0)} HP"
+        return "获得状态收益，主要价值在后续回合"
+
+    @staticmethod
+    def _risk_summary(
+        our_action: Dict[str, Any],
+        damage_taken: int,
+        my_active: Dict[str, Any],
+        unknowns: List[str],
+    ) -> str:
+        if damage_taken >= my_active.get("current_hp", 0):
+            return f"最坏情况被反杀，承受约 {damage_taken} 伤害"
+        if damage_taken > 0:
+            return f"最坏情况承受约 {damage_taken} 伤害"
+        if our_action["action_type"] == "switch":
+            return "若对手读换宠，可能被克制技能惩罚"
+        if unknowns:
+            return "主要风险来自对手技能或属性估算不完整"
+        return "短期风险较低"
+
+    @staticmethod
+    def _action_unknowns(
+        our_action: Dict[str, Any],
+        opp_active: Dict[str, Any],
+        state: Dict[str, Any],
+    ) -> List[str]:
+        unknowns: List[str] = []
+        if not (opp_active.get("equipped_skills") or opp_active.get("skills") or opp_active.get("used_skills")):
+            unknowns.append("对手技能未暴露，使用技能池估算")
+        elif not (opp_active.get("equipped_skills") or opp_active.get("skills")):
+            unknowns.append("对手只暴露了部分已使用技能")
+
+        stats = opp_active.get("stats")
+        has_stats = False
+        if isinstance(stats, list):
+            has_stats = len([s for s in stats if isinstance(s, dict) and (s.get("total") or 0) > 0]) >= 4
+        elif isinstance(stats, dict):
+            has_stats = len([v for v in stats.values() if isinstance(v, (int, float)) and v > 0]) >= 4
+        if not has_stats:
+            unknowns.append("对手攻防属性不可见，伤害使用估算")
+
+        if our_action["action_type"] == "skill" and our_action.get("is_damage_skill") and not state.get("weather"):
+            meta = our_action.get("meta") or {}
+            if "天气" in str(meta.get("desc", "")):
+                unknowns.append("技能可能受天气/场地影响，当前仅按已知场地计算")
+        return unknowns
+
+    @staticmethod
+    def _action_confidence(unknowns: List[str], opp_active: Dict[str, Any]) -> str:
+        if len(unknowns) >= 2:
+            return "low"
+        if unknowns:
+            return "medium"
+        return TacticalEngine._assess_confidence(opp_active)
+
+    @staticmethod
+    def _primary_plan(actions: List[ActionScore]) -> str:
+        if not actions:
+            return ""
+        top = actions[0]
+        name = f"换上 {top.switch_to_name}" if top.action_type == "switch" else (top.skill_name or top.reason)
+        return f"首选 {name}：{top.expected_gain or top.reason}"
+
+    @staticmethod
+    def _build_warnings(
+        actions: List[ActionScore],
+        opp_predicted: List[OpponentAction],
+        confidence: str,
+        opp_skill_source: str,
+    ) -> List[str]:
+        warnings: List[str] = []
+        if confidence == "low" or opp_skill_source in {"", "preset"}:
+            warnings.append("对手技能信息不足，推荐偏保守")
+        dangerous = [a for a in opp_predicted if a.can_ko]
+        if dangerous:
+            names = "、".join(a.skill_name or a.switch_to_name or "未知行动" for a in dangerous[:2])
+            warnings.append(f"对手存在击杀威胁：{names}")
+        if actions and actions[0].category == "gamble":
+            warnings.append("首选行动属于高风险收益线，需确认是否愿意赌对手行动")
+        return warnings
+
+    def _battle_metrics(
+        self,
+        my_active: Dict[str, Any],
+        opp_active: Dict[str, Any],
+        my_pets: List[Dict[str, Any]],
+        opp_pets: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        living_my = [p for p in my_pets if p.get("current_hp", 1) > 0]
+        living_opp = [p for p in opp_pets if p.get("current_hp", 1) > 0]
+        my_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
+        opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
+        return {
+            "speed_line": {
+                "my": my_speed,
+                "opp": opp_speed,
+                "order": "我方先手" if my_speed >= opp_speed else "对手先手",
+            },
+            "energy_window": {
+                "my": my_active.get("energy", 0),
+                "opp": opp_active.get("energy", 0),
+            },
+            "pet_count": {
+                "my_alive": len(living_my),
+                "opp_alive": len(living_opp),
+                "delta": len(living_my) - len(living_opp),
+            },
+            "type_matchup": self._type_matchup_score(my_active, opp_active),
+        }
+
+    @staticmethod
+    def _opponent_profile(
+        opp_active: Dict[str, Any],
+        opp_predicted: List[OpponentAction],
+        opp_skill_source: str,
+    ) -> Dict[str, Any]:
+        used = opp_active.get("used_skills") or []
+        switch_prob = sum(a.probability for a in opp_predicted if a.action_type == "switch")
+        skill_prob = sum(a.probability for a in opp_predicted if a.action_type == "skill")
+        return {
+            "skill_source": opp_skill_source,
+            "revealed_skills": [
+                {"skill_id": s.get("skill_id"), "skill_name": s.get("skill_name")}
+                for s in used
+            ],
+            "revealed_skill_count": len(used),
+            "estimated_switch_probability": round(switch_prob, 3),
+            "estimated_skill_probability": round(skill_prob, 3),
+            "low_hp": opp_active.get("hp_pct", 1.0) < 0.25,
+            "low_energy": opp_active.get("energy", 10) <= 1,
+        }
+
+    @staticmethod
+    def _opp_skill_source(opp_active: Dict[str, Any]) -> str:
+        _skills, source = resolve_opponent_skills(opp_active)
+        return source
+
+    @staticmethod
+    def _opp_action_reason(skill_id: int, probability: float, opp_active: Dict[str, Any]) -> str:
+        used = {
+            s.get("skill_id")
+            for s in (opp_active.get("used_skills") or [])
+        }
+        if skill_id in used:
+            return f"已使用过，按历史频率估计 {probability:.0%}"
+        return f"来自候选技能池，按威力/能量估计 {probability:.0%}"
+
+    def _annotate_opp_threat(
+        self,
+        actions: List[OpponentAction],
+        opp_active: Dict[str, Any],
+        state: Dict[str, Any],
+    ) -> None:
+        my_active = state.get("my_active")
+        if not my_active:
+            return
+        weather = state.get("weather")
+        my_hp = my_active.get("current_hp", 0)
+        for action in actions:
+            if action.action_type != "skill" or action.skill_id is None:
+                continue
+            meta = get_skill_meta(action.skill_id)
+            damage = self._calc_damage(opp_active, my_active, meta, weather)
+            action.threat_damage = damage if damage > 0 else None
+            action.can_ko = damage >= my_hp if damage > 0 else False
 
     # ------------------------------------------------------------------
     # Helpers

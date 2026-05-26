@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from src.analysis.replay_runner import BattleReplayRunner
-from src.analysis.damage_audit import build_damage_audit
+from src.analysis.damage_audit import build_damage_audit, build_multi_session_damage_audit
 from src.analysis.pet_identity import same_battle_pet
 from src.protocol.opcodes import summarize
 from tests.packet_reader import load_battle_packets
@@ -169,6 +169,18 @@ class TestReplayRunnerDamagePrediction:
         assert all(s["actual_total"] == s["actual_per_hit"] * s["hit_count"] for s in multi_hit)
         assert report["catastrophic_high_confidence"] == []
 
+    def test_multi_session_damage_audit_groups_by_skill(self, session1_runner_result):
+        report = build_damage_audit(session1_runner_result)
+        aggregate = build_multi_session_damage_audit({
+            "battle_session_1": report,
+            "battle_session_1_copy": report,
+        })
+        assert aggregate["session_count"] == 2
+        assert aggregate["total_direct_damage"] == report["total_direct_damage"] * 2
+        assert aggregate["matched_predictions"] == report["matched_predictions"] * 2
+        assert aggregate["by_skill"]
+        assert aggregate["by_session"]["battle_session_1"]["matched_predictions"] == report["matched_predictions"]
+
 
 # ---------------------------------------------------------------------------
 # Formatting
@@ -302,6 +314,22 @@ class TestReplayRunnerBrowserParity:
         ]
         assert skill_actions
         assert max(action["damage_dealt"] for action in skill_actions) < 1000
+
+    def test_tactical_recommendations_include_reliability_and_cockpit_fields(self, session1_runner_result):
+        rs = next(round_ for round_ in session1_runner_result.rounds if round_.round_num == 8)
+        rec = rs.tactical_recommendations
+        assert rec is not None
+        assert rec.get("primary_plan")
+        assert rec.get("metrics", {}).get("speed_line")
+        assert rec.get("opponent_profile", {}).get("skill_source") in {"protocol", "used", "preset"}
+        reliability = rec.get("reliability")
+        assert reliability is not None
+        assert reliability["confidence"] in {"high", "medium", "low"}
+        assert isinstance(reliability["missing_reasons"], list)
+        action = rec["actions"][0]
+        assert action.get("expected_gain")
+        assert action.get("risk")
+        assert action.get("metrics")
 
 
 class TestReplayRunnerFieldContext:

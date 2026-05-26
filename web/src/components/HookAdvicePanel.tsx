@@ -23,7 +23,7 @@ export default function HookAdvicePanel({ advice }: Props) {
 
   return (
     <Card size="small" title="战术分析" style={{ marginBottom: 12 }}>
-      <Space direction="vertical" style={{ width: '100%' }}>
+      <Space orientation="vertical" style={{ width: '100%' }}>
         {Array.from(grouped.entries()).map(([hookId, items]) =>
           items.map((item, idx) => {
             const cfg = priorityConfig[item.priority] ?? priorityConfig[2];
@@ -32,7 +32,7 @@ export default function HookAdvicePanel({ advice }: Props) {
                 key={`${hookId}-${idx}`}
                 type={item.priority === 0 ? 'error' : item.priority === 1 ? 'warning' : 'info'}
                 showIcon
-                message={
+                title={
                   <Space>
                     <span>{item.title}</span>
                     <Tag color={cfg.color}>{cfg.label}</Tag>

@@ -28,6 +28,7 @@ from src.analysis.event_formatter import format_battle_event
 from src.analysis.hook_registry import HookContext, HookRegistry, HookTrigger
 from src.analysis.hooks import create_default_hooks
 from src.analysis.models import ProcessResult
+from src.analysis.prediction_reliability import build_prediction_reliability
 from src.analysis.suggestions import build_state_suggestions
 from src.analysis.tactical_engine import TacticalEngine
 
@@ -104,6 +105,12 @@ class BattleProcessor:
         tactical_dict: Optional[Dict[str, Any]] = None
         if self._include_analysis and self.battle_active() and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
             tactical_dict = self._compute_tactical(state)
+            if tactical_dict is not None:
+                tactical_dict["reliability"] = build_prediction_reliability(
+                    state=state,
+                    battle_advice=battle_advice_dict,
+                    tactical=tactical_dict,
+                )
 
         # 3. Hook 分析
         hook_advice_dicts: List[Dict[str, Any]] = []

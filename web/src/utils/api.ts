@@ -155,4 +155,32 @@ export const testSniffer = (refreshKey = false) =>
   api.post<SnifferTestResult>('/sniffer/test', null, { params: refreshKey ? { refresh_key: true } : {} })
     .then(r => r.data);
 
+export interface BattleReportSummary {
+  report_id: string;
+  session_id: string;
+  battle_index: number;
+  enter_ts: string;
+  finish_ts: string;
+  duration_seconds: number;
+  complete: boolean;
+  file_count: number;
+  battle_packet_count: number;
+  rounds: number | null;
+  result: string | null;
+  session_path: string;
+}
+
+export const fetchBattleReports = () =>
+  api.get<{ reports: BattleReportSummary[] }>('/battle/reports').then(r => r.data);
+
+export const fetchBattleReport = (reportId: string) =>
+  api.get<BattleReportSummary>(`/battle/reports/${encodeURIComponent(reportId)}`).then(r => r.data);
+
+export const downloadBattleReport = (reportId: string) =>
+  api.get<Blob>(`/battle/reports/${encodeURIComponent(reportId)}/download`, { responseType: 'blob' })
+    .then(r => ({
+      blob: r.data,
+      filename: r.headers['x-report-filename'] || `raco-report_${reportId.replace(/[:\\/.]/g, '_')}.raco-report`,
+    }));
+
 export default api;

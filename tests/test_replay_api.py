@@ -1,10 +1,13 @@
 """Integration test for the battle replay API endpoint."""
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 from fastapi.testclient import TestClient
 
 from src.api.app import create_app
+from src.analysis.battle_report import BattleReportError
 
 
 @pytest.fixture(scope="module")
@@ -73,3 +76,70 @@ class TestReplayTrackerState:
             assert p["name"], f"Pet with empty name: {p}"
             assert p["max_hp"] > 0, f"Pet {p['name']} has no max_hp"
             assert p["current_hp"] >= 0, f"Pet {p['name']} has negative hp"
+
+
+class TestBattleReportEndpoints:
+    def test_list_reports(self, client, monkeypatch):
+        from src.api import routes_battle
+
+        summary = SimpleNamespace(
+            report_id="session:1",
+            session_id="session",
+            battle_index=1,
+            enter_ts="10:00:00.000",
+            finish_ts="10:01:00.000",
+            duration_seconds=60,
+            complete=True,
+            file_count=12,
+            battle_packet_count=8,
+            rounds=3,
+            result="WIN",
+            session_path="logs/packets/session",
+        )
+        monkeypatch.setattr(routes_battle, "scan_report_summaries", lambda: [summary])
+
+        resp = client.get("/api/battle/reports")
+
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["reports"][0]["report_id"] == "session:1"
+        assert data["reports"][0]["complete"] is True
+
+    def test_get_report_detail(self, client, monkeypatch):
+        from src.api import routes_battle
+
+        summary = SimpleNamespace(report_id="session:1", session_id="session", battle_index=1)
+        monkeypatch.setattr(routes_battle, "get_report_summary", lambda report_id: summary)
+
+        resp = client.get("/api/battle/reports/session%3A1")
+
+        assert resp.status_code == 200
+        assert resp.json()["report_id"] == "session:1"
+
+    def test_download_report(self, client, monkeypatch):
+        from src.api import routes_battle
+
+        monkeypatch.setattr(
+            routes_battle,
+            "build_report_package",
+            lambda report_id: ("raco-report_session_battle-1.raco-report", b"zip-bytes"),
+        )
+
+        resp = client.get("/api/battle/reports/session%3A1/download")
+
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/zip"
+        assert resp.headers["x-report-filename"].endswith(".raco-report")
+        assert resp.content == b"zip-bytes"
+
+    def test_invalid_report_returns_404(self, client, monkeypatch):
+        from src.api import routes_battle
+
+        def _raise(_report_id):
+            raise BattleReportError("Battle not found")
+
+        monkeypatch.setattr(routes_battle, "get_report_summary", _raise)
+
+        resp = client.get("/api/battle/reports/missing%3A1")
+
+        assert resp.status_code == 404

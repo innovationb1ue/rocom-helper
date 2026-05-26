@@ -87,7 +87,7 @@ const BattleEventLog: React.FC<Props> = ({ events = [], maxDisplay = 80 }) => {
       <Timeline
         items={filtered.map((ev) => ({
           color: KIND_COLORS[ev.kind] || ev.color || 'blue',
-          children: (
+          content: (
             <div style={{ fontSize: 13 }}>
               <Space size={4}>
                 <Tag style={{ margin: 0, fontSize: 11 }}>

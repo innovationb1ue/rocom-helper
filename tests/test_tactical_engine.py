@@ -322,12 +322,37 @@ class TestRecommendation:
         assert "opp_predicted" in d
         assert "round_number" in d
         assert "confidence" in d
+        assert "primary_plan" in d
+        assert "metrics" in d
+        assert "opponent_profile" in d
         assert isinstance(d["actions"], list)
         if d["actions"]:
             action = d["actions"][0]
             assert "score" in action
             assert "reason" in action
             assert "action_type" in action
+            assert "expected_gain" in action
+            assert "risk" in action
+            assert "metrics" in action
+            assert "unknowns" in action
+
+    def test_opponent_prediction_has_threat_metadata(self):
+        my = _make_pet("我方", hp=120, max_hp=300, pet_id=1)
+        opp = _make_pet(
+            "敌方",
+            pet_id=101,
+            used_skills=[
+                {"skill_id": 7020370, "skill_name": "技能A", "skill_damage_type": 2,
+                 "skill_element": 1, "cost_energy": 1},
+            ],
+        )
+        state = _make_state(my_active=my, opp_active=opp, opp_pets=[opp])
+        rec = TacticalEngine().recommend(state)
+        assert rec is not None
+        skill_actions = [a for a in rec.opp_predicted if a.action_type == "skill"]
+        assert skill_actions
+        assert all(a.source for a in skill_actions)
+        assert any(a.threat_damage is not None for a in skill_actions)
 
     def test_with_multiple_switch_options(self):
         my = _make_pet("我方", pet_id=1, energy=10)
