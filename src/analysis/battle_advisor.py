@@ -15,9 +15,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.analysis.damage_calc import DamageCalculator
-from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
+from src.analysis.damage_prediction import DamagePredictionService
 from src.analysis.models import BattleAdvice, SkillAnalysis
 from src.analysis.pet_identity import same_battle_pet
 from src.analysis.skill_resolver import resolve_equipped_or_pool, resolve_opponent_skills, skills_from_pool
@@ -31,8 +30,8 @@ from src.analysis.counter import CounterPicker
 class BattleAdvisor:
     def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
         self.chart = type_chart or TypeChart()
-        self._damage_calc = DamageCalculator(self.chart)
-        register_innate_hooks(self._damage_calc)
+        self._prediction_service = DamagePredictionService(self.chart)
+        self._damage_calc = self._prediction_service._damage_calc
 
     def analyze(self, state: Dict[str, Any]) -> BattleAdvice:
         my_active = state.get("my_active")
@@ -87,8 +86,9 @@ class BattleAdvisor:
             sa = self._skill_from_equipped(eq, meta)
             damage_type = sa.skill_damage_type
             if meta and damage_type in (2, 3):
-                dr = self._damage_calc.calculate(attacker, defender, meta, weather=weather)
-                if dr is not None:
+                pred = self._prediction_service.predict(attacker, defender, meta, weather=weather)
+                if pred is not None:
+                    dr = pred["result"]
                     sa.power = dr.power
                     sa.effective_power = dr.effective_power
                     sa.expected_damage = dr.expected_damage
@@ -106,6 +106,9 @@ class BattleAdvisor:
                     sa.weather_mult = dr.weather_mult
                     sa.damage_breakdown = dr.damage_breakdown
                     sa.warnings = dr.warnings
+                    sa.prediction = pred["prediction"]
+                    sa.explain = pred["explain"]
+                    sa.validation_hint = pred["validation_hint"]
             # 技能综合质量评分
             eval_dict = self._eval_skill_dict(eq, meta)
             sa._quality_score = round(score_skill(eval_dict, self.chart), 1)

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from src.analysis.replay_runner import BattleReplayRunner
+from src.analysis.damage_audit import build_damage_audit
 from src.analysis.pet_identity import same_battle_pet
 from src.protocol.opcodes import summarize
 from tests.packet_reader import load_battle_packets
@@ -144,6 +145,29 @@ class TestReplayRunnerDamagePrediction:
                 assert pred["expected_damage"] is not None
                 assert pred["expected_damage"] >= 0
         assert found_attack
+
+    def test_predictions_have_closed_loop_fields(self, session1_runner_result):
+        for rs in session1_runner_result.rounds:
+            for pred in rs.damage_predictions:
+                if pred.get("expected_damage") is None:
+                    continue
+                assert "prediction" in pred
+                assert "explain" in pred
+                assert "validation_hint" in pred
+                assert pred["prediction"]["total"] >= pred["prediction"]["per_hit"]
+                assert isinstance(pred["prediction"]["accuracy_flags"], list)
+                return
+        pytest.fail("No damage prediction with closed-loop fields found")
+
+    def test_damage_audit_extracts_direct_damage_samples(self, session1_runner_result):
+        report = build_damage_audit(session1_runner_result)
+        assert report["total_direct_damage"] >= 10
+        assert report["matched_predictions"] > 0
+        assert report["samples"]
+        multi_hit = [s for s in report["samples"] if s["hit_count"] > 1]
+        assert multi_hit
+        assert all(s["actual_total"] == s["actual_per_hit"] * s["hit_count"] for s in multi_hit)
+        assert report["catastrophic_high_confidence"] == []
 
 
 # ---------------------------------------------------------------------------
