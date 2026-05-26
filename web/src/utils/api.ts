@@ -168,6 +168,8 @@ export interface BattleReportSummary {
   rounds: number | null;
   result: string | null;
   session_path: string;
+  archived: boolean;
+  archive_path: string | null;
 }
 
 export const fetchBattleReports = () =>

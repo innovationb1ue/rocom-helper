@@ -16,8 +16,8 @@ from src.analysis.battle_state import BattleStateTracker
 from src.analysis.constants import OPCODE_ROUND_START
 from src.analysis.battle_report import (
     BattleReportError,
-    build_report_package,
     get_report_summary,
+    get_report_package,
     scan_report_summaries,
 )
 from src.api.battle_manager import get_battle_manager
@@ -110,7 +110,7 @@ async def get_battle_report(report_id: str):
 @router.get("/api/battle/reports/{report_id}/download")
 async def download_battle_report(report_id: str):
     try:
-        filename, payload = build_report_package(urllib.parse.unquote(report_id))
+        filename, payload = get_report_package(urllib.parse.unquote(report_id))
     except BattleReportError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return Response(

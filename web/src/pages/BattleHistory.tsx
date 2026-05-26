@@ -102,9 +102,12 @@ const BattleHistory: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'complete',
-      width: 96,
-      render: (complete: boolean) => (
-        complete ? <Tag color="success">完整</Tag> : <Tag color="warning">未完成</Tag>
+      width: 150,
+      render: (complete: boolean, record) => (
+        <Space size={4} wrap>
+          {complete ? <Tag color="success">完整</Tag> : <Tag color="warning">未完成</Tag>}
+          {record.archived ? <Tag color="geekblue">已归档</Tag> : <Tag color="default">可生成</Tag>}
+        </Space>
       ),
       filters: [
         { text: '完整', value: true },

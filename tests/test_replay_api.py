@@ -121,7 +121,7 @@ class TestBattleReportEndpoints:
 
         monkeypatch.setattr(
             routes_battle,
-            "build_report_package",
+            "get_report_package",
             lambda report_id: ("raco-report_session_battle-1.raco-report", b"zip-bytes"),
         )
 

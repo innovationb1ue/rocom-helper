@@ -19,6 +19,7 @@ from fastapi import WebSocket
 
 from src.analysis.battle_processor import BattleProcessor
 from src.analysis.battle_summary import compute_battle_summary
+from src.analysis.battle_report import archive_latest_completed_battle
 from src.analysis.constants import (
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
@@ -113,7 +114,24 @@ class BattleManager:
             for message in build_battle_messages(opcode, result):
                 await self._push_message(message)
 
+            if opcode == OPCODE_BATTLE_FINISH:
+                asyncio.create_task(self._archive_completed_battle())
+
             return result
+
+    async def _archive_completed_battle(self) -> None:
+        from src.api.sniffer_manager import get_sniffer_manager
+
+        session_dir = get_sniffer_manager().get_packet_session_dir()
+        if session_dir is None:
+            return
+        try:
+            archive_path = await asyncio.to_thread(archive_latest_completed_battle, session_dir)
+        except Exception:
+            logger.exception("自动归档战斗报告失败")
+            return
+        if archive_path is not None:
+            logger.info("战斗报告已自动归档: %s", archive_path)
 
     # ------------------------------------------------------------------
     # WebSocket push helpers

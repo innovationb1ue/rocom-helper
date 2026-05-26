@@ -9,9 +9,13 @@ from pathlib import Path
 import pytest
 
 from src.analysis.battle_report import (
+    archive_latest_completed_battle,
+    archive_report_package,
     build_report_analysis,
     build_report_package,
+    find_archived_report,
     get_report_summary,
+    get_report_package,
     load_battle_packets_for_window,
     parse_opcode_hex,
     read_metadata,
@@ -89,6 +93,38 @@ def test_build_report_package_contains_manifest_analysis_and_packets(packet_root
     assert analysis["total_packets"] == manifest["battle_packet_count"]
     assert analysis["final_state"]["round"] == 17
     json.dumps(analysis, ensure_ascii=False)
+
+
+def test_archive_report_package_writes_cached_report(packet_root: Path, tmp_path: Path):
+    archive_root = tmp_path / "archives"
+    rid = report_id("2026-05-07_21-17-31_monitor", 1)
+
+    archive_path = archive_report_package(rid, packet_root, archive_root)
+
+    assert archive_path.is_file()
+    assert find_archived_report(rid, archive_root) == archive_path
+    filename, payload = get_report_package(rid, packet_root, archive_root)
+    assert filename == archive_path.name
+    assert payload == archive_path.read_bytes()
+
+
+def test_archive_latest_completed_battle(packet_root: Path, tmp_path: Path):
+    session_dir = packet_root / "2026-05-07_21-17-31_monitor"
+
+    archive_path = archive_latest_completed_battle(session_dir, packet_root, tmp_path / "archives")
+
+    assert archive_path is not None
+    assert archive_path.is_file()
+
+
+def test_scan_report_summaries_marks_archived_report(packet_root: Path, tmp_path: Path):
+    archive_root = tmp_path / "archives"
+    archive_report_package("2026-05-07_21-17-31_monitor:1", packet_root, archive_root)
+
+    report = scan_report_summaries(packet_root, archive_root)[0]
+
+    assert report.archived is True
+    assert report.archive_path is not None
 
 
 def test_report_analysis_matches_direct_replay(packet_root: Path):
