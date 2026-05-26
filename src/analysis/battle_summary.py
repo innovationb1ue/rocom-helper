@@ -30,10 +30,22 @@ def compute_battle_summary(state: Dict[str, Any]) -> Dict[str, Any]:
         key = OPCODE_LABELS.get(opcode, hex(opcode))
         event_stats[key] = event_stats.get(key, 0) + 1
 
+    field_context = state.get("field_context") or {}
+    weather_history = field_context.get("weather_history", [])
+    global_events = field_context.get("global_events", [])
+    global_event_stats: Dict[str, int] = {}
+    for event in global_events:
+        kind = event.get("kind", "unknown")
+        global_event_stats[kind] = global_event_stats.get(kind, 0) + 1
+
     return {
         "result": state.get("result"),
         "rounds": state.get("round"),
         "my_pets_final": my_pets_final,
         "opp_pets_final": opp_pets_final,
         "event_stats": event_stats,
+        "weather_current": field_context.get("weather_current") or state.get("weather"),
+        "weather_history": weather_history,
+        "global_event_stats": global_event_stats,
+        "global_events": global_events,
     }

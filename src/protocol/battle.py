@@ -97,6 +97,16 @@ def _first_value(value: Any) -> Any:
     return items[0] if items else None
 
 
+def _weather_name(weather_id: Optional[int]) -> Optional[str]:
+    if weather_id is None:
+        return None
+    from src.data.loader import get_weather
+    meta = get_weather(weather_id)
+    if isinstance(meta, dict) and meta.get("name"):
+        return meta["name"]
+    return None
+
+
 def _schema_quality(
     detail: Dict[str, Any],
     *,
@@ -673,7 +683,7 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["skill_id"] = pick_first(collect_varints(wm, 1))
             out["skill_name"] = skill_name(out["skill_id"])
             out["weather_id"] = pick_first(collect_varints(wm, 2))
-            out["weather_name"] = SDT_TO_TYPE.get(out["weather_id"], out["weather_id"])
+            out["weather_name"] = _weather_name(out["weather_id"])
             out["expire_round"] = pick_first(collect_varints(wm, 5))
 
     elif entry_type == 23:
