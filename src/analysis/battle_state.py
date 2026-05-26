@@ -657,7 +657,8 @@ class BattleStateTracker:
             matched["buffs"] = []
             matched["combo_bonus"] = 0
             matched["poison_stacks"] = 0
-            matched["used_skills"] = []
+            # 保留该宠物已曝光技能；换下再换上时不应丢失历史追踪
+            matched.setdefault("used_skills", [])
             # 用 change_pet wrapper 中的丰富数据更新已匹配的宠物
             if matched.get("base_speed") is None:
                 bs = entry.get("new_pet_battle_stats") or []

@@ -1,8 +1,12 @@
-import { Card, Tag, Typography, Tooltip } from 'antd';
-import type { SkillAnalysis, BattlePet, PetTrait } from '../stores/battleStore';
+import { Card, Tag, Tooltip, Typography } from 'antd';
+import type { BattlePet, PetTrait, SkillAnalysis } from '../stores/battleStore';
 import { TYPE_COLORS, TYPE_NAMES, textColorFor } from '../utils/typeColors';
 
 const { Text } = Typography;
+
+function isAttackSkill(s: SkillAnalysis): boolean {
+  return s.skill_damage_type === 2 || s.skill_damage_type === 3;
+}
 
 function effectivenessColor(label: string | null | undefined): string {
   if (!label) return '#d9d9d9';
@@ -23,48 +27,55 @@ function confidenceTag(confidence: string | null | undefined) {
   return null;
 }
 
-function isAttackSkill(s: SkillAnalysis): boolean {
-  return s.skill_damage_type === 2 || s.skill_damage_type === 3;
+function totalDamage(s: SkillAnalysis): number {
+  return s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function perHitDamage(s: SkillAnalysis): number {
+  return s.prediction?.per_hit ?? s.expected_damage ?? 0;
+}
+
+function hitCount(s: SkillAnalysis): number {
+  return s.prediction?.hit_count ?? s.hit_count ?? 1;
+}
+
+function confidence(s: SkillAnalysis): string | null | undefined {
+  return s.prediction?.confidence ?? s.confidence;
 }
 
 function formatBreakdown(s: SkillAnalysis, oppHp: number): string {
-  const bd = s.damage_breakdown;
-  if (!bd) return '';
   const lines: string[] = [];
-  const basePwr = (bd.base_power as number) ?? s.power ?? 0;
-  const effPwr = (bd.effective_power as number) ?? s.effective_power ?? basePwr;
-  if (effPwr !== basePwr) {
-    lines.push(`威力: ${basePwr} → ${effPwr}`);
-  } else {
-    lines.push(`威力: ${basePwr}`);
+  const bd = s.damage_breakdown;
+  const explain = s.explain;
+  const basePwr = (bd?.base_power as number | undefined) ?? s.power ?? 0;
+  const effPwr = (bd?.effective_power as number | undefined) ?? s.effective_power ?? basePwr;
+  lines.push(effPwr !== basePwr ? `威力: ${basePwr} -> ${effPwr}` : `威力: ${basePwr}`);
+
+  const statSources = explain?.stat_sources;
+  if (statSources) {
+    lines.push(`属性来源: 攻=${statSources.attack || '-'} 防=${statSources.defense || '-'}`);
   }
-  const al = bd.ability_level as number | undefined;
-  if (al !== undefined && al !== 1.0) {
-    lines.push(`能力等级: ×${al.toFixed(2)}`);
-  }
+
+  const al = bd?.ability_level as number | undefined;
+  if (al !== undefined && al !== 1.0) lines.push(`能力等级: x${al.toFixed(2)}`);
   if (s.effectiveness != null && s.effectiveness !== 1.0) {
-    lines.push(`属性克制: ×${s.effectiveness} (${s.effectiveness_label || ''})`);
+    lines.push(`属性克制: x${s.effectiveness} (${s.effectiveness_label || ''})`);
   }
-  if (s.is_stab) {
-    lines.push('本系加成: ×1.5');
-  }
-  const wm = bd.weather_mult as number | undefined;
-  if (wm !== undefined && wm !== 1.0) {
-    lines.push(`天气: ×${wm}`);
-  }
-  const pm = bd.power_mult as number | undefined;
-  if (pm !== undefined && pm !== 1.0) {
-    lines.push(`威力修正: ×${pm}`);
-  }
-  const hc = (bd.hit_count as number) ?? s.hit_count ?? 1;
-  if (hc > 1) {
-    lines.push(`连击: ×${hc}`);
-  }
-  const totalDmg = s.total_max_damage ?? s.expected_damage ?? 0;
-  if (oppHp > 0) {
-    lines.push(`─────────`);
-    lines.push(`预期伤害: ${totalDmg} (${Math.round(totalDmg / oppHp * 100)}% HP)`);
-  }
+  if (s.is_stab) lines.push('本系加成: x1.5');
+  const wm = (bd?.weather_mult as number | undefined) ?? s.weather_mult;
+  if (wm !== undefined && wm !== 1.0) lines.push(`天气: x${wm}`);
+  const pm = (bd?.power_mult as number | undefined) ?? s.power_mult;
+  if (pm !== undefined && pm !== 1.0) lines.push(`技能修正: x${pm}`);
+
+  const cal = explain?.calibration;
+  if (cal?.applied) lines.push(`校准: x${cal.multiplier}`);
+
+  const hc = hitCount(s);
+  if (hc > 1) lines.push(`连击: ${perHitDamage(s)} x ${hc}`);
+  const total = totalDamage(s);
+  if (oppHp > 0) lines.push(`预计总伤害: ${total} (${Math.round(total / oppHp * 100)}% HP)`);
+  if (s.validation_hint) lines.push(`提示: ${s.validation_hint}`);
+  if (s.warnings?.length) lines.push(...s.warnings.map((w) => `警告: ${w}`));
   return lines.join('\n');
 }
 
@@ -92,9 +103,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
           <div style={{ marginBottom: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
             {traits.map((t) => (
               <Tooltip key={t.name} title={t.description}>
-                <Tag color="gold" style={{ fontSize: 11, margin: 0 }}>
-                  {t.name}
-                </Tag>
+                <Tag color="gold" style={{ fontSize: 11, margin: 0 }}>{t.name}</Tag>
               </Tooltip>
             ))}
           </div>
@@ -103,10 +112,10 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
           const typeColor = TYPE_COLORS[s.skill_element] || '#999';
           const typeName = TYPE_NAMES[s.skill_element] || '?';
           const attack = isAttackSkill(s);
-          const isCombo = (s.hit_count ?? 1) > 1;
-          const hitCount = s.hit_count ?? 1;
-          const totalDmg = s.total_max_damage ?? s.expected_damage ?? 0;
+          const hc = hitCount(s);
+          const total = totalDamage(s);
           const breakdownText = attack ? formatBreakdown(s, oppHp) : '';
+          const conf = confidence(s);
 
           return (
             <div
@@ -114,6 +123,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                flexWrap: 'wrap',
                 gap: 8,
                 padding: '4px 8px',
                 borderRadius: 6,
@@ -121,82 +131,48 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                 border: s.can_ko ? '1px solid #b7eb8f' : '1px solid transparent',
               }}
             >
-              {/* 属性标签 */}
-              <Tag style={{
-                margin: 0,
-                minWidth: 48,
-                textAlign: 'center',
-                background: typeColor,
-                color: textColorFor(typeColor),
-                border: 'none',
-                fontWeight: 600,
-                fontSize: 11,
-              }}>
+              <Tag style={{ margin: 0, minWidth: 48, textAlign: 'center', background: typeColor, color: textColorFor(typeColor), border: 'none', fontWeight: 600, fontSize: 11 }}>
                 {typeName}
               </Tag>
-
-              {/* 技能名 */}
               <Text strong style={{ minWidth: 80, fontSize: 13 }}>{s.skill_name}</Text>
-
-              {/* 攻/辅 标签 */}
               <Tag color={attack ? 'red' : 'blue'} style={{ fontSize: 11, margin: 0 }}>
-                {attack ? '攻' : '辅'}
+                {attack ? '攻击' : '辅助'}
               </Tag>
-
-              {/* 能耗 */}
               <Text type="secondary" style={{ fontSize: 11, minWidth: 36 }}>
                 {s.energy_cost > 0 ? `${s.energy_cost}EP` : '免费'}
               </Text>
 
-              {/* 攻击技能：威力 + 预期伤害 */}
               {attack && s.expected_damage != null && (
                 <>
-                  {/* 预期威力 */}
                   {s.effective_power != null && (
                     <Tag style={{ fontSize: 11, margin: 0, background: '#f0f0f0', border: '1px solid #d9d9d9' }}>
                       威力 {s.effective_power}
                     </Tag>
                   )}
-
-                  {/* 预期伤害 */}
                   <Tooltip title={breakdownText || undefined}>
                     <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600 }}>
-                      {isCombo ? totalDmg : s.expected_damage}
+                      {total}
                     </Text>
                   </Tooltip>
-
-                  {isCombo && (
-                    <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>×{hitCount}</Tag>
-                  )}
-
-                  {/* HP 百分比 */}
+                  {hc > 1 && <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>{perHitDamage(s)} x {hc}</Tag>}
                   {oppHp > 0 && (
                     <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>
-                      ({Math.round(totalDmg / oppHp * 100)}%)
+                      ({Math.round(total / oppHp * 100)}%)
                     </Text>
                   )}
-
-                  {/* 克制标签 */}
                   {s.effectiveness_label && (
                     <Tag style={{ fontSize: 11, margin: 0, borderColor: effectivenessColor(s.effectiveness_label), color: effectivenessColor(s.effectiveness_label) }}>
-                      {s.effectiveness_label}
-                      {s.effectiveness != null && s.effectiveness !== 1.0 && ` ×${s.effectiveness}`}
+                      {s.effectiveness_label}{s.effectiveness != null && s.effectiveness !== 1.0 && ` x${s.effectiveness}`}
                     </Tag>
                   )}
-
                   {s.is_stab && <Tag color="blue" style={{ fontSize: 11, margin: 0 }}>STAB</Tag>}
                   {s.can_ko && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>KO!</Tag>}
-
-                  <Tooltip title={s.warnings?.length ? s.warnings.join('\n') : undefined}>
-                    {confidenceTag(s.confidence)}
+                  <Tooltip title={s.validation_hint || s.warnings?.join('\n') || undefined}>
+                    {confidenceTag(conf)}
                   </Tooltip>
-                  {s.confidence === 'medium' && (
-                    <Text type="secondary" style={{ fontSize: 10 }}>(估算)</Text>
-                  )}
                 </>
               )}
 
-              {/* 状态技能：描述 */}
               {!attack && s.skill_desc && (
                 <Text type="secondary" style={{ fontSize: 12, flex: 1 }} ellipsis>
                   {s.skill_desc}

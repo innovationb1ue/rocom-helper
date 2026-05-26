@@ -159,7 +159,7 @@ class DamageCalculator:
         stats = self._resolve_combat_stats(attacker, defender, damage_type, power)
         if stats is None:
             return None
-        effective_atk, effective_def, ability_level, confidence, warnings = stats
+        effective_atk, effective_def, ability_level, confidence, warnings, stat_sources = stats
 
         # Phase 3: Compute base damage
         base = self._compute_base_damage(power, effective_atk, effective_def, skill_meta, attacker, defender)
@@ -173,7 +173,7 @@ class DamageCalculator:
             dmg, power, ability_level, effective_atk, effective_def,
             effectiveness, stab_mult, weather_mult, power_mult,
             skill_meta, skill_element, attacker, defender,
-            damage_type, eff_label, is_stab, confidence, warnings,
+            damage_type, eff_label, is_stab, confidence, warnings, stat_sources,
         )
 
     # ------------------------------------------------------------------
@@ -194,7 +194,7 @@ class DamageCalculator:
 
     def _resolve_combat_stats(
         self, attacker: Dict, defender: Dict, damage_type: int, power: int,
-    ) -> Optional[Tuple[float, float, float, str, List[str]]]:
+    ) -> Optional[Tuple[float, float, float, str, List[str], Dict[str, str]]]:
         """获取有效攻防属性、能力等级和置信度。返回 None 如果无法获取属性。"""
         confidence = "high"
         warnings: List[str] = []
@@ -246,7 +246,13 @@ class DamageCalculator:
         if ability_level != 1.0:
             warnings.append(f"能力等级 ×{ability_level:.2f}")
 
-        return effective_atk, effective_def, ability_level, confidence, warnings
+        stat_sources = {
+            "attack": atk_source,
+            "defense": def_source,
+            "attack_stat": atk_name,
+            "defense_stat": def_name,
+        }
+        return effective_atk, effective_def, ability_level, confidence, warnings, stat_sources
 
     def _compute_base_damage(
         self, power: int, eff_atk: float, eff_def: float,
@@ -311,7 +317,7 @@ class DamageCalculator:
         skill_meta: Dict, skill_element: int,
         attacker: Dict, defender: Dict,
         damage_type: int, eff_label: str, is_stab: bool,
-        confidence: str, warnings: List[str],
+        confidence: str, warnings: List[str], stat_sources: Dict[str, str],
     ) -> DamageResult:
         """阶段 4: post_calc hook、连击、HP%、能耗、构造结果。"""
         base_hits = self._get_base_hit_count(skill_meta)
@@ -354,6 +360,9 @@ class DamageCalculator:
             "weather_mult": weather_mult,
             "power_mult": power_mult,
             "hit_count": hit_count,
+            "stat_sources": stat_sources,
+            "defender_current_hp": defender_cur_hp,
+            "defender_max_hp": defender_max_hp,
         }
 
         return DamageResult(

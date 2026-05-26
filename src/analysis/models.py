@@ -44,6 +44,9 @@ class SkillAnalysis:
     weather_mult: Optional[float] = None
     damage_breakdown: Optional[Dict[str, Any]] = None
     warnings: List[str] = field(default_factory=list)
+    prediction: Optional[Dict[str, Any]] = None
+    explain: Optional[Dict[str, Any]] = None
+    validation_hint: Optional[str] = None
     _quality_score: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:

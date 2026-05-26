@@ -61,6 +61,21 @@ export interface SkillAnalysis {
   weather_mult?: number | null;
   damage_breakdown?: Record<string, unknown> | null;
   warnings?: string[];
+  prediction?: {
+    per_hit: number;
+    total: number;
+    hit_count: number;
+    confidence: string;
+    accuracy_flags: string[];
+  } | null;
+  explain?: {
+    formula?: string;
+    stat_sources?: Record<string, unknown>;
+    multipliers?: Record<string, unknown>;
+    hooks?: Record<string, unknown>;
+    calibration?: Record<string, unknown>;
+  } | null;
+  validation_hint?: string | null;
 }
 
 export interface FormattedBattleEvent {

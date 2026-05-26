@@ -346,6 +346,24 @@ class TestChangePet:
         assert state["my_active"]["name"] == "草苗"
         assert state["my_active"]["buffs"] == []
 
+    def test_switch_back_keeps_used_skills_tracking(self, tracker):
+        """换下再换上后，已追踪技能不应丢失。"""
+        tracker.handle_event(0x1316, _enter_event_multi_pet())
+        # 敌方当前为水龟（slot 401），先记录一个已使用技能
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "skill_cast", "skill_id": 7700999, "skill_name": "水流冲击", "actor_side": 401},
+        ]))
+        # 敌方换到电鼠（slot 402）
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 402, "new_pet_name": "电鼠", "new_pet_id": 201},
+        ]))
+        # 再换回水龟（slot 401）
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "change_pet", "battle_pet_id": 401, "new_pet_name": "水龟", "new_pet_id": 200},
+        ]))
+        used = state["opp_active"].get("used_skills", [])
+        assert any(s.get("skill_id") == 7700999 for s in used)
+
 
 class TestEffectApply:
     def test_new_effect_added(self, tracker):

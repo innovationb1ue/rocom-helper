@@ -1,8 +1,12 @@
-import { Card, Tag, Typography } from 'antd';
-import type { SkillAnalysis, BattlePet } from '../stores/battleStore';
+import { Card, Tag, Tooltip, Typography } from 'antd';
+import type { BattlePet, SkillAnalysis } from '../stores/battleStore';
 import { TYPE_COLORS, TYPE_NAMES, textColorFor } from '../utils/typeColors';
 
 const { Text } = Typography;
+
+function isAttackSkill(s: SkillAnalysis): boolean {
+  return s.skill_damage_type === 2 || s.skill_damage_type === 3;
+}
 
 function effectivenessColor(label: string | null | undefined): string {
   if (!label) return '#d9d9d9';
@@ -23,8 +27,20 @@ function confidenceTag(confidence: string | null | undefined) {
   return null;
 }
 
-function isAttackSkill(s: SkillAnalysis): boolean {
-  return s.skill_damage_type === 2 || s.skill_damage_type === 3;
+function totalDamage(s: SkillAnalysis): number {
+  return s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function perHitDamage(s: SkillAnalysis): number {
+  return s.prediction?.per_hit ?? s.expected_damage ?? 0;
+}
+
+function hitCount(s: SkillAnalysis): number {
+  return s.prediction?.hit_count ?? s.hit_count ?? 1;
+}
+
+function confidence(s: SkillAnalysis): string | null | undefined {
+  return s.prediction?.confidence ?? s.confidence;
 }
 
 interface OpponentSkillPanelProps {
@@ -47,11 +63,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
       title={
         <span>
           对手技能 vs {myName}
-          {sourceLabel && (
-            <Tag color={sourceColor} style={{ marginLeft: 8, fontSize: 11 }}>
-              {sourceLabel}
-            </Tag>
-          )}
+          {sourceLabel && <Tag color={sourceColor} style={{ marginLeft: 8, fontSize: 11 }}>{sourceLabel}</Tag>}
         </span>
       }
       size="small"
@@ -59,18 +71,16 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
       styles={{ body: { padding: '8px 12px' } }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <div style={{ marginBottom: 4 }}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            {oppName || '对手'} 可能使用的技能及对我方的伤害预测
-          </Text>
-        </div>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {oppName || '对手'} 可能使用的技能及对我方的伤害预测
+        </Text>
         {skills.map((s) => {
           const typeColor = TYPE_COLORS[s.skill_element] || '#999';
           const typeName = TYPE_NAMES[s.skill_element] || '?';
           const attack = isAttackSkill(s);
-          const isCombo = (s.hit_count ?? 1) > 1;
-          const hitCount = s.hit_count ?? 1;
-          const totalDmg = s.total_max_damage ?? s.expected_damage ?? 0;
+          const hc = hitCount(s);
+          const total = totalDamage(s);
+          const conf = confidence(s);
 
           return (
             <div
@@ -78,6 +88,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                flexWrap: 'wrap',
                 gap: 8,
                 padding: '4px 8px',
                 borderRadius: 6,
@@ -85,34 +96,17 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                 border: s.can_ko ? '1px solid #ffccc7' : '1px solid transparent',
               }}
             >
-              {/* 属性标签 */}
-              <Tag style={{
-                margin: 0,
-                minWidth: 48,
-                textAlign: 'center',
-                background: typeColor,
-                color: textColorFor(typeColor),
-                border: 'none',
-                fontWeight: 600,
-                fontSize: 11,
-              }}>
+              <Tag style={{ margin: 0, minWidth: 48, textAlign: 'center', background: typeColor, color: textColorFor(typeColor), border: 'none', fontWeight: 600, fontSize: 11 }}>
                 {typeName}
               </Tag>
-
-              {/* 技能名 */}
               <Text strong style={{ minWidth: 80, fontSize: 13 }}>{s.skill_name}</Text>
-
-              {/* 攻/辅 标签 */}
               <Tag color={attack ? 'red' : 'blue'} style={{ fontSize: 11, margin: 0 }}>
-                {attack ? '攻' : '辅'}
+                {attack ? '攻击' : '辅助'}
               </Tag>
-
-              {/* 能耗 */}
               <Text type="secondary" style={{ fontSize: 11, minWidth: 36 }}>
                 {s.energy_cost > 0 ? `${s.energy_cost}EP` : '免费'}
               </Text>
 
-              {/* 攻击技能：威力 + 预期伤害 */}
               {attack && s.expected_damage != null && (
                 <>
                   {s.effective_power != null && (
@@ -120,36 +114,28 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                       威力 {s.effective_power}
                     </Tag>
                   )}
-
                   <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600, color: s.can_ko ? '#ff4d4f' : undefined }}>
-                    {isCombo ? totalDmg : s.expected_damage}
+                    {total}
                   </Text>
-
-                  {isCombo && (
-                    <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>×{hitCount}</Tag>
-                  )}
-
+                  {hc > 1 && <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>{perHitDamage(s)} x {hc}</Tag>}
                   {myHp > 0 && (
                     <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>
-                      ({Math.round(totalDmg / myHp * 100)}%)
+                      ({Math.round(total / myHp * 100)}%)
                     </Text>
                   )}
-
                   {s.effectiveness_label && (
                     <Tag style={{ fontSize: 11, margin: 0, borderColor: effectivenessColor(s.effectiveness_label), color: effectivenessColor(s.effectiveness_label) }}>
-                      {s.effectiveness_label}
-                      {s.effectiveness != null && s.effectiveness !== 1.0 && ` ×${s.effectiveness}`}
+                      {s.effectiveness_label}{s.effectiveness != null && s.effectiveness !== 1.0 && ` x${s.effectiveness}`}
                     </Tag>
                   )}
-
                   {s.is_stab && <Tag color="blue" style={{ fontSize: 11, margin: 0 }}>STAB</Tag>}
                   {s.can_ko && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>危险!</Tag>}
-
-                  {confidenceTag(s.confidence)}
+                  <Tooltip title={s.validation_hint || s.warnings?.join('\n') || undefined}>
+                    {confidenceTag(conf)}
+                  </Tooltip>
                 </>
               )}
 
-              {/* 状态技能：描述 */}
               {!attack && s.skill_desc && (
                 <Text type="secondary" style={{ fontSize: 12, flex: 1 }} ellipsis>
                   {s.skill_desc}

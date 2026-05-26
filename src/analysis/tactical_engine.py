@@ -11,6 +11,7 @@ import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.analysis.damage_calc import DamageCalculator
+from src.analysis.damage_prediction import DamagePredictionService
 from src.analysis.innate_hooks import register_innate_hooks
 from src.analysis.constants import SDT_TO_TYPE
 from src.analysis.skill_classifier import classify_skill_effect
@@ -53,6 +54,7 @@ class TacticalEngine:
         self.chart = type_chart or TypeChart()
         self._damage_calc = DamageCalculator(self.chart)
         register_innate_hooks(self._damage_calc)
+        self._prediction_service = DamagePredictionService(self.chart, damage_calc=self._damage_calc)
         self._threat = ThreatAssessor(self.chart)
         self._counter = CounterPicker(self.chart)
 
@@ -671,10 +673,10 @@ class TacticalEngine:
         damage_type = skill_meta.get("damage_type", 0)
         if damage_type not in (2, 3):
             return 0
-        dr = self._damage_calc.calculate(attacker, defender, skill_meta, weather=weather)
-        if dr is None:
+        pred = self._prediction_service.predict(attacker, defender, skill_meta, weather=weather)
+        if pred is None:
             return 0
-        return dr.expected_damage
+        return pred["prediction"]["total"]
 
     def _type_matchup_score(
         self, our_pet: Dict[str, Any], opp_pet: Dict[str, Any],
