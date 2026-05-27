@@ -108,13 +108,19 @@ class BattleManager:
     # Core processing — delegates to BattleProcessor, then pushes WebSocket
     # ------------------------------------------------------------------
 
-    async def process_event(self, opcode: int, detail: Dict[str, Any]) -> ProcessResult:
+    async def process_event(
+        self,
+        opcode: int,
+        detail: Dict[str, Any],
+        *,
+        enable_archive: bool = True,
+    ) -> ProcessResult:
         async with self._process_lock:
             result = self._processor.process_event(opcode, detail)
             for message in build_battle_messages(opcode, result):
                 await self._push_message(message)
 
-            if opcode == OPCODE_BATTLE_FINISH:
+            if enable_archive and opcode == OPCODE_BATTLE_FINISH:
                 asyncio.create_task(self._archive_completed_battle())
 
             return result

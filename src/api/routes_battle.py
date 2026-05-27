@@ -185,7 +185,7 @@ async def replay_battle_packets(
                 stopped_early = True
                 break
 
-        result = await mgr.process_event(opcode, detail)
+        result = await mgr.process_event(opcode, detail, enable_archive=False)
         processed += 1
         total_formatted += len(result.formatted_events)
 

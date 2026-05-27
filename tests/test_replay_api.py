@@ -1,12 +1,14 @@
 """Integration test for the battle replay API endpoint."""
 from __future__ import annotations
 
+import asyncio
 from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
 
 from src.api.app import create_app
+from src.analysis.constants import OPCODE_BATTLE_FINISH
 from src.analysis.battle_report import BattleReportError
 
 
@@ -49,6 +51,24 @@ class TestReplayEndpoint:
         resp = client.post("/api/battle/replay?delay_ms=0&session=nonexistent_session")
         data = resp.json()
         assert data["status"] == "error"
+
+    def test_replay_does_not_trigger_auto_archive(self, client, monkeypatch):
+        from src.api.battle_manager import BattleManager
+
+        original = BattleManager.process_event
+        archive_flags = []
+
+        async def _process_event(self, opcode, detail, *, enable_archive=True):
+            archive_flags.append(enable_archive)
+            return await original(self, opcode, detail, enable_archive=enable_archive)
+
+        monkeypatch.setattr(BattleManager, "process_event", _process_event)
+
+        resp = client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
+
+        assert resp.json()["status"] == "ok"
+        assert archive_flags
+        assert set(archive_flags) == {False}
 
 
 class TestReplayTrackerState:
@@ -143,3 +163,43 @@ class TestBattleReportEndpoints:
         resp = client.get("/api/battle/reports/missing%3A1")
 
         assert resp.status_code == 404
+
+
+class TestBattleManagerArchiveToggle:
+    def test_process_event_archives_by_default(self, monkeypatch):
+        from src.api.battle_manager import BattleManager
+
+        mgr = BattleManager()
+        calls = []
+
+        async def _archive():
+            calls.append("archive")
+
+        monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
+
+        async def _run():
+            await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"})
+            await asyncio.sleep(0)
+
+        asyncio.run(_run())
+
+        assert calls == ["archive"]
+
+    def test_process_event_can_disable_archive(self, monkeypatch):
+        from src.api.battle_manager import BattleManager
+
+        mgr = BattleManager()
+        calls = []
+
+        async def _archive():
+            calls.append("archive")
+
+        monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
+
+        async def _run():
+            await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"}, enable_archive=False)
+            await asyncio.sleep(0)
+
+        asyncio.run(_run())
+
+        assert calls == []
