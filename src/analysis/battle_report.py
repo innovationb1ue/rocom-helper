@@ -1,7 +1,7 @@
 """Battle report export helpers.
 
 The report package is intended for support/debugging: it keeps the original
-RC01 packet files intact and adds replay analysis that is easy to inspect.
+RC01 packet files intact with enough metadata to identify the battle window.
 """
 from __future__ import annotations
 
@@ -31,9 +31,9 @@ from src.protocol.proto_core import extract_inner_message, parse_record
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_PACKET_ROOT = PROJECT_ROOT / "logs" / "packets"
 DEFAULT_ARCHIVE_ROOT = PROJECT_ROOT / "logs" / "battle_reports"
-REPORT_FORMAT_VERSION = 1
-DEFAULT_PAD_BEFORE = 5.0
-DEFAULT_PAD_AFTER = 2.0
+REPORT_FORMAT_VERSION = 2
+DEFAULT_PAD_BEFORE = 10.0
+DEFAULT_PAD_AFTER = 5.0
 DATA_CMD_PATTERN = "*_0x4013_*.bin"
 MAGIC_V1 = b"RC01"
 BATTLE_OPCODES = frozenset(LIFECYCLE_OPCODES | IN_BATTLE_OPCODES)
@@ -229,13 +229,10 @@ def build_report_package(
     if not selected_files:
         raise BattleReportError("No packet files found in battle window")
 
-    packets = load_battle_packets_for_window(session_dir, boundary, pad_before=pad_before, pad_after=pad_after)
-    analysis = build_report_analysis(packets, include_events=True)
     manifest = build_manifest(
         session_dir,
         boundary,
         selected_files,
-        analysis,
         pad_before=pad_before,
         pad_after=pad_after,
     )
@@ -243,13 +240,7 @@ def build_report_package(
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2, default=str))
-        zf.writestr("analysis.json", json.dumps(analysis, ensure_ascii=False, indent=2, default=str))
-        zf.writestr(
-            "README.txt",
-            "Raco Helper battle report.\n"
-            "请把整个 .raco-report 文件发送给开发者用于战斗问题分析。\n"
-            "packets/ 目录保留原始 RC01 抓包文件，analysis.json 为当前版本生成的结构化回放结果。\n",
-        )
+        zf.writestr("README.txt", _report_readme())
         session_meta = session_dir / "_session.json"
         if session_meta.exists():
             zf.write(session_meta, "packets/_session.json")
@@ -258,6 +249,15 @@ def build_report_package(
 
     filename = f"raco-report_{session_dir.name}_battle-{boundary.index}.raco-report"
     return filename, buffer.getvalue()
+
+
+def _report_readme() -> str:
+    return (
+        "Raco Helper battle report.\n"
+        "This .raco-report keeps original RC01 packet files for battle debugging.\n"
+        "Extract packets/ and replay the .bin files to reproduce the full battle.\n"
+        "manifest.json records the source session, battle boundary, export window, and file list.\n"
+    )
 
 
 def report_filename(report_id_value: str) -> str:
@@ -342,12 +342,10 @@ def build_manifest(
     session_dir: Path,
     boundary: BattleBoundary,
     selected_files: List[Path],
-    analysis: Dict[str, Any],
     *,
     pad_before: float,
     pad_after: float,
 ) -> Dict[str, Any]:
-    final_state = analysis.get("final_state", {})
     return {
         "format": "raco-battle-report",
         "format_version": REPORT_FORMAT_VERSION,
@@ -367,12 +365,7 @@ def build_manifest(
         },
         "files": [fpath.name for fpath in selected_files],
         "file_count": len(selected_files),
-        "battle_packet_count": analysis.get("total_packets", 0),
-        "analysis": {
-            "rounds": final_state.get("round"),
-            "result": final_state.get("result"),
-            "stopped_early": analysis.get("stopped_early", False),
-        },
+        "battle_packet_count": count_battle_packet_files(selected_files),
     }
 
 

@@ -11,18 +11,18 @@ import pytest
 from src.analysis.battle_report import (
     archive_latest_completed_battle,
     archive_report_package,
-    build_report_analysis,
     build_report_package,
+    count_battle_packet_files,
     find_archived_report,
     get_report_summary,
     get_report_package,
-    load_battle_packets_for_window,
     parse_opcode_hex,
     read_metadata,
     report_id,
     scan_battles,
     scan_report_summaries,
 )
+from scripts.unpack_battle_report import unpack_report, verify_replay
 
 
 FIXTURE_SESSION = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
@@ -71,28 +71,39 @@ def test_scan_battles_marks_unfinished_session(packet_root: Path):
     assert battles[0].incomplete is True
 
 
-def test_build_report_package_contains_manifest_analysis_and_packets(packet_root: Path):
+def test_build_report_package_contains_manifest_and_original_packets(packet_root: Path):
     rid = report_id("2026-05-07_21-17-31_monitor", 1)
     filename, payload = build_report_package(rid, packet_root)
+    session_dir = packet_root / "2026-05-07_21-17-31_monitor"
 
     assert filename.endswith(".raco-report")
     with zipfile.ZipFile(BytesIO(payload)) as zf:
         names = set(zf.namelist())
         assert "manifest.json" in names
-        assert "analysis.json" in names
+        assert "analysis.json" not in names
         assert "README.txt" in names
         assert "packets/_session.json" in names
-        assert any(name.startswith("packets/") and name.endswith(".bin") for name in names)
+        packet_names = sorted(name for name in names if name.startswith("packets/") and name.endswith(".bin"))
+        assert packet_names
 
         manifest = json.loads(zf.read("manifest.json").decode("utf-8"))
-        analysis = json.loads(zf.read("analysis.json").decode("utf-8"))
+        readme = zf.read("README.txt").decode("utf-8")
+        for packet_name in packet_names:
+            source_name = Path(packet_name).name
+            assert zf.read(packet_name) == (session_dir / source_name).read_bytes()
 
     assert manifest["format"] == "raco-battle-report"
-    assert manifest["format_version"] == 1
+    assert manifest["format_version"] == 2
     assert manifest["report_id"] == rid
-    assert analysis["total_packets"] == manifest["battle_packet_count"]
-    assert analysis["final_state"]["round"] == 17
-    json.dumps(analysis, ensure_ascii=False)
+    assert "analysis" not in manifest
+    assert manifest["window"]["pad_before"] == 10.0
+    assert manifest["window"]["pad_after"] == 5.0
+    assert manifest["file_count"] == len(packet_names)
+    assert set(manifest["files"]) == {Path(name).name for name in packet_names}
+    assert manifest["battle_packet_count"] == count_battle_packet_files(
+        [session_dir / Path(name).name for name in packet_names]
+    )
+    assert "original RC01 packet files" in readme
 
 
 def test_archive_report_package_writes_cached_report(packet_root: Path, tmp_path: Path):
@@ -106,6 +117,26 @@ def test_archive_report_package_writes_cached_report(packet_root: Path, tmp_path
     filename, payload = get_report_package(rid, packet_root, archive_root)
     assert filename == archive_path.name
     assert payload == archive_path.read_bytes()
+
+
+def test_unpack_report_restores_replayable_packet_dir(packet_root: Path, tmp_path: Path):
+    rid = report_id("2026-05-07_21-17-31_monitor", 1)
+    filename, payload = build_report_package(rid, packet_root)
+    report_path = tmp_path / filename
+    report_path.write_bytes(payload)
+
+    out_dir = unpack_report(report_path, tmp_path / "unpacked")
+
+    assert (out_dir / "_session.json").is_file()
+    assert (out_dir / "_raco_report_manifest.json").is_file()
+    assert list(out_dir.glob("*.bin"))
+
+    summary = verify_replay(out_dir)
+    assert summary["total_packets"] > 0
+    assert summary["final_round"] == 17
+    assert summary["result"] == "WIN_HP"
+    assert summary["my_pets"] == 6
+    assert summary["opp_pets"] == 6
 
 
 def test_archive_latest_completed_battle(packet_root: Path, tmp_path: Path):
@@ -125,20 +156,3 @@ def test_scan_report_summaries_marks_archived_report(packet_root: Path, tmp_path
 
     assert report.archived is True
     assert report.archive_path is not None
-
-
-def test_report_analysis_matches_direct_replay(packet_root: Path):
-    session_dir = packet_root / "2026-05-07_21-17-31_monitor"
-    boundary = scan_battles(session_dir)[0]
-    packets = load_battle_packets_for_window(session_dir, boundary)
-
-    direct = build_report_analysis(packets)
-    rid = report_id(session_dir.name, boundary.index)
-    _, payload = build_report_package(rid, packet_root)
-
-    with zipfile.ZipFile(BytesIO(payload)) as zf:
-        analysis = json.loads(zf.read("analysis.json").decode("utf-8"))
-
-    assert analysis["total_packets"] == direct["total_packets"]
-    assert analysis["final_state"]["round"] == direct["final_state"]["round"]
-    assert analysis["battle_summary"]["result"] == direct["battle_summary"]["result"]

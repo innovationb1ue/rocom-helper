@@ -169,15 +169,14 @@ class TestBattleManagerArchiveToggle:
     def test_process_event_archives_by_default(self, monkeypatch):
         from src.api.battle_manager import BattleManager
 
-        mgr = BattleManager()
         calls = []
 
         async def _archive():
             calls.append("archive")
 
-        monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
-
         async def _run():
+            mgr = BattleManager()
+            monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
             await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"})
             await asyncio.sleep(0)
 
@@ -188,15 +187,14 @@ class TestBattleManagerArchiveToggle:
     def test_process_event_can_disable_archive(self, monkeypatch):
         from src.api.battle_manager import BattleManager
 
-        mgr = BattleManager()
         calls = []
 
         async def _archive():
             calls.append("archive")
 
-        monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
-
         async def _run():
+            mgr = BattleManager()
+            monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
             await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"}, enable_archive=False)
             await asyncio.sleep(0)
 
