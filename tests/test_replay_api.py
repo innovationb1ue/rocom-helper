@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import asyncio
+import shutil
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -9,7 +11,10 @@ from fastapi.testclient import TestClient
 
 from src.api.app import create_app
 from src.analysis.constants import OPCODE_BATTLE_FINISH
-from src.analysis.battle_report import BattleReportError
+from src.analysis.battle_report import BattleReportError, get_report_package, parse_opcode_hex, read_metadata
+
+
+FIXTURE_SESSION = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
 
 
 @pytest.fixture(scope="module")
@@ -151,6 +156,33 @@ class TestBattleReportEndpoints:
         assert resp.headers["content-type"] == "application/zip"
         assert resp.headers["x-report-filename"].endswith(".raco-report")
         assert resp.content == b"zip-bytes"
+
+    def test_download_unfinished_report(self, client, monkeypatch, tmp_path: Path):
+        from src.api import routes_battle
+
+        if not FIXTURE_SESSION.exists():
+            pytest.skip("battle_session_1 fixture not found")
+
+        packet_root = tmp_path / "logs" / "packets"
+        session_dir = packet_root / "2026-05-07_21-17-31_monitor"
+        shutil.copytree(FIXTURE_SESSION, session_dir)
+        for fpath in session_dir.glob("*.bin"):
+            meta = read_metadata(fpath) or {}
+            if parse_opcode_hex(meta) == OPCODE_BATTLE_FINISH:
+                fpath.unlink()
+
+        monkeypatch.setattr(
+            routes_battle,
+            "get_report_package",
+            lambda report_id: get_report_package(report_id, packet_root),
+        )
+
+        resp = client.get("/api/battle/reports/2026-05-07_21-17-31_monitor%3A1/download")
+
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/zip"
+        assert resp.headers["x-report-filename"].endswith(".raco-report")
+        assert resp.content.startswith(b"PK")
 
     def test_invalid_report_returns_404(self, client, monkeypatch):
         from src.api import routes_battle

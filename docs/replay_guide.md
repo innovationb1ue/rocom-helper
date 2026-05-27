@@ -6,15 +6,15 @@
 
 ## 前提条件
 
-- 后端运行: `python -m src.main` (端口 8000)（Windows 上使用 `py` 代替 `python`）
+- 后端运行: `py -m src.main` (端口 8000)
 - 前端运行: `cd web && npm run dev` (端口 5173)
-- 浏览器打开 `http://localhost:5173/battle-live`
+- 浏览器打开 `http://localhost:5173/battle`
 
 ## 回放步骤
 
 ### 1. 前端准备
 
-在浏览器中打开 `http://localhost:5173/battle-live`，点击 **"连接战斗"** 按钮。页面应显示绿色的 "已连接" 标签。WebSocket 连接建立后，后端的 `BattleManager` 才会推送数据。
+在浏览器中打开 `http://localhost:5173/battle`，点击 **"连接战斗"** 按钮。页面应显示绿色的 "已连接" 标签。WebSocket 连接建立后，后端的 `BattleManager` 才会推送数据。
 
 ### 2. 触发回放
 
@@ -64,7 +64,7 @@ py -m scripts.replay_to_frontend --delay 80 --host localhost --port 8000
   "result": "WIN_HP",
   "rounds": 17,
   "stopped_early": false,
-  "my_pets": 4,
+  "my_pets": 6,
   "opp_pets": 6
 }
 ```
@@ -176,10 +176,83 @@ py -m scripts.replay_headless --session battle_session_1 --round 7
 
 ## 战斗报告
 
-生成格式化的战斗报告文件：
+生成完整分析报告。默认写入 `docs/battle_report.txt`；加 `--json` 时把结构化结果输出到 stdout：
 
 ```bash
+py -m scripts.generate_battle_report
 py -m scripts.generate_battle_report --json
 ```
 
 输出包含完整的回合分析、伤害对比和战斗总结。
+
+## `.raco-report` 导入导出
+
+`.raco-report` 是用于问题复现和开发调试的战斗抓包包。它不是分析结果文件，而是一个 zip 格式的原始包归档，包含：
+
+```text
+manifest.json                  # 报告元数据：来源 session、战斗边界、导出窗口、文件列表
+README.txt                     # 简短说明
+packets/_session.json          # 原始 session 元数据（如果存在）
+packets/*.bin                  # 原始 RC01 抓包文件
+```
+
+当前格式版本为 `format_version = 2`。包内不再包含 `analysis.json`；完整分析应在导入后重新回放生成。
+
+### 导出 `.raco-report`
+
+实时抓包完成一场战斗后，后端会把最近完成的战斗归档到 `logs/battle_reports/<session>/`。也可以通过 API 下载：
+
+```bash
+# 列出可导出的战斗报告
+curl http://localhost:8000/api/battle/reports
+
+# 下载指定报告；report_id 形如 2026-05-07_21-17-31_monitor:1
+curl -o battle.raco-report "http://localhost:8000/api/battle/reports/<urlencoded_report_id>/download"
+```
+
+导出窗口使用战斗开始前 `10s`、战斗结束后 `5s` 的缓冲，确保 battle_enter 附近上下文不会被遗漏。包内的 `packets/*.bin` 是从 `logs/packets/<session>/` 原样写入的 RC01 文件，解压后的字节内容应与源文件一致。
+
+### 导入 `.raco-report`
+
+使用 `scripts.unpack_battle_report` 把报告解压成普通抓包目录：
+
+```bash
+# 解压到默认目录：与 report 同目录、同名文件夹
+py -m scripts.unpack_battle_report path\to\battle.raco-report
+
+# 指定输出目录
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets
+
+# 解压后立即运行无头完整回放验证
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+```
+
+解压后的目录结构类似普通抓包 session：
+
+```text
+tmp/report_packets/
+├── _session.json
+├── _raco_report_manifest.json
+├── c2s_0x4013_0551_212323.955.bin
+├── s2c_0x4013_1543_212323.988.bin
+└── ...
+```
+
+其中 `_raco_report_manifest.json` 是从报告里的 `manifest.json` 复制出来的导出元数据。`.bin` 文件位于目录根部，因此现有 `load_battle_packets()`、`BattleReplayRunner` 和调试脚本可以直接读取。
+
+### 验证导入结果
+
+推荐导入时直接加 `--verify`：
+
+```bash
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+```
+
+成功时输出类似：
+
+```text
+Replay verification: PASS
+  packets=176 rounds=17 final_round=17 result=WIN_HP my_pets=6 opp_pets=6
+```
+
+如果需要进一步调试，可以把解压目录复制或移动到 `tests/fixtures/packets/<name>/`，再用现有无头回放或测试夹具读取。

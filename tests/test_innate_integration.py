@@ -253,36 +253,35 @@ class TestReplayAPIWithInnateSkills:
         with TestClient(app) as c:
             yield c
 
-    def test_replay_api_returns_ok(self, api_client):
+    @pytest.fixture(scope="class")
+    def replay_api_result(self, api_client):
+        from src.api.battle_manager import get_battle_manager
+
         resp = api_client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
         data = resp.json()
+        state = get_battle_manager().tracker.get_state()
+        return data, state
+
+    def test_replay_api_returns_ok(self, replay_api_result):
+        data, _ = replay_api_result
         assert data["status"] == "ok"
 
-    def test_replay_api_pet_count(self, api_client):
-        resp = api_client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
-        data = resp.json()
+    def test_replay_api_pet_count(self, replay_api_result):
+        data, _ = replay_api_result
         assert data["opp_pets"] == 6
         assert data["my_pets"] > 0
 
-    def test_replay_state_has_innate_fields(self, api_client):
+    def test_replay_state_has_innate_fields(self, replay_api_result):
         """After replay, tracker state should have combo_bonus and poison_stacks on pets."""
-        from src.api.battle_manager import get_battle_manager
-
-        api_client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
-        mgr = get_battle_manager()
-        state = mgr.tracker.get_state()
+        _, state = replay_api_result
 
         for pet in state["my_pets"] + state["opp_pets"]:
             assert "combo_bonus" in pet, f"Pet {pet.get('name')} missing combo_bonus"
             assert "poison_stacks" in pet, f"Pet {pet.get('name')} missing poison_stacks"
 
-    def test_replay_state_poison_tracked(self, api_client):
+    def test_replay_state_poison_tracked(self, replay_api_result):
         """After replay, at least one opponent pet should have poison_stacks > 0."""
-        from src.api.battle_manager import get_battle_manager
-
-        api_client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
-        mgr = get_battle_manager()
-        state = mgr.tracker.get_state()
+        _, state = replay_api_result
 
         poisoned = [p for p in state["opp_pets"] if p.get("poison_stacks", 0) > 0]
         assert len(poisoned) >= 1, "No poisoned opponent pets after replay"

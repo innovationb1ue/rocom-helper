@@ -642,11 +642,11 @@ def read_metadata(filepath: Path) -> Optional[Dict[str, Any]]:
             f.read(4)
             f.read(4)
             header_extra_len = struct.unpack(">I", f.read(4))[0]
-            f.read(header_extra_len)
+            f.seek(header_extra_len, os.SEEK_CUR)
             body_len = struct.unpack(">I", f.read(4))[0]
-            f.read(body_len)
+            f.seek(body_len, os.SEEK_CUR)
             decrypted_len = struct.unpack(">I", f.read(4))[0]
-            f.read(decrypted_len)
+            f.seek(decrypted_len, os.SEEK_CUR)
             meta_len = struct.unpack(">I", f.read(4))[0]
             if meta_len <= 0 or meta_len > 1_000_000:
                 return None

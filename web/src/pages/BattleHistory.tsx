@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Empty, Space, Table, Tag, Tooltip, message } from 'antd';
 import type { TableProps } from 'antd';
 import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
+import type { AxiosError } from 'axios';
 
 import { downloadBattleReport, fetchBattleReports } from '../utils/api';
 import type { BattleReportSummary } from '../utils/api';
@@ -22,6 +23,33 @@ const saveBlob = (blob: Blob, filename: string) => {
   link.click();
   document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
+};
+
+const canExportReport = (report: BattleReportSummary) =>
+  report.file_count > 0 && report.battle_packet_count > 0;
+
+const readDownloadError = async (err: unknown) => {
+  const fallback = '导出报告失败';
+  const responseData = (err as AxiosError)?.response?.data;
+  if (responseData instanceof Blob) {
+    const text = await responseData.text();
+    if (!text) return fallback;
+    try {
+      const parsed = JSON.parse(text) as { detail?: unknown };
+      return typeof parsed.detail === 'string' ? parsed.detail : text;
+    } catch {
+      return text;
+    }
+  }
+  if (
+    responseData &&
+    typeof responseData === 'object' &&
+    'detail' in responseData &&
+    typeof responseData.detail === 'string'
+  ) {
+    return responseData.detail;
+  }
+  return fallback;
 };
 
 const BattleHistory: React.FC = () => {
@@ -72,7 +100,7 @@ const BattleHistory: React.FC = () => {
       message.success('报告已导出');
     } catch (err) {
       console.error('[BattleHistory] download report failed:', err);
-      message.error('导出报告失败');
+      message.error(await readDownloadError(err));
     } finally {
       setDownloading(null);
     }
@@ -102,11 +130,17 @@ const BattleHistory: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'complete',
-      width: 150,
+      width: 160,
       render: (complete: boolean, record) => (
         <Space size={4} wrap>
           {complete ? <Tag color="success">完整</Tag> : <Tag color="warning">未完成</Tag>}
-          {record.archived ? <Tag color="geekblue">已归档</Tag> : <Tag color="default">可生成</Tag>}
+          {record.archived ? (
+            <Tag color="geekblue">已归档</Tag>
+          ) : (
+            <Tag color={canExportReport(record) ? 'default' : 'error'}>
+              {canExportReport(record) ? '可导出' : '无包'}
+            </Tag>
+          )}
         </Space>
       ),
       filters: [
@@ -148,18 +182,22 @@ const BattleHistory: React.FC = () => {
       key: 'actions',
       width: 110,
       align: 'right',
-      render: (_, record) => (
-        <Tooltip title="导出报告">
+      render: (_, record) => {
+        const exportable = canExportReport(record);
+        return (
+        <Tooltip title={exportable ? '导出报告' : '无可导出包'}>
           <Button
             type="primary"
             icon={<DownloadOutlined />}
+            disabled={!exportable}
             loading={downloading === record.report_id}
             onClick={() => void handleDownload(record)}
           >
             导出
           </Button>
         </Tooltip>
-      ),
+        );
+      },
     },
   ], [downloading]);
 

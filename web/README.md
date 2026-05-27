@@ -1,4 +1,4 @@
-# Roco PvP Helper — Web Frontend
+# Roco PvP Helper - Web Frontend
 
 React single-page application for the Roco PvP Helper real-time battle analysis tool.
 
@@ -26,37 +26,48 @@ The frontend expects the backend running on `http://localhost:8000`.
 
 | Route | Page | Description |
 |-------|------|-------------|
-| `/` | Dashboard | Overview with stats and quick links |
-| `/pets` | PetBrowser | Browse and search pet database |
-| `/teams` | TeamBuilder | Build and analyze team compositions |
-| `/type-chart` | TypeChart | Interactive type effectiveness chart |
-| `/battle-live` | BattleLive | Real-time battle monitor (WebSocket) |
-| `/battle-history` | BattleHistory | Battle replay history |
+| `/` | Redirect | Redirects to `/battle` |
+| `/battle` | BattleLive | Real-time battle monitor (WebSocket) |
+| `/history` | BattleHistory | Battle report list and `.raco-report` downloads |
+| `/skill-presets` | SkillPresets | Popular skill presets and pets by skill |
 
 ## Key Components
 
 | Component | Description |
 |-----------|-------------|
-| `DamagePredictionPanel` | Damage predictions for all equipped skills, including combo hit counts and KO calculations |
 | `SkillPanel` | Detailed skill analysis with effectiveness breakdown |
-| `HookAdvicePanel` | Tactical analysis advice from analysis hooks (opponent tracking, energy monitoring, switch recommendations) |
+| `OpponentSkillPanel` | Opponent skill prediction and known skill display |
+| `HookAdvicePanel` | Tactical analysis advice from analysis hooks |
 | `BattleTimeline` | Chronological battle event timeline |
+| `BattleEventLog` | Compact battle event log |
 | `BattleSummaryPanel` | End-of-battle summary statistics |
-| `CoverageRadar` | Team type coverage visualization |
+| `TeamRoster` | Active and bench pet state display |
+| `TacticalPanel` | Action recommendation panel |
 
 ## State Management
 
 Zustand stores in `src/stores/`:
-- **battleStore** — Live battle state (pets, HP, energy, skills, damage predictions, hook advice, traits)
-- **petsStore** — Pet database browsing
-- **snifferStore** — Packet capture session status
+- **battleStore** - Live battle state, events, suggestions, skill analysis, hook advice, traits, opponent skills, and tactical recommendations
+- **snifferStore** - Packet capture session status
 
 ## WebSocket Protocol
 
 The `BattleLive` page connects to `ws://localhost:8000/ws/battle` and receives these message types:
-- `state_update` — Full battle state snapshot
-- `battle_event` / `battle_events` — Formatted battle events for timeline
-- `skill_analysis` — Damage predictions for equipped skills (with traits)
-- `hook_advice` — Analysis hook recommendations
-- `suggestions` — Simple rule-based suggestions
-- `battle_summary` — End-of-battle summary
+- `connected` - Initial connection confirmation
+- `state_update` - Full battle state snapshot
+- `battle_event` / `battle_events` - Formatted battle events for timeline
+- `skill_analysis` - Damage predictions for equipped skills, with traits when available
+- `opp_skill_analysis` - Opponent skill analysis when available
+- `hook_advice` - Analysis hook recommendations
+- `suggestions` - Simple rule-based suggestions
+- `tactical_recommendations` - Recommended actions from tactical analysis
+- `battle_summary` - End-of-battle summary
+
+## Battle Report Downloads
+
+The history page uses:
+- `GET /api/battle/reports` to list reports
+- `GET /api/battle/reports/{report_id}` to fetch report metadata
+- `GET /api/battle/reports/{report_id}/download` to download `.raco-report`
+
+`.raco-report` files contain original RC01 `.bin` packets and manifest metadata. Use `py -m scripts.unpack_battle_report <file> --verify` from the project root to import and replay them.

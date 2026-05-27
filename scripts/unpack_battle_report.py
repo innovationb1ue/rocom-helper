@@ -83,8 +83,8 @@ def unpack_report(report_path: Path, output_dir: Optional[Path] = None, *, force
     return output_dir
 
 
-def verify_replay(packet_dir: Path) -> Dict[str, Any]:
-    """Run a full headless replay from an unpacked packet directory."""
+def verify_replay(packet_dir: Path, *, full_analysis: bool = False) -> Dict[str, Any]:
+    """Run a headless replay from an unpacked packet directory."""
     from tests.packet_reader import load_battle_packets
     from src.analysis.replay_runner import BattleReplayRunner
 
@@ -92,7 +92,11 @@ def verify_replay(packet_dir: Path) -> Dict[str, Any]:
     if not packets:
         raise ReportUnpackError(f"No battle packets found in: {packet_dir}")
 
-    result = BattleReplayRunner().run(packets)
+    result = BattleReplayRunner(
+        include_analysis=full_analysis,
+        include_hooks=full_analysis,
+        include_formatting=full_analysis,
+    ).run(packets)
     return {
         "total_packets": result.total_packets,
         "rounds": len(result.rounds),

@@ -40,7 +40,9 @@ pytest -k "test_name"           # 按名称模式匹配运行测试
 py -m scripts.replay_headless --session battle_session_1       # 文本摘要（事件、预测、hook 建议）
 py -m scripts.replay_headless --session battle_session_1 --json  # 完整 JSON 输出（写入 tmp/）
 py -m scripts.replay_headless --round 7                        # 在第 7 回合停止
-py -m scripts.generate_battle_report --json                    # 生成报告文件（docs/battle_report.txt）
+py -m scripts.generate_battle_report                           # 生成文本报告（docs/battle_report.txt）
+py -m scripts.generate_battle_report --json                    # 输出完整 JSON 到 stdout
+py -m scripts.unpack_battle_report path\to\battle.raco-report --verify  # 导入 .raco-report 并验证回放
 py -m scripts.replay_to_frontend --delay 80 --session battle_session_1  # 推送回放到前端 WebSocket
 py -m scripts.replay_to_frontend --delay 80 --session battle_session_1 --round 7  # 回放到第 7 回合
 ```
@@ -195,12 +197,12 @@ api/ (FastAPI)
   │
   ▼
 web/ (React SPA)
-  ├── stores/ ── Zustand 状态管理（battleStore, snifferStore, petsStore）
+  ├── stores/ ── Zustand 状态管理（battleStore, snifferStore）
   ├── hooks/ ── useBattle（WebSocket）、usePets（REST）、useSnifferMonitor
-  ├── pages/ ── Dashboard, PetBrowser, TeamBuilder, TypeChart, BattleLive, BattleHistory
+  ├── pages/ ── BattleLive, BattleHistory, SkillPresets
   ├── components/ ── PetCard, TeamSlot, TypeBadge, BattleTimeline, BattleEventLog,
   │                  DamagePredictionPanel, SkillPanel, HookAdvicePanel,
-  │                  BattleSummaryPanel, TeamRoster, CoverageRadar
+  │                  BattleSummaryPanel, TeamRoster, OpponentSkillPanel, TacticalPanel
 ```
 
 ### 数据文件

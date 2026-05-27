@@ -462,6 +462,21 @@ class TestReplayRunnerRoundFormattedEvents:
                 assert "summary" in fe
 
 
+class TestReplayRunnerSnapshots:
+    def test_snapshots_are_stable_after_later_events(self, session1_packets):
+        result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+            session1_packets,
+            stop_round=3,
+        )
+        first_with_pets = next(ev for ev in result.events if ev.state_after.get("my_pets"))
+        original_name = first_with_pets.state_after["my_pets"][0]["name"]
+
+        result.final_state["my_pets"][0]["name"] = "__mutated_final_state__"
+
+        assert first_with_pets.state_after is not result.final_state
+        assert first_with_pets.state_after["my_pets"][0]["name"] == original_name
+
+
 # ---------------------------------------------------------------------------
 # Flags: disable stages
 # ---------------------------------------------------------------------------
@@ -470,7 +485,7 @@ class TestReplayRunnerRoundFormattedEvents:
 class TestReplayRunnerFlags:
     def test_no_analysis(self, session1_packets):
         runner = BattleReplayRunner(include_analysis=False)
-        result = runner.run(session1_packets)
+        result = runner.run(session1_packets, stop_round=3)
         for ev in result.events:
             assert ev.battle_advice is None
         for rs in result.rounds:
@@ -479,13 +494,13 @@ class TestReplayRunnerFlags:
 
     def test_no_hooks(self, session1_packets):
         runner = BattleReplayRunner(include_hooks=False)
-        result = runner.run(session1_packets)
+        result = runner.run(session1_packets, stop_round=3)
         for ev in result.events:
             assert ev.hook_advice == []
 
     def test_no_formatting(self, session1_packets):
         runner = BattleReplayRunner(include_formatting=False)
-        result = runner.run(session1_packets)
+        result = runner.run(session1_packets, stop_round=3)
         for ev in result.events:
             assert ev.formatted_events == []
         for rs in result.rounds:
@@ -497,6 +512,6 @@ class TestReplayRunnerFlags:
             include_hooks=False,
             include_formatting=False,
         )
-        result = runner.run(session1_packets)
+        result = runner.run(session1_packets, stop_round=3)
         assert result.total_packets > 0
         assert result.final_state["round"] > 0

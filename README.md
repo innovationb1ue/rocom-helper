@@ -87,6 +87,17 @@ py -m scripts.replay_to_frontend --delay 80 --session battle_session_1
 
 更多回放参数、指定回合停止和 API 调用方式见 [战斗回放指南](docs/replay_guide.md)。
 
+### `.raco-report` 导入导出
+
+`.raco-report` 是可分享的战斗抓包包，内部保留原始 RC01 `.bin` 文件和少量 manifest 元数据，不包含预生成分析结果。
+
+```bash
+# 导入报告为普通抓包目录，并验证能否完整回放
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+```
+
+导出通过战斗报告 API 或前端历史页面完成；导入、导出和包结构详见 [战斗回放指南](docs/replay_guide.md#raco-report-导入导出)。
+
 ## 功能概览
 
 ### 实时战斗
@@ -114,6 +125,7 @@ py -m scripts.replay_to_frontend --delay 80 --session battle_session_1
 - `scripts.replay_to_frontend`：将预录包推送到前端 WebSocket，模拟实时战斗。
 - `scripts.extract_battle`：从抓包 session 中提取战斗 fixture，详见 [战斗包提取文档](docs/extract_battle.md)。
 - `scripts.generate_battle_report`：生成格式化战斗报告。
+- `scripts.unpack_battle_report`：导入 `.raco-report`，还原为可完整回放的抓包目录。
 
 ## 技术架构
 
@@ -164,23 +176,24 @@ web/
 | 端点 | 说明 |
 |------|------|
 | `GET /api/health` | 健康检查 |
-| `GET /api/pets` / `GET /api/pets/{id}` | 宠物列表与详情 |
-| `GET /api/skills` / `GET /api/skills/{id}` | 技能列表与详情 |
-| `GET /api/types` / `GET /api/types/{id}/matchups` | 属性与克制关系 |
-| `POST /api/teams/analyze` | 队伍覆盖率、角色、速度梯队和建议 |
-| `POST /api/teams/counter` | 查找 counter-pick |
 | `GET /api/battle/state` | 当前战斗状态快照 |
+| `GET /api/battle/pets` | 双方战斗宠物列表与 active 宠物 |
+| `GET /api/battle/effects` | 当前天气、阶段和双方 buff 摘要 |
 | `POST /api/battle/replay` | 将预录战斗包回放到 WebSocket 客户端 |
+| `GET /api/battle/reports` | 列出可下载的 `.raco-report` |
+| `GET /api/battle/reports/{report_id}` | 获取单个报告元数据 |
+| `GET /api/battle/reports/{report_id}/download` | 下载 `.raco-report` 原始抓包包 |
 | `POST /api/sniffer/start` / `POST /api/sniffer/stop` | 启动或停止网络监听 |
 | `GET /api/sniffer/status` | 查询监听状态 |
+| `GET /api/config/popular-skills` | 热门技能预设 |
+| `GET /api/config/pets-with-skills` | 可按技能查询的宠物索引 |
 
 ### WebSocket
 
 | 端点 | 说明 |
 |------|------|
-| `ws://localhost:8000/ws/battle` | 推送战斗状态、事件、伤害预测、Hook 建议和战斗总结 |
-| `ws://localhost:8000/ws/monitor` | 推送监听状态、抓包记录、密钥捕获和流关闭事件 |
-
+| `/ws/battle` | 实时战斗状态、事件、技能分析、Hook 建议和结算摘要 |
+| `/api/sniffer/ws/monitor` | 抓包监听状态推送 |
 ## 常用命令
 
 ```bash

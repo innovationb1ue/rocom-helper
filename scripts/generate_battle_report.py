@@ -77,7 +77,11 @@ def generate_report(session_dir: Path, stop_round: Optional[int] = None) -> str:
 
     runner = BattleReplayRunner()
     result = runner.run(packets, stop_round=stop_round)
+    return generate_report_from_result(result)
 
+
+def generate_report_from_result(result: Any) -> str:
+    """Render a battle report from an existing ReplayResult."""
     lines: List[str] = []
 
     # ── header ──

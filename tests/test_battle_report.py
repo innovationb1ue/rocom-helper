@@ -28,14 +28,30 @@ from scripts.unpack_battle_report import unpack_report, verify_replay
 FIXTURE_SESSION = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
 
 
+@pytest.fixture(scope="module")
+def packet_root(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    if not FIXTURE_SESSION.exists():
+        pytest.skip("battle_session_1 fixture not found")
+    root = tmp_path_factory.mktemp("packet_logs") / "logs" / "packets"
+    session_dir = root / "2026-05-07_21-17-31_monitor"
+    shutil.copytree(FIXTURE_SESSION, session_dir)
+    return root
+
+
 @pytest.fixture()
-def packet_root(tmp_path: Path) -> Path:
+def destructive_packet_root(tmp_path: Path) -> Path:
     if not FIXTURE_SESSION.exists():
         pytest.skip("battle_session_1 fixture not found")
     root = tmp_path / "logs" / "packets"
     session_dir = root / "2026-05-07_21-17-31_monitor"
     shutil.copytree(FIXTURE_SESSION, session_dir)
     return root
+
+
+@pytest.fixture(scope="module")
+def report_package(packet_root: Path):
+    rid = report_id("2026-05-07_21-17-31_monitor", 1)
+    return build_report_package(rid, packet_root)
 
 
 def test_scan_report_summaries_from_logs(packet_root: Path):
@@ -58,8 +74,8 @@ def test_get_report_summary_can_include_replay_result(packet_root: Path):
     assert report.result is not None
 
 
-def test_scan_battles_marks_unfinished_session(packet_root: Path):
-    session_dir = packet_root / "2026-05-07_21-17-31_monitor"
+def test_scan_battles_marks_unfinished_session(destructive_packet_root: Path):
+    session_dir = destructive_packet_root / "2026-05-07_21-17-31_monitor"
     for fpath in session_dir.glob("*.bin"):
         meta = read_metadata(fpath) or {}
         if parse_opcode_hex(meta) == 0x132C:
@@ -71,9 +87,39 @@ def test_scan_battles_marks_unfinished_session(packet_root: Path):
     assert battles[0].incomplete is True
 
 
-def test_build_report_package_contains_manifest_and_original_packets(packet_root: Path):
-    rid = report_id("2026-05-07_21-17-31_monitor", 1)
-    filename, payload = build_report_package(rid, packet_root)
+def test_build_report_package_allows_unfinished_session(destructive_packet_root: Path):
+    session_dir = destructive_packet_root / "2026-05-07_21-17-31_monitor"
+    for fpath in session_dir.glob("*.bin"):
+        meta = read_metadata(fpath) or {}
+        if parse_opcode_hex(meta) == 0x132C:
+            fpath.unlink()
+
+    battles = scan_battles(session_dir)
+    assert battles
+    assert battles[0].incomplete is True
+
+    filename, payload = build_report_package(
+        report_id("2026-05-07_21-17-31_monitor", 1),
+        destructive_packet_root,
+    )
+
+    assert filename.endswith(".raco-report")
+    with zipfile.ZipFile(BytesIO(payload)) as zf:
+        names = set(zf.namelist())
+        packet_names = sorted(name for name in names if name.startswith("packets/") and name.endswith(".bin"))
+        manifest = json.loads(zf.read("manifest.json").decode("utf-8"))
+
+    assert packet_names
+    assert manifest["complete"] is False
+    assert manifest["battle_packet_count"] > 0
+    assert manifest["file_count"] == len(packet_names)
+
+
+def test_build_report_package_contains_manifest_and_original_packets(
+    packet_root: Path,
+    report_package,
+):
+    filename, payload = report_package
     session_dir = packet_root / "2026-05-07_21-17-31_monitor"
 
     assert filename.endswith(".raco-report")
@@ -94,7 +140,7 @@ def test_build_report_package_contains_manifest_and_original_packets(packet_root
 
     assert manifest["format"] == "raco-battle-report"
     assert manifest["format_version"] == 2
-    assert manifest["report_id"] == rid
+    assert manifest["report_id"] == report_id("2026-05-07_21-17-31_monitor", 1)
     assert "analysis" not in manifest
     assert manifest["window"]["pad_before"] == 10.0
     assert manifest["window"]["pad_after"] == 5.0
@@ -119,9 +165,8 @@ def test_archive_report_package_writes_cached_report(packet_root: Path, tmp_path
     assert payload == archive_path.read_bytes()
 
 
-def test_unpack_report_restores_replayable_packet_dir(packet_root: Path, tmp_path: Path):
-    rid = report_id("2026-05-07_21-17-31_monitor", 1)
-    filename, payload = build_report_package(rid, packet_root)
+def test_unpack_report_restores_replayable_packet_dir(report_package, tmp_path: Path):
+    filename, payload = report_package
     report_path = tmp_path / filename
     report_path.write_bytes(payload)
 

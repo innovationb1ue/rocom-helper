@@ -195,3 +195,38 @@ py -m scripts.replay_headless --session battle_session_4
 **验证失败（包数量不匹配）**
 
 时间窗口计算基于文件名中的时间戳。如果文件命名格式异常，可能导致过滤不准确。尝试调整 `--pad-before` 和 `--pad-after`。
+
+## `.raco-report` 与 fixture 提取的区别
+
+`scripts.extract_battle` 用于从本地抓包 session 中提取测试 fixture，输出位置通常是 `tests/fixtures/packets/battle_session_N/`。它适合把已知战斗纳入测试集。
+
+`.raco-report` 用于导出和分享一场战斗的原始抓包证据，输出是一个单文件归档，适合用户把问题包发给开发者。二者都保留原始 RC01 `.bin`，但用途不同：
+
+| 工具 | 输入 | 输出 | 典型用途 |
+|------|------|------|----------|
+| `scripts.extract_battle` | `logs/packets/<session>/` | `tests/fixtures/packets/<name>/` | 本地提取测试 fixture |
+| `.raco-report` 下载/API | `logs/packets/<session>/` | `*.raco-report` | 导出并分享战斗抓包 |
+| `scripts.unpack_battle_report` | `*.raco-report` | 普通 packet 目录 | 导入报告并复现战斗 |
+
+### 导入 `.raco-report` 为可回放目录
+
+```bash
+# 解压报告
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets
+
+# 解压并立即验证能否完整回放
+py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+```
+
+解压后目录结构与普通抓包目录兼容：
+
+```text
+tmp/report_packets/
+├── _session.json
+├── _raco_report_manifest.json
+├── c2s_0x4013_*.bin
+├── s2c_0x4013_*.bin
+└── ...
+```
+
+`_raco_report_manifest.json` 保存报告来源、战斗边界、导出窗口和文件列表；根目录下的 `.bin` 是原始 RC01 抓包文件。验证通过后，可以把该目录复制到 `tests/fixtures/packets/<name>/` 作为新的 fixture。

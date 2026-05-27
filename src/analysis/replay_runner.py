@@ -125,7 +125,7 @@ class BattleReplayRunner:
 
             state_before = copy.deepcopy(processor.get_state())
             result = processor.process_event(opcode, detail)
-            state_after = copy.deepcopy(result.state)
+            state_after = result.state
 
             current_round = state_after.get("round", current_round)
 
@@ -154,7 +154,7 @@ class BattleReplayRunner:
                 suggestions=suggestions,
                 tactical=copy.deepcopy(result.tactical) if self._include_analysis else None,
             )
-            messages = copy.deepcopy(build_battle_messages(opcode, filtered_result))
+            messages = build_battle_messages(opcode, filtered_result)
             message_sequence.extend(messages)
 
             snap = ReplayEventSnapshot(
@@ -177,7 +177,7 @@ class BattleReplayRunner:
             if current_round not in round_map:
                 round_map[current_round] = RoundSnapshot(
                     round_num=current_round,
-                    state_at_start=copy.deepcopy(state_before),
+                    state_at_start=state_before,
                 )
             rs = round_map[current_round]
             rs.events.append(snap)
@@ -202,8 +202,8 @@ class BattleReplayRunner:
                 stopped_early = True
                 break
 
-        final_state = copy.deepcopy(processor.get_state())
-        battle_summary = copy.deepcopy(compute_battle_summary(final_state))
+        final_state = processor.get_state()
+        battle_summary = compute_battle_summary(final_state)
         rounds = [round_map[r] for r in sorted(round_map.keys())]
 
         return ReplayResult(
