@@ -18,7 +18,7 @@ router = APIRouter()
 async def start_sniffer():
     """启动持久化 Sniffer 监听。"""
     mgr = get_sniffer_manager()
-    if mgr.state in ("listening", "connected", "key_captured"):
+    if mgr.state in ("listening", "connected", "key_missing", "key_captured"):
         return {"status": "already_running", "message": "已在监听中", "details": mgr.get_status()}
     await mgr.start()
     return {"status": "ok", "message": "监听已启动", "details": mgr.get_status()}

@@ -24,6 +24,7 @@ from src.protocol.opcodes import summarize
 
 _DEFAULT_PORT = settings.capture_port
 _DEFAULT_BPF = f"tcp port {_DEFAULT_PORT}"
+_KEY_MISSING_SUPPRESS_THRESHOLD = 3
 
 
 def _flow_key_from_packet(packet: Any, port: int) -> Optional[Tuple[str, int, str, int]]:
@@ -154,6 +155,9 @@ class Sniffer:
                 if dedupe not in flow.seen_acks:
                     flow.seen_acks.add(dedupe)
                     flow.key = key
+                    flow.key_miss_count = 0
+                    flow.key_missing_suppressed = False
+                    flow.key_missing_reported = False
                     write_key_file(self.key_file, key, flow.flow_id)
                     logger.info("[ack_0x1002] flow=%s key=%s", flow.flow_id,
                                 printable_ascii(key) or key.hex())
@@ -188,9 +192,21 @@ class Sniffer:
 
         # 解密 DATA 帧
         if flow.key is None:
+            flow.key_miss_count += 1
             self.stats["key_miss"] += 1
-            if plog:
+            if plog and not flow.key_missing_suppressed:
                 plog.log_key_miss(flow.flow_id, f"0x{be21.cmd:04X}", be21.seq)
+            if flow.key_miss_count >= _KEY_MISSING_SUPPRESS_THRESHOLD:
+                flow.key_missing_suppressed = True
+                if not flow.key_missing_reported:
+                    flow.key_missing_reported = True
+                    self._emit("key_missing_suppressed", {
+                        "flow_id": flow.flow_id,
+                        "cmd": be21.cmd,
+                        "seq": be21.seq,
+                        "key_miss_count": flow.key_miss_count,
+                        "reason": "已捕获到加密 DATA 帧但未捕获会话密钥，后续该连接将降级静默",
+                    })
             return
         try:
             iv, plain = decrypt_4013_body(flow.key, be21.body)

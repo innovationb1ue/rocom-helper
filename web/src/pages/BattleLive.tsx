@@ -20,6 +20,7 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; text:
   idle: { color: 'default', icon: <CloseCircleOutlined />, text: '未启动' },
   listening: { color: 'processing', icon: <SearchOutlined />, text: '监听中' },
   connected: { color: 'warning', icon: <WarningOutlined />, text: '游戏已连接' },
+  key_missing: { color: 'warning', icon: <WarningOutlined />, text: '密钥已错过' },
   key_captured: { color: 'success', icon: <CheckCircleOutlined />, text: '密钥已获取' },
   disconnected: { color: 'error', icon: <CloseCircleOutlined />, text: '游戏已断开' },
   decrypt_fail: { color: 'error', icon: <ExclamationCircleOutlined />, text: '解密失败' },
@@ -56,7 +57,7 @@ const BattleLive: React.FC = () => {
     await stopMonitoring();
   };
 
-  const isActive = ['listening', 'connected', 'key_captured'].includes(sniffer.status);
+  const isActive = ['listening', 'connected', 'key_missing', 'key_captured'].includes(sniffer.status);
   const sc = statusConfig[sniffer.status] || statusConfig.idle;
 
   return (
@@ -93,6 +94,15 @@ const BattleLive: React.FC = () => {
 
         {sniffer.status === 'idle' && sniffer.message.includes('失败') && (
           <Alert type="error" title={sniffer.message} style={{ marginTop: 8 }} showIcon closable />
+        )}
+
+        {sniffer.status === 'key_missing' && (
+          <Alert
+            type="warning"
+            title={sniffer.message}
+            style={{ marginTop: 8 }}
+            showIcon
+          />
         )}
 
         {isActive && sniffer.recentRecords.length > 0 && (

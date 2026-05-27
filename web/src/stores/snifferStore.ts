@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type SnifferStatus = 'idle' | 'listening' | 'connected' | 'key_captured' | 'disconnected' | 'decrypt_fail' | 'parse_fail';
+export type SnifferStatus = 'idle' | 'listening' | 'connected' | 'key_missing' | 'key_captured' | 'disconnected' | 'decrypt_fail' | 'parse_fail';
 
 export interface SlimRecord {
   record_type?: string;

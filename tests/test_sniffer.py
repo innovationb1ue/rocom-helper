@@ -5,6 +5,7 @@ import pytest
 from unittest.mock import MagicMock, call
 from src.capture.sniffer import Sniffer
 from src.capture.frame import Be21Packet
+from src.capture.reassembly import FlowState
 
 
 def _make_be21(cmd: int, seq: int, direction: str, body: bytes = b"\x00" * 16) -> MagicMock:
@@ -100,3 +101,72 @@ class TestSnifferParseFailStats:
         assert sniffer.stats["parse_fail"] == initial
         assert not any(e[0] == "parse_fail" for e in events)
         # 但仍然写日志（通过 plog），且返回（不 crash）
+
+
+class TestSnifferMissingKeySuppression:
+    """验证错过密钥后的降级静默行为。"""
+
+    def _make_sniffer(self):
+        events = []
+
+        def on_event(evt_type, data):
+            events.append((evt_type, data))
+
+        sniffer = Sniffer()
+        sniffer.on_event = on_event
+        sniffer.pkt_logger = MagicMock()
+        return sniffer, events
+
+    def _make_flow(self):
+        return FlowState(
+            flow_id="127.0.0.1:10000-127.0.0.1:8195",
+            client_ip="127.0.0.1",
+            client_port=10000,
+            server_ip="127.0.0.1",
+            server_port=8195,
+        )
+
+    def test_missing_key_emits_suppression_once_and_limits_logging(self):
+        sniffer, events = self._make_sniffer()
+        flow = self._make_flow()
+        be21 = _make_be21(cmd=0x4013, seq=1, direction="s2c")
+
+        for seq in range(1, 6):
+            be21.seq = seq
+            sniffer._handle_be21(flow, be21)
+
+        suppression_events = [e for e in events if e[0] == "key_missing_suppressed"]
+        assert len(suppression_events) == 1
+        assert suppression_events[0][1]["key_miss_count"] == 3
+        assert flow.key_missing_suppressed is True
+        assert flow.key_missing_reported is True
+        assert flow.key_miss_count == 5
+        assert sniffer.stats["key_miss"] == 5
+        assert sniffer.pkt_logger.log_key_miss.call_count == 3
+
+    def test_key_capture_clears_missing_key_suppression(self, tmp_path):
+        sniffer, events = self._make_sniffer()
+        sniffer.key_file = str(tmp_path / "session_key.txt")
+        flow = self._make_flow()
+        data = _make_be21(cmd=0x4013, seq=1, direction="s2c")
+
+        for seq in range(1, 4):
+            data.seq = seq
+            sniffer._handle_be21(flow, data)
+
+        key = b"1234567890abcdef"
+        ack = _make_be21(
+            cmd=0x1002,
+            seq=10,
+            direction="s2c",
+            body=b"",
+        )
+        ack.header_extra = b"\x00\x00" + key
+
+        sniffer._handle_be21(flow, ack)
+
+        assert flow.key == key
+        assert flow.key_miss_count == 0
+        assert flow.key_missing_suppressed is False
+        assert flow.key_missing_reported is False
+        assert any(e[0] == "key_captured" for e in events)

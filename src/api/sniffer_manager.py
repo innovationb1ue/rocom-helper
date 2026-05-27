@@ -28,7 +28,7 @@ class SnifferManager:
         self._broadcast_task: Optional[asyncio.Task] = None
         self._monitor_task: Optional[asyncio.Task] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
-        self._state = "idle"  # idle | listening | connected | key_captured | disconnected
+        self._state = "idle"  # idle | listening | connected | key_missing | key_captured | disconnected
         self._state_message = "未启动"
         self._key_hex: Optional[str] = None
         self._flow_count = 0
@@ -112,6 +112,9 @@ class SnifferManager:
             self._save_key(data.get("key_hex"), data.get("flow_id", ""))
             self._set_state("key_captured", "密钥已捕获，正在监听数据")
             self._push({"type": "key_captured", **data})
+        elif event_type == "key_missing_suppressed":
+            self._set_state("key_missing", "密钥已错过，请重启游戏或重新连接后再监听")
+            self._push({"type": "key_missing_suppressed", **data})
         elif event_type == "decrypt_fail":
             self._push({"type": "decrypt_fail", **data})
         elif event_type == "parse_fail":
@@ -261,6 +264,7 @@ class SnifferManager:
             "flow_count": self._flow_count,
             "key_hex": self._key_hex,
             "sniffer_running": self._sniffer is not None and self._sniffer.is_running,
+            "key_miss": stats.get("key_miss", 0),
             "decrypt_fail": stats.get("decrypt_fail", 0),
             "parse_fail": stats.get("parse_fail", 0),
         }
