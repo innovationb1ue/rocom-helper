@@ -136,6 +136,12 @@ def formatted_replay(replay_result):
     return all_formatted, state
 
 
+@pytest.fixture(scope="module")
+def generated_report():
+    from scripts.generate_battle_report import generate_report
+    return generate_report(SESSION_DIR)
+
+
 class TestEventFormatterSession2:
     def test_formatted_events_produced(self, formatted_replay):
         formatted, _ = formatted_replay
@@ -222,9 +228,8 @@ class TestBattleSummarySession2:
 
 
 class TestBattleReportSession2:
-    def test_generate_report(self, replay_result):
-        from scripts.generate_battle_report import generate_report
-        report = generate_report(SESSION_DIR)
+    def test_generate_report(self, generated_report):
+        report = generated_report
         assert len(report) > 200, "Report is too short"
         assert "对战开始" in report
         assert "对战结束" in report
@@ -232,9 +237,8 @@ class TestBattleReportSession2:
         assert "敌方阵容" in report
         assert "事件统计" in report
 
-    def test_report_saved(self, replay_result, tmp_path):
-        from scripts.generate_battle_report import generate_report
-        report = generate_report(SESSION_DIR)
+    def test_report_saved(self, generated_report, tmp_path):
+        report = generated_report
         out = tmp_path / "battle_session_2_report.txt"
         out.write_text(report, encoding="utf-8")
         assert out.exists()

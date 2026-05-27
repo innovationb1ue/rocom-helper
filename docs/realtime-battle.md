@@ -349,6 +349,9 @@ damage = base * effectiveness * stab * weather * hits * power_mult
 | GET | `/api/battle/pets` | 获取双方精灵列表 |
 | GET | `/api/battle/effects` | 获取天气/buff 信息 |
 | POST | `/api/battle/replay` | 回放战斗包（参数：delay_ms, session, stop_round） |
+| GET | `/api/battle/reports` | 列出可下载的 `.raco-report` |
+| GET | `/api/battle/reports/{report_id}` | 获取单个报告元数据 |
+| GET | `/api/battle/reports/{report_id}/download` | 下载 `.raco-report` 原始抓包包 |
 
 ### 2.8 Web 前端
 
@@ -385,7 +388,7 @@ npm install
 ### 3.3 启动后端
 
 ```bash
-python -m src.main
+py -m src.main
 ```
 
 API 服务运行在 `http://localhost:8000`。
@@ -470,7 +473,7 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 游戏逻辑 | `src/game/type_chart.py` | 18 属性克制矩阵、弱点/抗性查询 |
 | 游戏逻辑 | `src/game/stats.py` | 种族值/能力值计算（HP + 5 属性公式） |
 | 游戏逻辑 | `src/game/skill_eval.py` | 技能评分引擎 |
-| API | `src/api/routes_battle.py` | WebSocket 战斗端点 |
+| API | `src/api/routes_battle.py` | WebSocket 战斗端点、回放 API、`.raco-report` 下载 API |
 | 分析 | `src/analysis/battle_processor.py` | 纯同步事件处理器（状态 + 格式化 + 伤害 + hooks） |
 | 分析 | `src/analysis/pet_info.py` | 宠物信息构造工厂（from_wrapper/from_change_pet → to_dict） |
 | 分析 | `src/analysis/event_formatter.py` | 协议事件 → UI 格式化事件 |

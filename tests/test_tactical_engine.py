@@ -85,6 +85,34 @@ def _make_state(my_active=None, opp_active=None, my_pets=None, opp_pets=None, ro
     }
 
 
+@pytest.fixture(scope="module")
+def replay_session1_packets():
+    from pathlib import Path
+    from tests.packet_reader import load_battle_packets
+
+    return load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
+
+
+@pytest.fixture(scope="module")
+def replay_session1_state_only_result(replay_session1_packets):
+    from src.analysis.replay_runner import BattleReplayRunner
+
+    return BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+        replay_session1_packets
+    )
+
+
+@pytest.fixture(scope="module")
+def replay_session1_round8_state(replay_session1_packets):
+    from src.analysis.replay_runner import BattleReplayRunner
+
+    result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+        replay_session1_packets,
+        stop_round=8,
+    )
+    return result.rounds[-1].state_at_end
+
+
 # ---------------------------------------------------------------------------
 # Tests: _clamp01
 # ---------------------------------------------------------------------------
@@ -322,12 +350,37 @@ class TestRecommendation:
         assert "opp_predicted" in d
         assert "round_number" in d
         assert "confidence" in d
+        assert "primary_plan" in d
+        assert "metrics" in d
+        assert "opponent_profile" in d
         assert isinstance(d["actions"], list)
         if d["actions"]:
             action = d["actions"][0]
             assert "score" in action
             assert "reason" in action
             assert "action_type" in action
+            assert "expected_gain" in action
+            assert "risk" in action
+            assert "metrics" in action
+            assert "unknowns" in action
+
+    def test_opponent_prediction_has_threat_metadata(self):
+        my = _make_pet("我方", hp=120, max_hp=300, pet_id=1)
+        opp = _make_pet(
+            "敌方",
+            pet_id=101,
+            used_skills=[
+                {"skill_id": 7020370, "skill_name": "技能A", "skill_damage_type": 2,
+                 "skill_element": 1, "cost_energy": 1},
+            ],
+        )
+        state = _make_state(my_active=my, opp_active=opp, opp_pets=[opp])
+        rec = TacticalEngine().recommend(state)
+        assert rec is not None
+        skill_actions = [a for a in rec.opp_predicted if a.action_type == "skill"]
+        assert skill_actions
+        assert all(a.source for a in skill_actions)
+        assert any(a.threat_damage is not None for a in skill_actions)
 
     def test_with_multiple_switch_options(self):
         my = _make_pet("我方", pet_id=1, energy=10)
@@ -340,35 +393,19 @@ class TestRecommendation:
         switches = [a for a in rec.actions if a.action_type == "switch"]
         assert len(switches) == 2
 
-    def test_replay_session_runs(self):
+    def test_replay_session_runs(self, replay_session1_state_only_result):
         """集成测试：用真实回放数据验证引擎不崩溃。"""
-        from pathlib import Path
-        from tests.packet_reader import load_battle_packets
-        from src.analysis.battle_advisor import BattleAdvisor
-        from src.analysis.replay_runner import BattleReplayRunner
-
-        packets = load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
-        runner = BattleReplayRunner(include_analysis=False, include_hooks=False)
-        result = runner.run(packets)
-
         engine = TacticalEngine()
-        state = result.final_state
+        state = replay_session1_state_only_result.final_state
         if state.get("my_active") and state.get("opp_active"):
             rec = engine.recommend(state)
             assert rec is not None
             assert len(rec.actions) > 0
 
-    def test_round_8_damage_scores_match_replay_state(self):
-        from pathlib import Path
-        from tests.packet_reader import load_battle_packets
+    def test_round_8_damage_scores_match_replay_state(self, replay_session1_round8_state):
         from src.analysis.battle_advisor import BattleAdvisor
-        from src.analysis.replay_runner import BattleReplayRunner
 
-        packets = load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
-        result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
-            packets, stop_round=8
-        )
-        state = result.rounds[-1].state_at_end
+        state = replay_session1_round8_state
 
         rec = TacticalEngine().recommend(state)
         assert rec is not None

@@ -2,16 +2,24 @@
 from __future__ import annotations
 
 import asyncio
+import urllib.parse
 import json
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.responses import Response
 
 from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.constants import OPCODE_ROUND_START
+from src.analysis.battle_report import (
+    BattleReportError,
+    get_report_summary,
+    get_report_package,
+    scan_report_summaries,
+)
 from src.api.battle_manager import get_battle_manager
 
 logger = logging.getLogger(__name__)
@@ -85,6 +93,36 @@ async def get_battle_effects():
     }
 
 
+@router.get("/api/battle/reports")
+async def list_battle_reports():
+    reports = scan_report_summaries()
+    return {"reports": [r.__dict__ for r in reports]}
+
+
+@router.get("/api/battle/reports/{report_id}")
+async def get_battle_report(report_id: str):
+    try:
+        return get_report_summary(urllib.parse.unquote(report_id)).__dict__
+    except BattleReportError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.get("/api/battle/reports/{report_id}/download")
+async def download_battle_report(report_id: str):
+    try:
+        filename, payload = get_report_package(urllib.parse.unquote(report_id))
+    except BattleReportError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return Response(
+        content=payload,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "X-Report-Filename": filename,
+        },
+    )
+
+
 # ------------------------------------------------------------------
 # Replay endpoint
 # ------------------------------------------------------------------
@@ -147,7 +185,7 @@ async def replay_battle_packets(
                 stopped_early = True
                 break
 
-        result = await mgr.process_event(opcode, detail)
+        result = await mgr.process_event(opcode, detail, enable_archive=False)
         processed += 1
         total_formatted += len(result.formatted_events)
 

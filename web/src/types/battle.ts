@@ -116,10 +116,29 @@ export interface ActionScore {
   switch_to_name: string | null;
   score: number;
   reason: string;
+  category?: string;
+  expected_gain?: string;
+  risk?: string;
+  confidence?: string;
   damage_dealt: number | null;
   damage_taken: number | null;
   can_ko: boolean;
   energy_cost: number;
+  metrics?: {
+    speed_order?: string;
+    my_speed?: number;
+    opp_speed?: number;
+    energy_after?: number;
+    kill_line?: number;
+    survival_line?: number;
+    damage_pct?: number;
+    incoming_pct?: number;
+    can_ko?: boolean;
+    switch_penalty?: boolean;
+    type_matchup?: number;
+    effect_tags?: string[];
+  };
+  unknowns?: string[];
 }
 
 export interface OpponentAction {
@@ -128,6 +147,28 @@ export interface OpponentAction {
   skill_name: string | null;
   switch_to_name: string | null;
   probability: number;
+  source?: string;
+  reason?: string;
+  threat_damage?: number | null;
+  can_ko?: boolean;
+}
+
+export interface PredictionReliability {
+  confidence: string;
+  score: number;
+  coverage: {
+    my_attack_predictions: number;
+    opp_attack_predictions: number;
+    opponent_skill_source: string;
+  };
+  flags: { code: string; label: string; count: number }[];
+  missing_reasons: string[];
+  context: {
+    weather?: unknown;
+    weather_used?: boolean;
+    buffs_seen?: boolean;
+    hooks_used?: boolean;
+  };
 }
 
 export interface TacticalRecommendation {
@@ -135,6 +176,11 @@ export interface TacticalRecommendation {
   opp_predicted: OpponentAction[];
   round_number: number;
   confidence: string;
+  primary_plan?: string;
+  warnings?: string[];
+  metrics?: Record<string, unknown>;
+  reliability?: PredictionReliability;
+  opponent_profile?: Record<string, unknown>;
 }
 
 export interface BattleState {

@@ -35,17 +35,11 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    from src.api.routes_pets import router as pets_router
-    from src.api.routes_teams import router as teams_router
     from src.api.routes_battle import router as battle_router
-    from src.api.routes_data import router as data_router
     from src.api.routes_sniffer import router as sniffer_router
     from src.api.routes_config import router as config_router
 
-    app.include_router(pets_router, prefix="/api")
-    app.include_router(teams_router, prefix="/api/teams")
     app.include_router(battle_router)
-    app.include_router(data_router, prefix="/api/data")
     app.include_router(sniffer_router, prefix="/api/sniffer")
     app.include_router(config_router, prefix="/api")
 

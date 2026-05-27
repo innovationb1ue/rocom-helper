@@ -18,7 +18,7 @@ const BattleTimeline: React.FC<Props> = ({ events }) => (
   <Timeline
     items={events.slice(-20).reverse().map((ev) => ({
       color: ev.opcode === 0x132C ? 'red' : ev.opcode === 0x1316 ? 'green' : 'blue',
-      children: (
+      content: (
         <div>
           <Tag>{OPCODE_LABELS[ev.opcode] || `0x${ev.opcode.toString(16)}`}</Tag>
           {ev.round != null && <span>R{ev.round}</span>}

@@ -80,6 +80,10 @@ class OpponentAction:
     skill_name: Optional[str] = None
     switch_to_name: Optional[str] = None
     probability: float = 0.0
+    source: str = ""
+    reason: str = ""
+    threat_damage: Optional[int] = None
+    can_ko: bool = False
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -109,10 +113,16 @@ class ActionScore:
     switch_to_name: Optional[str] = None
     score: float = 0.0
     reason: str = ""
+    category: str = "balanced"
+    expected_gain: str = ""
+    risk: str = ""
+    confidence: str = "medium"
     damage_dealt: Optional[int] = None
     damage_taken: Optional[int] = None
     can_ko: bool = False
     energy_cost: int = 0
+    metrics: Dict[str, Any] = field(default_factory=dict)
+    unknowns: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -124,6 +134,11 @@ class TacticalRecommendation:
     opp_predicted: List[OpponentAction] = field(default_factory=list)
     round_number: int = 0
     confidence: str = "medium"
+    primary_plan: str = ""
+    warnings: List[str] = field(default_factory=list)
+    metrics: Dict[str, Any] = field(default_factory=dict)
+    reliability: Dict[str, Any] = field(default_factory=dict)
+    opponent_profile: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -131,4 +146,9 @@ class TacticalRecommendation:
             "opp_predicted": [o.to_dict() for o in self.opp_predicted],
             "round_number": self.round_number,
             "confidence": self.confidence,
+            "primary_plan": self.primary_plan,
+            "warnings": self.warnings,
+            "metrics": self.metrics,
+            "reliability": self.reliability,
+            "opponent_profile": self.opponent_profile,
         }

@@ -265,6 +265,14 @@ class SnifferManager:
             "parse_fail": stats.get("parse_fail", 0),
         }
 
+    def get_packet_session_dir(self) -> Optional[Any]:
+        if self._sniffer is None:
+            return None
+        pkt_logger = getattr(self._sniffer, "pkt_logger", None)
+        if pkt_logger is None:
+            return None
+        return getattr(pkt_logger, "session_dir", None)
+
     def _save_key(self, key_hex: Optional[str], flow_id: str) -> None:
         if not key_hex:
             return
