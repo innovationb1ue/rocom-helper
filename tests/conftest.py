@@ -13,6 +13,7 @@ SESSION2_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battl
 SESSION3_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_3"
 SESSION8_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_8"
 SESSION9_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_9"
+SESSION10_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_10"
 
 
 @pytest.fixture(scope="session")
@@ -79,3 +80,18 @@ def session9_runner_result(session9_packets):
     """Replay battle_session_9 through BattleReplayRunner once."""
     runner = BattleReplayRunner()
     return runner.run(session9_packets)
+
+
+@pytest.fixture(scope="session")
+def session10_packets():
+    """Load battle_session_10 packets once for the entire test session."""
+    if not SESSION10_DIR.exists():
+        pytest.skip("battle_session_10 fixtures not found")
+    return load_battle_packets(SESSION10_DIR)
+
+
+@pytest.fixture(scope="session")
+def session10_runner_result(session10_packets):
+    """Replay battle_session_10 through BattleReplayRunner once."""
+    runner = BattleReplayRunner()
+    return runner.run(session10_packets)
