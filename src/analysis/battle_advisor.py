@@ -125,7 +125,9 @@ class BattleAdvisor:
         name = eq.get("skill_name") or get_skill_name(skill_id) or "?"
         element = eq.get("skill_element") or 0
         damage_type = eq.get("skill_damage_type") or (meta.get("damage_type", 0) if meta else 0)
-        energy_cost = eq.get("cost_energy")
+        energy_cost = eq.get("runtime_cost_energy")
+        if energy_cost is None:
+            energy_cost = eq.get("cost_energy")
         if energy_cost is None and meta:
             ec = meta.get("energy_cost", [0])
             energy_cost = ec[0] if ec else 0

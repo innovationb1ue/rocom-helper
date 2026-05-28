@@ -77,6 +77,7 @@ class BattleStateTracker:
                 "global_events": [],
                 "perform_groups": [],
                 "sync_events": [],
+                "item_sync_events": [],
             },
             "phase": "idle",
             "my_pets": [],
@@ -154,6 +155,7 @@ class BattleStateTracker:
         })
         ctx.setdefault("perform_groups", [])
         ctx.setdefault("sync_events", [])
+        ctx.setdefault("item_sync_events", [])
         return ctx
 
     @staticmethod
@@ -238,6 +240,20 @@ class BattleStateTracker:
             MAX_SYNC_EVENTS,
         )
 
+    def _record_item_sync_events(self, entry: Dict[str, Any]) -> None:
+        for item in (entry.get("sync_data") or {}).get("item_sync", []) or []:
+            payload = {
+                "round": self.state.get("round", 0),
+                "packet_index": (self._current_event_detail or {}).get("packet_index"),
+                "group_id": entry.get("group_id"),
+                **copy.deepcopy(item),
+            }
+            self._append_bounded(
+                self._field_context().setdefault("item_sync_events", []),
+                {k: v for k, v in payload.items() if v is not None},
+                MAX_SYNC_EVENTS,
+            )
+
     def _pet_for_sync_id(self, pet_id: Any) -> Optional[Dict[str, Any]]:
         if pet_id is None:
             return None
@@ -261,21 +277,55 @@ class BattleStateTracker:
         skill_id = sync["skill_id"]
         runtime = pet.setdefault("skill_runtime", {})
         item = runtime.setdefault(self._skill_runtime_key(skill_id), {"skill_id": skill_id})
+        merged = dict(sync.get("skill_data") or {})
+        merged.update({k: v for k, v in sync.items() if k != "skill_data"})
+        if merged.get("damage_params"):
+            merged["damage_params_by_pet"] = {
+                str(dp.get("pet_id")): dp.get("damage_param")
+                for dp in merged["damage_params"]
+                if dp.get("pet_id") is not None and dp.get("damage_param") is not None
+            }
+        if merged.get("restraint_types"):
+            merged["restraint_types_by_pet"] = {
+                str(rt.get("pet_id")): rt.get("restraint_type")
+                for rt in merged["restraint_types"]
+                if rt.get("pet_id") is not None and rt.get("restraint_type") is not None
+            }
         for key in (
             "skill_name", "damage_param_change", "damage_param_result",
             "damage_param_pet_id", "cast_cnt_change", "cast_cnt_result",
             "pp_change", "pp_result", "cost_energy_change", "cost_energy_result",
             "cost_hp_change", "cost_hp_result", "display_hp_result",
-            "sp_energy_skill", "state", "damage_type",
+            "sp_energy_skill", "hp_per_energy", "state", "type", "cast_cnt",
+            "cost_energy", "raw_cost_energy", "equipped_slot", "cd_round",
+            "raw_damage", "rule_energy", "rule_damage_param", "effect_damage_param",
+            "buff_damage_param", "ex_damage_param", "damage_params",
+            "damage_params_by_pet", "restraint_types", "restraint_types_by_pet",
+            "cd_info", "enhance_info", "damage_type", "source",
         ):
-            if sync.get(key) is not None:
-                item[key] = sync[key]
+            if merged.get(key) is not None:
+                item[key] = merged[key]
+        item["source_round"] = self.state.get("round", 0)
         item["round"] = self.state.get("round", 0)
 
-        # 同步装备技能里的实时能耗，供当前回合建议直接使用。
+        runtime_cost = (
+            merged.get("cost_energy_result")
+            if merged.get("cost_energy_result") is not None
+            else merged.get("cost_energy")
+        )
+        if runtime_cost is None:
+            runtime_cost = merged.get("raw_cost_energy")
+
+        # 同步装备技能里的实时能耗和目标参数，供当前回合建议直接使用。
         for skill in pet.get("equipped_skills", []):
-            if skill.get("skill_id") == skill_id and sync.get("cost_energy_result") is not None:
-                skill["runtime_cost_energy"] = sync["cost_energy_result"]
+            if skill.get("skill_id") != skill_id:
+                continue
+            if runtime_cost is not None:
+                skill["runtime_cost_energy"] = runtime_cost
+            if merged.get("damage_params") is not None:
+                skill["runtime_damage_params"] = merged["damage_params"]
+            if merged.get("restraint_types") is not None:
+                skill["runtime_restraint_types"] = merged["restraint_types"]
 
     def _apply_pet_sync(self, sync: Dict[str, Any]) -> None:
         pet = self._pet_for_sync_id(sync.get("pet_id"))
@@ -290,6 +340,10 @@ class BattleStateTracker:
             pet["energy"] = max(0, min(max_energy, sync["energy_result"]))
         if sync.get("max_energy") is not None:
             pet["max_energy"] = sync["max_energy"]
+        if sync.get("state_bit_results") is not None:
+            pet["state_bit_results"] = sync["state_bit_results"]
+        if sync.get("shield_result") is not None:
+            pet["shield"] = sync["shield_result"]
         if sync.get("damage_result") is not None:
             pet["last_damage_result"] = sync["damage_result"]
         if sync.get("original_damage") is not None:
@@ -298,6 +352,12 @@ class BattleStateTracker:
             pet["charging_skill_id"] = sync["charging_skill_id"]
         if sync.get("instant_kill_result") is not None:
             pet["instant_kill_result"] = sync["instant_kill_result"]
+        if sync.get("revive_round") is not None:
+            pet["revive_round"] = sync["revive_round"]
+        if sync.get("revive_rounds") is not None:
+            pet["revive_rounds"] = sync["revive_rounds"]
+        if sync.get("triggered_buffs") is not None:
+            pet["triggered_buffs"] = sync["triggered_buffs"]
         if sync.get("buff_id") is not None and sync.get("buff_stack_result") is not None:
             buffs = pet.setdefault("buffs", [])
             existing = next((b for b in buffs if b.get("id") == sync["buff_id"]), None)
@@ -312,21 +372,39 @@ class BattleStateTracker:
                     "stage": sync["buff_stack_result"],
                 })
 
+    def _apply_pet_info_sync(self, sync: Dict[str, Any]) -> None:
+        pet = self._pet_for_sync_id(sync.get("pet_id"))
+        if pet is None:
+            return
+        for key in ("name", "level", "base_conf_id", "types", "max_hp"):
+            if sync.get(key) is not None:
+                pet[key] = sync[key]
+        if sync.get("equipped_skills"):
+            pet["runtime_equipped_skills"] = sync["equipped_skills"]
+
     def _apply_entry_sync_data(self, entry: Dict[str, Any]) -> None:
         sync_data = entry.get("sync_data") or {}
         if not sync_data:
             return
         self._record_sync_event(entry)
+        self._record_item_sync_events(entry)
         for sync in sync_data.get("pet_sync", []):
             self._apply_pet_sync(sync)
         for sync in sync_data.get("skill_sync", []):
+            sync.setdefault("source", "skill_sync")
             self._update_skill_runtime(self._pet_for_sync_id(sync.get("pet_id")), sync)
-        # role_sync/comm_sync 目前只保留紧凑历史，不主动改宠物状态。
+        for sync in sync_data.get("skill_change_sync", []):
+            sync.setdefault("source", "skill_change_sync")
+            self._update_skill_runtime(self._pet_for_sync_id(sync.get("pet_id")), sync)
+        for sync in sync_data.get("pet_info", []):
+            self._apply_pet_info_sync(sync)
+        # role_sync/comm_sync/task_infos 目前只保留紧凑历史，不主动改宠物状态。
 
     def _apply_pet_skill_updates(self, entry: Dict[str, Any]) -> None:
         for update in entry.get("pet_skill_updates", []) or []:
             pet = self._pet_for_sync_id(update.get("pet_id"))
             for skill in update.get("skills", []) or []:
+                skill.setdefault("source", "data_update.pet_skill")
                 self._update_skill_runtime(pet, skill)
 
     @staticmethod
@@ -437,6 +515,7 @@ class BattleStateTracker:
             "global_events": [],
             "perform_groups": [],
             "sync_events": [],
+            "item_sync_events": [],
         }
         self._set_weather_current(weather)
 

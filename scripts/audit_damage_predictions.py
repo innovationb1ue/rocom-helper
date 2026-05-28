@@ -39,6 +39,18 @@ def main() -> None:
     print(f"Matched predictions:    {report['matched_predictions']}")
     print(f"MAE: {report['mae']}  MAPE: {report['mape']}")
     print(f"Within 10%: {report['within_10pct']}  Within 25%: {report['within_25pct']}")
+    if report.get("candidate_strategies"):
+        print("Candidate strategies:")
+        for name, item in report["candidate_strategies"].items():
+            print(
+                f"  {name}: n={item['samples']} "
+                f"MAE={item['mae']} MAPE={item['mape']}"
+            )
+    if report.get("source_counts"):
+        print("Runtime source counts:")
+        for source_name, counts in report["source_counts"].items():
+            summary = ", ".join(f"{k or '?'}={v}" for k, v in sorted(counts.items()))
+            print(f"  {source_name}: {summary}")
     if len(sessions) > 1:
         print("Top skill groups:")
         for name, item in list(report["by_skill"].items())[:8]:

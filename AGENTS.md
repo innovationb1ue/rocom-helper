@@ -475,3 +475,16 @@ JSON 输出（`--json`，写入 `tmp/`）：结构化的 `ReplayResult` 序列�
 ## 语言约定
 
 代码库中的 UI 文本、注释和文档字符串使用中文。游戏数据文件使用中文字段名。修改 UI 或数据相关代码时请保持此约定。
+
+## 编码约定
+
+仓库文本文件默认按 UTF-8 处理。读取包含中文的文件时必须显式指定 UTF-8，避免 Windows PowerShell 默认编码导致中文乱码。不要用裸 `Get-Content path\to\file` 作为判断依据。
+
+推荐命令：
+```powershell
+Get-Content -LiteralPath path\to\file -Encoding UTF8
+$env:PYTHONIOENCODING = "utf-8"
+py -c "from pathlib import Path; print(Path('path/to/file').read_text(encoding='utf-8'))"
+```
+
+如果输出出现 `鍥炴斁`、`浼ゅ` 等乱码，优先按编码显示问题处理，重新用 UTF-8 读取后再分析文件内容。

@@ -144,13 +144,18 @@ class DamageCalculator:
         weather: Optional[Dict[str, Any]] = None,
     ) -> Optional[DamageResult]:
         """计算单个技能的伤害预测。返回 None 如果不是攻击技能。"""
-        power = self._get_power(skill_meta)
+        base_power = self._get_power(skill_meta)
         damage_type = skill_meta.get("damage_type", 0)
-        if power <= 0 or damage_type not in (2, 3):
+        if base_power <= 0 or damage_type not in (2, 3):
             return None
 
         raw_dam_type = skill_meta.get("skill_dam_type", 0)
         skill_element = SDT_TO_TYPE.get(raw_dam_type, raw_dam_type)
+        runtime_skill = self._get_runtime_skill(attacker, skill_meta.get("id"))
+        server_runtime = self._resolve_server_runtime(runtime_skill, defender)
+        server_runtime["formula_power_source"] = "skill_config"
+        server_runtime["power_used_in_formula"] = False
+        power = base_power
 
         # Phase 1: Resolve power
         power, _ = self._resolve_power(power, skill_meta, attacker, defender)
@@ -165,7 +170,9 @@ class DamageCalculator:
         base = self._compute_base_damage(power, effective_atk, effective_def, skill_meta, attacker, defender)
 
         # Phase 4: Apply multipliers (effectiveness, STAB, weather, hooks)
-        mult_result = self._apply_multipliers(base, skill_element, attacker, defender, skill_meta, weather)
+        mult_result = self._apply_multipliers(
+            base, skill_element, attacker, defender, skill_meta, weather, server_runtime,
+        )
         dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab = mult_result
 
         # Phase 5: Finalize (post_calc hooks, hit count, HP%, energy, result)
@@ -174,6 +181,7 @@ class DamageCalculator:
             effectiveness, stab_mult, weather_mult, power_mult,
             skill_meta, skill_element, attacker, defender,
             damage_type, eff_label, is_stab, confidence, warnings, stat_sources,
+            runtime_skill, server_runtime, power,
         )
 
     # ------------------------------------------------------------------
@@ -275,12 +283,25 @@ class DamageCalculator:
         self,
         base: float, skill_element: int,
         attacker: Dict, defender: Dict, skill_meta: Dict,
-        weather: Optional[Dict],
+        weather: Optional[Dict], server_runtime: Optional[Dict[str, Any]] = None,
     ) -> Tuple[int, float, float, float, float, str, bool]:
         """阶段 3: 属性克制、STAB、天气、pre_final hook。"""
         defender_types = defender.get("types", [])
-        effectiveness = self.chart.get_multiplier(skill_element, defender_types)
-        eff_label = self.chart.get_effectiveness_label(effectiveness)
+        local_effectiveness = self.chart.get_multiplier(skill_element, defender_types)
+        server_runtime = server_runtime or {}
+        server_effectiveness = server_runtime.get("effectiveness")
+        display_effectiveness = server_effectiveness if server_effectiveness is not None else local_effectiveness
+        # damage_params 已按目标给出威力参数，进入公式后不再重复乘克制。
+        calc_effectiveness = (
+            1.0
+            if server_runtime.get("power_source") == "server_damage_params"
+            and server_runtime.get("power_used_in_formula")
+            else display_effectiveness
+        )
+        server_runtime["local_effectiveness"] = local_effectiveness
+        server_runtime["display_effectiveness"] = display_effectiveness
+        server_runtime["calc_effectiveness"] = calc_effectiveness
+        eff_label = self.chart.get_effectiveness_label(display_effectiveness)
 
         attacker_types = attacker.get("types", [])
         is_stab = skill_element in attacker_types
@@ -291,7 +312,7 @@ class DamageCalculator:
 
         ctx = self._run_hooks("pre_final", {
             "base_damage": base,
-            "effectiveness": effectiveness,
+            "effectiveness": calc_effectiveness,
             "stab_mult": stab_mult,
             "weather_mult": weather_mult,
             "power_mult": power_mult,
@@ -300,13 +321,18 @@ class DamageCalculator:
             "defender": defender,
         })
         base = ctx["base_damage"]
-        effectiveness = ctx["effectiveness"]
+        calc_effectiveness = ctx["effectiveness"]
         stab_mult = ctx["stab_mult"]
         weather_mult = ctx.get("weather_mult", weather_mult)
         power_mult = ctx.get("power_mult", power_mult)
+        if server_runtime.get("effectiveness_source") != "server_restraint_types":
+            display_effectiveness = calc_effectiveness
+            eff_label = self.chart.get_effectiveness_label(display_effectiveness)
+        server_runtime["display_effectiveness"] = display_effectiveness
+        server_runtime["calc_effectiveness"] = calc_effectiveness
 
-        dmg = max(1, int(base * effectiveness * stab_mult * weather_mult * power_mult))
-        return dmg, effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab
+        dmg = max(1, int(base * calc_effectiveness * stab_mult * weather_mult * power_mult))
+        return dmg, display_effectiveness, stab_mult, weather_mult, power_mult, eff_label, is_stab
 
     def _finalize_damage(
         self,
@@ -318,6 +344,9 @@ class DamageCalculator:
         attacker: Dict, defender: Dict,
         damage_type: int, eff_label: str, is_stab: bool,
         confidence: str, warnings: List[str], stat_sources: Dict[str, str],
+        runtime_skill: Optional[Dict[str, Any]] = None,
+        server_runtime: Optional[Dict[str, Any]] = None,
+        final_power: Optional[int] = None,
     ) -> DamageResult:
         """阶段 4: post_calc hook、连击、HP%、能耗、构造结果。"""
         base_hits = self._get_base_hit_count(skill_meta)
@@ -341,13 +370,10 @@ class DamageCalculator:
         pct = total_damage / defender_max_hp
         can_ko = total_damage >= defender_cur_hp
 
-        # 战斗同步里的 damage_param_result 是运行时威力参数信号，先作为解释字段保留。
-        runtime_skill = self._get_runtime_skill(attacker, skill_meta.get("id"))
-        runtime_power = runtime_skill.get("damage_param_result")
-        energy_costs = skill_meta.get("energy_cost", [0])
-        energy_cost = energy_costs[0] if energy_costs else 0
-        if runtime_skill.get("cost_energy_result") is not None:
-            energy_cost = runtime_skill["cost_energy_result"]
+        runtime_skill = runtime_skill or self._get_runtime_skill(attacker, skill_meta.get("id"))
+        server_runtime = server_runtime or self._resolve_server_runtime(runtime_skill, defender)
+        runtime_power = server_runtime.get("power") or runtime_skill.get("damage_param_result")
+        energy_cost, energy_cost_source = self._resolve_energy_cost(runtime_skill, skill_meta)
         if energy_cost > 0:
             attacker_energy = attacker.get("energy", 10)
             if attacker_energy < energy_cost:
@@ -356,10 +382,15 @@ class DamageCalculator:
         effective_power = int(power * stab_mult)
         breakdown = {
             "base_power": self._get_power(skill_meta),
+            "final_power": final_power if final_power is not None else power,
+            "power_source": server_runtime.get("formula_power_source", "skill_config"),
+            "energy_cost_source": energy_cost_source,
+            "effectiveness_source": server_runtime.get("effectiveness_source", "type_chart"),
             "effective_power": effective_power,
             "runtime_power": runtime_power,
             "damage_param_result": runtime_power,
             "runtime_skill": runtime_skill or None,
+            "server_runtime": server_runtime or None,
             "ability_level": round(ability_level, 3),
             "atk": int(effective_atk),
             "def_": int(effective_def),
@@ -445,6 +476,84 @@ class DamageCalculator:
         runtime = attacker.get("skill_runtime") or {}
         item = runtime.get(str(skill_id)) or runtime.get(skill_id)
         return item if isinstance(item, dict) else {}
+
+    @staticmethod
+    def _target_keys(pet: Dict[str, Any]) -> List[str]:
+        keys: List[str] = []
+        for key in ("pet_id", "slot", "side"):
+            value = pet.get(key)
+            if value is not None:
+                keys.append(str(value))
+        return keys
+
+    @staticmethod
+    def _restraint_to_multiplier(value: Any) -> Optional[float]:
+        if value is None:
+            return None
+        try:
+            ivalue = int(value)
+        except (TypeError, ValueError):
+            return None
+        return {
+            -2: 0.25,
+            -1: 0.5,
+            0: 1.0,
+            1: 1.5,
+            2: 2.0,
+            3: 4.0,
+        }.get(ivalue)
+
+    def _resolve_server_runtime(self, runtime_skill: Dict[str, Any], defender: Dict[str, Any]) -> Dict[str, Any]:
+        """按目标读取服务器同步的技能威力参数和克制结果。"""
+        if not runtime_skill:
+            return {}
+        target_keys = self._target_keys(defender)
+        damage_by_pet = runtime_skill.get("damage_params_by_pet") or {}
+        restraint_by_pet = runtime_skill.get("restraint_types_by_pet") or {}
+
+        runtime_power = None
+        power_source = "skill_config"
+        for key in target_keys:
+            if damage_by_pet.get(key) is not None:
+                runtime_power = damage_by_pet[key]
+                power_source = "server_damage_params"
+                break
+        if runtime_power is None and runtime_skill.get("damage_param_result") is not None:
+            runtime_power = runtime_skill["damage_param_result"]
+            power_source = "server_damage_param_result"
+
+        restraint_value = None
+        for key in target_keys:
+            if restraint_by_pet.get(key) is not None:
+                restraint_value = restraint_by_pet[key]
+                break
+        effectiveness = self._restraint_to_multiplier(restraint_value)
+
+        out: Dict[str, Any] = {
+            "runtime_skill": runtime_skill,
+            "power": runtime_power,
+            "power_source": power_source,
+            "target_keys": target_keys,
+        }
+        if effectiveness is not None:
+            out["effectiveness"] = effectiveness
+            out["restraint_type"] = restraint_value
+            out["effectiveness_source"] = "server_restraint_types"
+        else:
+            out["effectiveness_source"] = "type_chart"
+        return {k: v for k, v in out.items() if v is not None}
+
+    @staticmethod
+    def _resolve_energy_cost(runtime_skill: Dict[str, Any], skill_meta: Dict[str, Any]) -> Tuple[int, str]:
+        for key, source in (
+            ("cost_energy_result", "skill_sync.cost_energy_result"),
+            ("cost_energy", "pet_skill.cost_energy"),
+            ("raw_cost_energy", "pet_skill.raw_cost_energy"),
+        ):
+            if runtime_skill.get(key) is not None:
+                return int(runtime_skill[key]), source
+        energy_costs = skill_meta.get("energy_cost", [0])
+        return (int(energy_costs[0]) if energy_costs else 0), "skill_config"
 
     @staticmethod
     def _get_stat_with_source(pet: Dict[str, Any], stat_name: str) -> Tuple[Optional[int], str]:

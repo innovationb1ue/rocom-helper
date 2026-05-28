@@ -398,6 +398,8 @@ class TestReplayRunnerFieldContext:
         ]
         assert any(item.get("damage_param_result") is not None for item in runtime_items)
         assert any(item.get("cost_energy_result") is not None for item in runtime_items)
+        assert any(item.get("damage_params_by_pet") for item in runtime_items)
+        assert any(item.get("restraint_types_by_pet") for item in runtime_items)
 
 
 # ---------------------------------------------------------------------------

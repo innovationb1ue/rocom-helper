@@ -347,8 +347,9 @@ class TestCalculate:
         assert bd["stab"] == 1.5
         assert bd["hit_count"] == 1
 
-    def test_runtime_skill_values_are_explain_only(self, calc):
-        """运行时威力参数进入解释字段，但不直接替换伤害公式威力。"""
+    def test_runtime_skill_damage_param_updates_power_and_energy(self, calc):
+        """服务器同步的威力参数和能耗优先于静态技能配置。"""
+        calc.clear_hooks()
         attacker = _make_attacker(types=[1], energy=3)
         attacker["skill_runtime"] = {
             "7700001": {
@@ -362,9 +363,36 @@ class TestCalculate:
         assert result.power == 80
         assert result.energy_cost == 4
         assert bd["base_power"] == 80
+        assert bd["final_power"] == 80
+        assert bd["power_source"] == "skill_config"
+        assert bd["energy_cost_source"] == "skill_sync.cost_energy_result"
         assert bd["runtime_power"] == 150
         assert bd["damage_param_result"] == 150
         assert bd["runtime_skill"]["pp_result"] == 8
+
+    def test_target_damage_params_do_not_double_apply_restraint(self, calc):
+        """目标相关 damage_params 已包含服务器目标语义，公式中不再重复乘克制。"""
+        calc.clear_hooks()
+        attacker = _make_attacker(types=[1], energy=5)
+        attacker["skill_runtime"] = {
+            "7700001": {
+                "cost_energy": 2,
+                "damage_params_by_pet": {"401": 180},
+                "restraint_types_by_pet": {"401": 1},
+            }
+        }
+        defender = _make_defender(types=[3], def_=150)
+        defender["pet_id"] = 401
+        result = calc.calculate(attacker, defender, _make_skill(element=1))
+        bd = result.damage_breakdown
+        assert result.power == 80
+        assert bd["final_power"] == 80
+        assert result.expected_damage == 216
+        assert result.effectiveness == 1.5
+        assert bd["power_source"] == "skill_config"
+        assert bd["server_runtime"]["power_source"] == "server_damage_params"
+        assert bd["effectiveness_source"] == "server_restraint_types"
+        assert result.energy_cost == 2
 
     def test_to_dict(self, calc):
         result = calc.calculate(

@@ -937,6 +937,20 @@ class TestGlobalFieldContext:
                              "state": 3,
                              "damage_type": 2},
                         ],
+                        "skill_change_sync": [
+                            {"pet_id": 1, "skill_id": 7020370,
+                             "skill_data": {
+                                 "cost_energy": 3,
+                                 "raw_cost_energy": 5,
+                                 "damage_params": [{"pet_id": 401, "damage_param": 180}],
+                                 "restraint_types": [{"pet_id": 401, "restraint_type": 1}],
+                                 "cd_round": 2,
+                                 "damage_type": 2,
+                             }},
+                        ],
+                        "item_sync": [
+                            {"item_id": 9001, "num": 1, "remain_use_cnt": 2},
+                        ],
                     },
                 },
             ],
@@ -947,10 +961,16 @@ class TestGlobalFieldContext:
         runtime = state["my_active"]["skill_runtime"]["7020370"]
         assert runtime["damage_param_result"] == 150
         assert runtime["cost_energy_result"] == 4
+        assert runtime["cost_energy"] == 3
+        assert runtime["raw_cost_energy"] == 5
         assert runtime["pp_result"] == 8
+        assert runtime["damage_params_by_pet"]["401"] == 180
+        assert runtime["restraint_types_by_pet"]["401"] == 1
+        assert runtime["cd_round"] == 2
         ctx = state["field_context"]
         assert ctx["perform_groups"][-1]["group_id"] == 7
         assert ctx["sync_events"][-1]["sync_data"]["skill_sync"][0]["damage_param_result"] == 150
+        assert ctx["item_sync_events"][-1]["item_id"] == 9001
 
     def test_data_update_pet_skill_updates_skill_runtime(self, tracker):
         """data_update.pet_skill 应进入同一套 skill_runtime。"""
@@ -964,7 +984,9 @@ class TestGlobalFieldContext:
                     {
                         "pet_id": 100,
                         "skills": [
-                            {"skill_id": 7020370, "cost_energy_result": 4, "state": 2},
+                            {"skill_id": 7020370, "cost_energy": 4, "raw_cost_energy": 5,
+                             "state": 2, "type": 1,
+                             "damage_params": [{"pet_id": 401, "damage_param": 180}]},
                         ],
                     },
                 ],
@@ -972,8 +994,11 @@ class TestGlobalFieldContext:
         ]))
 
         runtime = state["my_active"]["skill_runtime"]["7020370"]
-        assert runtime["cost_energy_result"] == 4
+        assert runtime["cost_energy"] == 4
+        assert runtime["raw_cost_energy"] == 5
         assert runtime["state"] == 2
+        assert runtime["type"] == 1
+        assert runtime["damage_params_by_pet"]["401"] == 180
 
 
 # ── 有效速度计算测试 ──────────────────────────────────────────────

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from statistics import mean
+from collections import Counter
 from typing import Any, Dict, Iterable, List, Optional
 
 from src.analysis.replay_runner import ReplayResult
@@ -29,6 +30,11 @@ class DamageAuditSample:
     confidence: Optional[str]
     accuracy_flags: List[str]
     validation_hint: Optional[str]
+    power_source: Optional[str]
+    energy_cost_source: Optional[str]
+    effectiveness_source: Optional[str]
+    candidate_totals: Dict[str, int]
+    candidate_abs_errors: Dict[str, int]
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -53,6 +59,8 @@ def build_damage_audit(result: ReplayResult) -> Dict[str, Any]:
         "within_10pct": sum(1 for s in matched if s.pct_error is not None and s.pct_error <= 0.10),
         "within_25pct": sum(1 for s in matched if s.pct_error is not None and s.pct_error <= 0.25),
         "high_confidence_samples": len(high_conf),
+        "source_counts": _source_counts([s.to_dict() for s in matched]),
+        "candidate_strategies": _candidate_strategy_summary([s.to_dict() for s in matched]),
         "catastrophic_high_confidence": catastrophic_high,
         "samples": [s.to_dict() for s in samples],
     }
@@ -78,6 +86,8 @@ def build_multi_session_damage_audit(reports: Dict[str, Dict[str, Any]]) -> Dict
         "mape": round(mean(pct_errors), 4) if pct_errors else None,
         "within_10pct": sum(1 for s in matched if s.get("pct_error") is not None and s["pct_error"] <= 0.10),
         "within_25pct": sum(1 for s in matched if s.get("pct_error") is not None and s["pct_error"] <= 0.25),
+        "source_counts": _source_counts(matched),
+        "candidate_strategies": _candidate_strategy_summary(matched),
         "by_skill": _group_samples(all_samples, "skill_name"),
         "by_session": {
             session: {
@@ -100,6 +110,32 @@ def build_multi_session_damage_audit(reports: Dict[str, Dict[str, Any]]) -> Dict
             and s.get("pct_error") is not None
             and s["pct_error"] > 0.5
         ],
+    }
+
+
+def _source_counts(samples: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
+    return {
+        "power_source": dict(Counter(str(s.get("power_source") or "") for s in samples)),
+        "energy_cost_source": dict(Counter(str(s.get("energy_cost_source") or "") for s in samples)),
+        "effectiveness_source": dict(Counter(str(s.get("effectiveness_source") or "") for s in samples)),
+    }
+
+
+def _candidate_strategy_summary(samples: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    grouped: Dict[str, List[int]] = {}
+    grouped_pct: Dict[str, List[float]] = {}
+    for sample in samples:
+        actual = int(sample.get("actual_total") or 0)
+        for name, abs_error in (sample.get("candidate_abs_errors") or {}).items():
+            grouped.setdefault(name, []).append(abs_error)
+            grouped_pct.setdefault(name, []).append(abs_error / max(1, actual))
+    return {
+        name: {
+            "samples": len(errors),
+            "mae": round(mean(errors), 2) if errors else None,
+            "mape": round(mean(grouped_pct.get(name, [])), 4) if grouped_pct.get(name) else None,
+        }
+        for name, errors in sorted(grouped.items())
     }
 
 
@@ -163,10 +199,18 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 confidence = pred_obj.get("confidence") or prediction.get("confidence")
                 flags = list(pred_obj.get("accuracy_flags") or [])
                 hint = prediction.get("validation_hint")
+                breakdown = prediction.get("damage_breakdown") or {}
+            else:
+                breakdown = {}
 
             error = predicted_total - actual_total if predicted_total is not None else None
             abs_error = abs(error) if error is not None else None
             pct_error = abs_error / max(1, actual_total) if abs_error is not None else None
+            candidates = _candidate_totals(predicted_total, prediction or {}, breakdown)
+            candidate_errors = {
+                name: abs(total - actual_total)
+                for name, total in candidates.items()
+            }
             yield DamageAuditSample(
                 round_num=event.round_num,
                 event_index=event.index,
@@ -184,6 +228,11 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 confidence=confidence,
                 accuracy_flags=flags,
                 validation_hint=hint,
+                power_source=breakdown.get("power_source"),
+                energy_cost_source=breakdown.get("energy_cost_source"),
+                effectiveness_source=breakdown.get("effectiveness_source"),
+                candidate_totals=candidates,
+                candidate_abs_errors=candidate_errors,
             )
 
 
@@ -197,3 +246,23 @@ def _find_prediction(
         if pred.get("skill_name") == skill_name:
             return pred
     return None
+
+
+def _candidate_totals(
+    predicted_total: Optional[int],
+    prediction: Dict[str, Any],
+    breakdown: Dict[str, Any],
+) -> Dict[str, int]:
+    if predicted_total is None:
+        return {}
+    out = {"active": int(predicted_total)}
+    power = breakdown.get("final_power") or prediction.get("power") or breakdown.get("runtime_power")
+    base_power = breakdown.get("base_power")
+    if power and base_power and power != base_power:
+        out["static_power_estimate"] = max(1, round(predicted_total * base_power / power))
+    server_runtime = breakdown.get("server_runtime") or {}
+    calc_eff = server_runtime.get("calc_effectiveness")
+    display_eff = server_runtime.get("display_effectiveness")
+    if breakdown.get("power_source") == "server_damage_params" and calc_eff and display_eff:
+        out["server_power_double_restraint"] = max(1, round(predicted_total * display_eff / calc_eff))
+    return out

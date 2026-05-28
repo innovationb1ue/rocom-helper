@@ -25,6 +25,7 @@
 from __future__ import annotations
 
 import logging
+import struct
 from typing import Any, Dict, List, Optional
 
 from src.protocol.proto_core import (
@@ -421,7 +422,11 @@ _PET_SYNC_FIELDS = {
     27: ("state_bit_results", False),
     30: ("instant_kill_change", True),
     31: ("instant_kill_result", True),
+    32: ("revive_round", True),
+    33: ("revive_rounds", True),
     34: ("charging_skill_id", False),
+    35: ("height_change", True),
+    36: ("height_result", True),
     38: ("mutation_type", False),
     39: ("max_energy", False),
 }
@@ -458,6 +463,8 @@ _ROLE_SYNC_FIELDS = {
     9: ("hp_result", True),
     10: ("pvp_score_change", True),
     11: ("pvp_score_result", True),
+    12: ("black_hp_change", True),
+    13: ("black_hp_result", True),
     14: ("legend_skill_cast_num", True),
     15: ("allow_use_cnt_inbattle", True),
 }
@@ -468,6 +475,17 @@ _COMM_SYNC_FIELDS = {
     3: ("sp_energy_result", True),
     4: ("final_battle_energy_change", True),
     5: ("final_battle_energy_result", True),
+    6: ("b1_phantom_point_change", True),
+    7: ("b1_phantom_point_result", True),
+}
+
+_ITEM_SYNC_FIELDS = {
+    1: ("item_id", False),
+    4: ("num", True),
+    6: ("remain_use_cnt", True),
+    10: ("allow_use_cnt", True),
+    11: ("battle_use_time_max", True),
+    12: ("battle_use_time_remain", True),
 }
 
 
@@ -481,6 +499,240 @@ def _pick_sync_value(msg: Dict[str, Any], field_no: int, signed: bool = False) -
     if value is None:
         return None
     return maybe_signed64(value) if signed else value
+
+
+def _pick_fixed32_float(msg: Dict[str, Any], field_no: int) -> Optional[float]:
+    """解析 protobuf wire5 float 字段，服务器会用它同步部分技能换算参数。"""
+    for entry in field_groups(msg).get(field_no, []):
+        raw = entry.get("raw_hex")
+        if not raw:
+            continue
+        try:
+            return round(float(struct.unpack("<f", bytes.fromhex(raw))[0]), 6)
+        except (ValueError, struct.error):
+            continue
+    return None
+
+
+def _extract_buffdata_93_skill(msg: Dict[str, Any]) -> Dict[str, Any]:
+    """解析 triggered_buffs 中的轻量 buff 触发引用。"""
+    return _compact_dict({
+        "buffbase_id": _pick_sync_value(msg, 1, True),
+        "value": _pick_sync_value(msg, 2, True),
+        "side": _pick_sync_value(msg, 3, True),
+        "role_uin": _pick_sync_value(msg, 4, False),
+    })
+
+
+def _extract_damage_params(msg: Dict[str, Any], field_no: int) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(field_no, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "pet_id": _pick_sync_value(sub, 1, False),
+            "damage_param": _pick_sync_value(sub, 2, False),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_restraint_types(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(27, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "pet_id": _pick_sync_value(sub, 1, False),
+            "restraint_type": _pick_sync_value(sub, 2, True),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_cd_info(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(34, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "buff_id": _pick_sync_value(sub, 1, False),
+            "value": _pick_sync_value(sub, 2, True),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_enhance_info(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(35, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "buff_id": _pick_sync_value(sub, 1, False),
+            "effect_ids": [maybe_signed64(v) for v in collect_varints(sub, 2)],
+            "cast_moment": _pick_sync_value(sub, 3, False),
+            "tip_id": _pick_sync_value(sub, 4, False),
+            "skill_id": normalize_skill_id(_pick_sync_value(sub, 5, False)),
+            "stack": _pick_sync_value(sub, 6, False),
+            "buffbase_id": _pick_sync_value(sub, 7, False),
+            "skill_type": _pick_sync_value(sub, 8, True),
+            "caster_pet_base_id": _pick_sync_value(sub, 10, False),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_pet_skill_round_data(msg: Dict[str, Any]) -> Dict[str, Any]:
+    """解析 PetSkillRoundData。field 2 是状态，field 3 是类型，field 39 才是技能 ID。"""
+    sid = normalize_skill_id(_pick_sync_value(msg, 39, False))
+    item = _compact_dict({
+        "raw_round_skill_id": _pick_sync_value(msg, 1, False),
+        "skill_id": sid,
+        "skill_name": skill_name(sid),
+        "state": _pick_sync_value(msg, 2, True),
+        "type": _pick_sync_value(msg, 3, False),
+        "cast_cnt": _pick_sync_value(msg, 4, True),
+        "cost_hp": _pick_sync_value(msg, 5, False),
+        "display_hp": bool(_pick_sync_value(msg, 6, False) or 0),
+        "hp_per_energy": _pick_fixed32_float(msg, 7),
+        "last_cast_round": _pick_sync_value(msg, 8, True),
+        "cost_energy": _pick_sync_value(msg, 9, False),
+        "cost_energy_buff": _pick_sync_value(msg, 10, True),
+        "cost_energy_buff_factor": _pick_sync_value(msg, 11, True),
+        "cost_energy_buff_mul": _pick_sync_value(msg, 12, True),
+        "cost_energy_buff_set": _pick_sync_value(msg, 13, True),
+        "sp_energy_skill": _pick_sync_value(msg, 14, False),
+        "carryon_slot_idx": _pick_sync_value(msg, 15, True),
+        "consume_energy": _pick_sync_value(msg, 16, True),
+        "consume_hp": _pick_sync_value(msg, 17, True),
+        "ex_damage_param": _pick_sync_value(msg, 18, True),
+        "cost_all_energy": bool(_pick_sync_value(msg, 19, False) or 0),
+        "fever_state": bool(_pick_sync_value(msg, 20, False) or 0),
+        "rule_energy": _pick_sync_value(msg, 21, True),
+        "rule_damage_param": _pick_sync_value(msg, 22, True),
+        "effect_damage_param": _pick_sync_value(msg, 23, True),
+        "buff_damage_param": _pick_sync_value(msg, 24, True),
+        "equipped_slot": _pick_sync_value(msg, 25, False),
+        "cd_round": _pick_sync_value(msg, 28, True),
+        "flag": _pick_sync_value(msg, 29, False),
+        "raw_damage": _pick_sync_value(msg, 30, True),
+        "used_cnt": _pick_sync_value(msg, 31, False),
+        "disable_conf_dam_type": bool(_pick_sync_value(msg, 33, False) or 0),
+        "change_times": _pick_sync_value(msg, 36, True),
+        "cr_reset_round": _pick_sync_value(msg, 37, True),
+        "cr_reset_reason": _pick_sync_value(msg, 38, True),
+        "used_cnt_for_evolute": _pick_sync_value(msg, 40, False),
+        "change_src_skill": normalize_skill_id(_pick_sync_value(msg, 42, False)),
+        "state_tips": _pick_sync_value(msg, 43, False),
+        "must_cost_hp": bool(_pick_sync_value(msg, 44, False) or 0),
+        "last_pos": _pick_sync_value(msg, 47, False),
+        "consume_change_effeciency": _pick_sync_value(msg, 49, False),
+        "is_change_effeciency": _pick_sync_value(msg, 50, False),
+        "original_pos": _pick_sync_value(msg, 51, False),
+        "raw_cost_energy": _pick_sync_value(msg, 52, False),
+        "cast_rounds": _pick_sync_value(msg, 53, False),
+        "enable_on_charging": bool(_pick_sync_value(msg, 54, False) or 0),
+        "round_start_pos": _pick_sync_value(msg, 55, False),
+        "last_round_pos": _pick_sync_value(msg, 56, False),
+        "swap_from_pet": _pick_sync_value(msg, 57, False),
+        "priority_display": bool(_pick_sync_value(msg, 58, False) or 0),
+        "perform_flag": _pick_sync_value(msg, 60, False),
+        "remove_round": _pick_sync_value(msg, 61, True),
+        "original_skill_id": normalize_skill_id(_pick_sync_value(msg, 62, False)),
+        "damage_type": _pick_sync_value(msg, 63, True),
+        "cost_energy_buff_mul_10000": _pick_sync_value(msg, 64, True),
+        "cost_energy_buff_factor_list": [maybe_signed64(v) for v in collect_varints(msg, 65)],
+        "cd_outfield_round": _pick_sync_value(msg, 66, True),
+        "season_id": _pick_sync_value(msg, 68, True),
+        "damage_params": _extract_damage_params(msg, 26),
+        "restraint_types": _extract_restraint_types(msg),
+        "cd_info": _extract_cd_info(msg),
+        "enhance_info": _extract_enhance_info(msg),
+    })
+    return item
+
+
+def _extract_skill_change_sync(sync: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(sync).get(5, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        sid = normalize_skill_id(_pick_sync_value(sub, 2, False))
+        skill_data = {}
+        skill_sub = first_sub(field_groups(sub).get(3, []))
+        if skill_sub:
+            skill_data = _extract_pet_skill_round_data(skill_sub)
+        item = _compact_dict({
+            "pet_id": _pick_sync_value(sub, 1, False),
+            "skill_id": sid or skill_data.get("skill_id"),
+            "skill_name": skill_name(sid or skill_data.get("skill_id")),
+            "skill_data": skill_data,
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_pet_info_sync(sync: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(sync).get(6, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        common = first_sub(field_groups(sub).get(2, []))
+        creature = extract_creature(
+            common,
+            path="sync_data.pet_info",
+            record={"opcode": 0x1324, "opcode_hex": "0x1324"},
+        ) if common else None
+        compact_skills = []
+        for skill in (creature or {}).get("equipped_skills", []):
+            compact_skills.append(_compact_dict({
+                "skill_id": skill.get("skill_id"),
+                "skill_name": skill.get("skill_name"),
+                "equipped_slot": skill.get("equipped_slot"),
+                "cost_energy": skill.get("cost_energy"),
+            }))
+        item = _compact_dict({
+            "pet_id": (creature or {}).get("pet_id"),
+            "name": (creature or {}).get("name"),
+            "level": (creature or {}).get("level"),
+            "base_conf_id": (creature or {}).get("base_conf_id"),
+            "types": (creature or {}).get("types"),
+            "max_hp": (creature or {}).get("max_hp"),
+            "equipped_skills": compact_skills,
+            "data_level": _pick_sync_value(sub, 4, True),
+            "full_for_data_level": bool(_pick_sync_value(sub, 5, False) or 0),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_task_infos(sync: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(sync).get(8, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "task_id": _pick_sync_value(sub, 1, False),
+            "task_state": _pick_sync_value(sub, 2, True),
+            "uin": _pick_sync_value(sub, 3, False),
+        })
+        if item:
+            items.append(item)
+    return items
 
 
 def _extract_sync_items(sync: Dict[str, Any], field_no: int, spec: Dict[int, tuple]) -> List[Dict[str, Any]]:
@@ -497,6 +749,19 @@ def _extract_sync_items(sync: Dict[str, Any], field_no: int, spec: Dict[int, tup
             sid = normalize_skill_id(item["skill_id"])
             item["skill_id"] = sid
             item["skill_name"] = skill_name(sid)
+            item["hp_per_energy"] = _pick_fixed32_float(sub, 15)
+        if field_no == 2:
+            state_bits = collect_varints(sub, 27)
+            if state_bits:
+                item["state_bit_results"] = state_bits
+            triggered = [
+                _extract_buffdata_93_skill(e["sub"])
+                for e in field_groups(sub).get(37, [])
+                if e.get("sub") is not None
+            ]
+            triggered = [x for x in triggered if x]
+            if triggered:
+                item["triggered_buffs"] = triggered
         item = _compact_dict(item)
         if item:
             items.append(item)
@@ -518,14 +783,7 @@ def _extract_pet_skill_updates(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
             skill_sub = skill_entry.get("sub")
             if skill_sub is None:
                 continue
-            sid = normalize_skill_id(pick_first(collect_varints(skill_sub, 39)))
-            skill = _compact_dict({
-                "skill_id": sid,
-                "skill_name": skill_name(sid),
-                "equipped_slot": pick_first(collect_varints(skill_sub, 25)),
-                "cost_energy_result": _pick_sync_value(skill_sub, 9, True),
-                "state": _pick_sync_value(skill_sub, 3, True),
-            })
+            skill = _extract_pet_skill_round_data(skill_sub)
             if skill:
                 update["skills"].append(skill)
         update = _compact_dict(update)
@@ -542,6 +800,10 @@ def _extract_sync_data(sync: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         "pet_sync": _extract_sync_items(sync, 2, _PET_SYNC_FIELDS),
         "skill_sync": _extract_sync_items(sync, 3, _SKILL_SYNC_FIELDS),
         "comm_sync": _extract_sync_items(sync, 4, _COMM_SYNC_FIELDS),
+        "skill_change_sync": _extract_skill_change_sync(sync),
+        "pet_info": _extract_pet_info_sync(sync),
+        "item_sync": _extract_sync_items(sync, 7, _ITEM_SYNC_FIELDS),
+        "task_infos": _extract_task_infos(sync),
     })
 
 
