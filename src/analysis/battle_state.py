@@ -19,6 +19,13 @@ from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_info import PetInfo
 from src.analysis.pet_identity import is_hidden_pet_id, refresh_battle_uid, same_battle_pet
+from src.analysis.state_helpers import (
+    append_bounded,
+    clone_state_with_effective_speed,
+    compute_effective_speed,
+    initial_battle_state,
+    pick_keys,
+)
 from src.analysis.constants import (
     OPCODE_ACTION_RESOLVE,
     OPCODE_BATTLE_ENTER,
@@ -49,45 +56,13 @@ GLOBAL_EVENT_KINDS = {
 
 
 def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
-    """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正 + 属性等级修正)，最低 1。"""
-    base = pet.get("base_speed")
-    if base is None:
-        return None
-    from src.data.loader import get_buff_stat_modifiers, get_speed_buff_modifiers
-    speed_mods = get_speed_buff_modifiers(pet.get("buffs", []))
-    stat_mods = get_buff_stat_modifiers(pet.get("buffs", []))
-    pct = (speed_mods.get("pct_total", 0.0)
-           + stat_mods.get("spd_up", 0.0)
-           - stat_mods.get("spd_down", 0.0))
-    effective = (base + speed_mods.get("flat_total", 0)) * (1.0 + pct)
-    return max(1, int(round(effective)))
+    """兼容旧测试/调用方的导入名，实际实现位于 state_helpers。"""
+    return compute_effective_speed(pet)
 
 
 class BattleStateTracker:
     def __init__(self) -> None:
-        initial_weather = {"id": None, "name": None, "expire_round": None}
-        self.state: Dict[str, Any] = {
-            "battle_id": None,
-            "battle_mode": None,
-            "round": 0,
-            "max_round": 0,
-            "weather": initial_weather,
-            "field_context": {
-                "weather_current": initial_weather,
-                "weather_history": [],
-                "global_events": [],
-                "perform_groups": [],
-                "sync_events": [],
-                "item_sync_events": [],
-            },
-            "phase": "idle",
-            "my_pets": [],
-            "opp_pets": [],
-            "my_active": None,
-            "opp_active": None,
-            "events": [],
-            "result": None,
-        }
+        self.state: Dict[str, Any] = initial_battle_state()
         # battle slot IDs whose ownership has been established
         self._opponent_slots: set = set()
         self._player_slots: set = set()
@@ -138,15 +113,7 @@ class BattleStateTracker:
         return self.get_state()
 
     def get_state(self) -> Dict[str, Any]:
-        state = copy.deepcopy(self.state)
-        # 计算所有精灵的实际速度（基础速度 + buff 修正）
-        for pet in state.get("my_pets", []) + state.get("opp_pets", []):
-            pet["effective_speed"] = _compute_effective_speed(pet)
-        for key in ("my_active", "opp_active"):
-            active = state.get(key)
-            if active:
-                active["effective_speed"] = _compute_effective_speed(active)
-        return state
+        return clone_state_with_effective_speed(self.state)
 
     def _field_context(self) -> Dict[str, Any]:
         ctx = self.state.setdefault("field_context", {
@@ -203,9 +170,7 @@ class BattleStateTracker:
 
     @staticmethod
     def _append_bounded(items: List[Dict[str, Any]], item: Dict[str, Any], limit: int) -> None:
-        items.append(item)
-        if len(items) > limit:
-            del items[:len(items) - limit]
+        append_bounded(items, item, limit)
 
     def _record_perform_group(self, entry: Dict[str, Any]) -> None:
         payload = self._pick(entry, [
@@ -421,7 +386,7 @@ class BattleStateTracker:
 
     @staticmethod
     def _pick(entry: Dict[str, Any], keys: List[str]) -> Dict[str, Any]:
-        return {key: entry.get(key) for key in keys if entry.get(key) is not None}
+        return pick_keys(entry, keys)
 
     def _global_event_payload(self, kind: str, entry: Dict[str, Any]) -> Dict[str, Any]:
         common = [

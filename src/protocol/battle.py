@@ -53,50 +53,25 @@ from src.protocol.proto_core import (
     SPECIAL_ACTION_COMMANDS,
     SPECIAL_ACTION_SHAPES,
 )
+from src.protocol.battle_actions import (
+    _extract_skill_or_special,
+    _extract_skill_ref,
+    _extract_special_action,
+)
+from src.protocol.battle_schema import (
+    _as_list,
+    _compact_dict,
+    _enum_name,
+    _enum_value,
+    _first_value,
+    _make_simple_extractor,
+    _raw_field_dump,
+    _schema_or_raw,
+    _schema_payload,
+    _schema_quality,
+)
 
 logger = logging.getLogger(__name__)
-
-# ---------------------------------------------------------------------------
-# Schema-first 辅助函数
-# 用于从 proto_schema.json 解码的结构化数据中提取值。
-# _schema_payload: 获取已解码的 schema 数据（如果存在）
-# _enum_value/_enum_name: 处理枚举类型值（schema 中的 {value, name} 结构）
-# _schema_quality: 标记解析质量（schema_postprocess vs raw_field_postprocess）
-# ---------------------------------------------------------------------------
-
-def _schema_payload(record: Dict[str, Any], expected_message: str) -> Optional[Dict[str, Any]]:
-    decoded = record.get("_decoded")
-    if isinstance(decoded, dict) and decoded:
-        message_name = record.get("_message_name")
-        if message_name in (None, "", expected_message):
-            return decoded
-    return None
-
-
-def _enum_value(value: Any) -> Optional[int]:
-    if isinstance(value, dict):
-        return _enum_value(value.get("value"))
-    if isinstance(value, bool):
-        return int(value)
-    if isinstance(value, int):
-        return value
-    return None
-
-
-def _enum_name(value: Any) -> Optional[str]:
-    return value.get("name") if isinstance(value, dict) and isinstance(value.get("name"), str) else None
-
-
-def _as_list(value: Any) -> list:
-    if value is None:
-        return []
-    return value if isinstance(value, list) else [value]
-
-
-def _first_value(value: Any) -> Any:
-    items = _as_list(value)
-    return items[0] if items else None
-
 
 def _weather_name(weather_id: Optional[int]) -> Optional[str]:
     if weather_id is None:
@@ -106,175 +81,6 @@ def _weather_name(weather_id: Optional[int]) -> Optional[str]:
     if isinstance(meta, dict) and meta.get("name"):
         return meta["name"]
     return None
-
-
-def _schema_quality(
-    detail: Dict[str, Any],
-    *,
-    message: str,
-    found: bool,
-    level: str = "battle_semantic",
-) -> Dict[str, Any]:
-    detail.update({
-        "schema_message": message,
-        "schema_found": found,
-        "parse_quality": "schema_postprocess" if found else "raw_field_postprocess",
-        "semantic_level": level,
-    })
-    return detail
-
-
-# ---------------------------------------------------------------------------
-# Core skill / action extraction
-# ---------------------------------------------------------------------------
-
-def _extract_skill_ref(msg: Dict[str, Any], *, skill_field: int = 3) -> Dict[str, Any]:
-    """Extract a skill reference from a sub-message (fields 1=actor, 2=target, 3=skill)."""
-    all_field_values = collect_varints(msg, skill_field)
-    skill_id_x100 = pick_first(all_field_values, low=100_000)
-    sid = normalize_skill_id(skill_id_x100)
-
-    skill_slot_index: Optional[int] = None
-    if skill_id_x100 is None:
-        raw_small = [v for v in all_field_values if 1 <= v <= 10]
-        if raw_small:
-            skill_slot_index = raw_small[0]
-
-    actor = pick_first(collect_varints(msg, 1))
-    target = pick_first(collect_varints(msg, 2))
-    out: Dict[str, Any] = {
-        "actor_side": actor,
-        "actor_side_name": side_name(actor),
-        "target_side": target,
-        "target_side_name": side_name(target),
-        "skill_id_x100": skill_id_x100,
-        "skill_id": sid,
-        "skill_name": skill_name(sid),
-        "skill_slot_index": skill_slot_index,
-    }
-    _attach_skill_meta(out, sid)
-    return out
-
-
-def _extract_special_action(
-    msg: Dict[str, Any],
-    *,
-    command_flag: Optional[int] = None,
-    command_slot: Optional[int] = None,
-) -> Optional[Dict[str, Any]]:
-    """Try to interpret *msg* as a special-action (willpower, energy-bottle, switch)."""
-    kind = pick_first(collect_varints(msg, 1), low=0, high=99)
-    if kind is None:
-        return None
-
-    # Try field 8 -> 4 -> 3 for a nested payload
-    sub: Optional[Dict[str, Any]] = None
-    payload_branch: Optional[int] = None
-    for branch in (8, 4, 3):
-        entries = field_groups(msg).get(branch, [])
-        s = first_sub(entries)
-        if s is not None:
-            sub = s
-            payload_branch = branch
-            break
-
-    if sub is None:
-        return None
-
-    # Determine action_name
-    action_name: Optional[str] = None
-    lookup_key: Optional[tuple] = None
-    if command_flag is not None and command_slot is not None:
-        lookup_key = (command_flag, command_slot)
-        action_name = SPECIAL_ACTION_COMMANDS.get(lookup_key)  # type: ignore[arg-type]
-    if action_name is None and kind is not None and payload_branch is not None:
-        lookup_key = (kind, payload_branch)
-        action_name = SPECIAL_ACTION_SHAPES.get(lookup_key)  # type: ignore[arg-type]
-
-    if action_name is None:
-        return None
-
-    out: Dict[str, Any] = {
-        "action_kind": "special_action",
-        "action_name": action_name,
-        "payload_kind": kind,
-        "payload_branch": payload_branch,
-        "command_flag": command_flag,
-        "command_slot": command_slot,
-    }
-    # If sub has actor/target fields, include them
-    actor = pick_first(collect_varints(sub, 1))
-    target = pick_first(collect_varints(sub, 2))
-    out["actor_side"] = actor
-    out["actor_side_name"] = side_name(actor)
-    out["target_side"] = target
-    out["target_side_name"] = side_name(target)
-    return out
-
-
-def _extract_skill_or_special(
-    record: Dict[str, Any],
-    *,
-    extra_fields: Dict[str, Any],
-    command_flag: Optional[int] = None,
-    command_slot: Optional[int] = None,
-) -> Optional[Dict[str, Any]]:
-    """Try to extract a skill or special action from *record*'s root."""
-    root = record.get("root")
-    if root is None:
-        return None
-
-    groups = field_groups(root)
-    # The payload sub-message is in field 2
-    f2 = groups.get(2, [])
-    payload = first_sub(f2)
-    if payload is None:
-        return None
-
-    out: Optional[Dict[str, Any]] = None
-
-    # 1. Try skill extraction
-    skill_id_x100 = pick_first(collect_varints(payload, 3), low=100_000)
-    if skill_id_x100 is not None:
-        out = _extract_skill_ref(payload)
-    else:
-        # Check nested sub in field 3 for skill info
-        f3 = field_groups(payload).get(3, [])
-        f3_sub = first_sub(f3)
-        if f3_sub is not None:
-            sid3 = pick_first(collect_varints(f3_sub, 3), low=100_000)
-            if sid3 is not None:
-                out = _extract_skill_ref(f3_sub)
-
-    # 1b. Fallback: check for slot index (small values 1-10)
-    if out is None:
-        raw_all = collect_varints(payload, 3)
-        raw_small = [v for v in raw_all if 1 <= v <= 10]
-        if raw_small:
-            actor = pick_first(collect_varints(payload, 1))
-            target = pick_first(collect_varints(payload, 2))
-            out = {
-                "actor_side": actor,
-                "actor_side_name": side_name(actor),
-                "target_side": target,
-                "target_side_name": side_name(target),
-                "skill_id": None,
-                "skill_name": None,
-                "skill_slot_index": raw_small[0],
-            }
-
-    # 2. Try special action
-    if out is None:
-        out = _extract_special_action(payload, command_flag=command_flag, command_slot=command_slot)
-
-    if out is None:
-        return None
-
-    out.update(extra_fields)
-    out["opcode"] = record.get("opcode")
-    out["opcode_hex"] = record.get("opcode_hex", "")
-    return out
-
 
 # ---------------------------------------------------------------------------
 # 0x130b - Skill select
@@ -487,11 +293,6 @@ _ITEM_SYNC_FIELDS = {
     11: ("battle_use_time_max", True),
     12: ("battle_use_time_remain", True),
 }
-
-
-def _compact_dict(data: Dict[str, Any]) -> Dict[str, Any]:
-    """丢弃空值，避免把低价值空字段写入状态快照。"""
-    return {k: v for k, v in data.items() if v is not None and v != [] and v != {}}
 
 
 def _pick_sync_value(msg: Dict[str, Any], field_no: int, signed: bool = False) -> Optional[int]:
@@ -1917,36 +1718,6 @@ def extract_1312_round_flow(record: Dict[str, Any]) -> Dict[str, Any]:
 # Auxiliary battle opcodes (0x1326, 0x132A, 0x132D, 0x1334, 0x133C, 0x13F6)
 # ---------------------------------------------------------------------------
 
-def _schema_or_raw(record: Dict[str, Any], message_name: str) -> Dict[str, Any]:
-    """Return schema-decoded dict or raw field dump."""
-    decoded = _schema_payload(record, message_name)
-    if decoded is not None:
-        return dict(decoded)
-    root = record.get("root")
-    if root is None:
-        return {}
-    out: Dict[str, Any] = {}
-    for fn, entries in field_groups(root).items():
-        vals = collect_varints(root, fn)
-        if vals:
-            out[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
-        for e in entries:
-            if e.get("text"):
-                out[f"field_{fn}_text"] = e["text"]
-                break
-    return out
-
-
-def _make_simple_extractor(message_name: str):
-    """生成标准的 auxiliary extractor: schema_or_raw + opcode 标记。"""
-    def _extractor(record: Dict[str, Any]) -> Dict[str, Any]:
-        detail = _schema_or_raw(record, message_name)
-        detail["opcode"] = record.get("opcode")
-        detail["opcode_hex"] = record.get("opcode_hex", "")
-        return detail
-    return _extractor
-
-
 extract_1326_auto_cmd = _make_simple_extractor("ChangeAutoCmdNotify")
 extract_1326_auto_cmd.__doc__ = """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
 
@@ -1969,20 +1740,6 @@ extract_13f6_ai_skill.__doc__ = """0x13F6 AiSelectSkillNotify — AI skill hint.
 # ---------------------------------------------------------------------------
 # Round confirm opcodes (0x1313, 0x1314)
 # ---------------------------------------------------------------------------
-
-def _raw_field_dump(record: Dict[str, Any]) -> Dict[str, Any]:
-    """通用 raw 字段转储，提取所有 varint 字段。"""
-    root = record.get("root")
-    detail: Dict[str, Any] = {}
-    if root is not None:
-        for fn, entries in field_groups(root).items():
-            vals = collect_varints(root, fn)
-            if vals:
-                detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
-    detail["opcode"] = record.get("opcode")
-    detail["opcode_hex"] = record.get("opcode_hex", "")
-    return detail
-
 
 def extract_1313_round_confirm(record: Dict[str, Any]) -> Dict[str, Any]:
     """0x1313 BattleRoundConfirmNotify — round confirm."""

@@ -461,8 +461,11 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 抓包 | `src/capture/key_capture.py` | 从 ACK 帧提取会话密钥 |
 | 协议 | `src/protocol/proto_core.py` | Protobuf 解析原语、精灵/状态提取 |
 | 协议 | `src/protocol/opcodes.py` | Opcode 注册表与分发 |
-| 协议 | `src/protocol/battle.py` | 战斗协议各 Opcode 的详细解析 |
+| 协议 | `src/protocol/battle.py` | 战斗协议各 Opcode 的兼容提取门面 |
+| 协议 | `src/protocol/battle_schema.py` | schema/raw fallback 与辅助 opcode 提取工具 |
+| 协议 | `src/protocol/battle_actions.py` | 技能与特殊行动的共用提取逻辑 |
 | 分析 | `src/analysis/battle_state.py` | 实时战斗状态追踪与建议生成 |
+| 分析 | `src/analysis/state_helpers.py` | 状态初始结构、速度计算、紧凑工具函数 |
 | 分析 | `src/analysis/damage_calc.py` | 伤害计算引擎（4 阶段 Hook 管线） |
 | 分析 | `src/analysis/innate_hooks.py` | 先天技能伤害 Hook（combo/stat/type/power 修正） |
 | 分析 | `src/analysis/battle_advisor.py` | 战斗分析协调器（技能分析 + 伤害预测） |
@@ -478,8 +481,11 @@ sniffer = Sniffer(preset_key=b"16-byte-key-here")
 | 分析 | `src/analysis/pet_info.py` | 宠物信息构造工厂（from_wrapper/from_change_pet → to_dict） |
 | 分析 | `src/analysis/event_formatter.py` | 协议事件 → UI 格式化事件 |
 | 分析 | `src/analysis/constants.py` | Opcode 常量、集合、标签集中管理 |
+| 分析 | `src/analysis/tactical/` | 战术推荐的展示分类与说明文案 |
+| 数据 | `src/data/catalog.py` | 静态 JSON bundle、ID 规范化和基础元数据缓存 |
 | API | `src/api/sniffer_manager.py` | 抓包器生命周期管理、密钥持久化 |
 | API | `src/api/battle_manager.py` | 全局单例：抓包桥接、WS 推送、hook 分发 |
+| API | `src/api/replay_service.py` | fixture 回放服务，隔离路由与协议解析细节 |
 | API | `src/api/app.py` | FastAPI 应用入口 |
 | 入口 | `src/main.py` | Uvicorn 启动脚本 |
 | 前端 | `web/src/pages/BattleLive.tsx` | 实时战斗页面 |

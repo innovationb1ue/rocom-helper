@@ -18,7 +18,6 @@ from typing import Any, Dict, List, Optional
 from fastapi import WebSocket
 
 from src.analysis.battle_processor import BattleProcessor
-from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.battle_report import archive_latest_completed_battle
 from src.analysis.constants import (
     IN_BATTLE_OPCODES,

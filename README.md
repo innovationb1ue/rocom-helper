@@ -153,16 +153,16 @@ web/
   React + Ant Design + Zustand 实时展示
 ```
 
-详细原理见 [实时战斗功能：原理与用法](docs/realtime-battle.md) 和 [战斗分析指南](docs/battle_analysis_guide.md)。
+详细原理见 [架构说明](docs/architecture.md)、[实时战斗功能：原理与用法](docs/realtime-battle.md) 和 [战斗分析指南](docs/battle_analysis_guide.md)。
 
 ### 主要目录
 
 | 路径 | 说明 |
 |------|------|
 | `src/capture/` | 抓包、TCP 重组、BE21 帧解析、AES 解密和密钥提取 |
-| `src/protocol/` | Protobuf/TGCP 解析、opcode 分发、战斗字段提取 |
-| `src/analysis/` | 战斗状态机、伤害预测、事件格式化、Hook 分析和回放 runner |
-| `src/api/` | FastAPI 应用、REST 路由、WebSocket、抓包和战斗管理 |
+| `src/protocol/` | Protobuf/TGCP 解析、opcode 分发、战斗字段提取；`battle.py` 保留兼容门面 |
+| `src/analysis/` | 战斗状态机、伤害预测、事件格式化、Hook 分析、战术推荐和回放 runner |
+| `src/api/` | FastAPI 应用、REST 路由、WebSocket、抓包管理和回放 service |
 | `src/game/` | 属性克制、种族值计算、技能评分等游戏机制 |
 | `web/` | React 19 + TypeScript + Ant Design 6 前端 |
 | `data/game/` | 宠物、技能、属性、buff、协议 schema 等静态数据 |
