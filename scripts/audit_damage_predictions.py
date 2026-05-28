@@ -10,6 +10,20 @@ from src.analysis.replay_runner import BattleReplayRunner
 from tests.packet_reader import load_battle_packets
 
 
+def _resolve_session_dir(session: str) -> Path:
+    """按字面路径、fixture 名称、运行日志名称的顺序解析回放目录。"""
+    direct = Path(session)
+    if direct.is_dir():
+        return direct
+    fixture = Path("tests") / "fixtures" / "packets" / session
+    if fixture.is_dir():
+        return fixture
+    log_dir = Path("logs") / "packets" / session
+    if log_dir.is_dir():
+        return log_dir
+    return fixture
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Audit replay damage predictions")
     parser.add_argument("--session", default="battle_session_1")
@@ -24,7 +38,7 @@ def main() -> None:
     sessions = args.sessions or [args.session]
     reports = {}
     for session in sessions:
-        session_dir = Path("tests") / "fixtures" / "packets" / session
+        session_dir = _resolve_session_dir(session)
         result = BattleReplayRunner().run(load_battle_packets(session_dir))
         reports[session] = build_damage_audit(result)
 

@@ -255,14 +255,16 @@ def _candidate_totals(
 ) -> Dict[str, int]:
     if predicted_total is None:
         return {}
-    out = {"active": int(predicted_total)}
+    out = {"production": int(predicted_total)}
     power = breakdown.get("final_power") or prediction.get("power") or breakdown.get("runtime_power")
     base_power = breakdown.get("base_power")
     if power and base_power and power != base_power:
-        out["static_power_estimate"] = max(1, round(predicted_total * base_power / power))
+        out["static_power_fallback"] = max(1, round(predicted_total * base_power / power))
     server_runtime = breakdown.get("server_runtime") or {}
     calc_eff = server_runtime.get("calc_effectiveness")
     display_eff = server_runtime.get("display_effectiveness")
-    if breakdown.get("power_source") == "server_damage_params" and calc_eff and display_eff:
-        out["server_power_double_restraint"] = max(1, round(predicted_total * display_eff / calc_eff))
+    if breakdown.get("power_source") == "server_damage_params":
+        out["server_target_power_no_restraint"] = int(predicted_total)
+        if calc_eff and display_eff:
+            out["server_target_power_keep_restraint"] = max(1, round(predicted_total * display_eff / calc_eff))
     return out

@@ -43,6 +43,32 @@ function confidence(s: SkillAnalysis): string | null | undefined {
   return s.prediction?.confidence ?? s.confidence;
 }
 
+function numberValue(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function recordValue(value: unknown): Record<string, unknown> | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
+}
+
+function powerInfo(s: SkillAnalysis): { value?: number; line: string } {
+  const bd = s.damage_breakdown ?? {};
+  const basePower = numberValue(bd.base_power) ?? s.power ?? 0;
+  const finalPower = numberValue(bd.final_power);
+  const serverRuntime = recordValue(bd.server_runtime);
+  const serverPower = numberValue(serverRuntime?.power);
+  const usesServerPower = serverRuntime?.power_source === 'server_damage_params' && serverPower !== undefined;
+  const value = usesServerPower ? serverPower : finalPower ?? s.effective_power ?? basePower;
+
+  if (usesServerPower && value !== basePower) {
+    return { value, line: `威力: 静态 ${basePower} -> 服务器目标威力 ${value}` };
+  }
+  if (value !== basePower) {
+    return { value, line: `威力: ${basePower} -> ${value}` };
+  }
+  return { value, line: `威力: ${basePower}` };
+}
+
 interface OpponentSkillPanelProps {
   skills: SkillAnalysis[];
   source: string;
@@ -81,6 +107,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
           const hc = hitCount(s);
           const total = totalDamage(s);
           const conf = confidence(s);
+          const pwr = powerInfo(s);
 
           return (
             <div
@@ -109,10 +136,12 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
 
               {attack && s.expected_damage != null && (
                 <>
-                  {s.effective_power != null && (
-                    <Tag style={{ fontSize: 11, margin: 0, background: '#f0f0f0', border: '1px solid #d9d9d9' }}>
-                      威力 {s.effective_power}
-                    </Tag>
+                  {pwr.value != null && (
+                    <Tooltip title={pwr.line}>
+                      <Tag style={{ fontSize: 11, margin: 0, background: '#f0f0f0', border: '1px solid #d9d9d9' }}>
+                        威力 {pwr.value}
+                      </Tag>
+                    </Tooltip>
                   )}
                   <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600, color: s.can_ko ? '#ff4d4f' : undefined }}>
                     {total}

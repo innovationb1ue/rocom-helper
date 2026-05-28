@@ -146,16 +146,22 @@ class DamageCalculator:
         """计算单个技能的伤害预测。返回 None 如果不是攻击技能。"""
         base_power = self._get_power(skill_meta)
         damage_type = skill_meta.get("damage_type", 0)
-        if base_power <= 0 or damage_type not in (2, 3):
-            return None
-
         raw_dam_type = skill_meta.get("skill_dam_type", 0)
         skill_element = SDT_TO_TYPE.get(raw_dam_type, raw_dam_type)
         runtime_skill = self._get_runtime_skill(attacker, skill_meta.get("id"))
         server_runtime = self._resolve_server_runtime(runtime_skill, defender)
-        server_runtime["formula_power_source"] = "skill_config"
-        server_runtime["power_used_in_formula"] = False
         power = base_power
+        if server_runtime.get("power_source") == "server_damage_params" and server_runtime.get("power") is not None:
+            # 目标相关 damage_params 与游戏内预估威力一致，用作本次目标的公式威力。
+            power = int(server_runtime["power"])
+            server_runtime["formula_power_source"] = "server_damage_params"
+            server_runtime["power_used_in_formula"] = True
+        else:
+            # damage_param_result 不是目标相关值，只保留在解释字段中。
+            server_runtime["formula_power_source"] = "skill_config"
+            server_runtime["power_used_in_formula"] = False
+        if power <= 0 or damage_type not in (2, 3):
+            return None
 
         # Phase 1: Resolve power
         power, _ = self._resolve_power(power, skill_meta, attacker, defender)
@@ -513,11 +519,17 @@ class DamageCalculator:
 
         runtime_power = None
         power_source = "skill_config"
+        matched_damage_key = None
         for key in target_keys:
             if damage_by_pet.get(key) is not None:
                 runtime_power = damage_by_pet[key]
                 power_source = "server_damage_params"
+                matched_damage_key = key
                 break
+        if runtime_power is None and defender.get("pet_id") == 20000000 and len(damage_by_pet) == 1:
+            # 对手隐藏身份时状态机可能没有真实 pet_id；服务器此刻只给一个目标威力，可作为当前目标。
+            matched_damage_key, runtime_power = next(iter(damage_by_pet.items()))
+            power_source = "server_damage_params"
         if runtime_power is None and runtime_skill.get("damage_param_result") is not None:
             runtime_power = runtime_skill["damage_param_result"]
             power_source = "server_damage_param_result"
@@ -527,6 +539,8 @@ class DamageCalculator:
             if restraint_by_pet.get(key) is not None:
                 restraint_value = restraint_by_pet[key]
                 break
+        if restraint_value is None and matched_damage_key is not None and restraint_by_pet.get(str(matched_damage_key)) is not None:
+            restraint_value = restraint_by_pet[str(matched_damage_key)]
         effectiveness = self._restraint_to_multiplier(restraint_value)
 
         out: Dict[str, Any] = {
@@ -534,6 +548,7 @@ class DamageCalculator:
             "power": runtime_power,
             "power_source": power_source,
             "target_keys": target_keys,
+            "matched_target_key": matched_damage_key,
         }
         if effectiveness is not None:
             out["effectiveness"] = effectiveness
