@@ -260,7 +260,17 @@ class BattleStateTracker:
             return None
         side_num = self._side_int(pet_id)
         if side_num is not None and side_num in self._battle_side_pets:
-            return self._battle_side_pets[side_num]
+            pet = self._battle_side_pets[side_num]
+            active_key = "my_active" if self._is_mine(side_num) else "opp_active"
+            active = self.state.get(active_key)
+            if (
+                pet.get("current_hp", 0) <= 0
+                and active is not None
+                and active.get("current_hp", 0) > 0
+            ):
+                self._bind_battle_side(side_num, active, is_mine=(active_key == "my_active"))
+                return active
+            return pet
         for pet in self.state["my_pets"] + self.state["opp_pets"]:
             if pet.get("pet_id") == pet_id or pet.get("slot") == pet_id:
                 return pet
@@ -612,6 +622,16 @@ class BattleStateTracker:
         if side_num is not None:
             pet = self._battle_side_pets.get(side_num)
             if pet is not None:
+                active_key = "my_active" if self._is_mine(side_value) else "opp_active"
+                active = self.state.get(active_key)
+                if (
+                    bind_fallback
+                    and pet.get("current_hp", 0) <= 0
+                    and active is not None
+                    and active.get("current_hp", 0) > 0
+                ):
+                    self._bind_battle_side(side_num, active, is_mine=(active_key == "my_active"))
+                    return active
                 return pet
             for candidate in self.state["my_pets"] + self.state["opp_pets"]:
                 if candidate.get("slot") == side_num:
@@ -881,6 +901,9 @@ class BattleStateTracker:
             refresh_battle_uid(matched, side=401 if is_opp else 1)
             self.state[active_key] = matched
             self._bind_battle_side(battle_pet_id, matched, is_mine=not is_opp)
+            target_side = entry.get("target_side")
+            if target_side is not None:
+                self._bind_battle_side(target_side, matched, is_mine=not is_opp)
             matched["buffs"] = []
             matched["combo_bonus"] = 0
             matched["poison_stacks"] = 0
@@ -1214,6 +1237,8 @@ class BattleStateTracker:
     # 活跃指针：通过 base_conf_id 或名称匹配当前活跃宠物
     def _update_pets_from_wrappers(self, wrappers: List[Dict[str, Any]]) -> None:
         active_candidates: Dict[str, Dict[str, Any]] = {}
+        active_sides: Dict[str, Any] = {}
+        active_ownership: Dict[str, bool] = {}
         for w in wrappers:
             side = w.get("side")
             is_mine = (side == 1 or side == "我方")
@@ -1290,7 +1315,16 @@ class BattleStateTracker:
                 current_candidate = active_candidates.get(active_key)
                 if current_candidate is None:
                     active_candidates[active_key] = matched
+                    active_sides[active_key] = side
+                    active_ownership[active_key] = is_mine
                 elif current_candidate.get("current_hp", 0) <= 0 and matched.get("current_hp", 0) > 0:
                     active_candidates[active_key] = matched
+                    active_sides[active_key] = side
+                    active_ownership[active_key] = is_mine
         for active_key, pet in active_candidates.items():
             self.state[active_key] = pet
+            self._bind_battle_side(
+                active_sides.get(active_key),
+                pet,
+                is_mine=active_ownership.get(active_key),
+            )

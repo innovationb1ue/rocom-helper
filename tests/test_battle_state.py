@@ -205,6 +205,44 @@ class TestDamageTracking:
         })
         assert state["opp_active"]["current_hp"] == 240
 
+    def test_round_start_rebinds_generic_side_before_damage(self, tracker):
+        """round_start 指定的当前出战宠应接管通用 side=1 的后续伤害。"""
+        tracker.handle_event(0x1316, {
+            "opcode": 0x1316,
+            "battle_id": 20260528,
+            "battle_mode": 1,
+            "round": 0,
+            "wrappers": [
+                {"pet_id": 1001, "pet_name": "公平鸽", "side": 1,
+                 "slot": 1, "hp": 413, "max_hp": 413},
+                {"pet_id": 1002, "pet_name": "加油蟹", "side": 1,
+                 "slot": 5, "hp": 482, "max_hp": 482},
+                {"pet_id": 2001, "pet_name": "针叶巡林", "side": 401,
+                 "slot": 401, "hp": 400, "max_hp": 400},
+            ],
+        })
+        tracker.handle_event(0x131A, {
+            "opcode": 0x131A,
+            "round": 1,
+            "wrappers": [
+                {"pet_id": 1002, "pet_name": "加油蟹", "side": 1,
+                 "slot": 5, "hp": 482, "max_hp": 482},
+                {"pet_id": 2001, "pet_name": "针叶巡林", "side": 401,
+                 "slot": 401, "hp": 400, "max_hp": 400},
+            ],
+        })
+
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "damage": 115, "target_hp_after": 367,
+             "damage_target_side": 1},
+        ]))
+        fair_dove = next(pet for pet in state["my_pets"] if pet["name"] == "公平鸽")
+        cheer_crab = next(pet for pet in state["my_pets"] if pet["name"] == "加油蟹")
+
+        assert state["my_active"]["name"] == "加油蟹"
+        assert fair_dove["current_hp"] == 413
+        assert cheer_crab["current_hp"] == 367
+
 
 class TestSkillCast:
     def test_energy_consumed(self, tracker):
