@@ -12,7 +12,7 @@ def calc():
     return DamageCalculator(TypeChart())
 
 
-def _make_attacker(types=None, atk=200, spa=180, level=100, max_hp=300, current_hp=300, energy=10):
+def _make_attacker(types=None, atk=200, spa=180, level=100, max_hp=300, current_hp=300, energy=10, buffs=None):
     types = types or [1]
     return {
         "types": types,
@@ -20,6 +20,7 @@ def _make_attacker(types=None, atk=200, spa=180, level=100, max_hp=300, current_
         "max_hp": max_hp,
         "current_hp": current_hp,
         "energy": energy,
+        "buffs": buffs or [],
         "stats": [
             {"name": "ATK", "total": atk},
             {"name": "SPA", "total": spa},
@@ -29,12 +30,13 @@ def _make_attacker(types=None, atk=200, spa=180, level=100, max_hp=300, current_
     }
 
 
-def _make_defender(types=None, def_=150, spd=150, max_hp=350, current_hp=350):
+def _make_defender(types=None, def_=150, spd=150, max_hp=350, current_hp=350, buffs=None):
     types = types or [2]
     return {
         "types": types,
         "max_hp": max_hp,
         "current_hp": current_hp,
+        "buffs": buffs or [],
         "stats": [
             {"name": "DEF", "total": def_},
             {"name": "SPD", "total": spd},
@@ -346,6 +348,30 @@ class TestCalculate:
         assert bd["effectiveness"] == 2.0
         assert bd["stab"] == 1.5
         assert bd["hit_count"] == 1
+
+    def test_stat_buff_changes_special_damage_and_breakdown(self, calc):
+        plain = calc.calculate(
+            _make_attacker(types=[1], spa=180),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, element=1),
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[{"id": 20010020, "stage": 1}]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, element=1),
+        )
+        assert buffed.expected_damage > plain.expected_damage
+        assert buffed.damage_breakdown["attacker_buff_modifiers"] == {"spa_up": 0.1}
+        assert buffed.damage_breakdown["defender_buff_modifiers"] == {}
+
+    def test_defender_buff_exposed_in_breakdown(self, calc):
+        result = calc.calculate(
+            _make_attacker(types=[1], atk=200),
+            _make_defender(types=[0], def_=150, buffs=[{"id": 20010050, "stage": 1}]),
+            _make_skill(dam_type=2, element=1),
+        )
+        assert result.damage_breakdown["attacker_buff_modifiers"] == {}
+        assert result.damage_breakdown["defender_buff_modifiers"].get("def_up") == pytest.approx(0.1)
 
     def test_runtime_skill_damage_param_updates_power_and_energy(self, calc):
         """非目标相关 damage_param_result 只保留解释字段，能耗仍优先使用服务器结果。"""

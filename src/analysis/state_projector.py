@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 
 from src.analysis.battle_state import POISON_BUFF_IDS
 from src.analysis.pet_identity import refresh_battle_uid
+from src.data.loader import enrich_buff_modifiers
 
 
 def project_state_after_entries(state: Dict[str, Any], entries: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -74,15 +75,16 @@ def _project_effect_apply(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
     if existing:
         if stage is not None:
             existing["stage"] = stage
+            existing.update(enrich_buff_modifiers(existing))
         existing["turns_applied"] = existing.get("turns_applied", 0) + 1
     else:
-        buffs.append({
+        buffs.append(enrich_buff_modifiers({
             "id": effect_id,
             "name": ename or str(effect_id),
             "stage": stage,
             "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
             "turns_applied": 1,
-        })
+        }))
     if effect_id in POISON_BUFF_IDS:
         active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
@@ -102,6 +104,7 @@ def _project_effect_stage(state: Dict[str, Any], entry: Dict[str, Any]) -> None:
         existing = next((b for b in buffs if b.get("id") == effect_id), None)
         if existing and new_stage is not None:
             existing["stage"] = new_stage
+            existing.update(enrich_buff_modifiers(existing))
 
 
 def _project_energy(state: Dict[str, Any], entry: Dict[str, Any]) -> None:

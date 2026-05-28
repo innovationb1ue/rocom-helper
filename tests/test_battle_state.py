@@ -378,6 +378,17 @@ class TestEffectApply:
         assert buffs[0]["name"] == "烧伤"
         assert buffs[0]["id"] == 100
 
+    def test_stat_buff_added_with_modifier_summary(self, tracker):
+        """属性 buff 应展开确定数值。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20010020, "effect_name": "魔攻等级提升", "effect_stage": 1},
+        ]))
+        buff = state["my_active"]["buffs"][0]
+        assert buff["modifiers"] == {"spa_up": 0.1}
+        assert buff["modifier_summary"] == ["魔攻 +10%"]
+
     def test_existing_effect_updated(self, tracker):
         """重复效果更新 stage 和 turns_applied。"""
         tracker.handle_event(0x1316, _enter_event())
@@ -393,6 +404,20 @@ class TestEffectApply:
         assert len(buffs) == 1  # Not duplicated
         assert buffs[0]["stage"] == 2
         assert buffs[0]["turns_applied"] == 2
+
+    def test_existing_stat_effect_recomputes_modifier_summary(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20010020, "effect_name": "魔攻等级提升", "effect_stage": 1},
+        ]))
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20010020, "effect_name": "魔攻等级提升", "effect_stage": 2},
+        ]))
+        buff = state["my_active"]["buffs"][0]
+        assert buff["modifiers"] == {"spa_up": 0.2}
+        assert buff["modifier_summary"] == ["魔攻 +20%"]
 
     def test_effect_with_source_skill(self, tracker):
         """效果记录来源技能。"""
@@ -426,6 +451,20 @@ class TestEffectApply:
              "effect_id": 100, "effect_stage": 3},
         ]))
         assert state["my_active"]["buffs"][0]["stage"] == 3
+
+    def test_effect_stage_recomputes_stat_modifier_summary(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20010020, "effect_name": "魔攻等级提升", "effect_stage": 1},
+        ]))
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_stage", "actor_side": 1,
+             "effect_id": 20010020, "effect_stage": 2},
+        ]))
+        buff = state["my_active"]["buffs"][0]
+        assert buff["modifiers"] == {"spa_up": 0.2}
+        assert buff["modifier_summary"] == ["魔攻 +20%"]
 
 
 class TestHeal:
@@ -927,7 +966,8 @@ class TestGlobalFieldContext:
                     "sync_data": {
                         "pet_sync": [
                             {"pet_id": 1, "hp_change": -20, "hp_result": 280,
-                             "energy_change": -1, "energy_result": 9},
+                             "energy_change": -1, "energy_result": 9,
+                             "buff_id": 20010020, "buff_stack_result": 2},
                         ],
                         "skill_sync": [
                             {"pet_id": 1, "skill_id": 7020370,
@@ -958,6 +998,8 @@ class TestGlobalFieldContext:
 
         assert state["my_active"]["current_hp"] == 280
         assert state["my_active"]["energy"] == 9
+        assert state["my_active"]["buffs"][0]["modifiers"] == {"spa_up": 0.2}
+        assert state["my_active"]["buffs"][0]["modifier_summary"] == ["魔攻 +20%"]
         runtime = state["my_active"]["skill_runtime"]["7020370"]
         assert runtime["damage_param_result"] == 150
         assert runtime["cost_energy_result"] == 4

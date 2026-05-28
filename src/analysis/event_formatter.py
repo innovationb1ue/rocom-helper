@@ -17,6 +17,7 @@ from src.analysis.constants import (
     OPCODE_SKILL_SELECT,
     OPCODE_SPECIAL_REFRESH,
 )
+from src.data.loader import enrich_buff_modifiers
 
 
 @dataclass
@@ -158,7 +159,14 @@ def _fmt_effect_apply(entry: Dict[str, Any], _state: Dict[str, Any]) -> Formatte
     ename = entry.get("effect_name") or entry.get("effect_id") or "(未知效果)"
     stage = entry.get("effect_stage")
     related = entry.get("related_skills")
+    modifier_summary = enrich_buff_modifiers({
+        "id": entry.get("effect_id"),
+        "name": ename,
+        "stage": stage,
+    }).get("modifier_summary", [])
     parts = [f"{actor}→{target} {ename}"]
+    if modifier_summary:
+        parts.append("/".join(modifier_summary))
     if stage is not None:
         parts.append(f"stage={stage}")
     if related:
@@ -173,6 +181,7 @@ def _fmt_effect_apply(entry: Dict[str, Any], _state: Dict[str, Any]) -> Formatte
             "target_side": target,
             "effect_name": ename,
             "stage": stage,
+            "modifier_summary": modifier_summary,
         },
         icon="experiment",
         color="purple",

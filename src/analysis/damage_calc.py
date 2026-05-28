@@ -378,6 +378,8 @@ class DamageCalculator:
 
         runtime_skill = runtime_skill or self._get_runtime_skill(attacker, skill_meta.get("id"))
         server_runtime = server_runtime or self._resolve_server_runtime(runtime_skill, defender)
+        attacker_buff_modifiers = get_buff_stat_modifiers(attacker.get("buffs", []))
+        defender_buff_modifiers = get_buff_stat_modifiers(defender.get("buffs", []))
         runtime_power = server_runtime.get("power") or runtime_skill.get("damage_param_result")
         energy_cost, energy_cost_source = self._resolve_energy_cost(runtime_skill, skill_meta)
         if energy_cost > 0:
@@ -398,6 +400,8 @@ class DamageCalculator:
             "runtime_skill": runtime_skill or None,
             "server_runtime": server_runtime or None,
             "ability_level": round(ability_level, 3),
+            "attacker_buff_modifiers": attacker_buff_modifiers,
+            "defender_buff_modifiers": defender_buff_modifiers,
             "atk": int(effective_atk),
             "def_": int(effective_def),
             "effectiveness": effectiveness,

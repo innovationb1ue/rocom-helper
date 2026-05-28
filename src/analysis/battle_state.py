@@ -29,6 +29,7 @@ from src.analysis.constants import (
     OPCODE_SKILL_SELECT,
     OPCODE_SPECIAL_REFRESH,
 )
+from src.data.loader import enrich_buff_modifiers
 
 logger = logging.getLogger(__name__)
 
@@ -365,12 +366,13 @@ class BattleStateTracker:
                 pet["buffs"] = [b for b in buffs if b.get("id") != sync["buff_id"]]
             elif existing:
                 existing["stage"] = sync["buff_stack_result"]
+                existing.update(enrich_buff_modifiers(existing))
             else:
-                buffs.append({
+                buffs.append(enrich_buff_modifiers({
                     "id": sync["buff_id"],
                     "name": str(sync["buff_id"]),
                     "stage": sync["buff_stack_result"],
-                })
+                }))
 
     def _apply_pet_info_sync(self, sync: Dict[str, Any]) -> None:
         pet = self._pet_for_sync_id(sync.get("pet_id"))
@@ -919,15 +921,16 @@ class BattleStateTracker:
         if existing:
             if stage is not None:
                 existing["stage"] = stage
+                existing.update(enrich_buff_modifiers(existing))
             existing["turns_applied"] = existing.get("turns_applied", 0) + 1
         else:
-            buffs.append({
+            buffs.append(enrich_buff_modifiers({
                 "id": effect_id,
                 "name": ename or str(effect_id),
                 "stage": stage,
                 "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
                 "turns_applied": 1,
-            })
+            }))
         if effect_id in POISON_BUFF_IDS:
             active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
@@ -943,6 +946,7 @@ class BattleStateTracker:
             existing = next((b for b in buffs if b["id"] == effect_id), None)
             if existing and new_stage is not None:
                 existing["stage"] = new_stage
+                existing.update(enrich_buff_modifiers(existing))
 
     def _append_pet_effect_history(self, entry: Dict[str, Any], event_kind: str) -> None:
         side = entry.get("target_side") or entry.get("actor_side")
@@ -1253,7 +1257,7 @@ class BattleStateTracker:
                         existing_ids = {b["id"] for b in pet.get("buffs", []) if "id" in b}
                         for b in w_buffs:
                             if b.get("id") not in existing_ids:
-                                pet.setdefault("buffs", []).append(b)
+                                pet.setdefault("buffs", []).append(enrich_buff_modifiers(b))
                     # 如果之前没有装备技能，用新 wrapper 的补充
                     w_eq = w.get("equipped_skills") or []
                     if w_eq and not pet.get("equipped_skills"):

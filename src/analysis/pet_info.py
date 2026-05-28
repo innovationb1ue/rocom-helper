@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_identity import battle_uid
-from src.data.loader import get_pet_meta, get_pet_skill_meta
+from src.data.loader import enrich_buff_modifiers, get_pet_meta, get_pet_skill_meta
 
 
 class PetInfo:
@@ -94,7 +94,7 @@ class PetInfo:
         pet.current_hp = w.get("hp") if w.get("hp") is not None else w.get("current_hp", 0)
         pet.max_hp = w.get("max_hp", 0)
         pet.energy = min(10, w.get("energy", default_energy))
-        pet.buffs = list(initial_buffs)
+        pet.buffs = [enrich_buff_modifiers(b) for b in initial_buffs]
         pet.initial_buff_ids = [b["id"] for b in initial_buffs if "id" in b]
         pet.innate_skill_id = w.get("passive_skill_id")
         pet.level = w.get("level")

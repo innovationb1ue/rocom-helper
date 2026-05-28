@@ -15,6 +15,7 @@ from src.data.loader import (
     get_buff_meta,
     get_pet_skill_meta,
     get_buff_stat_modifiers,
+    enrich_buff_modifiers,
     invalidate_cache,
     DATA_DIR,
 )
@@ -249,3 +250,22 @@ class TestBuffStatModifiers:
             pytest.skip("No single-base buff with buffbase 2001005 found")
         result = get_buff_stat_modifiers([{"id": target_buff_id, "stage": 1}])
         assert abs(result.get("def_up", 0.0) - 0.1) < 0.001
+
+    def test_enrich_atk_buff_summary(self):
+        buff = enrich_buff_modifiers({"id": 20010010, "name": "物攻等级提升", "stage": 1})
+        assert buff["modifiers"] == {"atk_up": 0.1}
+        assert buff["modifier_summary"] == ["物攻 +10%"]
+
+    def test_enrich_spa_buff_summary(self):
+        buff = enrich_buff_modifiers({"id": 20010020, "name": "魔攻等级提升", "stage": 1})
+        assert buff["modifiers"] == {"spa_up": 0.1}
+        assert buff["modifier_summary"] == ["魔攻 +10%"]
+
+    def test_enrich_stage_multiplies_summary(self):
+        buff = enrich_buff_modifiers({"id": 20010020, "name": "魔攻等级提升", "stage": 2})
+        assert buff["modifiers"] == {"spa_up": 0.2}
+        assert buff["modifier_summary"] == ["魔攻 +20%"]
+
+    def test_enrich_unknown_buff_keeps_original_fields(self):
+        buff = enrich_buff_modifiers({"id": 999999999, "name": "未知", "stage": 1})
+        assert buff == {"id": 999999999, "name": "未知", "stage": 1}

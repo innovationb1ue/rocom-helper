@@ -51,6 +51,32 @@ function recordValue(value: unknown): Record<string, unknown> | undefined {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 }
 
+const BUFF_MOD_LABELS: Record<string, string> = {
+  atk_up: '物攻',
+  atk_down: '物攻',
+  spa_up: '魔攻',
+  spa_down: '魔攻',
+  def_up: '物防',
+  def_down: '物防',
+  spd_up: '魔防',
+  spd_down: '魔防',
+};
+
+function formatBuffMods(value: unknown): string | null {
+  const mods = recordValue(value);
+  if (!mods) return null;
+  const parts = Object.entries(mods).flatMap(([key, raw]) => {
+    const num = numberValue(raw);
+    if (!num) return [];
+    const label = BUFF_MOD_LABELS[key] || key;
+    const sign = key.endsWith('_up') ? '+' : '-';
+    const pct = Math.abs(num * 100);
+    const text = Math.abs(pct - Math.round(pct)) < 0.001 ? String(Math.round(pct)) : pct.toFixed(1);
+    return `${label}${sign}${text}%`;
+  });
+  return parts.length ? parts.join(' / ') : null;
+}
+
 function powerInfo(s: SkillAnalysis): { value?: number; line: string } {
   const bd = s.damage_breakdown ?? {};
   const basePower = numberValue(bd.base_power) ?? s.power ?? 0;
@@ -82,6 +108,10 @@ function formatBreakdown(s: SkillAnalysis, oppHp: number): string {
 
   const al = bd?.ability_level as number | undefined;
   if (al !== undefined && al !== 1.0) lines.push(`能力等级: x${al.toFixed(2)}`);
+  const attackerBuffs = formatBuffMods(bd?.attacker_buff_modifiers);
+  if (attackerBuffs) lines.push(`我方buff: ${attackerBuffs}`);
+  const defenderBuffs = formatBuffMods(bd?.defender_buff_modifiers);
+  if (defenderBuffs) lines.push(`对方buff: ${defenderBuffs}`);
   if (s.effectiveness != null && s.effectiveness !== 1.0) {
     lines.push(`属性克制: x${s.effectiveness} (${s.effectiveness_label || ''})`);
   }

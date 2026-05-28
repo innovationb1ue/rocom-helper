@@ -228,7 +228,7 @@ def get_pb_message_meta(name: Optional[str]) -> Optional[Dict[str, Any]]:
 
 def invalidate_cache() -> None:
     """热重载 / 测试时调用，使下次查询重新读取数据文件。"""
-    global _json_cache, _maps_cache, _innate_skills_cache, _buff_dmg_reduce_cache
+    global _json_cache, _maps_cache, _innate_skills_cache, _buff_stat_cache, _speed_buff_cache, _buff_dmg_reduce_cache
     global _pet_species_cache, _pet_trait_cache, _name_to_base_id_cache
     global _nature_cache, _nature_by_name_cache
     global _evolution_cache, _evo_by_petbase_cache
@@ -237,6 +237,8 @@ def invalidate_cache() -> None:
         _json_cache = None
         _maps_cache = None
         _innate_skills_cache = None
+        _buff_stat_cache = None
+        _speed_buff_cache = None
         _buff_dmg_reduce_cache = None
         _pet_species_cache = None
         _pet_trait_cache = None
@@ -446,6 +448,51 @@ def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]
             for key, val in mods.items():
                 result[key] = result.get(key, 0.0) + val * stage
     return result
+
+
+_BUFF_MODIFIER_LABELS = {
+    "atk_up": "物攻",
+    "atk_down": "物攻",
+    "spa_up": "魔攻",
+    "spa_down": "魔攻",
+    "def_up": "物防",
+    "def_down": "物防",
+    "spd_up": "魔防",
+    "spd_down": "魔防",
+}
+
+
+def _format_modifier_pct(value: float) -> str:
+    pct = value * 100
+    if abs(pct - round(pct)) < 0.001:
+        return str(int(round(pct)))
+    return f"{pct:.1f}".rstrip("0").rstrip(".")
+
+
+def format_buff_modifier_summary(modifiers: Dict[str, float]) -> List[str]:
+    """将属性修正转成人类可读摘要，例如 ["魔攻 +10%"]。"""
+    summary: List[str] = []
+    for key in ("atk_up", "atk_down", "spa_up", "spa_down", "def_up", "def_down", "spd_up", "spd_down"):
+        value = modifiers.get(key)
+        if not value:
+            continue
+        label = _BUFF_MODIFIER_LABELS.get(key, key)
+        sign = "+" if key.endswith("_up") else "-"
+        summary.append(f"{label} {sign}{_format_modifier_pct(abs(value))}%")
+    return summary
+
+
+def enrich_buff_modifiers(buff: Dict[str, Any]) -> Dict[str, Any]:
+    """为 buff 字典补充确定属性数值，保留原字段并只添加紧凑解释字段。"""
+    enriched = dict(buff)
+    modifiers = get_buff_stat_modifiers([enriched])
+    if modifiers:
+        enriched["modifiers"] = modifiers
+        enriched["modifier_summary"] = format_buff_modifier_summary(modifiers)
+    else:
+        enriched.pop("modifiers", None)
+        enriched.pop("modifier_summary", None)
+    return enriched
 
 
 # ── Buff 速度修正查询 ──────────────────────────────────────────────

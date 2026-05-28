@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Progress, Tag, Badge } from 'antd';
+import { Card, Progress, Tag, Badge, Tooltip } from 'antd';
 import { CloseCircleFilled } from '@ant-design/icons';
 import TypeBadge from './TypeBadge';
 import type { BattlePet } from '../stores/battleStore';
@@ -30,6 +30,13 @@ function isSameBattlePet(activePet: BattlePet | null, pet: BattlePet): boolean {
     activePet.pet_id !== HIDDEN_OPPONENT_PET_ID &&
     activePet.pet_id === pet.pet_id
   );
+}
+
+function buffLabel(buff: BattlePet['buffs'][number]): string {
+  if (buff.modifier_summary?.length) {
+    return buff.modifier_summary.join('/');
+  }
+  return buff.name || (buff.id != null ? String(buff.id) : '效果');
 }
 
 const TeamRoster: React.FC<Props> = ({ pets, activePet, side, label }) => {
@@ -87,6 +94,16 @@ const TeamRoster: React.FC<Props> = ({ pets, activePet, side, label }) => {
               >
                 S:{pet.effective_speed}
               </Tag>
+            )}
+            {pet.buffs?.slice(0, 2).map((buff, buffIndex) => (
+              <Tooltip key={`${buff.id ?? buff.name ?? buffIndex}-${buffIndex}`} title={buff.name || buffLabel(buff)}>
+                <Tag color={buff.modifier_summary?.length ? 'purple' : undefined} style={{ margin: 0, fontSize: 11, maxWidth: 82, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {buffLabel(buff)}
+                </Tag>
+              </Tooltip>
+            ))}
+            {pet.buffs && pet.buffs.length > 2 && (
+              <Tag style={{ margin: 0, fontSize: 11 }}>+{pet.buffs.length - 2}</Tag>
             )}
             {isActive && (
               <Badge status="processing" style={{ marginLeft: -4 }} />

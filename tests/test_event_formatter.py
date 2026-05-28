@@ -295,6 +295,19 @@ class TestFormatEffectApply:
         assert ev.kind == "effect_apply"
         assert "烧伤" in ev.summary
 
+    def test_stat_modifier_summary(self):
+        entry = {
+            "kind": "effect_apply",
+            "actor_side": 1,
+            "target_side": 401,
+            "effect_id": 20010020,
+            "effect_name": "魔攻等级提升",
+            "effect_stage": 1,
+        }
+        ev = format_action_entry(entry, _state_after_enter())
+        assert "魔攻 +10%" in ev.summary
+        assert ev.detail["modifier_summary"] == ["魔攻 +10%"]
+
     def test_with_related_skills(self):
         entry = {
             "kind": "effect_apply",

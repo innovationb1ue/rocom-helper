@@ -64,6 +64,37 @@ class TestProjectBuffChanges:
         assert len(opp["buffs"]) == 1
         assert opp["buffs"][0]["id"] == 20030370
 
+    def test_new_stat_buff_has_modifier_summary(self):
+        """属性 buff 投影后应带确定数值。"""
+        state = _make_state(
+            my_active={"buffs": [], "energy": 5, "current_hp": 100, "max_hp": 100}
+        )
+        entries = [
+            {"kind": "effect_apply", "target_side": 1, "effect_id": 20010010, "effect_stage": 1, "effect_name": "物攻等级提升"},
+        ]
+        projected = project_state_after_entries(state, entries)
+        buff = projected["my_active"]["buffs"][0]
+        assert buff["modifiers"] == {"atk_up": 0.1}
+        assert buff["modifier_summary"] == ["物攻 +10%"]
+
+    def test_stat_buff_stage_update_recomputes_summary(self):
+        """属性 buff stage 更新后数值摘要同步变化。"""
+        state = _make_state(
+            my_active={
+                "buffs": [{"id": 20010010, "stage": 1, "name": "物攻等级提升"}],
+                "energy": 5,
+                "current_hp": 100,
+                "max_hp": 100,
+            }
+        )
+        entries = [
+            {"kind": "effect_stage", "actor_side": 1, "effect_id": 20010010, "effect_stage": 2},
+        ]
+        projected = project_state_after_entries(state, entries)
+        buff = projected["my_active"]["buffs"][0]
+        assert buff["modifiers"] == {"atk_up": 0.2}
+        assert buff["modifier_summary"] == ["物攻 +20%"]
+
     def test_hp_unchanged_by_damage(self):
         """damage entry 不应修改投影状态的 HP。"""
         state = _make_state(

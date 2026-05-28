@@ -15,6 +15,16 @@ export interface EquippedSkill {
   skill_dam_type?: number | null;
 }
 
+export interface BattleBuff {
+  id?: number;
+  name?: string;
+  stage?: number | null;
+  source_skill?: string | null;
+  turns_applied?: number;
+  modifiers?: Record<string, number>;
+  modifier_summary?: string[];
+}
+
 export interface BattlePet {
   pet_id: number;
   name: string;
@@ -23,7 +33,7 @@ export interface BattlePet {
   max_hp: number;
   hp_pct: number;
   energy: number;
-  buffs: unknown[];
+  buffs: BattleBuff[];
   level?: number;
   slot?: number;
   skills?: EquippedSkill[];

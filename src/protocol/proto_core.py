@@ -13,7 +13,18 @@ import logging
 import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
-from src.data.loader import get_attr_name, get_skill_name, get_skill_meta, get_pet_meta, get_pet_name, get_buff_meta, get_buffbase_meta, get_pet_skill_meta, get_pet_species_types
+from src.data.loader import (
+    enrich_buff_modifiers,
+    get_attr_name,
+    get_skill_name,
+    get_skill_meta,
+    get_pet_meta,
+    get_pet_name,
+    get_buff_meta,
+    get_buffbase_meta,
+    get_pet_skill_meta,
+    get_pet_species_types,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -400,7 +411,7 @@ def extract_battle_buffs(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
             continue
         seen_ids.add(buff_id)
         stack = pick_first(collect_varints(sub, 4))
-        item: Dict[str, Any] = {"id": buff_id, "name": buff_name(buff_id) or str(buff_id), "stage": stack}
+        item = enrich_buff_modifiers({"id": buff_id, "name": buff_name(buff_id) or str(buff_id), "stage": stack})
         buffs.append(item)
     return buffs
 
