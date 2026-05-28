@@ -33,6 +33,8 @@ from src.analysis.constants import (
 logger = logging.getLogger(__name__)
 
 POISON_BUFF_IDS = {20070010}
+MAX_SYNC_EVENTS = 300
+MAX_PERFORM_GROUPS = 300
 GLOBAL_EVENT_KINDS = {
     "weather_change",
     "notify_perform",
@@ -73,6 +75,8 @@ class BattleStateTracker:
                 "weather_current": initial_weather,
                 "weather_history": [],
                 "global_events": [],
+                "perform_groups": [],
+                "sync_events": [],
             },
             "phase": "idle",
             "my_pets": [],
@@ -143,11 +147,14 @@ class BattleStateTracker:
         return state
 
     def _field_context(self) -> Dict[str, Any]:
-        return self.state.setdefault("field_context", {
+        ctx = self.state.setdefault("field_context", {
             "weather_current": self.state.get("weather"),
             "weather_history": [],
             "global_events": [],
         })
+        ctx.setdefault("perform_groups", [])
+        ctx.setdefault("sync_events", [])
+        return ctx
 
     @staticmethod
     def _weather_name(weather_id: Any, fallback: Any = None) -> Any:
@@ -192,11 +199,146 @@ class BattleStateTracker:
         return record
 
     @staticmethod
+    def _append_bounded(items: List[Dict[str, Any]], item: Dict[str, Any], limit: int) -> None:
+        items.append(item)
+        if len(items) > limit:
+            del items[:len(items) - limit]
+
+    def _record_perform_group(self, entry: Dict[str, Any]) -> None:
+        payload = self._pick(entry, [
+            "type", "kind", "group_id", "cast_moment", "is_group_head",
+            "group_ref", "is_last_hit", "exec_index", "event_ordinal",
+        ])
+        if not payload:
+            return
+        payload.update({
+            "round": self.state.get("round", 0),
+            "packet_index": (self._current_event_detail or {}).get("packet_index"),
+        })
+        payload = {k: v for k, v in payload.items() if v is not None}
+        self._append_bounded(
+            self._field_context().setdefault("perform_groups", []),
+            payload,
+            MAX_PERFORM_GROUPS,
+        )
+
+    def _record_sync_event(self, entry: Dict[str, Any]) -> None:
+        sync_data = entry.get("sync_data") or {}
+        if not sync_data:
+            return
+        payload = self._pick(entry, ["kind", "type", "group_id", "exec_index", "event_ordinal"])
+        payload.update({
+            "round": self.state.get("round", 0),
+            "packet_index": (self._current_event_detail or {}).get("packet_index"),
+            "sync_data": copy.deepcopy(sync_data),
+        })
+        self._append_bounded(
+            self._field_context().setdefault("sync_events", []),
+            payload,
+            MAX_SYNC_EVENTS,
+        )
+
+    def _pet_for_sync_id(self, pet_id: Any) -> Optional[Dict[str, Any]]:
+        if pet_id is None:
+            return None
+        side_num = self._side_int(pet_id)
+        if side_num is not None and side_num in self._battle_side_pets:
+            return self._battle_side_pets[side_num]
+        for pet in self.state["my_pets"] + self.state["opp_pets"]:
+            if pet.get("pet_id") == pet_id or pet.get("slot") == pet_id:
+                return pet
+        if side_num is not None:
+            return self._resolve_pet_for_side(side_num, bind_fallback=False)
+        return None
+
+    @staticmethod
+    def _skill_runtime_key(skill_id: Any) -> str:
+        return str(skill_id)
+
+    def _update_skill_runtime(self, pet: Optional[Dict[str, Any]], sync: Dict[str, Any]) -> None:
+        if pet is None or sync.get("skill_id") is None:
+            return
+        skill_id = sync["skill_id"]
+        runtime = pet.setdefault("skill_runtime", {})
+        item = runtime.setdefault(self._skill_runtime_key(skill_id), {"skill_id": skill_id})
+        for key in (
+            "skill_name", "damage_param_change", "damage_param_result",
+            "damage_param_pet_id", "cast_cnt_change", "cast_cnt_result",
+            "pp_change", "pp_result", "cost_energy_change", "cost_energy_result",
+            "cost_hp_change", "cost_hp_result", "display_hp_result",
+            "sp_energy_skill", "state", "damage_type",
+        ):
+            if sync.get(key) is not None:
+                item[key] = sync[key]
+        item["round"] = self.state.get("round", 0)
+
+        # 同步装备技能里的实时能耗，供当前回合建议直接使用。
+        for skill in pet.get("equipped_skills", []):
+            if skill.get("skill_id") == skill_id and sync.get("cost_energy_result") is not None:
+                skill["runtime_cost_energy"] = sync["cost_energy_result"]
+
+    def _apply_pet_sync(self, sync: Dict[str, Any]) -> None:
+        pet = self._pet_for_sync_id(sync.get("pet_id"))
+        if pet is None:
+            return
+        if sync.get("hp_result") is not None:
+            pet["current_hp"] = max(0, sync["hp_result"])
+            if pet.get("max_hp", 0) > 0:
+                pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
+        if sync.get("energy_result") is not None:
+            max_energy = sync.get("max_energy") or pet.get("max_energy") or 10
+            pet["energy"] = max(0, min(max_energy, sync["energy_result"]))
+        if sync.get("max_energy") is not None:
+            pet["max_energy"] = sync["max_energy"]
+        if sync.get("damage_result") is not None:
+            pet["last_damage_result"] = sync["damage_result"]
+        if sync.get("original_damage") is not None:
+            pet["last_original_damage"] = sync["original_damage"]
+        if sync.get("charging_skill_id") is not None:
+            pet["charging_skill_id"] = sync["charging_skill_id"]
+        if sync.get("instant_kill_result") is not None:
+            pet["instant_kill_result"] = sync["instant_kill_result"]
+        if sync.get("buff_id") is not None and sync.get("buff_stack_result") is not None:
+            buffs = pet.setdefault("buffs", [])
+            existing = next((b for b in buffs if b.get("id") == sync["buff_id"]), None)
+            if sync["buff_stack_result"] <= 0:
+                pet["buffs"] = [b for b in buffs if b.get("id") != sync["buff_id"]]
+            elif existing:
+                existing["stage"] = sync["buff_stack_result"]
+            else:
+                buffs.append({
+                    "id": sync["buff_id"],
+                    "name": str(sync["buff_id"]),
+                    "stage": sync["buff_stack_result"],
+                })
+
+    def _apply_entry_sync_data(self, entry: Dict[str, Any]) -> None:
+        sync_data = entry.get("sync_data") or {}
+        if not sync_data:
+            return
+        self._record_sync_event(entry)
+        for sync in sync_data.get("pet_sync", []):
+            self._apply_pet_sync(sync)
+        for sync in sync_data.get("skill_sync", []):
+            self._update_skill_runtime(self._pet_for_sync_id(sync.get("pet_id")), sync)
+        # role_sync/comm_sync 目前只保留紧凑历史，不主动改宠物状态。
+
+    def _apply_pet_skill_updates(self, entry: Dict[str, Any]) -> None:
+        for update in entry.get("pet_skill_updates", []) or []:
+            pet = self._pet_for_sync_id(update.get("pet_id"))
+            for skill in update.get("skills", []) or []:
+                self._update_skill_runtime(pet, skill)
+
+    @staticmethod
     def _pick(entry: Dict[str, Any], keys: List[str]) -> Dict[str, Any]:
         return {key: entry.get(key) for key in keys if entry.get(key) is not None}
 
     def _global_event_payload(self, kind: str, entry: Dict[str, Any]) -> Dict[str, Any]:
-        common = ["type", "index", "phase_arg", "state_arg", "extra_arg"]
+        common = [
+            "type", "index", "phase_arg", "state_arg", "extra_arg",
+            "group_id", "cast_moment", "is_group_head", "group_ref",
+            "is_last_hit", "exec_index",
+        ]
         by_kind = {
             "weather_change": common + [
                 "skill_id", "skill_name", "weather_id", "weather_name", "expire_round",
@@ -211,7 +353,7 @@ class BattleStateTracker:
                 "original_pet_name", "original_pet_types", "original_pet_level",
                 "original_base_conf_id",
             ],
-            "data_update": common + ["uin", "pet_id"],
+            "data_update": common + ["uin", "pet_id", "pet_skill_updates"],
             "ai_action": common + ["pet_id", "uin", "ai_type", "param"],
             "supply_pet": common + ["player_id", "supply_pets"],
             "effect_trigger": common + [
@@ -293,6 +435,8 @@ class BattleStateTracker:
             "weather_current": weather,
             "weather_history": [copy.deepcopy(weather)] if weather_id is not None else [],
             "global_events": [],
+            "perform_groups": [],
+            "sync_events": [],
         }
         self._set_weather_current(weather)
 
@@ -442,11 +586,13 @@ class BattleStateTracker:
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         for entry in detail.get("entries", []):
+            self._record_perform_group(entry)
             if entry.get("kind") in GLOBAL_EVENT_KINDS:
                 self._record_global_event(entry["kind"], entry)
             handler_name = self._ENTRY_HANDLERS.get(entry.get("kind"))
             if handler_name:
                 getattr(self, handler_name)(entry)
+            self._apply_entry_sync_data(entry)
 
     def _get_active_for_side(self, side_value: Any) -> Optional[Dict[str, Any]]:
         """根据 side 值获取对应的活跃宠物字典。"""
@@ -897,8 +1043,10 @@ class BattleStateTracker:
         self.state.setdefault("data_updates", []).append({
             "uin": entry.get("uin"),
             "pet_id": entry.get("pet_id"),
+            "pet_skill_updates": entry.get("pet_skill_updates"),
             "round": self.state["round"],
         })
+        self._apply_pet_skill_updates(entry)
 
     def _handle_ai_action_entry(self, entry: Dict[str, Any]) -> None:
         self.state.setdefault("ai_actions", []).append({

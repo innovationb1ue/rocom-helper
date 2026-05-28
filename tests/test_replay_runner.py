@@ -382,6 +382,23 @@ class TestReplayRunnerFieldContext:
         assert state_messages
         assert "field_context" in state_messages[-1]["state"]
 
+    def test_sync_context_and_skill_runtime_recorded(self, session1_runner_result):
+        """真实回放应记录紧凑同步历史和技能运行时参数。"""
+        state = session1_runner_result.final_state
+        ctx = state.get("field_context", {})
+        assert ctx.get("sync_events")
+        assert len(ctx["sync_events"]) <= 300
+        assert ctx.get("perform_groups")
+        assert len(ctx["perform_groups"]) <= 300
+        pets = state.get("my_pets", []) + state.get("opp_pets", [])
+        runtime_items = [
+            item
+            for pet in pets
+            for item in (pet.get("skill_runtime") or {}).values()
+        ]
+        assert any(item.get("damage_param_result") is not None for item in runtime_items)
+        assert any(item.get("cost_energy_result") is not None for item in runtime_items)
+
 
 # ---------------------------------------------------------------------------
 # Session 2

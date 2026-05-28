@@ -400,18 +400,180 @@ def _infer_action_from_wrappers(wrappers: List[Dict[str, Any]]) -> Optional[str]
 #   30=combo_skill_cast, 34=pvp_perform_marker, 35=data_update,
 #   37=supply_pet, 38=skill_pos_change, 39=special_move
 
+_PET_SYNC_FIELDS = {
+    1: ("pet_id", False),
+    2: ("hp_change", True),
+    3: ("hp_result", True),
+    6: ("shield_change", True),
+    7: ("shield_result", True),
+    8: ("attr_type", False),
+    9: ("attr_change", True),
+    10: ("attr_result", True),
+    11: ("original_damage", True),
+    12: ("damage_change", True),
+    13: ("damage_result", True),
+    14: ("buff_id", False),
+    15: ("buff_stack_change", True),
+    16: ("buff_stack_result", True),
+    17: ("state_bit_change_pos", False),
+    25: ("energy_change", True),
+    26: ("energy_result", True),
+    27: ("state_bit_results", False),
+    30: ("instant_kill_change", True),
+    31: ("instant_kill_result", True),
+    34: ("charging_skill_id", False),
+    38: ("mutation_type", False),
+    39: ("max_energy", False),
+}
+
+_SKILL_SYNC_FIELDS = {
+    1: ("pet_id", False),
+    2: ("skill_id", False),
+    3: ("damage_param_change", True),
+    4: ("damage_param_result", True),
+    5: ("cast_cnt_change", True),
+    6: ("cast_cnt_result", True),
+    7: ("pp_change", True),
+    8: ("pp_result", True),
+    9: ("cost_energy_change", True),
+    10: ("cost_energy_result", True),
+    11: ("cost_hp_change", True),
+    12: ("cost_hp_result", True),
+    13: ("display_hp_result", False),
+    14: ("sp_energy_skill", False),
+    16: ("damage_param_pet_id", True),
+    17: ("state", True),
+    18: ("damage_type", True),
+}
+
+_ROLE_SYNC_FIELDS = {
+    1: ("role_uin", False),
+    2: ("role_energy_change", True),
+    3: ("role_energy_result", True),
+    4: ("item_id", True),
+    5: ("remain_use_cnt", True),
+    6: ("item_num", True),
+    7: ("allow_use_cnt", True),
+    8: ("hp_change", True),
+    9: ("hp_result", True),
+    10: ("pvp_score_change", True),
+    11: ("pvp_score_result", True),
+    14: ("legend_skill_cast_num", True),
+    15: ("allow_use_cnt_inbattle", True),
+}
+
+_COMM_SYNC_FIELDS = {
+    1: ("sp_energy_type", False),
+    2: ("sp_energy_change", True),
+    3: ("sp_energy_result", True),
+    4: ("final_battle_energy_change", True),
+    5: ("final_battle_energy_result", True),
+}
+
+
+def _compact_dict(data: Dict[str, Any]) -> Dict[str, Any]:
+    """丢弃空值，避免把低价值空字段写入状态快照。"""
+    return {k: v for k, v in data.items() if v is not None and v != [] and v != {}}
+
+
+def _pick_sync_value(msg: Dict[str, Any], field_no: int, signed: bool = False) -> Optional[int]:
+    value = pick_first(collect_varints(msg, field_no))
+    if value is None:
+        return None
+    return maybe_signed64(value) if signed else value
+
+
+def _extract_sync_items(sync: Dict[str, Any], field_no: int, spec: Dict[int, tuple]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(sync).get(field_no, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = {
+            name: _pick_sync_value(sub, fn, signed)
+            for fn, (name, signed) in spec.items()
+        }
+        if field_no == 3 and item.get("skill_id") is not None:
+            sid = normalize_skill_id(item["skill_id"])
+            item["skill_id"] = sid
+            item["skill_name"] = skill_name(sid)
+        item = _compact_dict(item)
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_pet_skill_updates(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """解析 BattleDataUpdate.pet_skill，补全战斗中的技能运行时数据。"""
+    updates: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(7, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        update: Dict[str, Any] = {
+            "pet_id": pick_first(collect_varints(sub, 1)),
+            "skills": [],
+        }
+        for skill_entry in field_groups(sub).get(2, []):
+            skill_sub = skill_entry.get("sub")
+            if skill_sub is None:
+                continue
+            sid = normalize_skill_id(pick_first(collect_varints(skill_sub, 39)))
+            skill = _compact_dict({
+                "skill_id": sid,
+                "skill_name": skill_name(sid),
+                "equipped_slot": pick_first(collect_varints(skill_sub, 25)),
+                "cost_energy_result": _pick_sync_value(skill_sub, 9, True),
+                "state": _pick_sync_value(skill_sub, 3, True),
+            })
+            if skill:
+                update["skills"].append(skill)
+        update = _compact_dict(update)
+        if update:
+            updates.append(update)
+    return updates
+
+
+def _extract_sync_data(sync: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    if sync is None:
+        return {}
+    return _compact_dict({
+        "role_sync": _extract_sync_items(sync, 1, _ROLE_SYNC_FIELDS),
+        "pet_sync": _extract_sync_items(sync, 2, _PET_SYNC_FIELDS),
+        "skill_sync": _extract_sync_items(sync, 3, _SKILL_SYNC_FIELDS),
+        "comm_sync": _extract_sync_items(sync, 4, _COMM_SYNC_FIELDS),
+    })
+
+
+def _attach_perform_meta(out: Dict[str, Any], sub: Dict[str, Any]) -> None:
+    """补充 BattlePerformInfo 的通用元信息和同步结果。"""
+    is_group_head = pick_first(collect_varints(sub, 11))
+    is_last_hit = pick_first(collect_varints(sub, 27))
+    out.update({
+        "type": pick_first(collect_varints(sub, 1)),
+        "index": pick_first(collect_varints(sub, 2)),
+        "group_id": pick_first(collect_varints(sub, 2)),
+        "is_group_head": bool(is_group_head) if is_group_head is not None else None,
+        "phase_arg": pick_first(collect_varints(sub, 14)),
+        "cast_moment": pick_first(collect_varints(sub, 14)),
+        "state_arg": pick_first(collect_varints(sub, 26)),
+        "group_ref": pick_first(collect_varints(sub, 26)),
+        "extra_arg": is_last_hit,
+        "is_last_hit": bool(is_last_hit) if is_last_hit is not None else None,
+        "event_ordinal": pick_first(collect_varints(sub, 39)),
+        "exec_index": pick_first(collect_varints(sub, 39)),
+    })
+    sync_data = _extract_sync_data(first_sub(field_groups(sub).get(12, [])))
+    if sync_data:
+        out["sync_data"] = sync_data
+
+
 def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
     """Extract a single action entry from a 0x1324 sub-message."""
     sg = field_groups(sub)
     entry_type = pick_first(collect_varints(sub, 1))
-    out: Dict[str, Any] = {
-        "type": entry_type,
-        "index": pick_first(collect_varints(sub, 2)),
-        "phase_arg": pick_first(collect_varints(sub, 14)),
-        "state_arg": pick_first(collect_varints(sub, 26)),
-        "extra_arg": pick_first(collect_varints(sub, 27)),
-        "event_ordinal": pick_first(collect_varints(sub, 39)),
-    }
+    out: Dict[str, Any] = {}
+    _attach_perform_meta(out, sub)
 
     if entry_type == 1:
         # skill_cast — skill from field 3, energy from field 12 IR sub
@@ -795,6 +957,9 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             pet_sub = first_sub(field_groups(dm).get(3, []))
             if pet_sub:
                 out["pet_id"] = pick_first(collect_varints(pet_sub, 1))
+            pet_skill_updates = _extract_pet_skill_updates(dm)
+            if pet_skill_updates:
+                out["pet_skill_updates"] = pet_skill_updates
 
     elif entry_type == 37:
         # BPT_SUPPLY_PET — from field 45 sub (BattleSupplyPetPlayerInfo)

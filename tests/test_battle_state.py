@@ -907,6 +907,74 @@ class TestGlobalFieldContext:
         assert state["opp_active"]["effect_history"][-1]["kind"] == "effect_link"
         assert state["my_active"]["effect_history"][-1]["kind"] == "effect_trigger"
 
+    def test_sync_data_updates_pet_and_skill_runtime(self, tracker):
+        """sync_data 应补强 HP、能量和技能运行时参数。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, {
+            "opcode": 0x1324,
+            "packet_index": 8,
+            "entries": [
+                {
+                    "kind": "effect_apply",
+                    "type": 2,
+                    "group_id": 7,
+                    "cast_moment": 11,
+                    "is_group_head": True,
+                    "exec_index": 5,
+                    "actor_side": 1,
+                    "target_side": 401,
+                    "effect_id": 1001,
+                    "sync_data": {
+                        "pet_sync": [
+                            {"pet_id": 1, "hp_change": -20, "hp_result": 280,
+                             "energy_change": -1, "energy_result": 9},
+                        ],
+                        "skill_sync": [
+                            {"pet_id": 1, "skill_id": 7020370,
+                             "damage_param_result": 150,
+                             "cost_energy_result": 4,
+                             "pp_result": 8,
+                             "state": 3,
+                             "damage_type": 2},
+                        ],
+                    },
+                },
+            ],
+        })
+
+        assert state["my_active"]["current_hp"] == 280
+        assert state["my_active"]["energy"] == 9
+        runtime = state["my_active"]["skill_runtime"]["7020370"]
+        assert runtime["damage_param_result"] == 150
+        assert runtime["cost_energy_result"] == 4
+        assert runtime["pp_result"] == 8
+        ctx = state["field_context"]
+        assert ctx["perform_groups"][-1]["group_id"] == 7
+        assert ctx["sync_events"][-1]["sync_data"]["skill_sync"][0]["damage_param_result"] == 150
+
+    def test_data_update_pet_skill_updates_skill_runtime(self, tracker):
+        """data_update.pet_skill 应进入同一套 skill_runtime。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {
+                "kind": "data_update",
+                "uin": 123,
+                "pet_id": 100,
+                "pet_skill_updates": [
+                    {
+                        "pet_id": 100,
+                        "skills": [
+                            {"skill_id": 7020370, "cost_energy_result": 4, "state": 2},
+                        ],
+                    },
+                ],
+            },
+        ]))
+
+        runtime = state["my_active"]["skill_runtime"]["7020370"]
+        assert runtime["cost_energy_result"] == 4
+        assert runtime["state"] == 2
+
 
 # ── 有效速度计算测试 ──────────────────────────────────────────────
 

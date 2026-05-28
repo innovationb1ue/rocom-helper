@@ -341,8 +341,13 @@ class DamageCalculator:
         pct = total_damage / defender_max_hp
         can_ko = total_damage >= defender_cur_hp
 
+        # 战斗同步里的 damage_param_result 是运行时威力参数信号，先作为解释字段保留。
+        runtime_skill = self._get_runtime_skill(attacker, skill_meta.get("id"))
+        runtime_power = runtime_skill.get("damage_param_result")
         energy_costs = skill_meta.get("energy_cost", [0])
         energy_cost = energy_costs[0] if energy_costs else 0
+        if runtime_skill.get("cost_energy_result") is not None:
+            energy_cost = runtime_skill["cost_energy_result"]
         if energy_cost > 0:
             attacker_energy = attacker.get("energy", 10)
             if attacker_energy < energy_cost:
@@ -352,6 +357,9 @@ class DamageCalculator:
         breakdown = {
             "base_power": self._get_power(skill_meta),
             "effective_power": effective_power,
+            "runtime_power": runtime_power,
+            "damage_param_result": runtime_power,
+            "runtime_skill": runtime_skill or None,
             "ability_level": round(ability_level, 3),
             "atk": int(effective_atk),
             "def_": int(effective_def),
@@ -428,6 +436,15 @@ class DamageCalculator:
         if dam_para:
             return int(dam_para[0])
         return 0
+
+    @staticmethod
+    def _get_runtime_skill(attacker: Dict[str, Any], skill_id: Any) -> Dict[str, Any]:
+        """从状态机的 skill_runtime 中读取当前战斗里的技能同步参数。"""
+        if skill_id is None:
+            return {}
+        runtime = attacker.get("skill_runtime") or {}
+        item = runtime.get(str(skill_id)) or runtime.get(skill_id)
+        return item if isinstance(item, dict) else {}
 
     @staticmethod
     def _get_stat_with_source(pet: Dict[str, Any], stat_name: str) -> Tuple[Optional[int], str]:

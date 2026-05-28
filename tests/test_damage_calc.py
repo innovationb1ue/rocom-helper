@@ -347,6 +347,25 @@ class TestCalculate:
         assert bd["stab"] == 1.5
         assert bd["hit_count"] == 1
 
+    def test_runtime_skill_values_are_explain_only(self, calc):
+        """运行时威力参数进入解释字段，但不直接替换伤害公式威力。"""
+        attacker = _make_attacker(types=[1], energy=3)
+        attacker["skill_runtime"] = {
+            "7700001": {
+                "damage_param_result": 150,
+                "cost_energy_result": 4,
+                "pp_result": 8,
+            }
+        }
+        result = calc.calculate(attacker, _make_defender(types=[3]), _make_skill(element=1))
+        bd = result.damage_breakdown
+        assert result.power == 80
+        assert result.energy_cost == 4
+        assert bd["base_power"] == 80
+        assert bd["runtime_power"] == 150
+        assert bd["damage_param_result"] == 150
+        assert bd["runtime_skill"]["pp_result"] == 8
+
     def test_to_dict(self, calc):
         result = calc.calculate(
             _make_attacker(),
