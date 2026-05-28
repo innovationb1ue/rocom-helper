@@ -6,6 +6,26 @@ where py >nul 2>&1 || (
     echo ERROR: py not found. Install Python and ensure 'py' is on PATH.
     exit /b 1
 )
+
+:: Double-clicked .bat files do not inherit an activated Anaconda environment.
+:: Add the selected Python runtime's DLL paths so modules such as ssl can load.
+set "PYTHON_PREFIX="
+for /f "usebackq delims=" %%d in (`py -c "import sys; print(sys.prefix)" 2^>nul`) do set "PYTHON_PREFIX=%%d"
+if not defined PYTHON_PREFIX (
+    echo ERROR: Could not detect Python runtime prefix.
+    exit /b 1
+)
+if exist "%PYTHON_PREFIX%\Library\bin" set "PATH=%PYTHON_PREFIX%\Library\bin;%PATH%"
+if exist "%PYTHON_PREFIX%\DLLs" set "PATH=%PYTHON_PREFIX%\DLLs;%PATH%"
+if exist "%PYTHON_PREFIX%\Scripts" set "PATH=%PYTHON_PREFIX%\Scripts;%PATH%"
+
+py -c "import ssl" >nul 2>&1 || (
+    echo ERROR: Python ssl module failed to load.
+    echo        Python prefix: %PYTHON_PREFIX%
+    echo        If this is Anaconda, repair the environment or run from Anaconda Prompt.
+    exit /b 1
+)
+
 where npm >nul 2>&1 || (
     echo ERROR: npm not found. Install Node.js and ensure 'npm' is on PATH.
     exit /b 1

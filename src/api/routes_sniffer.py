@@ -5,7 +5,7 @@ import json
 import logging
 from typing import Any, Dict
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from src.api.sniffer_manager import get_sniffer_manager
 
@@ -20,7 +20,14 @@ async def start_sniffer():
     mgr = get_sniffer_manager()
     if mgr.state in ("listening", "connected", "key_missing", "key_captured"):
         return {"status": "already_running", "message": "已在监听中", "details": mgr.get_status()}
-    await mgr.start()
+    try:
+        await mgr.start()
+    except RuntimeError as exc:
+        logger.warning("启动 Sniffer 失败: %s", exc)
+        raise HTTPException(status_code=503, detail=mgr.state_message) from exc
+    except Exception as exc:
+        logger.exception("启动 Sniffer 异常")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {"status": "ok", "message": "监听已启动", "details": mgr.get_status()}
 
 

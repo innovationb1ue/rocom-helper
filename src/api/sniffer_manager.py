@@ -16,6 +16,7 @@ from src.protocol.proto_core import TGCP_COMMAND_NAMES
 logger = logging.getLogger(__name__)
 
 _PERSISTENT_KEY_FILE = settings.session_key_file
+_SNIFFER_START_TIMEOUT_SECONDS = 8.0
 
 
 class SnifferManager:
@@ -228,13 +229,40 @@ class SnifferManager:
             on_event=self._on_sniffer_event,
             packet_logger=pkt_log,
         )
-        self._sniffer.start()
+        try:
+            await asyncio.wait_for(
+                asyncio.to_thread(self._sniffer.start),
+                timeout=_SNIFFER_START_TIMEOUT_SECONDS,
+            )
+        except asyncio.TimeoutError as exc:
+            await self._cleanup_failed_start("抓包启动超时，请确认已安装 Npcap 并尝试以管理员身份运行。")
+            raise RuntimeError("Sniffer start timed out") from exc
+        except Exception as exc:
+            await self._cleanup_failed_start(f"抓包启动失败: {exc}")
+            raise
 
         # 4. 短暂等待后评估实际状态（游戏可能已打开）
         await asyncio.sleep(0.3)
         await self._evaluate_current_state()
 
         logger.info("持久化 Sniffer 已启动")
+
+    async def _cleanup_failed_start(self, message: str) -> None:
+        if self._broadcast_task:
+            self._broadcast_task.cancel()
+            self._broadcast_task = None
+        if self._monitor_task:
+            self._monitor_task.cancel()
+            self._monitor_task = None
+        if self._sniffer:
+            try:
+                if self._sniffer.is_running:
+                    self._sniffer.stop()
+            except Exception as exc:
+                logger.warning("清理失败的 Sniffer 启动时出错: %s", exc)
+            self._sniffer = None
+        self._flow_count = 0
+        self._set_state("idle", message)
 
     async def stop(self) -> None:
         """停止 Sniffer。"""

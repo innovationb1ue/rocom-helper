@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { apiBaseUrl } from '../config';
 
-const api = axios.create({ baseURL: apiBaseUrl() });
+const api = axios.create({ baseURL: apiBaseUrl(), timeout: 12000 });
 
 // 热门技能预设
 export interface PopularSkillPreset {
