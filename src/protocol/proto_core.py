@@ -11,6 +11,7 @@
 from __future__ import annotations
 import logging
 import re
+import struct
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 from src.data.loader import (
@@ -24,9 +25,13 @@ from src.data.loader import (
     get_buffbase_meta,
     get_pet_skill_meta,
     get_pet_species_types,
+    get_opcode_pb_meta,
 )
+from src.config import settings
 
 logger = logging.getLogger(__name__)
+
+_PROTO_SCHEMA_CACHE: Optional[Dict[str, Any]] = None
 
 # --- 底层 proto 原语 ---
 
@@ -270,6 +275,152 @@ def parse_proto_message(data: bytes, *, depth: int = 0, max_depth: int = 10, max
         fields.append(entry)
     return {"fields": fields, "consumed": off, "clean": clean and off == len(data)}
 
+
+# --- Schema-aware decode ---
+
+def _load_proto_schema() -> Dict[str, Any]:
+    """Lazy-load proto_schema.json for optional schema-aware post-processing."""
+    global _PROTO_SCHEMA_CACHE
+    if _PROTO_SCHEMA_CACHE is not None:
+        return _PROTO_SCHEMA_CACHE
+    path = settings.data_dir / "proto_schema.json"
+    try:
+        import json
+        with path.open("r", encoding="utf-8-sig") as fh:
+            data = json.load(fh)
+    except (OSError, ValueError) as exc:
+        logger.warning("Failed to load proto schema %s: %s", path, exc)
+        data = {}
+    _PROTO_SCHEMA_CACHE = data if isinstance(data, dict) else {}
+    return _PROTO_SCHEMA_CACHE
+
+
+def _message_schema(message_name: Optional[str]) -> Optional[Dict[str, Any]]:
+    if not message_name:
+        return None
+    messages = _load_proto_schema().get("messages", {})
+    if not isinstance(messages, dict):
+        return None
+    for key in (message_name, f".Next.{message_name}", f"Next.{message_name}"):
+        item = messages.get(key)
+        if isinstance(item, dict):
+            return item
+    return None
+
+
+def _schema_fields(message_schema: Dict[str, Any]) -> Dict[int, Dict[str, Any]]:
+    fields = message_schema.get("fields", {})
+    out: Dict[int, Dict[str, Any]] = {}
+    if not isinstance(fields, dict):
+        return out
+    for key, value in fields.items():
+        if not isinstance(value, dict):
+            continue
+        try:
+            out[int(key)] = value
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
+def _decode_packed_numeric(blob: bytes, field_type: str) -> List[Any]:
+    if field_type in {"float"}:
+        return [
+            round(float(struct.unpack("<f", blob[i:i + 4])[0]), 6)
+            for i in range(0, len(blob) - (len(blob) % 4), 4)
+        ]
+    values: List[Any] = []
+    off = 0
+    while off < len(blob):
+        try:
+            raw, off = read_varint(blob, off)
+        except ValueError:
+            return []
+        values.append(_coerce_scalar(raw, field_type))
+    return values
+
+
+def _coerce_scalar(value: int, field_type: str) -> Any:
+    if field_type == "bool":
+        return bool(value)
+    if field_type in {"int32", "int64", "sint32", "sint64"}:
+        return maybe_signed64(value)
+    if field_type == "enum":
+        return {"value": maybe_signed64(value), "name": None}
+    return value
+
+
+def _decode_scalar_entry(entry: Dict[str, Any], field_type: str) -> Any:
+    if entry.get("wire") == 5 and field_type == "float" and entry.get("raw_hex"):
+        try:
+            return round(float(struct.unpack("<f", bytes.fromhex(entry["raw_hex"]))[0]), 6)
+        except (ValueError, struct.error):
+            return None
+    if entry.get("wire") == 2:
+        if field_type in {"string"}:
+            return entry.get("text")
+        if field_type in {"bytes"}:
+            return bytes.fromhex(entry.get("raw_hex", ""))
+        raw = entry.get("raw_hex")
+        if raw:
+            packed = _decode_packed_numeric(bytes.fromhex(raw), field_type)
+            return packed if packed else None
+    if "value" in entry:
+        return _coerce_scalar(entry["value"], field_type)
+    return None
+
+
+def decode_proto_by_schema(msg: Dict[str, Any], message_name: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Decode a parsed protobuf tree using proto_schema.json.
+
+    The raw recursive tree remains the source of truth for fallback extractors; this
+    helper only adds a named, schema-shaped view for semantic post-processing.
+    """
+    schema = _message_schema(message_name)
+    if schema is None:
+        return None
+    field_specs = _schema_fields(schema)
+    grouped = field_groups(msg)
+    decoded: Dict[str, Any] = {}
+    for field_no, entries in grouped.items():
+        spec = field_specs.get(field_no)
+        if spec is None:
+            continue
+        name = spec.get("name") or f"field_{field_no}"
+        field_type = str(spec.get("type") or "")
+        is_message = bool(spec.get("message"))
+        repeated = bool(spec.get("repeated"))
+        values: List[Any] = []
+        for entry in entries:
+            value: Any = None
+            if is_message:
+                sub = entry.get("sub")
+                value = decode_proto_by_schema(sub, field_type) if sub is not None else None
+            else:
+                value = _decode_scalar_entry(entry, field_type)
+            if value is None:
+                continue
+            if repeated and isinstance(value, list) and not is_message and entry.get("wire") == 2:
+                values.extend(value)
+            else:
+                values.append(value)
+        if not values:
+            continue
+        decoded[name] = values if repeated or len(values) > 1 else values[0]
+    return decoded
+
+
+def _attach_schema_decode(record: Dict[str, Any]) -> Dict[str, Any]:
+    meta = get_opcode_pb_meta(record.get("opcode"))
+    if not isinstance(meta, dict):
+        return record
+    message_name = meta.get("message")
+    decoded = decode_proto_by_schema(record.get("root") or {}, message_name)
+    if decoded is not None:
+        record["_message_name"] = message_name
+        record["_decoded"] = decoded
+    return record
+
 # --- 辅助函数 ---
 def walk_messages(msg: Dict[str, Any], path: str = "root") -> List[Tuple[str, Dict[str, Any]]]:
     out = [(path, msg)]
@@ -416,6 +567,22 @@ def extract_battle_buffs(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     return buffs
 
 
+def _extract_simple_items(msg: Dict[str, Any], field_no: int, spec: Dict[int, Tuple[str, bool]]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(field_no, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item: Dict[str, Any] = {}
+        for fn, (name, signed) in spec.items():
+            value = pick_first(collect_varints(sub, fn))
+            if value is not None:
+                item[name] = maybe_signed64(value) if signed else value
+        if item:
+            items.append(item)
+    return items
+
+
 def extract_stats(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     best: List[Dict[str, Any]] = []
     for entry in field_groups(msg).get(14, []):
@@ -544,6 +711,19 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
 
     # 初始 buff 列表 (含先天特性) from BattleInsidePetInfo.field 5
     initial_buffs = extract_battle_buffs(dm)
+    triggered_buffs = [
+        item for item in (
+            {
+                "buffbase_id": maybe_signed64(pick_first(collect_varints(e["sub"], 1)) or 0),
+                "value": maybe_signed64(pick_first(collect_varints(e["sub"], 2)) or 0),
+                "side": maybe_signed64(pick_first(collect_varints(e["sub"], 3)) or 0),
+                "role_uin": pick_first(collect_varints(e["sub"], 4)),
+            }
+            for e in field_groups(dm).get(65, [])
+            if e.get("sub") is not None
+        )
+        if any(v not in (None, 0) for v in item.values())
+    ]
     # 先天特性/被动技能 from BattleInsidePetInfo.field 64
     passive_skill_id = pick_first(collect_varints(dm, 64))
     # 能量来自 PetData.field 33。battle_attr[26] 是"宠物伤害类型1"，不是能量。
@@ -564,6 +744,43 @@ def extract_state_wrapper(msg: Dict[str, Any], *, path: str, record: Dict[str, A
         "equipped_skills": equipped_skills,
         "skill_source": skill_source,
         "initial_buffs": initial_buffs,
+        "state_bits": collect_varints(dm, 24),
+        "sp_energy": _extract_simple_items(dm, 15, {
+            1: ("source_type", False),
+            2: ("env_type", False),
+            3: ("env_layer", False),
+            4: ("src_id", True),
+            5: ("tod_time", True),
+            6: ("expire_round", True),
+        }),
+        "extra_resist_type": collect_varints(dm, 30),
+        "in_battle_round": pick_first(collect_varints(dm, 31)),
+        "counter_round": pick_first(collect_varints(dm, 32)),
+        "revive_round": pick_first(collect_varints(dm, 33)),
+        "revive_rounds": pick_first(collect_varints(dm, 34)),
+        "charging_skill_id": pick_first(collect_varints(dm, 35)),
+        "remain_buff_infos": _extract_simple_items(dm, 39, {
+            1: ("buff_id", True),
+            2: ("stack", True),
+        }),
+        "extra_sdt": _extract_simple_items(dm, 41, {
+            1: ("type", True),
+            2: ("result", True),
+            3: ("buff_id", False),
+            4: ("buffbase_id", False),
+        }),
+        "changed_attr": [maybe_signed64(v) for v in collect_varints(dm, 54)],
+        "dead_round": pick_first(collect_varints(dm, 55)),
+        "dead_cnt": pick_first(collect_varints(dm, 56)),
+        "using_buffs": collect_varints(dm, 60),
+        "triggered_buffs": triggered_buffs,
+        "max_energy": pick_first(collect_varints(dm, 53)),
+        "speed_min": pick_first(collect_varints(dm, 71)),
+        "speed_max": pick_first(collect_varints(dm, 72)),
+        "owner_uin": pick_first(collect_varints(dm, 77)),
+        "last_up_round": pick_first(collect_varints(dm, 78)),
+        "last_down_round": pick_first(collect_varints(dm, 79)),
+        "charging_skill_energy": pick_first(collect_varints(dm, 82)),
         "passive_skill_id": passive_skill_id,
         "base_id": creature.get("base_id"),
         "base_conf_id": creature.get("base_conf_id"),
@@ -623,6 +840,12 @@ def _build_payload_root(opcode: int, payload: bytes) -> Tuple[Dict[str, Any], st
 def _empty_root() -> Dict[str, Any]:
     return {"fields": [], "consumed": 0, "clean": True}
 
+def _is_probable_business_opcode(opcode: int) -> bool:
+    return isinstance(opcode, int) and get_opcode_pb_meta(opcode) is not None
+
+def _finalize_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    return _attach_schema_decode(record)
+
 # v14 格式布局 (30字节头):
 # [0:4]   transport_seq (big-endian)
 # [4:6]   magic 0x55AA
@@ -658,7 +881,7 @@ def _parse_record_v14(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str,
         opcode = session_id & 0xFFFF
         normalized = False
     root, payload_format, special_payload = _build_payload_root(opcode, payload)
-    return {
+    return _finalize_record({
         **common, "record_type": "business", "transport_kind": "tgcp_data",
         "transport_layout": "tgcp_4013_v14", "transport_seq": transport_seq,
         "record_len": record_len, "session_id": session_id,
@@ -668,7 +891,7 @@ def _parse_record_v14(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str,
         "raw_opcode_hex": f"0x{raw_opcode:08X}", "opcode_normalized": normalized,
         "req_seq": req_seq, "payload_len": len(payload),
         "payload_trailer_len": trailer_len, "root": root,
-    }
+    })
 
 def _parse_record_live_s2c(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if common["direction"] != "s2c" or len(body) < 10 or body[4:6] != b"\x55\xaa":
@@ -681,12 +904,12 @@ def _parse_record_live_s2c(body: bytes, common: Dict[str, Any]) -> Optional[Dict
     trailer_len = tsf4g_trailer_len(raw_payload)
     payload = strip_tsf4g_padding(raw_payload)
     root, _, _ = _build_payload_root(opcode, payload)
-    return {
+    return _finalize_record({
         **common, "record_type": "business", "transport_kind": "tgcp_data",
         "transport_layout": "tgcp_4013_live_s2c", "opcode": opcode,
         "opcode_hex": f"0x{opcode:04X}", "subtype": subtype,
         "payload_len": len(payload), "payload_trailer_len": trailer_len, "root": root,
-    }
+    })
 
 def _parse_record_live_c2s(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if common["direction"] != "c2s" or len(body) < 14 or body[8:10] != b"\x39\x63":
@@ -700,14 +923,52 @@ def _parse_record_live_c2s(body: bytes, common: Dict[str, Any]) -> Optional[Dict
     trailer_len = tsf4g_trailer_len(raw_payload)
     payload = strip_tsf4g_padding(raw_payload)
     root, _, _ = _build_payload_root(opcode, payload)
-    return {
+    return _finalize_record({
         **common, "record_type": "business", "transport_kind": "tgcp_data",
         "transport_layout": "tgcp_4013_live_c2s",
         "opcode": opcode, "opcode_hex": f"0x{opcode:04X}",
         "raw_opcode": raw_opcode, "raw_opcode_hex": f"0x{raw_opcode:08X}",
         "opcode_normalized": normalized, "req_seq": req_seq,
         "payload_len": len(payload), "payload_trailer_len": trailer_len, "root": root,
-    }
+    })
+
+def _parse_record_live_c2s_no_magic(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Parse observed c2s business packets that omit the 0x3963 marker.
+
+    Layout matches live_c2s except bytes [8:10] are an opaque marker rather than
+    the magic value.  Guard with opcode metadata and a clean protobuf payload to
+    avoid treating arbitrary c2s blobs as business records.
+    """
+    if common["direction"] != "c2s" or len(body) < 14 or body[8:10] == b"\x39\x63":
+        return None
+    prefix_u32 = int.from_bytes(body[0:4], "big")
+    raw_opcode = int.from_bytes(body[4:8], "big")
+    opcode, normalized = normalize_c2s_opcode(raw_opcode)
+    if not _is_probable_business_opcode(opcode):
+        return None
+    req_seq = int.from_bytes(body[10:14], "big")
+    raw_payload = body[14:]
+    trailer_len = tsf4g_trailer_len(raw_payload)
+    payload = strip_tsf4g_padding(raw_payload)
+    root, _, _ = _build_payload_root(opcode, payload)
+    if not root.get("clean"):
+        return None
+    if any(entry.get("field") == 0 for entry in root.get("fields", [])):
+        return None
+    return _finalize_record({
+        **common, "record_type": "business", "transport_kind": "tgcp_data",
+        "transport_layout": "tgcp_4013_live_c2s_no_magic",
+        "transport_seq": prefix_u32, "prefix_u32": prefix_u32,
+        "prefix_u32_hex": f"0x{prefix_u32:08X}",
+        "opcode": opcode, "opcode_hex": f"0x{opcode:04X}",
+        "raw_opcode": raw_opcode, "raw_opcode_hex": f"0x{raw_opcode:08X}",
+        "opcode_normalized": normalized,
+        "marker_u16": int.from_bytes(body[8:10], "big"),
+        "marker_u16_hex": f"0x{int.from_bytes(body[8:10], 'big'):04X}",
+        "req_seq": req_seq,
+        "payload_len": len(payload), "payload_trailer_len": trailer_len,
+        "root": root,
+    })
 
 def _parse_record_live_c2s_short_heartbeat(body: bytes, common: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if common["direction"] != "c2s" or len(body) < 16 or body.find(b"tsf4g", 8) < 0:
@@ -717,7 +978,7 @@ def _parse_record_live_c2s_short_heartbeat(body: bytes, common: Dict[str, Any]) 
         return None
     req_seq = int.from_bytes(body[14:16], "little")
     leading_u32 = int.from_bytes(body[0:4], "big")
-    return {
+    return _finalize_record({
         **common, "record_type": "business", "transport_kind": "tgcp_data",
         "transport_layout": "tgcp_4013_live_c2s_short_heartbeat",
         "transport_seq": leading_u32, "prefix_u32": leading_u32,
@@ -725,7 +986,7 @@ def _parse_record_live_c2s_short_heartbeat(body: bytes, common: Dict[str, Any]) 
         "opcode": opcode, "opcode_hex": f"0x{opcode:04X}",
         "format": "c2s_short_heartbeat", "req_seq": req_seq,
         "payload_len": 0, "root": _empty_root(),
-    }
+    })
 
 
 # parse_record 是传输层的入口函数。
@@ -740,6 +1001,7 @@ def parse_record(packet: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return (_parse_record_v14(body, common)
             or _parse_record_live_s2c(body, common)
             or _parse_record_live_c2s(body, common)
+            or _parse_record_live_c2s_no_magic(body, common)
             or _parse_record_live_c2s_short_heartbeat(body, common))
 
 def parse_tgcp_control_packet(packet: Dict[str, Any]) -> Optional[Dict[str, Any]]:

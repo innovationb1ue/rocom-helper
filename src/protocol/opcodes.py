@@ -48,6 +48,15 @@ from src.protocol.battle import (
     extract_13f6_ai_skill,
     extract_1313_round_confirm,
     extract_1314_round_confirm_rsp,
+    extract_1305_load_finish_req,
+    extract_1306_load_finish_rsp,
+    extract_1309_supply_pet_req,
+    extract_130a_supply_pet_rsp,
+    extract_132e_player_runaway_req,
+    extract_132f_player_runaway_rsp,
+    extract_1335_round_op_query_req,
+    extract_1336_round_op_query_rsp,
+    extract_13f9_pk_again,
 )
 
 # ---------------------------------------------------------------------------
@@ -202,6 +211,10 @@ def _handle_0220(record, inner) -> Dict[str, Any]:
 # Standard "detail" handlers — auto-generated
 for _opc, _kind, _ext in [
     (0x130B, "client_skill_select", extract_130b_skill_select),
+    (0x1305, "battle_load_finish_req", extract_1305_load_finish_req),
+    (0x1306, "battle_load_finish_rsp", extract_1306_load_finish_rsp),
+    (0x1309, "supply_pet_req", extract_1309_supply_pet_req),
+    (0x130A, "supply_pet_rsp", extract_130a_supply_pet_rsp),
     (0x1322, "server_skill_declare", extract_1322_skill_declare),
     (0x1324, "action_resolve", extract_1324_action),
     (0x13F4, "special_refresh", extract_13f4_refresh),
@@ -214,11 +227,16 @@ for _opc, _kind, _ext in [
     (0x13F3, "preplay", extract_13f3_preplay),
     (0x1312, "round_flow", extract_1312_round_flow),
     (0x1326, "auto_cmd", extract_1326_auto_cmd),
+    (0x132E, "player_runaway_req", extract_132e_player_runaway_req),
+    (0x132F, "player_runaway_rsp", extract_132f_player_runaway_rsp),
     (0x132A, "role_leave", extract_132a_role_leave),
     (0x132D, "force_finish", extract_132d_force_finish),
     (0x1334, "emoji", extract_1334_emoji),
     (0x133C, "catch_rsp", extract_133c_catch_rsp),
     (0x13F6, "ai_skill", extract_13f6_ai_skill),
+    (0x1335, "round_op_query_req", extract_1335_round_op_query_req),
+    (0x1336, "round_op_query_rsp", extract_1336_round_op_query_rsp),
+    (0x13F9, "pk_again", extract_13f9_pk_again),
 ]:
     _OPCODE_REGISTRY[_opc] = (_kind, _make_detail_handler(_ext))
 

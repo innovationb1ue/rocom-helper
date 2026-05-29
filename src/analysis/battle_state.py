@@ -50,8 +50,12 @@ GLOBAL_EVENT_KINDS = {
     "data_update",
     "ai_action",
     "supply_pet",
+    "buff_trigger",
     "effect_trigger",
     "effect_link",
+    "cmd_failed",
+    "runaway",
+    "use_item",
 }
 
 
@@ -278,6 +282,8 @@ class BattleStateTracker:
             "buff_damage_param", "ex_damage_param", "damage_params",
             "damage_params_by_pet", "restraint_types", "restraint_types_by_pet",
             "cd_info", "enhance_info", "damage_type", "source",
+            "extra_damage_type", "cr_damage_params", "skill_buff",
+            "trans_info", "set_cost_info",
         ):
             if merged.get(key) is not None:
                 item[key] = merged[key]
@@ -318,6 +324,8 @@ class BattleStateTracker:
             pet["max_energy"] = sync["max_energy"]
         if sync.get("state_bit_results") is not None:
             pet["state_bit_results"] = sync["state_bit_results"]
+        if sync.get("state_bit_change_pos") is not None:
+            pet["state_bit_change_pos"] = sync["state_bit_change_pos"]
         if sync.get("shield_result") is not None:
             pet["shield"] = sync["shield_result"]
         if sync.get("damage_result") is not None:
@@ -326,6 +334,13 @@ class BattleStateTracker:
             pet["last_original_damage"] = sync["original_damage"]
         if sync.get("charging_skill_id") is not None:
             pet["charging_skill_id"] = sync["charging_skill_id"]
+        if sync.get("attr_type") is not None:
+            pet.setdefault("attr_changes", []).append({
+                "attr_type": sync.get("attr_type"),
+                "attr_change": sync.get("attr_change"),
+                "attr_result": sync.get("attr_result"),
+                "round": self.state.get("round", 0),
+            })
         if sync.get("instant_kill_result") is not None:
             pet["instant_kill_result"] = sync["instant_kill_result"]
         if sync.get("revive_round") is not None:
@@ -358,6 +373,18 @@ class BattleStateTracker:
                 pet[key] = sync[key]
         if sync.get("equipped_skills"):
             pet["runtime_equipped_skills"] = sync["equipped_skills"]
+
+    def _apply_wrapper_runtime_fields(self, pet: Dict[str, Any], w: Dict[str, Any]) -> None:
+        for key in (
+            "state_bits", "sp_energy", "extra_resist_type", "in_battle_round",
+            "counter_round", "revive_round", "revive_rounds", "charging_skill_id",
+            "remain_buff_infos", "extra_sdt", "changed_attr", "dead_round",
+            "dead_cnt", "using_buffs", "triggered_buffs", "max_energy",
+            "speed_min", "speed_max", "owner_uin", "last_up_round",
+            "last_down_round", "charging_skill_energy",
+        ):
+            if w.get(key) not in (None, [], {}):
+                pet[key] = copy.deepcopy(w[key])
 
     def _apply_entry_sync_data(self, entry: Dict[str, Any]) -> None:
         sync_data = entry.get("sync_data") or {}
@@ -419,6 +446,16 @@ class BattleStateTracker:
                 "actor_side", "actor_side_name", "target_side", "target_side_name",
                 "effect_id", "effect_name",
             ],
+            "buff_trigger": common + [
+                "actor_side", "actor_side_name", "target_side", "target_side_name",
+                "effect_id", "effect_name", "buff_id", "buffbase_ids",
+                "perform_type", "need_select_pet", "frozen_death",
+            ],
+            "cmd_failed": common + ["failed_reason"],
+            "runaway": common + [
+                "actor_side", "actor_side_name", "target_side", "target_side_name",
+            ],
+            "use_item": common + ["caster_id", "target_id", "item_id"],
         }
         payload = self._pick(entry, by_kind.get(kind, common))
         if kind == "weather_change":
@@ -501,6 +538,7 @@ class BattleStateTracker:
         opp_pets = []
         for w in wrappers:
             pet_info = PetInfo.from_wrapper(w, default_energy=10).to_dict()
+            self._apply_wrapper_runtime_fields(pet_info, w)
             equipped = w.get("equipped_skills") or []
             side = w.get("side")
             side_label = "MY" if (side == 1 or side == "我方") else "OPP"
@@ -633,6 +671,7 @@ class BattleStateTracker:
         "change_pet": "_handle_change_pet_entry",
         "effect_apply": "_handle_effect_apply_entry",
         "effect_stage": "_handle_effect_stage_entry",
+        "buff_trigger": "_handle_buff_trigger_entry",
         "effect_link": "_handle_effect_link_entry",
         "effect_trigger": "_handle_effect_trigger_entry",
         "weather_change": "_handle_weather_change_entry",
@@ -648,6 +687,9 @@ class BattleStateTracker:
         "data_update": "_handle_data_update_entry",
         "ai_action": "_handle_ai_action_entry",
         "supply_pet": "_handle_supply_pet_entry",
+        "cmd_failed": "_handle_cmd_failed_entry",
+        "runaway": "_handle_runaway_entry",
+        "use_item": "_handle_use_item_entry",
     }
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
@@ -957,6 +999,9 @@ class BattleStateTracker:
     def _handle_effect_trigger_entry(self, entry: Dict[str, Any]) -> None:
         self._append_pet_effect_history(entry, "effect_trigger")
 
+    def _handle_buff_trigger_entry(self, entry: Dict[str, Any]) -> None:
+        self._append_pet_effect_history(entry, "buff_trigger")
+
     def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
         weather_id = entry.get("weather_id")
         weather_name = self._weather_name(weather_id, entry.get("weather_name"))
@@ -1135,6 +1180,27 @@ class BattleStateTracker:
             "round": self.state["round"],
         })
 
+    def _handle_cmd_failed_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("cmd_failed_events", []).append({
+            "failed_reason": entry.get("failed_reason"),
+            "round": self.state["round"],
+        })
+
+    def _handle_runaway_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("runaway_events", []).append({
+            "actor_side": entry.get("actor_side"),
+            "target_side": entry.get("target_side"),
+            "round": self.state["round"],
+        })
+
+    def _handle_use_item_entry(self, entry: Dict[str, Any]) -> None:
+        self.state.setdefault("use_item_events", []).append({
+            "caster_id": entry.get("caster_id"),
+            "target_id": entry.get("target_id"),
+            "item_id": entry.get("item_id"),
+            "round": self.state["round"],
+        })
+
     def _handle_battle_finish(self, detail: Dict[str, Any]) -> None:
         self.state["result"] = detail.get("result_name", "UNKNOWN")
         self.state["phase"] = "finished"
@@ -1238,6 +1304,7 @@ class BattleStateTracker:
                         pet["side"] = w["side"]
                     if w.get("base_skill_pool") is not None:
                         pet["base_skill_pool"] = w["base_skill_pool"]
+                    self._apply_wrapper_runtime_fields(pet, w)
                     # 刷新先天特性
                     if w.get("passive_skill_id") is not None:
                         pet["innate_skill_id"] = w["passive_skill_id"]

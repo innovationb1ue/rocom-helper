@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import pytest
 from src.protocol.proto_core import parse_record
+from tests.conftest import SESSION10_DIR
+from tests.packet_reader import read_bin_packet
 
 
 class TestParseRecordReturnsNone:
@@ -87,3 +89,24 @@ class TestParseRecordReturnsNone:
             "decrypted_body_hex": "",
         }
         assert parse_record(pkt) is None
+
+
+class TestNoMagicC2SLayout:
+    def test_no_magic_c2s_skill_select_parses(self):
+        pkt = read_bin_packet(SESSION10_DIR / "c2s_0x4013_0232_213443.139.bin")
+        record = parse_record(pkt)
+
+        assert record is not None
+        assert record["transport_layout"] == "tgcp_4013_live_c2s_no_magic"
+        assert record["opcode"] == 0x130B
+        assert record["_message_name"] == "ZoneBattleCmdPushbackReq"
+        assert record["_decoded"]["req"][0]["cast_skill"]["skill_id"] == 716038000
+
+    def test_no_magic_c2s_round_confirm_parses(self):
+        pkt = read_bin_packet(SESSION10_DIR / "c2s_0x4013_0228_213436.126.bin")
+        record = parse_record(pkt)
+
+        assert record is not None
+        assert record["transport_layout"] == "tgcp_4013_live_c2s_no_magic"
+        assert record["opcode"] == 0x1313
+        assert record["_decoded"]["battle_radius"] == 1500

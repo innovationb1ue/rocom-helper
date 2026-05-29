@@ -299,6 +299,24 @@ def _fmt_effect_trigger(entry: Dict[str, Any], _state: Dict[str, Any]) -> Format
     )
 
 
+def _fmt_buff_trigger(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    actor = side_label(entry.get("actor_side"))
+    target = side_label(entry.get("target_side"))
+    ename = entry.get("effect_name") or entry.get("buff_id") or entry.get("effect_id") or "(未知效果)"
+    bases = entry.get("buffbase_ids") or []
+    parts = [f"{actor}→{target} {ename}"]
+    if bases:
+        parts.append(f"base={','.join(str(x) for x in bases)}")
+    return FormattedEvent(
+        kind="buff_trigger",
+        round=0,
+        summary=f"效果触发: {' '.join(parts)}",
+        detail=entry,
+        icon="experiment",
+        color="purple",
+    )
+
+
 def _fmt_revive(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
     actor = side_label(entry.get("actor_side"))
     target = side_label(entry.get("target_side"))
@@ -456,6 +474,43 @@ def _fmt_notify_perform(entry: Dict[str, Any], _state: Dict[str, Any]) -> Format
     )
 
 
+def _fmt_cmd_failed(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    reason = entry.get("failed_reason", "?")
+    return FormattedEvent(
+        kind="cmd_failed",
+        round=0,
+        summary=f"指令失败: reason={reason}",
+        detail=entry,
+        icon="alert-circle",
+        color="red",
+    )
+
+
+def _fmt_runaway(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    actor = side_label(entry.get("actor_side"))
+    return FormattedEvent(
+        kind="runaway",
+        round=0,
+        summary=f"逃跑: {actor}",
+        detail=entry,
+        icon="log-out",
+        color="orange",
+    )
+
+
+def _fmt_use_item(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
+    item = entry.get("item_id", "?")
+    target = side_label(entry.get("target_id"))
+    return FormattedEvent(
+        kind="use_item",
+        round=0,
+        summary=f"使用道具: item={item} target={target}",
+        detail=entry,
+        icon="package",
+        color="gold",
+    )
+
+
 def _fmt_change_model(entry: Dict[str, Any], state: Dict[str, Any]) -> FormattedEvent:
     actor_side = entry.get("actor_side") or entry.get("pet_id")
     actor = side_label(actor_side)
@@ -488,6 +543,7 @@ _ENTRY_FORMATTERS: Dict[str, Any] = {
     "defeat": _fmt_defeat,
     "effect_apply": _fmt_effect_apply,
     "effect_stage": _fmt_effect_stage,
+    "buff_trigger": _fmt_buff_trigger,
     "effect_link": _fmt_effect_link,
     "heal": _fmt_heal,
     "energy": _fmt_energy,
@@ -507,6 +563,9 @@ _ENTRY_FORMATTERS: Dict[str, Any] = {
     "idle": _fmt_idle,
     "notify_perform": _fmt_notify_perform,
     "change_model": _fmt_change_model,
+    "cmd_failed": _fmt_cmd_failed,
+    "runaway": _fmt_runaway,
+    "use_item": _fmt_use_item,
 }
 
 

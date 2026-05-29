@@ -26,7 +26,7 @@ class TestSession11Fixture:
         assert meta["file_count"] > 0
 
     def test_packets_loaded(self, session11_packets):
-        assert len(session11_packets) == 72
+        assert len(session11_packets) == 133
 
     def test_all_records_valid(self, session11_packets):
         for item in session11_packets:

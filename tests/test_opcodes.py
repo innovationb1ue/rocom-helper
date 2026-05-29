@@ -55,7 +55,7 @@ class TestSummarizePbMapFallback:
 
     def test_battle_load_req(self):
         kind, _ = summarize({"opcode": 0x1305})
-        assert kind == "ZoneBattleLoadFinishReq"
+        assert kind == "battle_load_finish_req"
 
     def test_battle_emoji_req(self):
         kind, _ = summarize({"opcode": 0x1331})

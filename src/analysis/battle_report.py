@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from src.analysis.constants import (
+    AUX_BATTLE_OPCODES,
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
     OPCODE_BATTLE_ENTER,
@@ -36,7 +37,7 @@ DEFAULT_PAD_BEFORE = 10.0
 DEFAULT_PAD_AFTER = 5.0
 DATA_CMD_PATTERN = "*_0x4013_*.bin"
 MAGIC_V1 = b"RC01"
-BATTLE_OPCODES = frozenset(LIFECYCLE_OPCODES | IN_BATTLE_OPCODES)
+BATTLE_OPCODES = frozenset(LIFECYCLE_OPCODES | IN_BATTLE_OPCODES | AUX_BATTLE_OPCODES)
 
 
 class BattleReportError(ValueError):

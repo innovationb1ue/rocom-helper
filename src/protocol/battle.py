@@ -92,6 +92,37 @@ def extract_130b_skill_select(record: Dict[str, Any]) -> Optional[Dict[str, Any]
     if root is None:
         return None
 
+    decoded = _schema_payload(record, "ZoneBattleCmdPushbackReq")
+    if decoded is not None:
+        req_items = _as_list(decoded.get("req"))
+        first_req = next((item for item in req_items if isinstance(item, dict)), {})
+        cast_skill = first_req.get("cast_skill") if isinstance(first_req.get("cast_skill"), dict) else {}
+        change_pet = first_req.get("change_pet") if isinstance(first_req.get("change_pet"), dict) else {}
+        use_item = first_req.get("use_item") if isinstance(first_req.get("use_item"), dict) else {}
+        skill_raw = _enum_value(cast_skill.get("skill_id")) if cast_skill else None
+        sid = normalize_skill_id(skill_raw)
+        out = _compact_dict({
+            "cmd_slot": _enum_value(decoded.get("wl_req_id")),
+            "cmd_flag": _enum_value(decoded.get("req_type")),
+            "actor_side": _enum_value(cast_skill.get("caster_pet_id")) if cast_skill else None,
+            "actor_side_name": side_name(_enum_value(cast_skill.get("caster_pet_id"))) if cast_skill else None,
+            "target_side": _enum_value(cast_skill.get("target_pet_id")) if cast_skill else None,
+            "target_side_name": side_name(_enum_value(cast_skill.get("target_pet_id"))) if cast_skill else None,
+            "target_pet_pos": _enum_value(cast_skill.get("target_pet_pos")) if cast_skill else None,
+            "skill_id_x100": skill_raw,
+            "skill_id": sid,
+            "skill_name": skill_name(sid),
+            "change_pet_id": _enum_value(change_pet.get("pet_id")) if change_pet else None,
+            "item_id": _enum_value(use_item.get("item_id")) if use_item else None,
+            "opcode": record.get("opcode"),
+            "opcode_hex": record.get("opcode_hex", ""),
+        })
+        if sid:
+            _attach_skill_meta(out, sid)
+        out["extract_kind"] = "skill_select"
+        _schema_quality(out, message="ZoneBattleCmdPushbackReq", found=True)
+        return out
+
     cmd_slot = pick_first(collect_varints(root, 5))
     cmd_flag = pick_first(collect_varints(root, 1))
 
@@ -199,13 +230,33 @@ def _infer_action_from_wrappers(wrappers: List[Dict[str, Any]]) -> Optional[str]
 # ---------------------------------------------------------------------------
 # _extract_1324_entry 解析 action resolve 中的单个条目。
 # entry_type (field 1) 决定条目类型:
-#   1=skill_cast, 4=damage, 2=effect_apply, 3=effect_stage,
+#   1=skill_cast, 4=damage, 2=effect_apply, 3=buff_trigger,
 #   5=heal, 6=energy, 7=defeat, 8=revive, 9=effect_trigger,
 #   10=effect_link, 11=sp_energy_change, 12=sp_energy_trigger,
 #   13=change_pet, 15=idle, 19=skill_state, 22=weather_change,
 #   23=notify_perform, 25=ai_action, 29=role_skill_cast,
 #   30=combo_skill_cast, 34=pvp_perform_marker, 35=data_update,
 #   37=supply_pet, 38=skill_pos_change, 39=special_move
+
+_PERFORM_SCHEMA_FIELD_BY_TYPE = {
+    14: (19, "use_item"),
+    16: (21, "monster_catch_change"),
+    17: (22, "monster_escape_change"),
+    18: (23, "catch_pet_info"),
+    20: (25, "pet_evolution"),
+    21: (28, "skill_aura"),
+    26: (31, "special_perform"),
+    27: (35, "cheers_switch"),
+    28: (36, "pet_escape"),
+    31: (40, "cmd_failed"),
+    32: (41, "battler_escape"),
+    33: (42, "battler_heal"),
+    36: (48, "runaway"),
+    40: (49, "prepare_to_battle"),
+    41: (50, "bag_to_prepare"),
+    42: (51, "feature_resonance"),
+    43: (52, "box_shield_break"),
+}
 
 _PET_SYNC_FIELDS = {
     1: ("pet_id", False),
@@ -325,6 +376,35 @@ def _extract_buffdata_93_skill(msg: Dict[str, Any]) -> Dict[str, Any]:
     })
 
 
+def _extract_simple_subitems(msg: Dict[str, Any], field_no: int, spec: Dict[int, tuple]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(field_no, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            name: _pick_sync_value(sub, fn, signed)
+            for fn, (name, signed) in spec.items()
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _raw_subfield_values(msg: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    if msg is None:
+        return {}
+    out: Dict[str, Any] = {}
+    for field_no, entries in field_groups(msg).items():
+        values = [maybe_signed64(e["value"]) for e in entries if "value" in e]
+        if values:
+            out[f"field_{field_no}"] = values if len(values) > 1 else values[0]
+        texts = [e["text"] for e in entries if e.get("text")]
+        if texts:
+            out[f"field_{field_no}_text"] = texts if len(texts) > 1 else texts[0]
+    return out
+
+
 def _extract_damage_params(msg: Dict[str, Any], field_no: int) -> List[Dict[str, Any]]:
     items: List[Dict[str, Any]] = []
     for entry in field_groups(msg).get(field_no, []):
@@ -353,6 +433,63 @@ def _extract_restraint_types(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
         if item:
             items.append(item)
     return items
+
+
+def _extract_extra_damage_types(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    items: List[Dict[str, Any]] = []
+    for entry in field_groups(msg).get(32, []):
+        sub = entry.get("sub")
+        if sub is None:
+            continue
+        item = _compact_dict({
+            "values": collect_varints(sub, 1),
+            "source": _pick_sync_value(sub, 2, False),
+        })
+        if item:
+            items.append(item)
+    return items
+
+
+def _extract_cr_damage_params(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return _extract_simple_subitems(msg, 41, {
+        1: ("pet_id", False),
+        2: ("param", True),
+    })
+
+
+def _extract_skill_buff_info(msg: Dict[str, Any]) -> Dict[str, Any]:
+    sub = first_sub(field_groups(msg).get(45, []))
+    if sub is None:
+        return {}
+    return _compact_dict({
+        "hp_per_energy": _pick_fixed32_float(sub, 1),
+        "damage_param": _pick_sync_value(sub, 2, True),
+        "damage_param_by": _pick_sync_value(sub, 3, True),
+        "energy_cost": _pick_sync_value(sub, 4, True),
+        "energy_cost_by": _pick_sync_value(sub, 5, True),
+        "multiply": _pick_sync_value(sub, 6, True),
+        "multiply_by": _pick_sync_value(sub, 7, True),
+        "priority": _pick_sync_value(sub, 8, True),
+        "cast_cnt": _pick_sync_value(sub, 9, True),
+        "trans_time": _pick_sync_value(sub, 10, True),
+    })
+
+
+def _extract_trans_info(msg: Dict[str, Any]) -> Dict[str, Any]:
+    sub = first_sub(field_groups(msg).get(48, []))
+    if sub is None:
+        return {}
+    return _compact_dict({
+        "trans_time": _pick_sync_value(sub, 1, True),
+        "initial_pos": _pick_sync_value(sub, 2, False),
+    })
+
+
+def _extract_set_cost_info(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return _extract_simple_subitems(msg, 59, {
+        1: ("reason_id", False),
+        2: ("cost", True),
+    })
 
 
 def _extract_cd_info(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -456,8 +593,13 @@ def _extract_pet_skill_round_data(msg: Dict[str, Any]) -> Dict[str, Any]:
         "season_id": _pick_sync_value(msg, 68, True),
         "damage_params": _extract_damage_params(msg, 26),
         "restraint_types": _extract_restraint_types(msg),
+        "extra_damage_type": _extract_extra_damage_types(msg),
         "cd_info": _extract_cd_info(msg),
         "enhance_info": _extract_enhance_info(msg),
+        "cr_damage_params": _extract_cr_damage_params(msg),
+        "skill_buff": _extract_skill_buff_info(msg),
+        "trans_info": _extract_trans_info(msg),
+        "set_cost_info": _extract_set_cost_info(msg),
     })
     return item
 
@@ -677,13 +819,23 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
                     hp_sub = cs
         if dmg_sub:
             ro = pick_first(collect_varints(dmg_sub, 12))
-            out["damage"] = pick_first(collect_varints(dmg_sub, 11)) or pick_first(collect_varints(dmg_sub, 13))
+            out["original_damage"] = _pick_sync_value(dmg_sub, 11, True)
+            out["damage_change"] = _pick_sync_value(dmg_sub, 12, True)
+            out["damage_result"] = _pick_sync_value(dmg_sub, 13, True)
+            out["actual_damage"] = (
+                out.get("original_damage")
+                if out.get("original_damage") is not None
+                else out.get("damage_result")
+            )
+            out["damage"] = out.get("actual_damage")
             out["overflow"] = maybe_signed64(ro) if ro is not None else None
             out["damage_target_side"] = pick_first(collect_varints(dmg_sub, 1))
             out["damage_target_side_name"] = side_name(out.get("damage_target_side"))
         if hp_sub:
             out["target_side"] = pick_first(collect_varints(hp_sub, 1)) or out.get("target_side")
             out["target_side_name"] = side_name(out.get("target_side"))
+            out["hp_change"] = _pick_sync_value(hp_sub, 2, True)
+            out["hp_result"] = _pick_sync_value(hp_sub, 3, True)
             out["target_hp_after"] = pick_first(collect_varints(hp_sub, 3), low=0, high=99999)
 
     elif entry_type == 2:
@@ -720,13 +872,20 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["related_skills"] = related
 
     elif entry_type == 3:
-        # effect_stage — from field 5 sub
-        out["kind"] = "effect_stage"
+        # BPT_BUFF_TRIGGER — field 5 is BattleBuffTrigger, not a stage update.
+        out["kind"] = "buff_trigger"
+        out["legacy_kind"] = "effect_stage"
+        out["aliases"] = ["effect_stage"]
         em = first_sub(sg.get(5, []))
         if em:
             _extract_actor_target(em, out)
             out["effect_id"] = pick_first(collect_varints(em, 3))
-            out["effect_base"] = pick_first(collect_varints(em, 6))
+            out["buff_id"] = out["effect_id"]
+            out["buffbase_ids"] = collect_varints(em, 6)
+            out["perform_type"] = pick_first(collect_varints(em, 7))
+            out["need_select_pet"] = bool(pick_first(collect_varints(em, 8)) or 0)
+            out["frozen_death"] = bool(pick_first(collect_varints(em, 9)) or 0)
+            out["effect_base"] = out["buffbase_ids"][0] if out.get("buffbase_ids") else None
             _attach_buff_meta(out, out.get("effect_id"))
             _attach_buffbase_meta(out, out.get("effect_base"))
 
@@ -1080,7 +1239,31 @@ def _extract_1324_entry(sub: Dict[str, Any]) -> Dict[str, Any]:
             out["skill_name"] = skill_name(sid) if sid else None
 
     else:
-        out["kind"] = f"unknown_type_{entry_type}"
+        schema_info = _PERFORM_SCHEMA_FIELD_BY_TYPE.get(entry_type)
+        if schema_info is not None:
+            field_no, kind = schema_info
+            out["kind"] = kind
+            out["schema_field"] = field_no
+            payload = first_sub(sg.get(field_no, []))
+            if payload:
+                out.update(_raw_subfield_values(payload))
+                if kind == "cmd_failed":
+                    out["failed_reason"] = pick_first(collect_varints(payload, 1))
+                elif kind == "battler_escape":
+                    _extract_actor_target(payload, out)
+                elif kind == "battler_heal":
+                    _extract_actor_target(payload, out)
+                    out["heal_value"] = pick_first(collect_varints(payload, 3))
+                elif kind == "runaway":
+                    _extract_actor_target(payload, out)
+                elif kind == "use_item":
+                    out["caster_id"] = pick_first(collect_varints(payload, 1))
+                    out["target_id"] = pick_first(collect_varints(payload, 2))
+                    out["item_id"] = pick_first(collect_varints(payload, 3))
+        else:
+            out["kind"] = "unhandled_battle_perform"
+            out["perform_type"] = entry_type
+            out["raw_fields"] = _raw_subfield_values(sub)
 
     return out
 
@@ -1721,8 +1904,16 @@ def extract_1312_round_flow(record: Dict[str, Any]) -> Dict[str, Any]:
 extract_1326_auto_cmd = _make_simple_extractor("ChangeAutoCmdNotify")
 extract_1326_auto_cmd.__doc__ = """0x1326 ChangeAutoCmdNotify — auto battle toggle."""
 
+extract_1305_load_finish_req = _make_simple_extractor("ZoneBattleLoadFinishReq")
+extract_1306_load_finish_rsp = _make_simple_extractor("ZoneBattleLoadFinishRsp")
+extract_1309_supply_pet_req = _make_simple_extractor("ZoneBattleSupplyPetReq")
+extract_130a_supply_pet_rsp = _make_simple_extractor("ZoneBattleSupplyPetRsp")
+
 extract_132a_role_leave = _make_simple_extractor("RoleLeaveNotify")
 extract_132a_role_leave.__doc__ = """0x132A RoleLeaveNotify — player disconnect."""
+
+extract_132e_player_runaway_req = _make_simple_extractor("ZoneBattlePlayerRunawayReq")
+extract_132f_player_runaway_rsp = _make_simple_extractor("ZoneBattlePlayerRunawayRsp")
 
 extract_132d_force_finish = _make_simple_extractor("BattleForceFinishNotify")
 extract_132d_force_finish.__doc__ = """0x132D BattleForceFinishNotify — forced battle end."""
@@ -1736,6 +1927,10 @@ extract_133c_catch_rsp.__doc__ = """0x133C CatchConfirmRsp — capture result.""
 extract_13f6_ai_skill = _make_simple_extractor("AiSelectSkillNotify")
 extract_13f6_ai_skill.__doc__ = """0x13F6 AiSelectSkillNotify — AI skill hint."""
 
+extract_1335_round_op_query_req = _make_simple_extractor("ZoneBattleRoundOpQueryReq")
+extract_1336_round_op_query_rsp = _make_simple_extractor("ZoneBattleRoundOpQueryRsp")
+extract_13f9_pk_again = _make_simple_extractor("ZoneBattlePkAgainNotify")
+
 
 # ---------------------------------------------------------------------------
 # Round confirm opcodes (0x1313, 0x1314)
@@ -1743,9 +1938,15 @@ extract_13f6_ai_skill.__doc__ = """0x13F6 AiSelectSkillNotify — AI skill hint.
 
 def extract_1313_round_confirm(record: Dict[str, Any]) -> Dict[str, Any]:
     """0x1313 BattleRoundConfirmNotify — round confirm."""
-    return _raw_field_dump(record)
+    detail = _schema_or_raw(record, "ZoneBattleRoundFlowFinishReq")
+    detail["opcode"] = record.get("opcode")
+    detail["opcode_hex"] = record.get("opcode_hex", "")
+    return detail
 
 
 def extract_1314_round_confirm_rsp(record: Dict[str, Any]) -> Dict[str, Any]:
     """0x1314 BattleRoundConfirmRsp — round confirm response."""
-    return _raw_field_dump(record)
+    detail = _schema_or_raw(record, "ZoneBattleRoundFlowFinishRsp")
+    detail["opcode"] = record.get("opcode")
+    detail["opcode_hex"] = record.get("opcode_hex", "")
+    return detail

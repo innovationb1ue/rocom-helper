@@ -75,9 +75,9 @@ def _schema_or_raw(record: Dict[str, Any], message_name: str) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for fn, entries in field_groups(root).items():
         vals = [
-            entry.get("varint")
+            entry.get("value")
             for entry in entries
-            if isinstance(entry, dict) and entry.get("varint") is not None
+            if isinstance(entry, dict) and entry.get("value") is not None
         ]
         if vals:
             out[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals
@@ -105,9 +105,9 @@ def _raw_field_dump(record: Dict[str, Any]) -> Dict[str, Any]:
     if root is not None:
         for fn, entries in field_groups(root).items():
             vals = [
-                entry.get("varint")
+                entry.get("value")
                 for entry in entries
-                if isinstance(entry, dict) and entry.get("varint") is not None
+                if isinstance(entry, dict) and entry.get("value") is not None
             ]
             if vals:
                 detail[f"field_{fn}"] = vals[0] if len(vals) == 1 else vals

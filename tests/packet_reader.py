@@ -8,14 +8,11 @@ from typing import Any, Dict, List, Optional
 
 from src.protocol.proto_core import parse_record, extract_inner_message
 from src.protocol.opcodes import summarize
+from src.analysis.constants import AUX_BATTLE_OPCODES, IN_BATTLE_OPCODES, LIFECYCLE_OPCODES
 
 MAGIC_V1 = b"RC01"
 
-BATTLE_OPCODES = frozenset({
-    0x1316, 0x131A, 0x130B, 0x1322, 0x1324, 0x130C,
-    0x1313, 0x1314, 0x132C, 0x13F4, 0x13FC, 0x13F3,
-    0x1312,
-})
+BATTLE_OPCODES = frozenset(LIFECYCLE_OPCODES | IN_BATTLE_OPCODES | AUX_BATTLE_OPCODES)
 
 
 def read_bin_packet(filepath: Path) -> Dict[str, Any]:

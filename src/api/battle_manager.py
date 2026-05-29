@@ -20,6 +20,7 @@ from fastapi import WebSocket
 from src.analysis.battle_processor import BattleProcessor
 from src.analysis.battle_report import archive_latest_completed_battle
 from src.analysis.constants import (
+    AUX_BATTLE_OPCODES,
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
     OPCODE_BATTLE_FINISH,
@@ -36,6 +37,7 @@ class BattleManager:
 
     _LIFECYCLE_OPCODES = LIFECYCLE_OPCODES
     _IN_BATTLE_OPCODES = IN_BATTLE_OPCODES
+    _AUX_BATTLE_OPCODES = AUX_BATTLE_OPCODES
 
     def __init__(self) -> None:
         self._processor = BattleProcessor()
@@ -93,7 +95,11 @@ class BattleManager:
         opcode = record.get("opcode")
         if opcode is None:
             return
-        if opcode not in self._LIFECYCLE_OPCODES and opcode not in self._IN_BATTLE_OPCODES:
+        if (
+            opcode not in self._LIFECYCLE_OPCODES
+            and opcode not in self._IN_BATTLE_OPCODES
+            and opcode not in self._AUX_BATTLE_OPCODES
+        ):
             return
         if opcode not in self._LIFECYCLE_OPCODES and not self.battle_active():
             return

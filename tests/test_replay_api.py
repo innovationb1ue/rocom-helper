@@ -36,7 +36,7 @@ class TestReplayEndpoint:
 
     def test_packets_processed(self, replay_response):
         assert replay_response["processed"] > 0
-        assert replay_response["processed"] == 176  # known packet count for session 1
+        assert replay_response["processed"] == 295  # includes aux/no-magic battle packets
 
     def test_battle_result(self, replay_response):
         assert replay_response["result"] is not None
