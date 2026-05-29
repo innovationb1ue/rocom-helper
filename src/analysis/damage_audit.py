@@ -35,6 +35,9 @@ class DamageAuditSample:
     effectiveness_source: Optional[str]
     candidate_totals: Dict[str, int]
     candidate_abs_errors: Dict[str, int]
+    ledger_ids: List[str]
+    actual_source: str
+    actual_confidence: str
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -110,6 +113,76 @@ def build_multi_session_damage_audit(reports: Dict[str, Dict[str, Any]]) -> Dict
             and s.get("pct_error") is not None
             and s["pct_error"] > 0.5
         ],
+        "samples": all_samples,
+    }
+
+
+def build_damage_calibration(
+    report: Dict[str, Any],
+    *,
+    min_samples: int = 3,
+) -> Dict[str, Any]:
+    """从审计报告生成只读校准配置草案。"""
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for sample in report.get("samples", []) or []:
+        skill_id = sample.get("skill_id")
+        predicted = sample.get("predicted_total")
+        actual = sample.get("actual_total")
+        if skill_id is None or predicted in (None, 0) or actual is None:
+            continue
+        grouped.setdefault(str(skill_id), []).append(sample)
+
+    skills: Dict[str, Dict[str, Any]] = {}
+    skipped: Dict[str, str] = {}
+    for skill_id, samples in grouped.items():
+        if len(samples) < min_samples:
+            skipped[skill_id] = "sample_count_below_min"
+            continue
+        before_errors = [
+            abs(int(s["predicted_total"]) - int(s["actual_total"])) / max(1, int(s["actual_total"]))
+            for s in samples
+        ]
+        pred_sum = sum(int(s["predicted_total"]) for s in samples)
+        actual_sum = sum(int(s["actual_total"]) for s in samples)
+        if pred_sum <= 0:
+            skipped[skill_id] = "missing_predicted_total"
+            continue
+        multiplier = actual_sum / pred_sum
+        adjusted = [max(1, round(int(s["predicted_total"]) * multiplier)) for s in samples]
+        abs_errors = [
+            abs(adj - int(sample["actual_total"]))
+            for adj, sample in zip(adjusted, samples)
+        ]
+        after_errors = [
+            err / max(1, int(sample["actual_total"]))
+            for err, sample in zip(abs_errors, samples)
+        ]
+        before_mape = mean(before_errors) if before_errors else None
+        after_mape = mean(after_errors) if after_errors else None
+        if before_mape is not None and after_mape is not None and after_mape >= before_mape:
+            skipped[skill_id] = "mape_not_improved"
+            continue
+        sessions = sorted({str(s.get("session")) for s in samples if s.get("session")})
+        skills[skill_id] = {
+            "multiplier": round(multiplier, 6),
+            "sample_count": len(samples),
+            "mae": round(mean(abs_errors), 2) if abs_errors else None,
+            "mape": round(after_mape, 4) if after_mape is not None else None,
+            "source_sessions": sessions,
+            "notes": (
+                "auto suggested from damage ledger; "
+                f"baseline_mape={round(before_mape, 4) if before_mape is not None else None}"
+            ),
+        }
+
+    return {
+        "version": 1,
+        "skills": dict(sorted(skills.items())),
+        "meta": {
+            "min_samples": min_samples,
+            "source": "scripts.audit_damage_predictions",
+            "skipped": skipped,
+        },
     }
 
 
@@ -177,8 +250,22 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 continue
 
             hit_count = int(detail.get("hit_count") or 1)
-            actual_per_hit = int(detail.get("damage") or 0)
-            actual_total = actual_per_hit * hit_count
+            ledger_records = _ledger_records_for_damage(event.state_after, detail)
+            if ledger_records:
+                ledger_total = sum(_ledger_actual_damage(item) for item in ledger_records)
+                hit_count = max(hit_count, len(ledger_records))
+                actual_total = ledger_total
+                actual_per_hit = int(round(ledger_total / max(1, hit_count)))
+                actual_source = "+".join(sorted({str(item.get("source")) for item in ledger_records if item.get("source")})) or "damage_ledger"
+                confidences = {str(item.get("confidence") or "") for item in ledger_records}
+                actual_confidence = "low" if "low" in confidences else ("medium" if "medium" in confidences else "high")
+                ledger_ids = [str(item.get("ledger_id")) for item in ledger_records if item.get("ledger_id")]
+            else:
+                actual_per_hit = int(detail.get("actual_damage") or detail.get("damage") or 0)
+                actual_total = actual_per_hit * hit_count
+                actual_source = "formatted_event"
+                actual_confidence = "medium"
+                ledger_ids = []
             target_side = str(detail.get("target_side") or "")
             prediction = _find_prediction(advice, skill_name, target_side)
             predicted_total = None
@@ -233,7 +320,46 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 effectiveness_source=breakdown.get("effectiveness_source"),
                 candidate_totals=candidates,
                 candidate_abs_errors=candidate_errors,
+                ledger_ids=ledger_ids,
+                actual_source=actual_source,
+                actual_confidence=actual_confidence,
             )
+
+
+def _ledger_records_for_damage(state: Dict[str, Any], detail: Dict[str, Any]) -> List[Dict[str, Any]]:
+    ledger = ((state.get("field_context") or {}).get("damage_ledger") or [])
+    by_id = {
+        str(item.get("ledger_id")): item
+        for item in ledger
+        if item.get("ledger_id")
+    }
+    wanted = [str(item) for item in detail.get("ledger_ids") or []]
+    if detail.get("ledger_id") is not None:
+        wanted.append(str(detail["ledger_id"]))
+    records = [by_id[item] for item in wanted if item in by_id]
+    if records:
+        return records
+    skill_name = detail.get("skill_name")
+    hp_after = detail.get("hp_after")
+    candidates = [
+        item for item in ledger
+        if item.get("event_kind") == "damage"
+        and item.get("skill_name") == skill_name
+        and (hp_after is None or item.get("hp_after") == hp_after)
+    ]
+    return candidates[-1:] if candidates else []
+
+
+def _ledger_actual_damage(item: Dict[str, Any]) -> int:
+    before = item.get("hp_before")
+    after = item.get("hp_after")
+    if before is not None and after is not None:
+        return max(0, int(before) - int(after))
+    if item.get("actual_damage") is not None:
+        return max(0, int(item["actual_damage"]))
+    if item.get("damage") is not None:
+        return max(0, int(item["damage"]))
+    return 0
 
 
 def _find_prediction(
@@ -256,15 +382,19 @@ def _candidate_totals(
     if predicted_total is None:
         return {}
     out = {"production": int(predicted_total)}
-    power = breakdown.get("final_power") or prediction.get("power") or breakdown.get("runtime_power")
+    power = breakdown.get("final_power") or prediction.get("power")
     base_power = breakdown.get("base_power")
     if power and base_power and power != base_power:
         out["static_power_fallback"] = max(1, round(predicted_total * base_power / power))
     server_runtime = breakdown.get("server_runtime") or {}
     calc_eff = server_runtime.get("calc_effectiveness")
     display_eff = server_runtime.get("display_effectiveness")
-    if breakdown.get("power_source") == "server_damage_params":
-        out["server_target_power_no_restraint"] = int(predicted_total)
+    runtime_power = breakdown.get("runtime_power")
+    if server_runtime.get("power_source") == "server_damage_params" and runtime_power and base_power:
+        out["server_target_power_keep_restraint"] = max(1, round(predicted_total * runtime_power / base_power))
         if calc_eff and display_eff:
-            out["server_target_power_keep_restraint"] = max(1, round(predicted_total * display_eff / calc_eff))
+            out["server_target_power_no_restraint"] = max(
+                1,
+                round(out["server_target_power_keep_restraint"] / max(float(display_eff), 0.001)),
+            )
     return out

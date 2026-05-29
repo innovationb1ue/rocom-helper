@@ -5,7 +5,11 @@ import argparse
 import json
 from pathlib import Path
 
-from src.analysis.damage_audit import build_damage_audit, build_multi_session_damage_audit
+from src.analysis.damage_audit import (
+    build_damage_audit,
+    build_damage_calibration,
+    build_multi_session_damage_audit,
+)
 from src.analysis.replay_runner import BattleReplayRunner
 from tests.packet_reader import load_battle_packets
 
@@ -33,6 +37,12 @@ def main() -> None:
         help="Audit several replay sessions and print an aggregate report",
     )
     parser.add_argument("--json", action="store_true", help="Print full JSON report")
+    parser.add_argument(
+        "--calibration-out",
+        nargs="?",
+        const="tmp/damage_calibration_suggested.json",
+        help="Write suggested damage_calibration.json to this path",
+    )
     args = parser.parse_args()
 
     sessions = args.sessions or [args.session]
@@ -43,8 +53,17 @@ def main() -> None:
         reports[session] = build_damage_audit(result)
 
     report = reports[sessions[0]] if len(sessions) == 1 else build_multi_session_damage_audit(reports)
+    calibration = None
+    if args.calibration_out:
+        calibration = build_damage_calibration(report)
+        out_path = Path(args.calibration_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(calibration, ensure_ascii=False, indent=2), encoding="utf-8")
     if args.json:
-        print(json.dumps(report, ensure_ascii=False, indent=2))
+        payload = dict(report)
+        if calibration is not None:
+            payload["calibration"] = calibration
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
         return
 
     print("=== Damage Prediction Audit ===")
@@ -79,6 +98,9 @@ def main() -> None:
                 f"  R{sample['round_num']} {sample['skill_name']}: "
                 f"actual={sample['actual_total']} predicted={sample['predicted_total']}"
             )
+    if args.calibration_out:
+        print(f"Calibration suggestion written: {args.calibration_out}")
+        print(f"Suggested skills: {len((calibration or {}).get('skills', {}))}")
 
 
 if __name__ == "__main__":

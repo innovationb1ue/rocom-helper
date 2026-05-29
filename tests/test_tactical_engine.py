@@ -1,5 +1,4 @@
 """战术推荐引擎单元测试。"""
-import pytest
 from src.analysis.tactical_engine import (
     TacticalEngine,
     TacticalRecommendation,
@@ -83,34 +82,6 @@ def _make_state(my_active=None, opp_active=None, my_pets=None, opp_pets=None, ro
         "weather": None,
         "result": None,
     }
-
-
-@pytest.fixture(scope="module")
-def replay_session1_packets():
-    from pathlib import Path
-    from tests.packet_reader import load_battle_packets
-
-    return load_battle_packets(Path("tests/fixtures/packets/battle_session_1"))
-
-
-@pytest.fixture(scope="module")
-def replay_session1_state_only_result(replay_session1_packets):
-    from src.analysis.replay_runner import BattleReplayRunner
-
-    return BattleReplayRunner(include_analysis=False, include_hooks=False).run(
-        replay_session1_packets
-    )
-
-
-@pytest.fixture(scope="module")
-def replay_session1_round8_state(replay_session1_packets):
-    from src.analysis.replay_runner import BattleReplayRunner
-
-    result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
-        replay_session1_packets,
-        stop_round=8,
-    )
-    return result.rounds[-1].state_at_end
 
 
 # ---------------------------------------------------------------------------
@@ -393,19 +364,19 @@ class TestRecommendation:
         switches = [a for a in rec.actions if a.action_type == "switch"]
         assert len(switches) == 2
 
-    def test_replay_session_runs(self, replay_session1_state_only_result):
+    def test_replay_session_runs(self, session1_state_only_result):
         """集成测试：用真实回放数据验证引擎不崩溃。"""
         engine = TacticalEngine()
-        state = replay_session1_state_only_result.final_state
+        state = session1_state_only_result.final_state
         if state.get("my_active") and state.get("opp_active"):
             rec = engine.recommend(state)
             assert rec is not None
             assert len(rec.actions) > 0
 
-    def test_round_8_damage_scores_match_replay_state(self, replay_session1_round8_state):
+    def test_round_8_damage_scores_match_replay_state(self, session1_round8_state):
         from src.analysis.battle_advisor import BattleAdvisor
 
-        state = replay_session1_round8_state
+        state = session1_round8_state
 
         rec = TacticalEngine().recommend(state)
         assert rec is not None

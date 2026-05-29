@@ -151,15 +151,10 @@ class DamageCalculator:
         runtime_skill = self._get_runtime_skill(attacker, skill_meta.get("id"))
         server_runtime = self._resolve_server_runtime(runtime_skill, defender)
         power = base_power
-        if server_runtime.get("power_source") == "server_damage_params" and server_runtime.get("power") is not None:
-            # 目标相关 damage_params 与游戏内预估威力一致，用作本次目标的公式威力。
-            power = int(server_runtime["power"])
-            server_runtime["formula_power_source"] = "server_damage_params"
-            server_runtime["power_used_in_formula"] = True
-        else:
-            # damage_param_result 不是目标相关值，只保留在解释字段中。
-            server_runtime["formula_power_source"] = "skill_config"
-            server_runtime["power_used_in_formula"] = False
+        # 服务端同步的 damage_params 在实战样本中并不稳定；先作为候选/解释源，
+        # 不默认替代静态技能威力进入公式。
+        server_runtime["formula_power_source"] = "skill_config"
+        server_runtime["power_used_in_formula"] = False
         if power <= 0 or damage_type not in (2, 3):
             return None
 
@@ -388,6 +383,7 @@ class DamageCalculator:
                 warnings.append(f"能量不足 (需要{energy_cost}, 当前{attacker_energy})")
 
         effective_power = int(power * stab_mult)
+        runtime_sources = self._runtime_sources(runtime_skill, server_runtime)
         breakdown = {
             "base_power": self._get_power(skill_meta),
             "final_power": final_power if final_power is not None else power,
@@ -399,6 +395,7 @@ class DamageCalculator:
             "damage_param_result": runtime_power,
             "runtime_skill": runtime_skill or None,
             "server_runtime": server_runtime or None,
+            "runtime_sources": runtime_sources,
             "ability_level": round(ability_level, 3),
             "attacker_buff_modifiers": attacker_buff_modifiers,
             "defender_buff_modifiers": defender_buff_modifiers,
@@ -436,6 +433,21 @@ class DamageCalculator:
             damage_breakdown=breakdown,
             warnings=warnings,
         )
+
+    @staticmethod
+    def _runtime_sources(runtime_skill: Dict[str, Any], server_runtime: Dict[str, Any]) -> Dict[str, Any]:
+        """汇总服务端同步运行时字段，供预测解释和审计使用。"""
+        return {
+            "has_damage_params": bool(runtime_skill.get("damage_params_by_pet")),
+            "has_restraint_types": bool(runtime_skill.get("restraint_types_by_pet")),
+            "has_set_cost_info": bool(runtime_skill.get("set_cost_info")),
+            "has_cr_damage_params": bool(runtime_skill.get("cr_damage_params")),
+            "has_extra_damage_type": bool(runtime_skill.get("extra_damage_type")),
+            "has_skill_buff": bool(runtime_skill.get("skill_buff")),
+            "matched_target_key": server_runtime.get("matched_target_key"),
+            "runtime_power": server_runtime.get("power") or runtime_skill.get("damage_param_result"),
+            "power_used_in_formula": bool(server_runtime.get("power_used_in_formula")),
+        }
 
     def calculate_all(
         self,

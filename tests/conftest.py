@@ -39,6 +39,37 @@ def session1_runner_result(session1_packets):
 
 
 @pytest.fixture(scope="session")
+def session1_state_only_result(session1_packets):
+    """Replay battle_session_1 without analysis/hooks once."""
+    return BattleReplayRunner(include_analysis=False, include_hooks=False).run(session1_packets)
+
+
+@pytest.fixture(scope="session")
+def session1_round8_state(session1_state_only_result):
+    """Expose the round 8 end state from the shared state-only replay."""
+    return next(
+        round_snapshot.state_at_end
+        for round_snapshot in session1_state_only_result.rounds
+        if round_snapshot.round_num == 8
+    )
+
+
+@pytest.fixture(scope="session")
+def session2_packets():
+    """Load battle_session_2 packets once for the entire test session."""
+    if not SESSION2_DIR.exists():
+        pytest.skip("battle_session_2 fixtures not found")
+    return load_battle_packets(SESSION2_DIR)
+
+
+@pytest.fixture(scope="session")
+def session2_runner_result(session2_packets):
+    """Replay battle_session_2 through BattleReplayRunner once."""
+    runner = BattleReplayRunner()
+    return runner.run(session2_packets)
+
+
+@pytest.fixture(scope="session")
 def session3_packets():
     """Load battle_session_3 packets once for the entire test session."""
     if not SESSION3_DIR.exists():

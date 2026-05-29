@@ -51,6 +51,46 @@ def read_bin_packet(filepath: Path) -> Dict[str, Any]:
     return pkt
 
 
+def _read_packet_metadata(filepath: Path) -> Optional[Dict[str, Any]]:
+    """Read only the trailing RC01 metadata block, leaving payload bytes untouched."""
+    try:
+        with open(filepath, "rb") as f:
+            if f.read(4) != MAGIC_V1:
+                return None
+            f.read(2)  # cmd
+            f.read(4)  # seq
+            f.read(4)  # direction
+
+            hdr_extra_len = struct.unpack(">I", f.read(4))[0]
+            f.seek(hdr_extra_len, 1)
+
+            body_len = struct.unpack(">I", f.read(4))[0]
+            f.seek(body_len, 1)
+
+            decrypted_len = struct.unpack(">I", f.read(4))[0]
+            f.seek(decrypted_len, 1)
+
+            meta_len = struct.unpack(">I", f.read(4))[0]
+            if meta_len <= 0 or meta_len > 1_000_000:
+                return None
+            metadata = json.loads(f.read(meta_len).decode("utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, struct.error):
+        return None
+    return metadata if isinstance(metadata, dict) else None
+
+
+def _metadata_opcode(metadata: Optional[Dict[str, Any]]) -> Optional[int]:
+    if not metadata:
+        return None
+    opcode_hex = metadata.get("opcode_hex")
+    if not opcode_hex:
+        return None
+    try:
+        return int(opcode_hex, 16)
+    except (TypeError, ValueError):
+        return None
+
+
 def _extract_timestamp(filename: str) -> str:
     """Extract timestamp portion from filename for sorting."""
     # Format: {direction}_{cmd_hex}_{seq:04d}_{HHMMSS.mmm}.bin
@@ -64,6 +104,9 @@ def load_battle_packets(session_dir: Path) -> List[Dict[str, Any]]:
     """Load battle-related packets from a session directory, sorted by timestamp."""
     packets = []
     for fpath in sorted(session_dir.glob("*.bin"), key=lambda p: _extract_timestamp(p.name)):
+        opcode_hint = _metadata_opcode(_read_packet_metadata(fpath))
+        if opcode_hint is not None and opcode_hint not in BATTLE_OPCODES:
+            continue
         pkt = read_bin_packet(fpath)
         if pkt["cmd"] != 0x4013 or not pkt["decrypted_body_hex"]:
             continue

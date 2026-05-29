@@ -25,9 +25,43 @@ def client():
 
 
 @pytest.fixture(scope="module")
-def replay_response(client):
-    resp = client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
-    return resp.json()
+def replay_run(client):
+    from src.api.battle_manager import BattleManager, get_battle_manager
+
+    original = BattleManager.process_event
+    archive_flags = []
+    patcher = pytest.MonkeyPatch()
+
+    async def _process_event(self, opcode, detail, *, enable_archive=True):
+        archive_flags.append(enable_archive)
+        return await original(self, opcode, detail, enable_archive=enable_archive)
+
+    patcher.setattr(BattleManager, "process_event", _process_event)
+    try:
+        resp = client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
+        state = get_battle_manager().tracker.get_state()
+    finally:
+        patcher.undo()
+    return {
+        "response": resp.json(),
+        "state": state,
+        "archive_flags": tuple(archive_flags),
+    }
+
+
+@pytest.fixture(scope="module")
+def replay_response(replay_run):
+    return replay_run["response"]
+
+
+@pytest.fixture(scope="module")
+def replay_state(replay_run):
+    return replay_run["state"]
+
+
+@pytest.fixture(scope="module")
+def replay_archive_flags(replay_run):
+    return replay_run["archive_flags"]
 
 
 class TestReplayEndpoint:
@@ -57,47 +91,24 @@ class TestReplayEndpoint:
         data = resp.json()
         assert data["status"] == "error"
 
-    def test_replay_does_not_trigger_auto_archive(self, client, monkeypatch):
-        from src.api.battle_manager import BattleManager
-
-        original = BattleManager.process_event
-        archive_flags = []
-
-        async def _process_event(self, opcode, detail, *, enable_archive=True):
-            archive_flags.append(enable_archive)
-            return await original(self, opcode, detail, enable_archive=enable_archive)
-
-        monkeypatch.setattr(BattleManager, "process_event", _process_event)
-
-        resp = client.post("/api/battle/replay?delay_ms=0&session=battle_session_1")
-
-        assert resp.json()["status"] == "ok"
-        assert archive_flags
-        assert set(archive_flags) == {False}
+    def test_replay_does_not_trigger_auto_archive(self, replay_response, replay_archive_flags):
+        assert replay_response["status"] == "ok"
+        assert replay_archive_flags
+        assert set(replay_archive_flags) == {False}
 
 
 class TestReplayTrackerState:
     """Verify the tracker state after replay matches known battle data."""
 
-    def test_tracker_has_state(self):
-        from src.api.battle_manager import get_battle_manager
-        mgr = get_battle_manager()
-        assert mgr.tracker is not None
-        state = mgr.tracker.get_state()
-        assert state["battle_id"] is not None
-        assert state["result"] is not None
+    def test_tracker_has_state(self, replay_state):
+        assert replay_state["battle_id"] is not None
+        assert replay_state["result"] is not None
 
-    def test_six_opponent_pets(self):
-        from src.api.battle_manager import get_battle_manager
-        mgr = get_battle_manager()
-        state = mgr.tracker.get_state()
-        assert len(state["opp_pets"]) == 6
+    def test_six_opponent_pets(self, replay_state):
+        assert len(replay_state["opp_pets"]) == 6
 
-    def test_pet_names_valid(self):
-        from src.api.battle_manager import get_battle_manager
-        mgr = get_battle_manager()
-        state = mgr.tracker.get_state()
-        for p in state["my_pets"] + state["opp_pets"]:
+    def test_pet_names_valid(self, replay_state):
+        for p in replay_state["my_pets"] + replay_state["opp_pets"]:
             assert p["name"], f"Pet with empty name: {p}"
             assert p["max_hp"] > 0, f"Pet {p['name']} has no max_hp"
             assert p["current_hp"] >= 0, f"Pet {p['name']} has negative hp"

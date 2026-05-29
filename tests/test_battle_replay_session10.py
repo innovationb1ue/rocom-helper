@@ -58,12 +58,12 @@ class TestSession10Replay:
                 }
 
         assert powers[5] == {
-            "final_power": 93,
-            "power_source": "server_damage_params",
+            "final_power": 75,
+            "power_source": "skill_config",
             "matched_target_key": "406",
         }
         assert powers[10] == {
-            "final_power": 103,
-            "power_source": "server_damage_params",
+            "final_power": 75,
+            "power_source": "skill_config",
             "matched_target_key": "405",
         }

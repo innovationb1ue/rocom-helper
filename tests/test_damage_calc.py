@@ -396,8 +396,8 @@ class TestCalculate:
         assert bd["damage_param_result"] == 150
         assert bd["runtime_skill"]["pp_result"] == 8
 
-    def test_target_damage_params_do_not_double_apply_restraint(self, calc):
-        """目标相关 damage_params 进入公式，且不再重复乘克制。"""
+    def test_target_damage_params_are_explain_only_by_default(self, calc):
+        """目标相关 damage_params 先作为候选/解释字段，不默认替代公式威力。"""
         calc.clear_hooks()
         attacker = _make_attacker(types=[1], energy=5)
         attacker["skill_runtime"] = {
@@ -413,15 +413,17 @@ class TestCalculate:
         bd = result.damage_breakdown
         assert result.power == 80
         assert bd["base_power"] == 80
-        assert bd["final_power"] == 180
-        assert result.expected_damage == 324
+        assert bd["final_power"] == 80
+        assert result.expected_damage == 216
         assert result.effectiveness == 1.5
-        assert bd["power_source"] == "server_damage_params"
+        assert bd["power_source"] == "skill_config"
+        assert bd["runtime_power"] == 180
         assert bd["server_runtime"]["power_source"] == "server_damage_params"
-        assert bd["server_runtime"]["power_used_in_formula"] is True
-        assert bd["server_runtime"]["calc_effectiveness"] == 1.0
+        assert bd["server_runtime"]["power_used_in_formula"] is False
+        assert bd["server_runtime"]["calc_effectiveness"] == 1.5
         assert bd["server_runtime"]["display_effectiveness"] == 1.5
         assert bd["effectiveness_source"] == "server_restraint_types"
+        assert bd["runtime_sources"]["matched_target_key"] == "401"
         assert result.energy_cost == 2
 
     def test_hidden_target_uses_single_server_damage_param(self, calc):
@@ -438,10 +440,11 @@ class TestCalculate:
         defender["pet_id"] = 20000000
         result = calc.calculate(attacker, defender, _make_skill(element=1))
         bd = result.damage_breakdown
-        assert bd["final_power"] == 103
-        assert bd["power_source"] == "server_damage_params"
+        assert bd["final_power"] == 80
+        assert bd["power_source"] == "skill_config"
+        assert bd["runtime_power"] == 103
         assert bd["server_runtime"]["matched_target_key"] == "405"
-        assert bd["server_runtime"]["calc_effectiveness"] == 1.0
+        assert bd["server_runtime"]["calc_effectiveness"] == 0.5
         assert bd["server_runtime"]["display_effectiveness"] == 0.5
 
     def test_to_dict(self, calc):

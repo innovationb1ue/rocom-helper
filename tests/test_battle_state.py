@@ -119,6 +119,46 @@ class TestDamageTracking:
         ]))
         assert state["opp_active"]["current_hp"] == 250
         assert state["opp_active"]["hp_pct"] < 1.0
+        ledger = state["field_context"]["damage_ledger"][-1]
+        assert ledger["event_kind"] == "damage"
+        assert ledger["hp_before"] == 350
+        assert ledger["hp_after"] == 250
+        assert ledger["source"] == "target_hp_after"
+        assert state["opp_active"]["hp_trace"][-1]["ledger_id"] == ledger["ledger_id"]
+        assert state["opp_active"]["last_damage_event"]["ledger_id"] == ledger["ledger_id"]
+
+    def test_damage_ledger_prefers_hp_result(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "damage": 100, "target_hp_after": 250,
+             "hp_result": 240, "damage_target_side": 401},
+        ]))
+        assert state["opp_active"]["current_hp"] == 240
+        ledger = state["field_context"]["damage_ledger"][-1]
+        assert ledger["source"] == "hp_result"
+        assert ledger["hp_result"] == 240
+        assert "damage_hp_mismatch" in ledger["anomalies"]
+
+    def test_damage_ledger_falls_back_to_actual_damage(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "damage", "actual_damage": 90, "damage": 90,
+             "damage_target_side": 401},
+        ]))
+        assert state["opp_active"]["current_hp"] == 260
+        ledger = state["field_context"]["damage_ledger"][-1]
+        assert ledger["source"] == "damage_fallback"
+        assert ledger["confidence"] == "medium"
+
+    def test_damage_ledger_clamps_invalid_hp(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "heal", "target_side": 401, "target_hp_after": 999},
+        ]))
+        assert state["opp_active"]["current_hp"] == 350
+        ledger = state["field_context"]["damage_ledger"][-1]
+        assert ledger["event_kind"] == "heal"
+        assert "hp_exceeds_max" in ledger["anomalies"]
 
     def test_damage_to_self(self, tracker):
         tracker.handle_event(0x1316, _enter_event())

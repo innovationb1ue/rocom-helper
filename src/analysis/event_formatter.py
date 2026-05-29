@@ -108,7 +108,9 @@ def _fmt_skill_cast(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedE
 def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
     target = side_label(entry.get("damage_target_side") or entry.get("target_side"))
     dmg = entry.get("damage", 0)
-    hp = entry.get("target_hp_after")
+    hp = entry.get("hp_after")
+    if hp is None:
+        hp = entry.get("target_hp_after")
     sname = entry.get("skill_name")
     hp_str = f"HP→{hp}" if hp is not None else ""
     src = f" [{sname}]" if sname else ""
@@ -121,6 +123,11 @@ def _fmt_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent
             "target_side": target,
             "damage": dmg,
             "hp_after": hp,
+            "hp_before": entry.get("hp_before"),
+            "ledger_id": entry.get("ledger_id"),
+            "actual_damage": entry.get("actual_damage"),
+            "damage_result": entry.get("damage_result"),
+            "target_pet_id": entry.get("target_pet_id"),
             "skill_name": sname,
         },
         icon="thunderbolt",
@@ -798,13 +805,23 @@ def _merge_damage_events(events: List[FormattedEvent]) -> List[FormattedEvent]:
             dmg = ev.detail.get("damage", 0)
             target = ev.detail.get("target_side", "")
             skill = ev.detail.get("skill_name")
+            ledger_ids = [
+                item.detail.get("ledger_id")
+                for item in events[i:j]
+                if item.detail.get("ledger_id") is not None
+            ]
             hp_str = f"HP→{hp}" if hp is not None else ""
             src = f" [{skill}]" if skill else ""
             merged = FormattedEvent(
                 kind="damage",
                 round=ev.round,
                 summary=f"{target} 受到 {dmg}x{count} 伤害 ({hp_str}){src}",
-                detail={**ev.detail, "hit_count": count, "hp_after": last.detail.get("hp_after")},
+                detail={
+                    **ev.detail,
+                    "hit_count": count,
+                    "hp_after": last.detail.get("hp_after"),
+                    "ledger_ids": ledger_ids,
+                },
                 icon=ev.icon,
                 color=ev.color,
             )

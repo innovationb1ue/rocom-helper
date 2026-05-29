@@ -28,6 +28,7 @@ def initial_battle_state() -> Dict[str, Any]:
             "perform_groups": [],
             "sync_events": [],
             "item_sync_events": [],
+            "damage_ledger": [],
         },
         "phase": "idle",
         "my_pets": [],

@@ -43,6 +43,8 @@ logger = logging.getLogger(__name__)
 POISON_BUFF_IDS = {20070010}
 MAX_SYNC_EVENTS = 300
 MAX_PERFORM_GROUPS = 300
+MAX_DAMAGE_LEDGER = 600
+MAX_PET_HP_TRACE = 160
 GLOBAL_EVENT_KINDS = {
     "weather_change",
     "notify_perform",
@@ -128,6 +130,7 @@ class BattleStateTracker:
         ctx.setdefault("perform_groups", [])
         ctx.setdefault("sync_events", [])
         ctx.setdefault("item_sync_events", [])
+        ctx.setdefault("damage_ledger", [])
         return ctx
 
     @staticmethod
@@ -224,6 +227,162 @@ class BattleStateTracker:
                 MAX_SYNC_EVENTS,
             )
 
+    def _next_ledger_id(self) -> str:
+        ledger = self._field_context().setdefault("damage_ledger", [])
+        detail = self._current_event_detail or {}
+        packet = detail.get("packet_index", "p?")
+        return f"r{self.state.get('round', 0)}:{packet}:{len(ledger) + 1}"
+
+    @staticmethod
+    def _as_int(value: Any) -> Optional[int]:
+        if value is None:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    def _apply_hp_update(
+        self,
+        pet: Optional[Dict[str, Any]],
+        *,
+        event_kind: str,
+        entry: Optional[Dict[str, Any]] = None,
+        side: Any = None,
+        target_pet_id: Any = None,
+        hp_change: Any = None,
+        hp_result: Any = None,
+        target_hp_after: Any = None,
+        actual_damage: Any = None,
+        source_hint: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """统一应用 HP 变化，并写入全局 damage_ledger 和宠物 hp_trace。"""
+        entry = entry or {}
+        hp_before = self._as_int(pet.get("current_hp")) if pet is not None else None
+        max_hp = self._as_int(pet.get("max_hp")) if pet is not None else None
+        hp_delta = self._as_int(hp_change)
+        result_hp = self._as_int(hp_result)
+        entry_hp_after = self._as_int(target_hp_after)
+        damage_value = self._as_int(actual_damage)
+        raw_after: Optional[int] = None
+        source = source_hint or "unknown"
+        fallback_reason: Optional[str] = None
+
+        if result_hp is not None:
+            raw_after = result_hp
+            source = "hp_result"
+        elif entry_hp_after is not None:
+            raw_after = entry_hp_after
+            source = "target_hp_after"
+        elif hp_before is not None and damage_value is not None:
+            raw_after = hp_before - damage_value
+            source = "damage_fallback"
+            fallback_reason = "missing_hp_result"
+        elif hp_before is not None and hp_delta is not None:
+            raw_after = hp_before + hp_delta
+            source = "hp_change_fallback"
+            fallback_reason = "missing_hp_result"
+
+        anomalies: List[str] = []
+        if pet is None:
+            anomalies.append("target_unresolved")
+        if raw_after is None:
+            anomalies.append("missing_hp_after")
+
+        hp_after = raw_after
+        if hp_after is not None:
+            if hp_after < 0:
+                anomalies.append("negative_hp")
+                hp_after = 0
+            if max_hp is not None and max_hp > 0 and hp_after > max_hp:
+                anomalies.append("hp_exceeds_max")
+                hp_after = max_hp
+            if hp_before is not None and hp_delta is not None and hp_after - hp_before != hp_delta:
+                anomalies.append("hp_change_mismatch")
+            if (
+                event_kind == "damage"
+                and hp_before is not None
+                and damage_value is not None
+                and max(0, hp_before - hp_after) != damage_value
+            ):
+                anomalies.append("damage_hp_mismatch")
+
+        confidence = "high"
+        if source.endswith("_fallback"):
+            confidence = "medium"
+        if anomalies:
+            confidence = "low" if "target_unresolved" in anomalies or "missing_hp_after" in anomalies else "medium"
+
+        if pet is not None and hp_after is not None:
+            pet["current_hp"] = hp_after
+            if max_hp is not None and max_hp > 0:
+                pet["hp_pct"] = hp_after / max_hp
+            else:
+                pet["hp_pct"] = 1.0 if hp_after > 0 else 0.0
+
+        detail = self._current_event_detail or {}
+        ledger = {
+            "ledger_id": self._next_ledger_id(),
+            "round": self.state.get("round", 0),
+            "opcode": self._current_opcode if self._current_opcode is not None else detail.get("opcode"),
+            "packet_index": detail.get("packet_index", entry.get("packet_index")),
+            "event_ordinal": entry.get("event_ordinal"),
+            "event_kind": event_kind,
+            "group_id": entry.get("group_id"),
+            "exec_index": entry.get("exec_index"),
+            "skill_id": entry.get("skill_id"),
+            "skill_name": entry.get("skill_name"),
+            "target_pet_id": target_pet_id if target_pet_id is not None else (pet or {}).get("pet_id"),
+            "side": side if side is not None else entry.get("target_side") or entry.get("damage_target_side"),
+            "hp_before": hp_before,
+            "hp_change": hp_delta,
+            "hp_result": result_hp,
+            "target_hp_after": entry_hp_after,
+            "hp_after": hp_after,
+            "raw_hp_after": raw_after,
+            "max_hp": max_hp,
+            "source": source,
+            "confidence": confidence,
+            "fallback_reason": fallback_reason,
+            "original_damage": entry.get("original_damage"),
+            "damage_change": entry.get("damage_change"),
+            "damage_result": entry.get("damage_result"),
+            "actual_damage": damage_value,
+            "damage": entry.get("damage"),
+            "is_critical": entry.get("is_critical"),
+            "restraint_type": entry.get("restraint_type"),
+            "anomalies": anomalies,
+        }
+        ledger = {k: v for k, v in ledger.items() if v not in (None, [], {})}
+        self._append_bounded(
+            self._field_context().setdefault("damage_ledger", []),
+            ledger,
+            MAX_DAMAGE_LEDGER,
+        )
+        if pet is not None:
+            self._append_bounded(
+                pet.setdefault("hp_trace", []),
+                copy.deepcopy(ledger),
+                MAX_PET_HP_TRACE,
+            )
+            if event_kind == "damage":
+                pet["last_damage_event"] = copy.deepcopy(ledger)
+                if ledger.get("damage_result") is not None:
+                    pet["last_damage_result"] = ledger["damage_result"]
+                if ledger.get("original_damage") is not None:
+                    pet["last_original_damage"] = ledger["original_damage"]
+            else:
+                pet["last_hp_event"] = copy.deepcopy(ledger)
+        if entry is not None:
+            entry["ledger_id"] = ledger["ledger_id"]
+            if ledger.get("target_pet_id") is not None:
+                entry["target_pet_id"] = ledger["target_pet_id"]
+            if hp_before is not None:
+                entry["hp_before"] = hp_before
+            if hp_after is not None:
+                entry["hp_after"] = hp_after
+        return ledger
+
     def _pet_for_sync_id(self, pet_id: Any) -> Optional[Dict[str, Any]]:
         if pet_id is None:
             return None
@@ -312,11 +471,31 @@ class BattleStateTracker:
     def _apply_pet_sync(self, sync: Dict[str, Any]) -> None:
         pet = self._pet_for_sync_id(sync.get("pet_id"))
         if pet is None:
+            if sync.get("hp_result") is not None or sync.get("hp_change") is not None:
+                self._apply_hp_update(
+                    None,
+                    event_kind="pet_sync",
+                    entry=sync,
+                    side=sync.get("pet_id"),
+                    target_pet_id=sync.get("pet_id"),
+                    hp_change=sync.get("hp_change"),
+                    hp_result=sync.get("hp_result"),
+                    actual_damage=sync.get("actual_damage") or sync.get("original_damage"),
+                    source_hint="pet_sync",
+                )
             return
-        if sync.get("hp_result") is not None:
-            pet["current_hp"] = max(0, sync["hp_result"])
-            if pet.get("max_hp", 0) > 0:
-                pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
+        if sync.get("hp_result") is not None or sync.get("hp_change") is not None:
+            self._apply_hp_update(
+                pet,
+                event_kind="pet_sync",
+                entry=sync,
+                side=sync.get("pet_id"),
+                target_pet_id=sync.get("pet_id"),
+                hp_change=sync.get("hp_change"),
+                hp_result=sync.get("hp_result"),
+                actual_damage=sync.get("actual_damage") or sync.get("original_damage"),
+                source_hint="pet_sync",
+            )
         if sync.get("energy_result") is not None:
             max_energy = sync.get("max_energy") or pet.get("max_energy") or 10
             pet["energy"] = max(0, min(max_energy, sync["energy_result"]))
@@ -530,6 +709,7 @@ class BattleStateTracker:
             "perform_groups": [],
             "sync_events": [],
             "item_sync_events": [],
+            "damage_ledger": [],
         }
         self._set_weather_current(weather)
 
@@ -708,24 +888,47 @@ class BattleStateTracker:
 
     def _handle_damage_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("damage_target_side")
-        damage = entry.get("damage", 0)
-        target_hp = entry.get("target_hp_after")
         if target_side is None:
+            self._apply_hp_update(
+                None,
+                event_kind="damage",
+                entry=entry,
+                side=entry.get("target_side") or target_side,
+                hp_change=entry.get("hp_change"),
+                hp_result=entry.get("hp_result"),
+                target_hp_after=entry.get("target_hp_after"),
+                actual_damage=entry.get("actual_damage") or entry.get("damage"),
+                source_hint="damage_entry",
+            )
             return
         # damage_target_side is the pet receiving damage — route to its active
         active = self._resolve_pet_for_side(target_side, bind_fallback=True)
         if active is not None:
-            # Use target_hp_after only if it's valid (not exceeding max_hp)
-            max_hp = active.get("max_hp", 0)
-            if target_hp is not None and (max_hp <= 0 or target_hp <= max_hp):
-                active["current_hp"] = max(0, target_hp)
-            else:
-                active["current_hp"] = max(0, active["current_hp"] - damage)
-            if active.get("max_hp", 0) > 0:
-                active["hp_pct"] = active["current_hp"] / active["max_hp"]
-            else:
-                active["hp_pct"] = 1.0 if active["current_hp"] > 0 else 0.0
+            self._apply_hp_update(
+                active,
+                event_kind="damage",
+                entry=entry,
+                side=target_side,
+                target_pet_id=active.get("pet_id"),
+                hp_change=entry.get("hp_change"),
+                hp_result=entry.get("hp_result"),
+                target_hp_after=entry.get("target_hp_after"),
+                actual_damage=entry.get("actual_damage") or entry.get("damage"),
+                source_hint="damage_entry",
+            )
             self._set_active_pet(active)
+        else:
+            self._apply_hp_update(
+                None,
+                event_kind="damage",
+                entry=entry,
+                side=target_side,
+                hp_change=entry.get("hp_change"),
+                hp_result=entry.get("hp_result"),
+                target_hp_after=entry.get("target_hp_after"),
+                actual_damage=entry.get("actual_damage") or entry.get("damage"),
+                source_hint="damage_entry",
+            )
 
     def _handle_skill_cast_entry(self, entry: Dict[str, Any]) -> None:
         actor_side = entry.get("actor_side", "")
@@ -761,18 +964,34 @@ class BattleStateTracker:
         defeated_side = entry.get("target_side", "")
         active = self._get_active_for_side(defeated_side)
         if active is not None:
-            active["current_hp"] = 0
-            active["hp_pct"] = 0.0
+            self._apply_hp_update(
+                active,
+                event_kind="defeat",
+                entry=entry,
+                side=defeated_side,
+                target_pet_id=active.get("pet_id"),
+                hp_result=0,
+                source_hint="defeat",
+            )
 
     def _handle_heal_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side")
-        hp_after = entry.get("target_hp_after")
+        hp_after = entry.get("hp_result") or entry.get("target_hp_after") or entry.get("hp_after")
         if target_side is None or hp_after is None:
             return
         active = self._get_active_for_side(target_side)
-        if active is not None and active["max_hp"] > 0:
-            active["current_hp"] = min(hp_after, active["max_hp"])
-            active["hp_pct"] = active["current_hp"] / active["max_hp"]
+        if active is not None:
+            self._apply_hp_update(
+                active,
+                event_kind="heal",
+                entry=entry,
+                side=target_side,
+                target_pet_id=active.get("pet_id"),
+                hp_change=entry.get("hp_change"),
+                hp_result=entry.get("hp_result"),
+                target_hp_after=hp_after,
+                source_hint="heal",
+            )
 
     def _handle_energy_entry(self, entry: Dict[str, Any]) -> None:
         target_side = entry.get("target_side") or entry.get("actor_side")
@@ -922,10 +1141,16 @@ class BattleStateTracker:
                 if len(bs) >= 6 and bs[5]:
                     matched["base_speed"] = bs[5]
             if entry.get("new_pet_current_hp") is not None and entry.get("new_pet_max_hp") is not None:
-                matched["current_hp"] = entry["new_pet_current_hp"]
                 matched["max_hp"] = entry["new_pet_max_hp"]
-                if matched["max_hp"] > 0:
-                    matched["hp_pct"] = matched["current_hp"] / matched["max_hp"]
+                self._apply_hp_update(
+                    matched,
+                    event_kind="change_pet",
+                    entry=entry,
+                    side=entry.get("target_side") or battle_pet_id,
+                    target_pet_id=matched.get("pet_id"),
+                    hp_result=entry["new_pet_current_hp"],
+                    source_hint="change_pet",
+                )
             if entry.get("new_pet_energy") is not None:
                 matched["energy"] = min(10, entry["new_pet_energy"])
             if entry.get("new_pet_passive_skill_id") is not None:
@@ -1147,10 +1372,18 @@ class BattleStateTracker:
                 stats = entry.get("model_battle_stats") or []
                 if len(stats) >= 6 and stats[5]:
                     active["base_speed"] = stats[5]
-                if entry.get("model_current_hp") is not None:
-                    active["current_hp"] = entry["model_current_hp"]
                 if entry.get("model_max_hp") is not None:
                     active["max_hp"] = entry["model_max_hp"]
+                if entry.get("model_current_hp") is not None:
+                    self._apply_hp_update(
+                        active,
+                        event_kind="change_model",
+                        entry=entry,
+                        side=active.get("side"),
+                        target_pet_id=active.get("pet_id"),
+                        hp_result=entry["model_current_hp"],
+                        source_hint="change_model",
+                    )
                 if active.get("max_hp", 0) > 0 and active.get("current_hp") is not None:
                     active["hp_pct"] = active["current_hp"] / active["max_hp"]
                 break
@@ -1210,9 +1443,15 @@ class BattleStateTracker:
             remain = fp.get("remain_hp", 0)
             for pet in self.state["my_pets"] + self.state["opp_pets"]:
                 if pet.get("pet_id") == pet_id:
-                    pet["current_hp"] = remain
-                    if pet["max_hp"] > 0:
-                        pet["hp_pct"] = remain / pet["max_hp"]
+                    self._apply_hp_update(
+                        pet,
+                        event_kind="battle_finish",
+                        entry=fp,
+                        side=pet.get("side"),
+                        target_pet_id=pet_id,
+                        hp_result=remain,
+                        source_hint="battle_finish",
+                    )
 
     def _handle_skill_select(self, detail: Dict[str, Any]) -> None:
         pass  # Client intent, just logged
@@ -1279,12 +1518,20 @@ class BattleStateTracker:
             for pet in pet_list:
                 if self._stable_pet_matches(pet, w):
                     matched = pet
-                    if "hp" in w:
-                        new_hp = w["hp"]
-                        if is_mine or new_hp is None or new_hp <= pet.get("current_hp", float("inf")):
-                            pet["current_hp"] = new_hp if new_hp is not None else pet["current_hp"]
                     if "max_hp" in w:
                         pet["max_hp"] = w["max_hp"]
+                    if "hp" in w:
+                        new_hp = w["hp"]
+                        if new_hp is not None and (is_mine or new_hp <= pet.get("current_hp", float("inf"))):
+                            self._apply_hp_update(
+                                pet,
+                                event_kind="round_start",
+                                entry=w,
+                                side=side,
+                                target_pet_id=pet.get("pet_id"),
+                                hp_result=new_hp,
+                                source_hint="round_start_wrapper",
+                            )
                     if w.get("name") and w["name"] != "?":
                         pet["name"] = w["name"]
                     if w.get("pet_id") and w["pet_id"] != 20000000:

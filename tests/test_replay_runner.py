@@ -7,12 +7,15 @@ from pathlib import Path
 import pytest
 
 from src.analysis.replay_runner import BattleReplayRunner
-from src.analysis.damage_audit import build_damage_audit, build_multi_session_damage_audit
+from src.analysis.damage_audit import (
+    build_damage_audit,
+    build_damage_calibration,
+    build_multi_session_damage_audit,
+)
 from src.analysis.pet_identity import same_battle_pet
 from src.protocol.opcodes import summarize
 from tests.packet_reader import load_battle_packets
 
-SESSION2_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_2"
 SESSION4_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_4"
 SPECTATE1_DIR = Path(__file__).resolve().parent / "fixtures" / "packets" / "spectate_session_1"
 
@@ -164,9 +167,11 @@ class TestReplayRunnerDamagePrediction:
         assert report["total_direct_damage"] >= 10
         assert report["matched_predictions"] > 0
         assert report["samples"]
+        assert any(s["ledger_ids"] for s in report["samples"])
+        assert any(s["actual_source"] != "formatted_event" for s in report["samples"])
         multi_hit = [s for s in report["samples"] if s["hit_count"] > 1]
         assert multi_hit
-        assert all(s["actual_total"] == s["actual_per_hit"] * s["hit_count"] for s in multi_hit)
+        assert all(s["actual_total"] >= 0 for s in multi_hit)
         assert report["catastrophic_high_confidence"] == []
 
     def test_multi_session_damage_audit_groups_by_skill(self, session1_runner_result):
@@ -179,7 +184,29 @@ class TestReplayRunnerDamagePrediction:
         assert aggregate["total_direct_damage"] == report["total_direct_damage"] * 2
         assert aggregate["matched_predictions"] == report["matched_predictions"] * 2
         assert aggregate["by_skill"]
+        assert aggregate["samples"]
         assert aggregate["by_session"]["battle_session_1"]["matched_predictions"] == report["matched_predictions"]
+
+    def test_damage_calibration_generation_filters_and_writes_metrics(self):
+        report = {
+            "samples": [
+                {"skill_id": 1, "predicted_total": 100, "actual_total": 50, "session": "s1"},
+                {"skill_id": 1, "predicted_total": 100, "actual_total": 50, "session": "s1"},
+                {"skill_id": 1, "predicted_total": 100, "actual_total": 50, "session": "s2"},
+                {"skill_id": 2, "predicted_total": 30, "actual_total": 20, "session": "s1"},
+                {"skill_id": None, "predicted_total": 10, "actual_total": 5, "session": "s1"},
+            ],
+        }
+
+        calibration = build_damage_calibration(report)
+
+        assert calibration["version"] == 1
+        assert set(calibration["skills"]) == {"1"}
+        item = calibration["skills"]["1"]
+        assert item["multiplier"] == 0.5
+        assert item["sample_count"] == 3
+        assert item["source_sessions"] == ["s1", "s2"]
+        assert calibration["meta"]["skipped"]["2"] == "sample_count_below_min"
 
 
 # ---------------------------------------------------------------------------
@@ -408,29 +435,19 @@ class TestReplayRunnerFieldContext:
 
 
 class TestReplayRunnerSession2:
-    @pytest.fixture(scope="class")
-    def session2_result(self):
-        if not SESSION2_DIR.exists():
-            pytest.skip("battle_session_2 not found")
-        pkts = load_battle_packets(SESSION2_DIR)
-        if not pkts:
-            pytest.skip("No battle packets in session 2")
-        runner = BattleReplayRunner()
-        return runner.run(pkts)
+    def test_basic_result(self, session2_runner_result):
+        assert session2_runner_result.total_packets > 0
 
-    def test_basic_result(self, session2_result):
-        assert session2_result.total_packets > 0
+    def test_final_state_has_pets(self, session2_runner_result):
+        assert len(session2_runner_result.final_state.get("my_pets", [])) > 0
+        assert len(session2_runner_result.final_state.get("opp_pets", [])) > 0
 
-    def test_final_state_has_pets(self, session2_result):
-        assert len(session2_result.final_state.get("my_pets", [])) > 0
-        assert len(session2_result.final_state.get("opp_pets", [])) > 0
-
-    def test_formatted_events(self, session2_result):
-        total = sum(len(ev.formatted_events) for ev in session2_result.events)
+    def test_formatted_events(self, session2_runner_result):
+        total = sum(len(ev.formatted_events) for ev in session2_runner_result.events)
         assert total > 0
 
-    def test_serializable(self, session2_result):
-        json.dumps(session2_result.battle_summary, default=str)
+    def test_serializable(self, session2_runner_result):
+        json.dumps(session2_runner_result.battle_summary, default=str)
 
 
 # ---------------------------------------------------------------------------

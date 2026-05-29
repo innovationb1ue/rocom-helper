@@ -41,10 +41,30 @@ def test_prediction_contains_compatible_and_extended_fields(tmp_path):
     assert pred is not None
     assert pred["result"].expected_damage > 0
     assert pred["prediction"]["total"] == pred["result"].total_damage
+    assert pred["prediction"]["audit_key"].startswith("900001:")
+    assert pred["prediction"]["target_hp_before"] == 300
+    assert pred["prediction"]["predicted_hp_after"] == max(0, 300 - pred["prediction"]["total"])
+    assert isinstance(pred["prediction"]["runtime_sources"], dict)
     assert pred["prediction"]["confidence"] == "medium"
     assert "uncalibrated_skill" in pred["prediction"]["accuracy_flags"]
     assert pred["explain"]["stat_sources"]["attack"] == "total"
     assert pred["validation_hint"] == "技能尚未经过回放校准"
+
+
+def test_prediction_marks_unmodeled_runtime_sources(tmp_path):
+    service = DamagePredictionService(calibration_store=DamageCalibrationStore(tmp_path / "missing.json"))
+    attacker = _pet("我方")
+    attacker["skill_runtime"] = {
+        "900001": {
+            "set_cost_info": [{"type": 1}],
+            "cr_damage_params": [{"rate": 2}],
+        }
+    }
+    pred = service.predict(attacker, _pet("敌方"), _skill())
+
+    assert pred is not None
+    assert "runtime_effect_unmodeled" in pred["prediction"]["accuracy_flags"]
+    assert pred["prediction"]["runtime_sources"]["has_set_cost_info"] is True
 
 
 def test_calibration_multiplier_adjusts_damage(tmp_path):
