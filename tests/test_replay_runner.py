@@ -11,6 +11,8 @@ from src.analysis.damage_audit import (
     build_damage_audit,
     build_damage_calibration,
     build_multi_session_damage_audit,
+    _ledger_actual_damage,
+    _ledger_records_for_damage,
 )
 from src.analysis.pet_identity import same_battle_pet
 from src.protocol.opcodes import summarize
@@ -207,6 +209,18 @@ class TestReplayRunnerDamagePrediction:
         assert item["sample_count"] == 3
         assert item["source_sessions"] == ["s1", "s2"]
         assert calibration["meta"]["skipped"]["2"] == "sample_count_below_min"
+
+    def test_damage_audit_uses_protocol_damage_for_overkill_hits(self):
+        ledger = [
+            {"ledger_id": "a", "event_kind": "damage", "skill_name": "追打",
+             "hp_before": 0, "hp_after": 0, "actual_damage": 112},
+        ]
+        detail = {"ledger_ids": ["a"], "ledger_id": "a", "skill_name": "追打"}
+
+        records = _ledger_records_for_damage({"field_context": {"damage_ledger": ledger}}, detail)
+
+        assert [r["ledger_id"] for r in records] == ["a"]
+        assert _ledger_actual_damage(records[0]) == 112
 
 
 # ---------------------------------------------------------------------------

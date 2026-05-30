@@ -17,6 +17,9 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
 from src.data.loader import (
+    get_buff_derived_stat_modifiers,
+    get_buff_hit_count_modifiers,
+    get_buff_power_modifiers,
     get_buff_stat_modifiers,
     get_skill_meta,
     get_skill_name,
@@ -157,6 +160,13 @@ class DamageCalculator:
         server_runtime["power_used_in_formula"] = False
         if power <= 0 or damage_type not in (2, 3):
             return None
+        buff_power_modifiers = get_buff_power_modifiers(
+            attacker.get("buffs", []),
+            skill_element=skill_element,
+            skill_name=skill_meta.get("name"),
+        )
+        if buff_power_modifiers.get("flat"):
+            power = max(1, power + int(buff_power_modifiers["flat"]))
 
         # Phase 1: Resolve power
         power, _ = self._resolve_power(power, skill_meta, attacker, defender)
@@ -363,7 +373,14 @@ class DamageCalculator:
         })
         dmg = ctx["min_damage"]
 
+        buff_hit_modifiers = get_buff_hit_count_modifiers(
+            attacker.get("buffs", []),
+            skill_element=skill_element,
+            skill_name=skill_meta.get("name"),
+        )
         hit_count = ctx.get("hit_count", 1)
+        if buff_hit_modifiers.get("flat"):
+            hit_count = max(1, int(hit_count + buff_hit_modifiers["flat"]))
         total_damage = dmg * hit_count
 
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1
@@ -374,7 +391,23 @@ class DamageCalculator:
         runtime_skill = runtime_skill or self._get_runtime_skill(attacker, skill_meta.get("id"))
         server_runtime = server_runtime or self._resolve_server_runtime(runtime_skill, defender)
         attacker_buff_modifiers = get_buff_stat_modifiers(attacker.get("buffs", []))
+        attacker_derived_modifiers = get_buff_derived_stat_modifiers(attacker.get("buffs", []))
         defender_buff_modifiers = get_buff_stat_modifiers(defender.get("buffs", []))
+        attacker_derived_buffs = self._collect_derived_buffs(attacker.get("buffs", []))
+        buff_power_modifiers = get_buff_power_modifiers(
+            attacker.get("buffs", []),
+            skill_element=skill_element,
+            skill_name=skill_meta.get("name"),
+        )
+        reflect_buff_applied = any(
+            buff.get("id") == 20890020 and (
+                buff.get("derived_buffs")
+                or buff.get("modifiers")
+                or get_buff_derived_stat_modifiers([buff])
+            )
+            for buff in attacker.get("buffs", []) or []
+            if isinstance(buff, dict)
+        )
         runtime_power = server_runtime.get("power") or runtime_skill.get("damage_param_result")
         energy_cost, energy_cost_source = self._resolve_energy_cost(runtime_skill, skill_meta)
         if energy_cost > 0:
@@ -398,6 +431,11 @@ class DamageCalculator:
             "runtime_sources": runtime_sources,
             "ability_level": round(ability_level, 3),
             "attacker_buff_modifiers": attacker_buff_modifiers,
+            "attacker_derived_buff_modifiers": attacker_derived_modifiers,
+            "attacker_derived_buffs": attacker_derived_buffs,
+            "reflect_buff_applied": reflect_buff_applied,
+            "buff_power_modifiers": buff_power_modifiers,
+            "buff_hit_count_modifiers": buff_hit_modifiers,
             "defender_buff_modifiers": defender_buff_modifiers,
             "atk": int(effective_atk),
             "def_": int(effective_def),
@@ -433,6 +471,26 @@ class DamageCalculator:
             damage_breakdown=breakdown,
             warnings=warnings,
         )
+
+    @staticmethod
+    def _collect_derived_buffs(buff_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        derived: List[Dict[str, Any]] = []
+        for buff in buff_list or []:
+            if not isinstance(buff, dict):
+                continue
+            parent = {
+                "id": buff.get("id"),
+                "name": buff.get("name"),
+            }
+            for item in buff.get("derived_buffs") or []:
+                if isinstance(item, dict):
+                    child = dict(item)
+                else:
+                    child = {"id": item}
+                child.setdefault("parent_buff_id", parent.get("id"))
+                child.setdefault("parent_buff_name", parent.get("name"))
+                derived.append({k: v for k, v in child.items() if v is not None})
+        return derived
 
     @staticmethod
     def _runtime_sources(runtime_skill: Dict[str, Any], server_runtime: Dict[str, Any]) -> Dict[str, Any]:

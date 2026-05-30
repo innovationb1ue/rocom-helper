@@ -52,18 +52,54 @@ class TestSession10Replay:
                 breakdown = pred.get("damage_breakdown") or {}
                 server_runtime = breakdown.get("server_runtime") or {}
                 powers[round_snapshot.round_num] = {
+                    "base_power": breakdown.get("base_power"),
                     "final_power": breakdown.get("final_power"),
+                    "buff_power_flat": (breakdown.get("buff_power_modifiers") or {}).get("flat"),
                     "power_source": breakdown.get("power_source"),
                     "matched_target_key": server_runtime.get("matched_target_key"),
                 }
 
         assert powers[5] == {
-            "final_power": 75,
+            "base_power": 75,
+            "final_power": 105,
+            "buff_power_flat": 30.0,
             "power_source": "skill_config",
             "matched_target_key": "406",
         }
         assert powers[10] == {
-            "final_power": 75,
+            "base_power": 75,
+            "final_power": 105,
+            "buff_power_flat": 30.0,
             "power_source": "skill_config",
             "matched_target_key": "405",
         }
+
+    def test_reflect_buff_has_derived_magic_modifier(self, session10_runner_result):
+        """白金独角兽的折射触发后应带上派生的光加魔攻。"""
+        found = []
+        for event in session10_runner_result.events:
+            for pet in event.state_after.get("my_pets", []) + event.state_after.get("opp_pets", []):
+                if pet.get("name") != "白金独角兽":
+                    continue
+                for buff in pet.get("buffs", []):
+                    if buff.get("id") == 20890020 and buff.get("derived_buffs"):
+                        found.append(buff)
+
+        assert found
+        assert found[0]["derived_buffs"][0]["id"] == 20171910
+        assert found[0]["modifiers"] == {"spa_up": 0.4}
+
+    def test_zhui_da_breakdown_marks_reflect_applied(self, session10_runner_result):
+        """追打预测应能审计到折射派生魔攻来源。"""
+        found = []
+        for round_snapshot in session10_runner_result.rounds:
+            for pred in round_snapshot.damage_predictions:
+                if pred.get("skill_id") != 7020470:
+                    continue
+                breakdown = pred.get("damage_breakdown") or {}
+                if breakdown.get("reflect_buff_applied"):
+                    found.append(breakdown)
+
+        assert found
+        assert found[0]["attacker_buff_modifiers"].get("spa_up") == 0.4
+        assert found[0]["attacker_derived_buffs"][0]["id"] == 20171910

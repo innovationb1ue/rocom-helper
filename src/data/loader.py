@@ -41,7 +41,10 @@ logger = logging.getLogger(__name__)
 from src.data.buff_modifiers import (
     enrich_buff_modifiers,
     format_buff_modifier_summary,
+    get_buff_derived_stat_modifiers,
     get_buff_damage_reduction,
+    get_buff_hit_count_modifiers,
+    get_buff_power_modifiers,
     get_buff_stat_modifiers,
     get_speed_buff_modifiers,
     reset_buff_modifier_caches,

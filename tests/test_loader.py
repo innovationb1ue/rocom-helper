@@ -14,6 +14,8 @@ from src.data.loader import (
     get_pet_name,
     get_buff_meta,
     get_pet_skill_meta,
+    get_buff_hit_count_modifiers,
+    get_buff_power_modifiers,
     get_buff_stat_modifiers,
     enrich_buff_modifiers,
     invalidate_cache,
@@ -269,3 +271,34 @@ class TestBuffStatModifiers:
     def test_enrich_unknown_buff_keeps_original_fields(self):
         buff = enrich_buff_modifiers({"id": 999999999, "name": "未知", "stage": 1})
         assert buff == {"id": 999999999, "name": "未知", "stage": 1}
+
+    def test_reflect_selector_does_not_expand_without_child_effect(self):
+        result = get_buff_stat_modifiers([{"id": 20890020, "name": "折射", "stage": 1}])
+        assert result == {}
+
+    def test_reflect_derived_light_magic_buff_adds_spa(self):
+        buff = enrich_buff_modifiers({
+            "id": 20890020,
+            "name": "折射",
+            "stage": 1,
+            "derived_buffs": [{"id": 20171910, "name": "光加魔攻"}],
+        })
+        assert buff["modifiers"] == {"spa_up": 0.4}
+        assert buff["modifier_summary"] == ["魔攻 +40%"]
+        assert buff["derived_modifier_summary"] == ["魔攻 +40%"]
+
+    def test_reflect_power_and_combo_children_do_not_become_spa(self):
+        assert get_buff_stat_modifiers([{"id": 20171870, "name": "普通加威力"}]) == {}
+        assert get_buff_stat_modifiers([{"id": 20172000, "name": "翼加连击"}]) == {}
+        assert get_buff_power_modifiers([{"id": 20171870, "name": "普通加威力"}]) == {
+            "flat": 20.0,
+            "sources": [20230440, 20230440],
+        }
+        assert get_buff_hit_count_modifiers([{"id": 20172000, "name": "翼加连击"}]) == {
+            "flat": 1.0,
+            "sources": [20450050],
+        }
+        assert get_buff_power_modifiers([{"id": 20171870, "name": "普通加威力"}], skill_element=17) == {}
+        assert get_buff_hit_count_modifiers([{"id": 20172000, "name": "翼加连击"}], skill_element=17) == {}
+        assert get_buff_power_modifiers([{"id": 20171870, "name": "普通加威力"}], skill_element=0)["flat"] == 20.0
+        assert get_buff_hit_count_modifiers([{"id": 20172000, "name": "翼加连击"}], skill_element=9)["flat"] == 1.0

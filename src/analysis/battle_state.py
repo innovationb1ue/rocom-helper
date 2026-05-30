@@ -41,6 +41,9 @@ from src.data.loader import enrich_buff_modifiers
 logger = logging.getLogger(__name__)
 
 POISON_BUFF_IDS = {20070010}
+REFLECT_BUFF_ID = 20890020
+REFLECT_BUFFBASE_ID = 2089001
+REFLECT_LIGHT_MAGIC_BUFF_ID = 20171910
 MAX_SYNC_EVENTS = 300
 MAX_PERFORM_GROUPS = 300
 MAX_DAMAGE_LEDGER = 600
@@ -542,6 +545,13 @@ class BattleStateTracker:
                     "name": str(sync["buff_id"]),
                     "stage": sync["buff_stack_result"],
                 }))
+            if sync["buff_id"] == REFLECT_BUFF_ID and sync["buff_stack_result"] > 0:
+                self._attach_reflect_derived_buff(
+                    pet,
+                    sync,
+                    source="pet_sync_reflect_buff",
+                    create_parent=True,
+                )
 
     def _apply_pet_info_sync(self, sync: Dict[str, Any]) -> None:
         pet = self._pet_for_sync_id(sync.get("pet_id"))
@@ -564,6 +574,29 @@ class BattleStateTracker:
         ):
             if w.get(key) not in (None, [], {}):
                 pet[key] = copy.deepcopy(w[key])
+
+    def _enrich_wrapper_buff_for_pet(
+        self,
+        pet: Dict[str, Any],
+        buff: Dict[str, Any],
+        *,
+        is_mine: bool,
+    ) -> Dict[str, Any]:
+        enriched = enrich_buff_modifiers(buff)
+        if enriched.get("id") != REFLECT_BUFF_ID:
+            return enriched
+        active = self.state.get("my_active" if is_mine else "opp_active")
+        if not active or active.get("side") != pet.get("side"):
+            return enriched
+        active_reflect = next(
+            (b for b in active.get("buffs", []) if b.get("id") == REFLECT_BUFF_ID and b.get("derived_buffs")),
+            None,
+        )
+        if active_reflect is None:
+            return enriched
+        enriched["derived_buffs"] = copy.deepcopy(active_reflect.get("derived_buffs", []))
+        enriched["derived_effects"] = copy.deepcopy(active_reflect.get("derived_effects", []))
+        return enrich_buff_modifiers(enriched)
 
     def _apply_entry_sync_data(self, entry: Dict[str, Any]) -> None:
         sync_data = entry.get("sync_data") or {}
@@ -1186,6 +1219,8 @@ class BattleStateTracker:
                 "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
                 "turns_applied": 1,
             }))
+        if self._is_reflect_magic_child(entry):
+            self._attach_reflect_derived_buff(active, entry, source="protocol_effect_apply", create_parent=False)
         if effect_id in POISON_BUFF_IDS:
             active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
@@ -1226,6 +1261,91 @@ class BattleStateTracker:
 
     def _handle_buff_trigger_entry(self, entry: Dict[str, Any]) -> None:
         self._append_pet_effect_history(entry, "buff_trigger")
+        if not self._is_reflect_trigger(entry):
+            return
+        side = entry.get("target_side") or entry.get("actor_side")
+        active = self._get_active_for_side(side) if side is not None else None
+        if active is None:
+            return
+        self._attach_reflect_derived_buff(active, entry, source="reflect_buff_trigger", create_parent=True)
+
+    @staticmethod
+    def _is_reflect_magic_child(entry: Dict[str, Any]) -> bool:
+        effect_name = str(entry.get("effect_name") or "")
+        effect_id = entry.get("effect_id")
+        return effect_id == REFLECT_LIGHT_MAGIC_BUFF_ID or "光加魔攻" in effect_name
+
+    @staticmethod
+    def _is_reflect_trigger(entry: Dict[str, Any]) -> bool:
+        ids = {entry.get("effect_id"), entry.get("buff_id")}
+        bases = set(entry.get("buffbase_ids") or [])
+        if entry.get("effect_base") is not None:
+            bases.add(entry.get("effect_base"))
+        effect_name = str(entry.get("effect_name") or "")
+        return (
+            REFLECT_BUFF_ID in ids
+            or REFLECT_BUFFBASE_ID in bases
+            or "折射" in effect_name
+        )
+
+    def _attach_reflect_derived_buff(
+        self,
+        active: Dict[str, Any],
+        entry: Dict[str, Any],
+        *,
+        source: str,
+        create_parent: bool,
+    ) -> None:
+        buffs = active.setdefault("buffs", [])
+        reflect = next((b for b in buffs if b.get("id") == REFLECT_BUFF_ID), None)
+        if reflect is None:
+            if not create_parent:
+                return
+            reflect = {
+                "id": REFLECT_BUFF_ID,
+                "name": "折射",
+                "stage": 1,
+                "turns_applied": 0,
+            }
+            buffs.append(reflect)
+
+        derived = reflect.setdefault("derived_buffs", [])
+        child_id = REFLECT_LIGHT_MAGIC_BUFF_ID
+        if not any((item.get("id") if isinstance(item, dict) else item) == child_id for item in derived):
+            derived.append({
+                "id": child_id,
+                "name": "光加魔攻",
+                "source": source,
+                "parent_buff_id": REFLECT_BUFF_ID,
+                "parent_buffbase_id": REFLECT_BUFFBASE_ID,
+                "round": self.state.get("round"),
+                "event_ordinal": entry.get("event_ordinal"),
+            })
+        effects = reflect.setdefault("derived_effects", [])
+        if not any(item.get("kind") == "spa_up" and item.get("source") == source for item in effects):
+            effects.append({
+                "kind": "spa_up",
+                "name": "光加魔攻",
+                "source": source,
+                "round": self.state.get("round"),
+                "event_ordinal": entry.get("event_ordinal"),
+            })
+        reflect.update(enrich_buff_modifiers(reflect))
+
+        # 变身/模型切换场景中，活跃 battler 和原宠记录会同时保留同一侧的折射 buff。
+        # 将已确认的派生效果同步回同侧记录，避免预测读取阵容宠物时丢掉 modifier。
+        active_side = active.get("side")
+        if active_side is None:
+            return
+        for pet in self.state.get("my_pets", []) + self.state.get("opp_pets", []):
+            if pet is active or pet.get("side") != active_side:
+                continue
+            other = next((b for b in pet.get("buffs", []) if b.get("id") == REFLECT_BUFF_ID), None)
+            if other is None:
+                continue
+            other["derived_buffs"] = copy.deepcopy(reflect.get("derived_buffs", []))
+            other["derived_effects"] = copy.deepcopy(reflect.get("derived_effects", []))
+            other.update(enrich_buff_modifiers(other))
 
     def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
         weather_id = entry.get("weather_id")
@@ -1561,7 +1681,9 @@ class BattleStateTracker:
                         existing_ids = {b["id"] for b in pet.get("buffs", []) if "id" in b}
                         for b in w_buffs:
                             if b.get("id") not in existing_ids:
-                                pet.setdefault("buffs", []).append(enrich_buff_modifiers(b))
+                                pet.setdefault("buffs", []).append(
+                                    self._enrich_wrapper_buff_for_pet(pet, b, is_mine=is_mine)
+                                )
                     # 如果之前没有装备技能，用新 wrapper 的补充
                     w_eq = w.get("equipped_skills") or []
                     if w_eq and not pet.get("equipped_skills"):

@@ -364,6 +364,103 @@ class TestCalculate:
         assert buffed.damage_breakdown["attacker_buff_modifiers"] == {"spa_up": 0.1}
         assert buffed.damage_breakdown["defender_buff_modifiers"] == {}
 
+    def test_reflect_derived_magic_buff_changes_special_damage(self, calc):
+        reflect = {
+            "id": 20890020,
+            "name": "折射",
+            "stage": 1,
+            "derived_buffs": [{"id": 20171910, "name": "光加魔攻"}],
+        }
+        plain = calc.calculate(
+            _make_attacker(types=[1], spa=180),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, element=1),
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[reflect]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, element=1),
+        )
+        assert buffed.expected_damage > plain.expected_damage
+        assert buffed.damage_breakdown["attacker_buff_modifiers"] == {"spa_up": 0.4}
+        assert buffed.damage_breakdown["attacker_derived_buff_modifiers"] == {"spa_up": 0.4}
+        assert buffed.damage_breakdown["attacker_derived_buffs"][0]["id"] == 20171910
+        assert buffed.damage_breakdown["reflect_buff_applied"] is True
+
+    def test_reflect_magic_modifier_does_not_change_physical_damage(self, calc):
+        reflect = {
+            "id": 20890020,
+            "name": "折射",
+            "derived_buffs": [{"id": 20171910, "name": "光加魔攻"}],
+        }
+        plain = calc.calculate(
+            _make_attacker(types=[1], atk=200, spa=180),
+            _make_defender(types=[0], def_=150, spd=150),
+            _make_skill(dam_type=2, element=1),
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[1], atk=200, spa=180, buffs=[reflect]),
+            _make_defender(types=[0], def_=150, spd=150),
+            _make_skill(dam_type=2, element=1),
+        )
+        assert buffed.expected_damage == plain.expected_damage
+        assert buffed.damage_breakdown["attacker_buff_modifiers"] == {"spa_up": 0.4}
+
+    def test_power_child_increases_effective_power_not_spa(self, calc):
+        power_buff = {"id": 20171870, "name": "普通加威力"}
+        plain = calc.calculate(
+            _make_attacker(types=[1], spa=180),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=2),
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[power_buff]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=2),
+        )
+        assert buffed.expected_damage > plain.expected_damage
+        assert buffed.damage_breakdown["final_power"] == 100
+        assert buffed.damage_breakdown["attacker_buff_modifiers"] == {}
+        assert buffed.damage_breakdown["buff_power_modifiers"]["flat"] == 20.0
+
+    def test_power_child_does_not_affect_light_skill(self, calc):
+        power_buff = {"id": 20171870, "name": "普通加威力"}
+        plain = calc.calculate(
+            _make_attacker(types=[17], spa=180),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=6),
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[17], spa=180, buffs=[power_buff]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=6),
+        )
+        assert buffed.expected_damage == plain.expected_damage
+        assert buffed.damage_breakdown["final_power"] == 80
+        assert buffed.damage_breakdown["buff_power_modifiers"] == {}
+
+    def test_combo_child_increases_hit_count_not_spa(self, calc):
+        combo_buff = {"id": 20172000, "name": "翼加连击"}
+        result = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[combo_buff]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=15),
+        )
+        assert result.hit_count == 2
+        assert result.total_damage == result.expected_damage * 2
+        assert result.damage_breakdown["attacker_buff_modifiers"] == {}
+        assert result.damage_breakdown["buff_hit_count_modifiers"]["flat"] == 1.0
+
+    def test_combo_child_does_not_affect_light_skill(self, calc):
+        combo_buff = {"id": 20172000, "name": "翼加连击"}
+        result = calc.calculate(
+            _make_attacker(types=[17], spa=180, buffs=[combo_buff]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=80, element=6),
+        )
+        assert result.hit_count == 1
+        assert result.damage_breakdown["buff_hit_count_modifiers"] == {}
+
     def test_defender_buff_exposed_in_breakdown(self, calc):
         result = calc.calculate(
             _make_attacker(types=[1], atk=200),

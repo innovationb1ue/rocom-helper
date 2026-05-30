@@ -38,6 +38,11 @@ class DamageAuditSample:
     ledger_ids: List[str]
     actual_source: str
     actual_confidence: str
+    buff_modifiers: Dict[str, Dict[str, float]]
+    derived_buffs: List[Dict[str, Any]]
+    ability_level: Optional[float]
+    power_mult: Optional[float]
+    reflect_buff_applied: bool
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -323,6 +328,17 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 ledger_ids=ledger_ids,
                 actual_source=actual_source,
                 actual_confidence=actual_confidence,
+                buff_modifiers={
+                    "attacker": breakdown.get("attacker_buff_modifiers") or {},
+                    "defender": breakdown.get("defender_buff_modifiers") or {},
+                    "attacker_derived": breakdown.get("attacker_derived_buff_modifiers") or {},
+                    "power": breakdown.get("buff_power_modifiers") or {},
+                    "hit_count": breakdown.get("buff_hit_count_modifiers") or {},
+                },
+                derived_buffs=list(breakdown.get("attacker_derived_buffs") or []),
+                ability_level=breakdown.get("ability_level"),
+                power_mult=breakdown.get("power_mult"),
+                reflect_buff_applied=bool(breakdown.get("reflect_buff_applied")),
             )
 
 
@@ -336,6 +352,7 @@ def _ledger_records_for_damage(state: Dict[str, Any], detail: Dict[str, Any]) ->
     wanted = [str(item) for item in detail.get("ledger_ids") or []]
     if detail.get("ledger_id") is not None:
         wanted.append(str(detail["ledger_id"]))
+    wanted = list(dict.fromkeys(wanted))
     records = [by_id[item] for item in wanted if item in by_id]
     if records:
         return records
@@ -351,14 +368,14 @@ def _ledger_records_for_damage(state: Dict[str, Any], detail: Dict[str, Any]) ->
 
 
 def _ledger_actual_damage(item: Dict[str, Any]) -> int:
-    before = item.get("hp_before")
-    after = item.get("hp_after")
-    if before is not None and after is not None:
-        return max(0, int(before) - int(after))
     if item.get("actual_damage") is not None:
         return max(0, int(item["actual_damage"]))
     if item.get("damage") is not None:
         return max(0, int(item["damage"]))
+    before = item.get("hp_before")
+    after = item.get("hp_after")
+    if before is not None and after is not None:
+        return max(0, int(before) - int(after))
     return 0
 
 

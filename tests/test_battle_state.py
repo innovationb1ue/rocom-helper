@@ -467,6 +467,21 @@ class TestEffectApply:
         assert buff["modifiers"] == {"spa_up": 0.1}
         assert buff["modifier_summary"] == ["魔攻 +10%"]
 
+    def test_reflect_trigger_attaches_derived_magic_modifier(self, tracker):
+        """折射触发后应把派生的光加魔攻挂到折射 buff 上。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20890020, "effect_name": "折射", "effect_stage": 1},
+            {"kind": "buff_trigger", "actor_side": 1, "target_side": 1,
+             "effect_id": 20890020, "effect_name": "折射", "buffbase_ids": [2089001]},
+        ]))
+        buff = state["my_active"]["buffs"][0]
+        assert buff["id"] == 20890020
+        assert buff["derived_buffs"][0]["id"] == 20171910
+        assert buff["modifiers"] == {"spa_up": 0.4}
+        assert buff["modifier_summary"] == ["魔攻 +40%"]
+
     def test_existing_effect_updated(self, tracker):
         """重复效果更新 stage 和 turns_applied。"""
         tracker.handle_event(0x1316, _enter_event())

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 from src.data.catalog import get_bundle
 
@@ -22,6 +22,30 @@ _ATTR_USING_PARAM4 = {17, 18}
 
 # buff_id → {"atk_up": 0.2, "atk_down": 0.0, ...} cached lookup
 _buff_stat_cache: Optional[Dict[int, Dict[str, float]]] = None
+
+# buff_id → [child_buff_id, ...] cached lookup. Repeated child ids are kept:
+# 光加魔攻 -> 20010020 x4 means +40% magic attack, not +10%.
+_buff_child_cache: Optional[Dict[int, List[int]]] = None
+
+# 折射本体是按系别选择子效果的 selector，不能在没有协议上下文时展开所有子效果。
+_TOP_LEVEL_SELECTOR_BUFF_IDS = {20890020}
+
+_POWER_FLAT_BUFF_IDS = {
+    20230440: 10,  # 通用威力+10
+}
+_HIT_FLAT_BUFF_IDS = {
+    20450050: 1,   # 通用连击次数+1
+    20450090: -1,  # 通用连击次数-1
+}
+_GENERIC_DAMAGE_MODIFIER_BUFF_IDS = set(_POWER_FLAT_BUFF_IDS) | set(_HIT_FLAT_BUFF_IDS)
+
+# 折射派生的“系别效果”只对同属性技能生效；普通=0, 翼=9。
+_BUFF_ELEMENT_SCOPES = {
+    20640140: 0,  # 普通
+    20171870: 0,  # 普通加威力
+    20640260: 9,  # 翼
+    20172000: 9,  # 翼加连击
+}
 
 
 def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
@@ -66,22 +90,268 @@ def _build_buff_stat_table() -> Dict[int, Dict[str, float]]:
     return table
 
 
-def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
-    """从 buff 列表解析属性修正，返回 {"atk_up": 0.2, "spa_down": 0.1, ...}。"""
-    global _buff_stat_cache
+def _build_buff_child_table() -> Dict[int, List[int]]:
+    """构建 buff_id → 子 buff ids，用于显式派生 buff 的递归展开。"""
+    bundle = get_bundle()
+    buff_meta = bundle.get("buff_meta", {})
+    buffbase_meta = bundle.get("buffbase_meta", {})
+    known_buff_ids = set(buff_meta.keys())
+
+    table: Dict[int, List[int]] = {}
+    for buff_id, buff_entry in buff_meta.items():
+        children: List[int] = []
+        for bb_id in buff_entry.get("buff_base_ids") or []:
+            bb = buffbase_meta.get(bb_id)
+            if not bb:
+                continue
+            for param in bb.get("buffbase_param", []) or []:
+                for raw in param.get("params", []) or []:
+                    try:
+                        child_id = int(raw)
+                    except (TypeError, ValueError):
+                        continue
+                    if child_id != buff_id and child_id in known_buff_ids:
+                        children.append(child_id)
+        if children:
+            table[buff_id] = children
+    return table
+
+
+def _ensure_buff_tables() -> None:
+    global _buff_stat_cache, _buff_child_cache
     if _buff_stat_cache is None:
         _buff_stat_cache = _build_buff_stat_table()
+    if _buff_child_cache is None:
+        _buff_child_cache = _build_buff_child_table()
+
+
+def _merge_modifiers(target: Dict[str, float], source: Dict[str, float], factor: float = 1.0) -> None:
+    for key, value in source.items():
+        target[key] = target.get(key, 0.0) + value * factor
+
+
+def _resolve_buff_modifiers(
+    buff_id: int,
+    *,
+    include_children: bool,
+    seen: Optional[Set[int]] = None,
+) -> Dict[str, float]:
+    """解析单个 buff 的属性修正。
+
+    ``include_children`` 只在子效果已经明确时打开；折射本体这类 selector
+    不能直接展开，否则会把所有系别效果同时加上。
+    """
+    _ensure_buff_tables()
+    assert _buff_stat_cache is not None
+    assert _buff_child_cache is not None
+
+    seen = set(seen or set())
+    if buff_id in seen:
+        return {}
+    seen.add(buff_id)
+
+    result: Dict[str, float] = dict(_buff_stat_cache.get(buff_id) or {})
+    if not include_children:
+        return result
+
+    for child_id in _buff_child_cache.get(buff_id, []):
+        _merge_modifiers(
+            result,
+            _resolve_buff_modifiers(child_id, include_children=True, seen=set(seen)),
+        )
+    return result
+
+
+def _collect_buff_ids(
+    buff_id: int,
+    *,
+    include_children: bool,
+    seen: Optional[Set[int]] = None,
+) -> List[int]:
+    _ensure_buff_tables()
+    assert _buff_child_cache is not None
+
+    seen = set(seen or set())
+    if buff_id in seen:
+        return []
+    seen.add(buff_id)
+
+    ids = [buff_id]
+    if not include_children:
+        return ids
+    for child_id in _buff_child_cache.get(buff_id, []):
+        ids.extend(_collect_buff_ids(child_id, include_children=True, seen=set(seen)))
+    return ids
+
+
+def _collect_effective_buff_ids(
+    buff_id: int,
+    *,
+    include_children: bool,
+    root_id: Optional[int] = None,
+    seen: Optional[Set[int]] = None,
+) -> List[tuple[int, int]]:
+    _ensure_buff_tables()
+    assert _buff_child_cache is not None
+
+    seen = set(seen or set())
+    if buff_id in seen:
+        return []
+    seen.add(buff_id)
+    root_id = root_id if root_id is not None else buff_id
+
+    ids = [(buff_id, root_id)]
+    if not include_children:
+        return ids
+    for child_id in _buff_child_cache.get(buff_id, []):
+        ids.extend(
+            _collect_effective_buff_ids(
+                child_id,
+                include_children=True,
+                root_id=root_id,
+                seen=set(seen),
+            )
+        )
+    return ids
+
+
+def _coerce_buff_id(value: Any) -> Optional[int]:
+    if isinstance(value, dict):
+        value = value.get("id") or value.get("buff_id") or value.get("effect_id")
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _buff_stage(buff: Dict[str, Any]) -> int:
+    try:
+        return max(1, int(buff.get("stage", 1) or 1))
+    except (TypeError, ValueError):
+        return 1
+
+
+def _iter_derived_buffs(buff: Dict[str, Any]) -> Iterable[Dict[str, Any]]:
+    for item in buff.get("derived_buffs") or []:
+        if isinstance(item, dict):
+            yield item
+        else:
+            yield {"id": item}
+
+
+def get_buff_derived_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """只计算 buff 字典中显式记录的 derived_buffs 属性修正。"""
+    result: Dict[str, float] = {}
+    for buff in buff_list:
+        for child in _iter_derived_buffs(buff):
+            child_id = _coerce_buff_id(child)
+            if child_id is None:
+                continue
+            child_mods = _resolve_buff_modifiers(child_id, include_children=True)
+            _merge_modifiers(result, child_mods, _buff_stage(child))
+    return result
+
+
+def _iter_effective_buff_ids(buff_list: List[Dict[str, Any]]) -> Iterable[tuple[int, int, Dict[str, Any]]]:
+    for buff in buff_list:
+        buff_id = _coerce_buff_id(buff)
+        if buff_id is None:
+            continue
+        include_children = buff_id not in _TOP_LEVEL_SELECTOR_BUFF_IDS
+        for item_id, root_id in _collect_effective_buff_ids(buff_id, include_children=include_children):
+            yield item_id, root_id, buff
+        for child in _iter_derived_buffs(buff):
+            child_id = _coerce_buff_id(child)
+            if child_id is None:
+                continue
+            for item_id, root_id in _collect_effective_buff_ids(child_id, include_children=True):
+                yield item_id, root_id, child
+
+
+def _damage_modifier_applies(
+    root_id: int,
+    source_buff: Dict[str, Any],
+    *,
+    skill_element: Optional[int],
+    skill_name: Optional[str],
+) -> bool:
+    source_skill = source_buff.get("source_skill")
+    if source_skill and skill_name and source_skill != skill_name:
+        return False
+    scoped_element = _BUFF_ELEMENT_SCOPES.get(root_id)
+    if scoped_element is not None and skill_element is not None:
+        return scoped_element == skill_element
+    if skill_element is not None and root_id in _GENERIC_DAMAGE_MODIFIER_BUFF_IDS and not source_skill:
+        return False
+    return True
+
+
+def get_buff_power_modifiers(
+    buff_list: List[Dict[str, Any]],
+    *,
+    skill_element: Optional[int] = None,
+    skill_name: Optional[str] = None,
+) -> Dict[str, float]:
+    """解析 buff 派生的技能威力修正。当前返回 flat 加值。"""
+    flat = 0.0
+    sources: List[int] = []
+    for buff_id, root_id, source_buff in _iter_effective_buff_ids(buff_list):
+        if not _damage_modifier_applies(
+            root_id,
+            source_buff,
+            skill_element=skill_element,
+            skill_name=skill_name,
+        ):
+            continue
+        value = _POWER_FLAT_BUFF_IDS.get(buff_id)
+        if value is None:
+            continue
+        flat += value
+        sources.append(buff_id)
+    return {"flat": flat, "sources": sources} if flat else {}
+
+
+def get_buff_hit_count_modifiers(
+    buff_list: List[Dict[str, Any]],
+    *,
+    skill_element: Optional[int] = None,
+    skill_name: Optional[str] = None,
+) -> Dict[str, float]:
+    """解析 buff 派生的连击次数修正。当前返回 flat 加值。"""
+    flat = 0.0
+    sources: List[int] = []
+    for buff_id, root_id, source_buff in _iter_effective_buff_ids(buff_list):
+        if not _damage_modifier_applies(
+            root_id,
+            source_buff,
+            skill_element=skill_element,
+            skill_name=skill_name,
+        ):
+            continue
+        value = _HIT_FLAT_BUFF_IDS.get(buff_id)
+        if value is None:
+            continue
+        flat += value
+        sources.append(buff_id)
+    return {"flat": flat, "sources": sources} if flat else {}
+
+
+def get_buff_stat_modifiers(buff_list: List[Dict[str, Any]]) -> Dict[str, float]:
+    """从 buff 列表解析属性修正，返回 {"atk_up": 0.2, "spa_down": 0.1, ...}。"""
+    _ensure_buff_tables()
 
     result: Dict[str, float] = {}
     for buff in buff_list:
-        buff_id = buff.get("id")
+        buff_id = _coerce_buff_id(buff)
         if buff_id is None:
             continue
-        mods = _buff_stat_cache.get(buff_id)
+        include_children = buff_id not in _TOP_LEVEL_SELECTOR_BUFF_IDS
+        mods = _resolve_buff_modifiers(buff_id, include_children=include_children)
         if mods:
-            stage = max(1, int(buff.get("stage", 1)))
-            for key, val in mods.items():
-                result[key] = result.get(key, 0.0) + val * stage
+            _merge_modifiers(result, mods, _buff_stage(buff))
+        derived_mods = get_buff_derived_stat_modifiers([buff])
+        if derived_mods:
+            _merge_modifiers(result, derived_mods)
     return result
 
 
@@ -120,7 +390,12 @@ def format_buff_modifier_summary(modifiers: Dict[str, float]) -> List[str]:
 def enrich_buff_modifiers(buff: Dict[str, Any]) -> Dict[str, Any]:
     """为 buff 字典补充确定属性数值，保留原字段并只添加紧凑解释字段。"""
     enriched = dict(buff)
+    derived_modifiers = get_buff_derived_stat_modifiers([enriched])
     modifiers = get_buff_stat_modifiers([enriched])
+    if derived_modifiers:
+        enriched["derived_modifier_summary"] = format_buff_modifier_summary(derived_modifiers)
+    else:
+        enriched.pop("derived_modifier_summary", None)
     if modifiers:
         enriched["modifiers"] = modifiers
         enriched["modifier_summary"] = format_buff_modifier_summary(modifiers)
@@ -298,7 +573,8 @@ def get_weather_damage_mult(weather: Optional[Dict[str, Any]], skill_element: in
 
 
 def reset_buff_modifier_caches() -> None:
-    global _buff_stat_cache, _speed_buff_cache, _buff_dmg_reduce_cache
+    global _buff_stat_cache, _buff_child_cache, _speed_buff_cache, _buff_dmg_reduce_cache
     _buff_stat_cache = None
+    _buff_child_cache = None
     _speed_buff_cache = None
     _buff_dmg_reduce_cache = None
