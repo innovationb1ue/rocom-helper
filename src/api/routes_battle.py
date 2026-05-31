@@ -12,6 +12,7 @@ from fastapi.responses import Response
 
 from src.analysis.battle_report import (
     BattleReportError,
+    build_report_diagnostics,
     get_report_summary,
     get_report_package,
     scan_report_summaries,
@@ -93,7 +94,11 @@ async def get_battle_effects():
 @router.get("/api/battle/reports")
 async def list_battle_reports():
     reports = scan_report_summaries()
-    return {"reports": [r.__dict__ for r in reports]}
+    diagnostics = build_report_diagnostics(reports=reports)
+    return {
+        "reports": [r.__dict__ for r in reports],
+        "diagnostics": diagnostics.__dict__,
+    }
 
 
 @router.get("/api/battle/reports/{report_id}")

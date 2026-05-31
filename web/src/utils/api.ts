@@ -97,8 +97,28 @@ export interface BattleReportSummary {
   archive_path: string | null;
 }
 
+export interface BattleReportDiagnostics {
+  report_count: number;
+  packet_session_count: number;
+  packet_file_count: number;
+  latest_session_id: string | null;
+  latest_session_path: string | null;
+  latest_session_file_count: number;
+  battle_enter_count: number;
+  battle_finish_count: number;
+  completed_battle_count: number;
+  incomplete_battle_count: number;
+  has_battle_enter: boolean;
+  has_battle_finish: boolean;
+}
+
+export interface BattleReportsResponse {
+  reports: BattleReportSummary[];
+  diagnostics: BattleReportDiagnostics;
+}
+
 export const fetchBattleReports = () =>
-  api.get<{ reports: BattleReportSummary[] }>('/battle/reports').then(r => r.data);
+  api.get<BattleReportsResponse>('/battle/reports').then(r => r.data);
 
 export const fetchBattleReport = (reportId: string) =>
   api.get<BattleReportSummary>(`/battle/reports/${encodeURIComponent(reportId)}`).then(r => r.data);

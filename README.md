@@ -107,6 +107,9 @@ py -m scripts.replay_to_frontend --delay 80 --session battle_session_1
 ```bash
 # 导入报告为普通抓包目录，并验证能否完整回放
 py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+
+# 收到用户报告后，一条命令生成文本报告和结构化分析
+py -m scripts.analyze_battle_report path\to\battle.raco-report --output tmp\received_reports
 ```
 
 导出通过战斗报告 API 或前端历史页面完成；导入、导出和包结构详见 [战斗回放指南](docs/replay_guide.md#raco-report-导入导出)。
@@ -139,6 +142,7 @@ py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\repor
 - `scripts.extract_battle`：从抓包 session 中提取战斗 fixture，详见 [战斗包提取文档](docs/extract_battle.md)。
 - `scripts.generate_battle_report`：生成格式化战斗报告。
 - `scripts.unpack_battle_report`：导入 `.raco-report`，还原为可完整回放的抓包目录。
+- `scripts.analyze_battle_report`：导入用户发来的 `.raco-report`，生成 `battle_report.txt` 和 `analysis.json`。
 
 ## 技术架构
 

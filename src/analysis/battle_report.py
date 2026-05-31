@@ -78,6 +78,22 @@ class BattleReportSummary:
     archive_path: Optional[str] = None
 
 
+@dataclass(frozen=True)
+class BattleReportDiagnostics:
+    report_count: int
+    packet_session_count: int
+    packet_file_count: int
+    latest_session_id: Optional[str]
+    latest_session_path: Optional[str]
+    latest_session_file_count: int
+    battle_enter_count: int
+    battle_finish_count: int
+    completed_battle_count: int
+    incomplete_battle_count: int
+    has_battle_enter: bool
+    has_battle_finish: bool
+
+
 def report_id(session_id: str, battle_index: int) -> str:
     return f"{session_id}:{battle_index}"
 
@@ -123,6 +139,80 @@ def scan_report_summaries(
                 )
             )
     return summaries
+
+
+def build_report_diagnostics(
+    packet_root: Path = DEFAULT_PACKET_ROOT,
+    *,
+    reports: Optional[List[BattleReportSummary]] = None,
+) -> BattleReportDiagnostics:
+    """Summarize why battle reports are or are not available."""
+    if reports is None:
+        reports = scan_report_summaries(packet_root)
+
+    if not packet_root.exists():
+        return BattleReportDiagnostics(
+            report_count=len(reports),
+            packet_session_count=0,
+            packet_file_count=0,
+            latest_session_id=None,
+            latest_session_path=None,
+            latest_session_file_count=0,
+            battle_enter_count=0,
+            battle_finish_count=0,
+            completed_battle_count=0,
+            incomplete_battle_count=0,
+            has_battle_enter=False,
+            has_battle_finish=False,
+        )
+
+    session_dirs = sorted(
+        (p for p in packet_root.glob("*_monitor") if p.is_dir()),
+        key=lambda p: p.name,
+        reverse=True,
+    )
+    latest = session_dirs[0] if session_dirs else None
+    packet_file_count = 0
+    latest_session_file_count = 0
+    battle_enter_count = 0
+    battle_finish_count = 0
+    completed_battle_count = 0
+    incomplete_battle_count = 0
+
+    for session_dir in session_dirs:
+        files = list(session_dir.glob("*.bin"))
+        packet_file_count += len(files)
+        if latest is not None and session_dir == latest:
+            latest_session_file_count = len(files)
+
+        for fpath in session_dir.glob(DATA_CMD_PATTERN):
+            meta = read_metadata(fpath) or {}
+            opcode = parse_opcode_hex(meta)
+            if opcode == OPCODE_BATTLE_ENTER:
+                battle_enter_count += 1
+            elif opcode == OPCODE_BATTLE_FINISH:
+                battle_finish_count += 1
+
+        for boundary in scan_battles(session_dir):
+            if boundary.incomplete:
+                incomplete_battle_count += 1
+            else:
+                completed_battle_count += 1
+
+    return BattleReportDiagnostics(
+        report_count=len(reports),
+        packet_session_count=len(session_dirs),
+        packet_file_count=packet_file_count,
+        latest_session_id=latest.name if latest is not None else None,
+        latest_session_path=str(latest) if latest is not None else None,
+        latest_session_file_count=latest_session_file_count,
+        battle_enter_count=battle_enter_count,
+        battle_finish_count=battle_finish_count,
+        completed_battle_count=completed_battle_count,
+        incomplete_battle_count=incomplete_battle_count,
+        has_battle_enter=battle_enter_count > 0,
+        has_battle_finish=battle_finish_count > 0,
+    )
 
 
 def get_report_summary(

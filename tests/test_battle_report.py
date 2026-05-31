@@ -12,6 +12,7 @@ from src.analysis.battle_report import (
     archive_latest_completed_battle,
     archive_report_package,
     build_report_package,
+    build_report_diagnostics,
     count_battle_packet_files,
     find_archived_report,
     get_report_summary,
@@ -23,6 +24,7 @@ from src.analysis.battle_report import (
     scan_report_summaries,
 )
 from scripts.unpack_battle_report import unpack_report, verify_replay
+from scripts.analyze_battle_report import analyze_report
 
 
 FIXTURE_SESSION = Path(__file__).resolve().parent / "fixtures" / "packets" / "battle_session_1"
@@ -65,6 +67,46 @@ def test_scan_report_summaries_from_logs(packet_root: Path):
     assert report.battle_packet_count > 0
     assert report.rounds is None
     assert report.result is None
+
+
+def test_build_report_diagnostics_for_missing_packet_root(tmp_path: Path):
+    diagnostics = build_report_diagnostics(tmp_path / "missing" / "packets")
+
+    assert diagnostics.report_count == 0
+    assert diagnostics.packet_session_count == 0
+    assert diagnostics.packet_file_count == 0
+    assert diagnostics.latest_session_id is None
+    assert diagnostics.has_battle_enter is False
+    assert diagnostics.has_battle_finish is False
+
+
+def test_build_report_diagnostics_for_empty_session(tmp_path: Path):
+    packet_root = tmp_path / "logs" / "packets"
+    (packet_root / "2026-05-31_12-00-00_monitor").mkdir(parents=True)
+
+    diagnostics = build_report_diagnostics(packet_root)
+
+    assert diagnostics.report_count == 0
+    assert diagnostics.packet_session_count == 1
+    assert diagnostics.packet_file_count == 0
+    assert diagnostics.latest_session_id == "2026-05-31_12-00-00_monitor"
+    assert diagnostics.latest_session_file_count == 0
+    assert diagnostics.has_battle_enter is False
+    assert diagnostics.has_battle_finish is False
+
+
+def test_build_report_diagnostics_for_complete_fixture(packet_root: Path):
+    diagnostics = build_report_diagnostics(packet_root)
+
+    assert diagnostics.report_count == 1
+    assert diagnostics.packet_session_count == 1
+    assert diagnostics.packet_file_count > 0
+    assert diagnostics.battle_enter_count == 1
+    assert diagnostics.battle_finish_count == 1
+    assert diagnostics.completed_battle_count == 1
+    assert diagnostics.incomplete_battle_count == 0
+    assert diagnostics.has_battle_enter is True
+    assert diagnostics.has_battle_finish is True
 
 
 def test_get_report_summary_can_include_replay_result(packet_root: Path):
@@ -113,6 +155,24 @@ def test_build_report_package_allows_unfinished_session(destructive_packet_root:
     assert manifest["complete"] is False
     assert manifest["battle_packet_count"] > 0
     assert manifest["file_count"] == len(packet_names)
+
+
+def test_build_report_diagnostics_for_unfinished_fixture(destructive_packet_root: Path):
+    session_dir = destructive_packet_root / "2026-05-07_21-17-31_monitor"
+    for fpath in session_dir.glob("*.bin"):
+        meta = read_metadata(fpath) or {}
+        if parse_opcode_hex(meta) == 0x132C:
+            fpath.unlink()
+
+    diagnostics = build_report_diagnostics(destructive_packet_root)
+
+    assert diagnostics.report_count == 1
+    assert diagnostics.battle_enter_count == 1
+    assert diagnostics.battle_finish_count == 0
+    assert diagnostics.completed_battle_count == 0
+    assert diagnostics.incomplete_battle_count == 1
+    assert diagnostics.has_battle_enter is True
+    assert diagnostics.has_battle_finish is False
 
 
 def test_build_report_package_contains_manifest_and_original_packets(
@@ -182,6 +242,25 @@ def test_unpack_report_restores_replayable_packet_dir(report_package, tmp_path: 
     assert summary["result"] == "WIN_HP"
     assert summary["my_pets"] == 6
     assert summary["opp_pets"] == 6
+
+
+def test_analyze_report_unpacks_verifies_and_writes_outputs(report_package, tmp_path: Path):
+    filename, payload = report_package
+    report_path = tmp_path / filename
+    report_path.write_bytes(payload)
+
+    result = analyze_report(report_path, tmp_path / "received_reports")
+
+    assert result.output_dir.is_dir()
+    assert result.packet_dir.is_dir()
+    assert result.text_report_path.is_file()
+    assert result.analysis_json_path.is_file()
+    assert result.summary["total_packets"] > 0
+    assert result.summary["final_round"] == 17
+    assert result.summary["result"] == "WIN_HP"
+    assert "洛克王国 PvP 对战回放报告" in result.text_report_path.read_text(encoding="utf-8")
+    analysis = json.loads(result.analysis_json_path.read_text(encoding="utf-8"))
+    assert analysis["battle_summary"]["result"] == "WIN_HP"
 
 
 def test_archive_latest_completed_battle(packet_root: Path, tmp_path: Path):

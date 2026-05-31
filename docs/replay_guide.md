@@ -203,7 +203,7 @@ packets/*.bin                  # 原始 RC01 抓包文件
 实时抓包完成一场战斗后，后端会把最近完成的战斗归档到 `logs/battle_reports/<session>/`。也可以通过 API 下载：
 
 ```bash
-# 列出可导出的战斗报告
+# 列出可导出的战斗报告，响应同时包含 diagnostics 诊断信息
 curl http://localhost:8000/api/battle/reports
 
 # 下载指定报告；report_id 形如 2026-05-07_21-17-31_monitor:1
@@ -246,6 +246,21 @@ tmp/report_packets/
 
 ```bash
 py -m scripts.unpack_battle_report path\to\battle.raco-report --output tmp\report_packets --verify
+```
+
+如果是开发者收到用户发来的 `.raco-report`，可以直接使用一条命令完成解包、回放验证和分析输出：
+
+```bash
+py -m scripts.analyze_battle_report path\to\battle.raco-report --output tmp\received_reports
+```
+
+输出目录会包含：
+
+```text
+tmp/received_reports/<report-name>/
+├── packets/              # 解包后的原始 RC01 包
+├── battle_report.txt     # 可读文本分析报告
+└── analysis.json         # 完整结构化回放分析
 ```
 
 成功时输出类似：

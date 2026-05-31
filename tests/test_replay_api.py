@@ -131,8 +131,25 @@ class TestBattleReportEndpoints:
             rounds=3,
             result="WIN",
             session_path="logs/packets/session",
+            archived=False,
+            archive_path=None,
+        )
+        diagnostics = SimpleNamespace(
+            report_count=1,
+            packet_session_count=1,
+            packet_file_count=12,
+            latest_session_id="session",
+            latest_session_path="logs/packets/session",
+            latest_session_file_count=12,
+            battle_enter_count=1,
+            battle_finish_count=1,
+            completed_battle_count=1,
+            incomplete_battle_count=0,
+            has_battle_enter=True,
+            has_battle_finish=True,
         )
         monkeypatch.setattr(routes_battle, "scan_report_summaries", lambda: [summary])
+        monkeypatch.setattr(routes_battle, "build_report_diagnostics", lambda reports=None: diagnostics)
 
         resp = client.get("/api/battle/reports")
 
@@ -140,6 +157,9 @@ class TestBattleReportEndpoints:
         data = resp.json()
         assert data["reports"][0]["report_id"] == "session:1"
         assert data["reports"][0]["complete"] is True
+        assert data["diagnostics"]["report_count"] == 1
+        assert data["diagnostics"]["packet_session_count"] == 1
+        assert data["diagnostics"]["has_battle_enter"] is True
 
     def test_get_report_detail(self, client, monkeypatch):
         from src.api import routes_battle

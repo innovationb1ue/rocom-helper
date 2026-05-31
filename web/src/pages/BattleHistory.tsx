@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, Card, Empty, Space, Table, Tag, Tooltip, message } from 'antd';
+import { Alert, Button, Card, Empty, Space, Table, Tag, Tooltip, Typography, message } from 'antd';
 import type { TableProps } from 'antd';
-import { DownloadOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DownloadOutlined, ReloadOutlined, SendOutlined } from '@ant-design/icons';
 import type { AxiosError } from 'axios';
 
 import { downloadBattleReport, fetchBattleReports } from '../utils/api';
-import type { BattleReportSummary } from '../utils/api';
+import type { BattleReportDiagnostics, BattleReportSummary } from '../utils/api';
+
+const { Text } = Typography;
 
 const formatDuration = (seconds: number) => {
   if (!Number.isFinite(seconds)) return '-';
@@ -110,8 +112,54 @@ const readDownloadError = async (err: unknown) => {
   return fallback;
 };
 
+const diagnosticsMessage = (diagnostics: BattleReportDiagnostics | null) => {
+  if (!diagnostics) return '正在读取抓包目录。';
+  if (diagnostics.packet_session_count === 0) {
+    return '还没有抓包会话。请先在实时战斗页启动监听，并完成一场 PvP 对战。';
+  }
+  if (diagnostics.packet_file_count === 0) {
+    return '已创建抓包会话，但没有写入包文件。请确认后端以管理员权限运行且 Npcap 正常工作。';
+  }
+  if (!diagnostics.has_battle_enter) {
+    return '已抓到网络包，但没有识别到战斗开始包。请确认监听已在进入 PvP 前启动。';
+  }
+  if (!diagnostics.has_battle_finish) {
+    return '已识别到战斗开始，但还没有战斗结束包。未完成记录仍会在可恢复时展示。';
+  }
+  return '已扫描抓包目录，但当前没有可导出的战斗记录。';
+};
+
+const DiagnosticsStrip: React.FC<{ diagnostics: BattleReportDiagnostics | null }> = ({ diagnostics }) => {
+  if (!diagnostics) return null;
+  return (
+    <Space size={6} wrap>
+      <Tag>会话 {diagnostics.packet_session_count}</Tag>
+      <Tag>包 {diagnostics.packet_file_count}</Tag>
+      <Tag color={diagnostics.has_battle_enter ? 'green' : 'default'}>开始 {diagnostics.battle_enter_count}</Tag>
+      <Tag color={diagnostics.has_battle_finish ? 'green' : 'default'}>结束 {diagnostics.battle_finish_count}</Tag>
+      {diagnostics.incomplete_battle_count > 0 && (
+        <Tag color="warning">未完成 {diagnostics.incomplete_battle_count}</Tag>
+      )}
+    </Space>
+  );
+};
+
+const EmptyReports: React.FC<{ diagnostics: BattleReportDiagnostics | null }> = ({ diagnostics }) => (
+  <Empty description="暂无可导出的战斗记录">
+    <Space orientation="vertical" size={4} style={{ maxWidth: 520 }}>
+      <Text type="secondary">{diagnosticsMessage(diagnostics)}</Text>
+      {diagnostics?.latest_session_id && (
+        <Text type="secondary">
+          最近会话：{diagnostics.latest_session_id}，文件 {diagnostics.latest_session_file_count} 个
+        </Text>
+      )}
+    </Space>
+  </Empty>
+);
+
 const BattleHistory: React.FC = () => {
   const [reports, setReports] = useState<BattleReportSummary[]>([]);
+  const [diagnostics, setDiagnostics] = useState<BattleReportDiagnostics | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState<string | null>(null);
 
@@ -120,6 +168,7 @@ const BattleHistory: React.FC = () => {
     try {
       const data = await fetchBattleReports();
       setReports(data.reports);
+      setDiagnostics(data.diagnostics);
     } catch (err) {
       console.error('[BattleHistory] load reports failed:', err);
       message.error('加载战斗历史失败');
@@ -134,6 +183,7 @@ const BattleHistory: React.FC = () => {
       .then((data) => {
         if (!cancelled) {
           setReports(data.reports);
+          setDiagnostics(data.diagnostics);
         }
       })
       .catch((err) => {
@@ -155,7 +205,7 @@ const BattleHistory: React.FC = () => {
     try {
       const { blob, filename } = await downloadBattleReport(report.report_id);
       saveBlob(blob, filename);
-      message.success('报告已导出');
+      message.success('报告已导出，可直接把 .raco-report 文件发送给开发者');
     } catch (err) {
       console.error('[BattleHistory] download report failed:', err);
       message.error(await readDownloadError(err));
@@ -303,20 +353,28 @@ const BattleHistory: React.FC = () => {
     <Card
       title="战斗历史"
       extra={(
-        <Space>
+        <Space wrap>
+          <DiagnosticsStrip diagnostics={diagnostics} />
           <Button icon={<ReloadOutlined />} onClick={() => void loadReports()} loading={loading}>
             刷新
           </Button>
         </Space>
       )}
     >
+      <Alert
+        type={reports.length > 0 ? 'success' : 'info'}
+        showIcon
+        icon={<SendOutlined />}
+        style={{ marginBottom: 12 }}
+        title={reports.length > 0 ? '选择一条记录导出 .raco-report，然后发送给开发者分析。' : diagnosticsMessage(diagnostics)}
+      />
       <Table<BattleReportSummary>
         rowKey="report_id"
         columns={columns}
         dataSource={sortedReports}
         loading={loading}
         pagination={{ pageSize: 20, showSizeChanger: false }}
-        locale={{ emptyText: <Empty description="暂无战斗记录" /> }}
+        locale={{ emptyText: <EmptyReports diagnostics={diagnostics} /> }}
         size="small"
         scroll={{ x: 'max-content' }}
       />

@@ -203,11 +203,11 @@ def generate_report_from_result(result: Any) -> str:
 
         if rs.opp_skill_analysis:
             lines.append("")
-            lines.append(f"  瀵规墜鎶€鑳藉垎鏋? (source={rs.opp_skill_source or 'unknown'}):")
+            lines.append(f"  对手技能分析 (source={rs.opp_skill_source or 'unknown'}):")
             for pred in rs.opp_skill_analysis:
                 name = pred.get("skill_name") or f"skill_{pred.get('skill_id', '?')}"
                 exp_dmg = pred.get("expected_damage")
-                ko_mark = " 鈽匥O" if pred.get("can_ko") else ""
+                ko_mark = " ★KO" if pred.get("can_ko") else ""
                 eff = pred.get("effectiveness_label", "") or ""
                 lines.append(
                     f"    {name:20s}  dmg: {exp_dmg!s:>5}  "
@@ -217,7 +217,7 @@ def generate_report_from_result(result: Any) -> str:
         if rs.tactical_recommendations:
             lines.append("")
             rec = rs.tactical_recommendations
-            lines.append(f"  鎴樻湳鎺ㄨ崘 ({rec.get('confidence', '?')}):")
+            lines.append(f"  战术推荐 ({rec.get('confidence', '?')}):")
             for action in rec.get("actions", [])[:5]:
                 label = action.get("skill_name") or action.get("switch_to_name") or action.get("action_type")
                 lines.append(
@@ -289,6 +289,48 @@ def generate_report_from_result(result: Any) -> str:
     return "\n".join(lines)
 
 
+def replay_result_to_dict(result: Any) -> Dict[str, Any]:
+    """Serialize ReplayResult to the JSON shape used by local report tools."""
+    return {
+        "total_packets": result.total_packets,
+        "stopped_early": result.stopped_early,
+        "rounds": [
+            {
+                "round_num": rs.round_num,
+                "formatted_events": rs.formatted_events,
+                "suggestions": rs.suggestions,
+                "damage_predictions": rs.damage_predictions,
+                "battle_advice": rs.battle_advice,
+                "traits": rs.traits,
+                "opp_traits": rs.opp_traits,
+                "opp_skill_analysis": rs.opp_skill_analysis,
+                "opp_skill_source": rs.opp_skill_source,
+                "tactical_recommendations": rs.tactical_recommendations,
+                "messages": rs.messages,
+            }
+            for rs in result.rounds
+        ],
+        "events": [
+            {
+                "index": ev.index,
+                "opcode": ev.opcode,
+                "kind": ev.kind,
+                "round_num": ev.round_num,
+                "formatted_events": ev.formatted_events,
+                "battle_advice": ev.battle_advice,
+                "hook_advice": ev.hook_advice,
+                "suggestions": ev.suggestions,
+                "tactical": ev.tactical,
+                "messages": ev.messages,
+            }
+            for ev in result.events
+        ],
+        "final_state": result.final_state,
+        "battle_summary": result.battle_summary,
+        "messages": result.messages,
+    }
+
+
 # ── entry point ──────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -314,43 +356,7 @@ if __name__ == "__main__":
     result = runner.run(pkts, stop_round=args.round)
 
     if args.json:
-        output = {
-            "total_packets": result.total_packets,
-            "stopped_early": result.stopped_early,
-            "rounds": [
-                {
-                    "round_num": rs.round_num,
-                    "formatted_events": rs.formatted_events,
-                    "suggestions": rs.suggestions,
-                    "damage_predictions": rs.damage_predictions,
-                    "battle_advice": rs.battle_advice,
-                    "traits": rs.traits,
-                    "opp_traits": rs.opp_traits,
-                    "opp_skill_analysis": rs.opp_skill_analysis,
-                    "opp_skill_source": rs.opp_skill_source,
-                    "tactical_recommendations": rs.tactical_recommendations,
-                    "messages": rs.messages,
-                }
-                for rs in result.rounds
-            ],
-            "events": [
-                {
-                    "index": ev.index,
-                    "opcode": ev.opcode,
-                    "kind": ev.kind,
-                    "formatted_events": ev.formatted_events,
-                    "battle_advice": ev.battle_advice,
-                    "hook_advice": ev.hook_advice,
-                    "suggestions": ev.suggestions,
-                    "tactical": ev.tactical,
-                    "messages": ev.messages,
-                }
-                for ev in result.events
-            ],
-            "final_state": result.final_state,
-            "battle_summary": result.battle_summary,
-            "messages": result.messages,
-        }
+        output = replay_result_to_dict(result)
         sys.stdout.buffer.write(
             _json.dumps(output, default=str, ensure_ascii=False, indent=2).encode("utf-8")
         )
