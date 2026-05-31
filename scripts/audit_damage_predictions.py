@@ -8,7 +8,9 @@ from pathlib import Path
 from src.analysis.damage_audit import (
     build_damage_audit,
     build_damage_calibration,
+    build_damage_mechanism_report,
     build_multi_session_damage_audit,
+    build_multi_session_damage_mechanism_report,
     build_special_damage_rules,
 )
 from src.analysis.replay_runner import BattleReplayRunner
@@ -50,16 +52,35 @@ def main() -> None:
         const="tmp/special_damage_rules_suggested.json",
         help="Write suggested special_damage_rules.json to this path",
     )
+    parser.add_argument(
+        "--mechanism-report-out",
+        nargs="?",
+        const="tmp/damage_mechanism_report.json",
+        help="Write skill runtime damage-parameter mechanism report to this path",
+    )
     args = parser.parse_args()
 
     sessions = args.sessions or [args.session]
     reports = {}
+    mechanism_reports = {}
     for session in sessions:
         session_dir = _resolve_session_dir(session)
         result = BattleReplayRunner().run(load_battle_packets(session_dir))
         reports[session] = build_damage_audit(result)
+        if args.mechanism_report_out:
+            mechanism_reports[session] = build_damage_mechanism_report(result, session=session)
 
     report = reports[sessions[0]] if len(sessions) == 1 else build_multi_session_damage_audit(reports)
+    mechanism_report = None
+    if args.mechanism_report_out:
+        mechanism_report = (
+            mechanism_reports[sessions[0]]
+            if len(sessions) == 1
+            else build_multi_session_damage_mechanism_report(mechanism_reports)
+        )
+        out_path = Path(args.mechanism_report_out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(mechanism_report, ensure_ascii=False, indent=2), encoding="utf-8")
     calibration = None
     if args.calibration_out:
         calibration = build_damage_calibration(report)
@@ -78,6 +99,8 @@ def main() -> None:
             payload["calibration"] = calibration
         if special_rules is not None:
             payload["special_rules"] = special_rules
+        if mechanism_report is not None:
+            payload["mechanism_report"] = mechanism_report
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return
 
@@ -126,12 +149,27 @@ def main() -> None:
                 f"  R{sample['round_num']} {sample['skill_name']}: "
                 f"actual={sample['actual_total']} predicted={sample['predicted_total']}"
             )
+    if mechanism_report:
+        print("Mechanism report:")
+        print(
+            f"  samples={mechanism_report['total_samples']} "
+            f"matched_runtime={mechanism_report['matched_runtime_samples']}"
+        )
+        for name, item in list((mechanism_report.get("by_skill") or {}).items())[:5]:
+            rec = item.get("recommendation") or {}
+            print(
+                f"  {name}: n={item['total']} "
+                f"recommendation={rec.get('status')} "
+                f"reason={rec.get('reason')}"
+            )
     if args.calibration_out:
         print(f"Calibration suggestion written: {args.calibration_out}")
         print(f"Suggested skills: {len((calibration or {}).get('skills', {}))}")
     if args.special_rules_out:
         print(f"Special damage rules suggestion written: {args.special_rules_out}")
         print(f"Suggested special skills: {len((special_rules or {}).get('skills', {}))}")
+    if args.mechanism_report_out:
+        print(f"Mechanism report written: {args.mechanism_report_out}")
 
 
 if __name__ == "__main__":

@@ -109,3 +109,130 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.tactical-action-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.tactical-action-list {
+  --tactical-row-height: 58px;
+  max-height: calc(var(--tactical-row-height) * 5 + 24px);
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-gutter: stable;
+}
+
+.tactical-action-list-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tactical-action-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 68px;
+  gap: 8px;
+  align-items: center;
+  min-height: var(--tactical-row-height);
+  padding: 6px 8px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.tactical-action-row-top {
+  box-shadow: inset 3px 0 0 #52c41a;
+}
+
+.tactical-action-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.tactical-action-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tactical-action-name {
+  display: block;
+  min-width: 56px;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.tactical-action-subline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 3px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.tactical-action-detail {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tactical-action-metrics {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  max-width: 44%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tactical-action-metrics .ant-tag {
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.tactical-action-score {
+  min-width: 0;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .tactical-action-list {
+    max-height: calc(var(--tactical-row-height) * 4 + 18px);
+  }
+
+  .tactical-action-row {
+    grid-template-columns: 22px minmax(0, 1fr) 56px;
+    gap: 6px;
+    padding-inline: 6px;
+  }
+
+  .tactical-action-name {
+    max-width: 132px;
+  }
+
+  .tactical-action-metrics {
+    display: none;
+  }
+}

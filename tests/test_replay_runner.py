@@ -6,10 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from src.analysis.replay_runner import BattleReplayRunner
+from src.analysis.replay_runner import BattleReplayRunner, ReplayEventSnapshot, ReplayResult
 from src.analysis.damage_audit import (
     build_damage_audit,
     build_damage_calibration,
+    build_damage_mechanism_report,
     build_multi_session_damage_audit,
     build_special_damage_rules,
     _ledger_actual_damage,
@@ -243,6 +244,163 @@ class TestReplayRunnerDamagePrediction:
         assert item["per_hit"] == 12
         assert item["hit_count"] == 4
         assert item["source_sessions"] == ["s1"]
+
+    def test_damage_mechanism_report_uses_state_before_runtime(self):
+        state_before = {
+            "my_active": {
+                "pet_id": 1,
+                "name": "测试方",
+                "skill_runtime": {
+                    "1001": {
+                        "raw_damage": 90,
+                        "rule_damage_param": 10,
+                        "effect_damage_param": 0,
+                        "buff_damage_param": 5,
+                        "ex_damage_param": 0,
+                        "damage_param_result": 105,
+                        "damage_params_by_pet": {"401": 105},
+                        "restraint_types_by_pet": {"401": 1},
+                        "damage_type": 3,
+                        "cost_energy_result": 2,
+                        "set_cost_info": [{"reason_id": 7, "cost": 2}],
+                        "skill_buff": {"damage_param": 5},
+                    },
+                },
+            },
+            "my_pets": [],
+            "opp_pets": [],
+        }
+        state_after = {
+            **state_before,
+            "my_active": {
+                **state_before["my_active"],
+                "skill_runtime": {
+                    "1001": {
+                        **state_before["my_active"]["skill_runtime"]["1001"],
+                        "raw_damage": 999,
+                    },
+                },
+            },
+            "field_context": {
+                "damage_ledger": [
+                    {
+                        "ledger_id": "l1",
+                        "event_kind": "damage",
+                        "skill_id": 1001,
+                        "skill_name": "测试技能",
+                        "target_pet_id": 401,
+                        "actual_damage": 120,
+                    },
+                ],
+            },
+        }
+        event = ReplayEventSnapshot(
+            index=1,
+            opcode=0x1324,
+            kind="action_resolve",
+            round_num=1,
+            state_before=state_before,
+            state_after=state_after,
+            formatted_events=[
+                {
+                    "kind": "damage",
+                    "detail": {
+                        "target_side": "敌方",
+                        "target_pet_id": 401,
+                        "ledger_id": "l1",
+                        "skill_name": "测试技能",
+                    },
+                },
+            ],
+            battle_advice={
+                "skill_analysis": [
+                    {
+                        "skill_id": 1001,
+                        "skill_name": "测试技能",
+                        "prediction": {"total": 110, "per_hit": 110},
+                        "damage_breakdown": {
+                            "base_power": 100,
+                            "final_power": 110,
+                            "runtime_power": 105,
+                            "power_source": "skill_config",
+                            "effectiveness_source": "server_restraint_types",
+                            "server_power_applied": False,
+                            "server_runtime": {
+                                "matched_target_key": "401",
+                                "power_source": "server_damage_params",
+                                "display_effectiveness": 1.5,
+                                "calc_effectiveness": 1.5,
+                            },
+                        },
+                    },
+                ],
+            },
+        )
+
+        report = build_damage_mechanism_report(ReplayResult(total_packets=1, events=[event]), session="s1")
+        sample = report["samples"][0]
+
+        assert sample["session"] == "s1"
+        assert sample["runtime_state_source"] == "state_before"
+        assert sample["raw_damage"] == 90
+        assert sample["matched_damage_param"] == 105
+        assert sample["restraint_type"] == 1
+        assert sample["decomposition_total"] == 105
+        assert sample["decomposition_matches"] is True
+        assert sample["strategy_totals"]["damage_param_as_effective_power"] == 105
+        assert report["recommendations"]["测试技能"]["status"] == "insufficient_samples"
+
+    def test_damage_mechanism_report_falls_back_to_state_after_runtime(self):
+        runtime = {
+            "raw_damage": 40,
+            "rule_damage_param": 0,
+            "effect_damage_param": 0,
+            "buff_damage_param": 0,
+            "ex_damage_param": 0,
+            "damage_params_by_pet": {"401": 40},
+            "restraint_types_by_pet": {"401": 0},
+        }
+        event = ReplayEventSnapshot(
+            index=1,
+            opcode=0x1324,
+            kind="action_resolve",
+            round_num=1,
+            state_before={"my_active": {"pet_id": 1, "skill_runtime": {}}, "my_pets": [], "opp_pets": []},
+            state_after={
+                "my_active": {"pet_id": 1, "skill_runtime": {"1002": runtime}},
+                "my_pets": [],
+                "opp_pets": [],
+                "field_context": {"damage_ledger": []},
+            },
+            formatted_events=[
+                {
+                    "kind": "damage",
+                    "detail": {
+                        "target_side": "敌方",
+                        "target_pet_id": 401,
+                        "damage": 30,
+                        "skill_name": "后置同步",
+                    },
+                },
+            ],
+            battle_advice={
+                "skill_analysis": [
+                    {
+                        "skill_id": 1002,
+                        "skill_name": "后置同步",
+                        "prediction": {"total": 35, "per_hit": 35},
+                        "damage_breakdown": {"base_power": 40, "final_power": 40},
+                    },
+                ],
+            },
+        )
+
+        report = build_damage_mechanism_report(ReplayResult(total_packets=1, events=[event]))
+        sample = report["samples"][0]
+
+        assert sample["runtime_state_source"] == "state_after"
+        assert sample["matched_damage_param"] == 40
+        assert sample["decomposition_matches"] is True
 
 
 # ---------------------------------------------------------------------------

@@ -6,6 +6,23 @@ from typing import Dict, List, Optional, Tuple
 STAT_NAMES = ["HP", "ATK", "DEF", "SPA", "SPD", "SPE"]
 STAT_NAMES_CN = ["生命", "物攻", "魔攻", "物防", "魔防", "速度"]
 
+PVP_TEMPLATE = {
+    "level": 60,
+    "effort_grow_level": 50,
+    "growth_star": 5,
+    "awaken_star": 0,
+    "positive_nature_modifier": 0.20,
+}
+
+_PVP_STAT_KEYS = {
+    "HP": "hp",
+    "ATK": "atk",
+    "DEF": "def",
+    "SPA": "spa",
+    "SPD": "spd",
+    "SPE": "spe",
+}
+
 # 性格修正: name → (increased_stat_index, decreased_stat_index)
 # None means neutral nature
 NATURE_EFFECTS: Dict[str, Optional[Tuple[int, int]]] = {
@@ -73,6 +90,48 @@ def calc_all_stats(bases: List[int], ivs: Optional[List[int]] = None,
         else:
             mod = get_nature_modifier(nature, i)
             result[name] = calc_stat(bases[i], ivs[i], evs[i], level, mod)
+    return result
+
+
+def calc_pvp_template_stat(
+    race_value: int,
+    stat_name: str,
+    nature_modifier: float = 0.0,
+) -> int:
+    """用 PvP 平衡模板从种族值估算战斗属性。
+
+    v1 沿用当前竞技场经验公式：
+    HP = 1.7×种族值 + 170，其他属性 = 1.1×种族值 + 60。
+    正面性格在 PvP 中按 +20% 处理；负面性格沿用传入的负面比例。
+    """
+    stat = stat_name.upper()
+    if stat == "HP":
+        return round(1.7 * race_value + 170)
+
+    base = 1.1 * race_value + 60
+    if nature_modifier > 0:
+        base *= 1.0 + PVP_TEMPLATE["positive_nature_modifier"]
+    elif nature_modifier < 0:
+        base *= max(0.1, 1.0 + nature_modifier)
+    return round(base)
+
+
+def calc_pvp_template_stats(
+    species_stats: Dict[str, int],
+    nature_modifiers: Optional[Dict[str, float]] = None,
+) -> Dict[str, int]:
+    """按 PvP 平衡模板生成六维属性，返回大写 stat 名称。"""
+    nature_modifiers = nature_modifiers or {}
+    result: Dict[str, int] = {}
+    for stat_name, species_key in _PVP_STAT_KEYS.items():
+        race = species_stats.get(species_key) or species_stats.get(stat_name)
+        if race is None:
+            continue
+        result[stat_name] = calc_pvp_template_stat(
+            int(race),
+            stat_name,
+            nature_modifiers.get(species_key, 0.0),
+        )
     return result
 
 

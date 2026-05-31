@@ -131,6 +131,10 @@ class TestGetStat:
     def test_no_stats_key(self):
         assert DamageCalculator._get_stat({}, "ATK") is None
 
+    def test_pvp_template_stat_from_species(self):
+        pet = {"base_id": 3001, "stats": []}
+        assert DamageCalculator._get_pvp_template_stat(pet, "ATK") == 133
+
 
 # ---------------------------------------------------------------------------
 # TestCalculate — 完整伤害计算
@@ -138,6 +142,32 @@ class TestGetStat:
 
 
 class TestCalculate:
+    def test_missing_protocol_stats_use_pvp_template(self, calc):
+        attacker = {
+            "base_id": 3001,
+            "types": [3],
+            "current_hp": 300,
+            "max_hp": 300,
+            "energy": 10,
+            "buffs": [],
+            "stats": [],
+        }
+        defender = {
+            "base_id": 3001,
+            "types": [1],
+            "current_hp": 300,
+            "max_hp": 300,
+            "buffs": [],
+            "stats": [],
+        }
+        result = calc.calculate(attacker, defender, _make_skill())
+
+        assert result is not None
+        assert result.confidence == "medium"
+        assert result.damage_breakdown["stat_sources"]["attack"] == "pvp_template"
+        assert result.damage_breakdown["stat_sources"]["defense"] == "pvp_template"
+        assert not any("wiki" in warning for warning in result.warnings)
+
     def test_physical_damage_uses_atk_def(self, calc):
         result = calc.calculate(
             _make_attacker(atk=300, spa=100),

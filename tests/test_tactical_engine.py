@@ -140,6 +140,38 @@ class TestActionEnumeration:
         assert len(skill_actions) == 1
         assert skill_actions[0]["skill_name"] == "低耗"
 
+    def test_cd_round_filters_unavailable_skills(self):
+        pet = _make_pet(
+            equipped_skills=[
+                {"skill_id": 7020370, "skill_name": "可用", "equipped_slot": 0,
+                 "skill_damage_type": 2, "skill_element": 1, "cost_energy": 1},
+                {"skill_id": 7020970, "skill_name": "冷却", "equipped_slot": 1,
+                 "skill_damage_type": 2, "skill_element": 1, "cost_energy": 2},
+            ],
+            energy=10,
+        )
+        pet["skill_runtime"] = {"7020970": {"skill_id": 7020970, "cd_round": 2}}
+        engine = TacticalEngine()
+        actions = engine._enumerate_our_actions(pet, [pet])
+        skill_names = [a["skill_name"] for a in actions if a["action_type"] == "skill"]
+
+        assert skill_names == ["可用"]
+
+    def test_runtime_energy_cost_takes_priority(self):
+        pet = _make_pet(
+            equipped_skills=[
+                {"skill_id": 7020970, "skill_name": "实时耗能", "equipped_slot": 0,
+                 "skill_damage_type": 2, "skill_element": 1, "cost_energy": 2},
+            ],
+            energy=1,
+        )
+        pet["skill_runtime"] = {"7020970": {"skill_id": 7020970, "cost_energy_result": 1}}
+        engine = TacticalEngine()
+        actions = engine._enumerate_our_actions(pet, [pet])
+
+        assert len(actions) == 1
+        assert actions[0]["energy_cost"] == 1
+
     def test_dead_pets_excluded_from_switch(self):
         pet = _make_pet(pet_id=1)
         dead = _make_pet(name="死亡宠", hp=0, pet_id=2)
@@ -190,6 +222,26 @@ class TestOpponentPrediction:
         skills = [p for p in predicted if p.action_type == "skill"]
         assert len(skills) == 0
 
+    def test_cd_round_filters_opponent_skills(self):
+        opp = _make_pet(
+            "敌方",
+            energy=10,
+            pet_id=101,
+            equipped_skills=[
+                {"skill_id": 7020370, "skill_name": "可用", "skill_damage_type": 2,
+                 "skill_element": 1, "cost_energy": 1},
+                {"skill_id": 7020970, "skill_name": "冷却", "skill_damage_type": 2,
+                 "skill_element": 1, "cost_energy": 2},
+            ],
+        )
+        opp["skill_runtime"] = {"7020970": {"skill_id": 7020970, "cd_round": 1}}
+        engine = TacticalEngine()
+        state = _make_state(opp_active=opp, opp_pets=[opp])
+        predicted = engine._predict_opp_actions(opp, [opp], state)
+        skill_names = [p.skill_name for p in predicted if p.action_type == "skill"]
+
+        assert skill_names == ["可用"]
+
     def test_switch_probability_increases_with_low_hp(self):
         opp = _make_pet("敌方", hp=50, max_hp=300, pet_id=101)
         engine = TacticalEngine()
@@ -229,6 +281,84 @@ class TestOutcomeResolution:
         )
         assert outcome.we_ko is True
         assert outcome.opp_kos_us is False
+
+    def test_priority_skill_acts_before_faster_normal_skill(self):
+        my = _make_pet("我方", speed=50, hp=300, pet_id=1)
+        opp = _make_pet("敌方", speed=200, hp=10, pet_id=101)
+        engine = TacticalEngine()
+
+        our_action = {
+            "action_type": "skill",
+            "skill_id": 7020970,
+            "skill_name": "先发制人",
+            "energy_cost": 2,
+            "damage_type": 2,
+            "skill_element": 1,
+            "meta": {"damage_type": 2, "dam_para": [65], "energy_cost": [2],
+                     "type": 1, "hit_para": 10000, "skill_dam_type": 2},
+            "is_damage_skill": True,
+            "priority_layer": 1,
+        }
+        opp_act = OpponentAction(action_type="skill", skill_id=7020370, probability=1.0, priority_layer=0)
+
+        outcome = engine._resolve_skill_vs_skill(
+            our_action, opp_act, my, opp, _make_state(my_active=my, opp_active=opp), None,
+        )
+
+        assert outcome.we_act_first is True
+        assert outcome.we_ko is True
+        assert outcome.opp_damage_dealt == 0
+
+    def test_higher_priority_layer_acts_first(self):
+        my = _make_pet("我方", speed=200, hp=10, pet_id=1)
+        opp = _make_pet("敌方", speed=50, hp=300, pet_id=101)
+        engine = TacticalEngine()
+
+        our_action = {
+            "action_type": "skill",
+            "skill_id": 7020970,
+            "skill_name": "先发制人",
+            "energy_cost": 2,
+            "damage_type": 2,
+            "skill_element": 1,
+            "meta": {"damage_type": 2, "dam_para": [65], "energy_cost": [2],
+                     "type": 1, "hit_para": 10000, "skill_dam_type": 2},
+            "is_damage_skill": True,
+            "priority_layer": 1,
+        }
+        opp_act = OpponentAction(action_type="skill", skill_id=7020370, probability=1.0, priority_layer=2)
+
+        outcome = engine._resolve_skill_vs_skill(
+            our_action, opp_act, my, opp, _make_state(my_active=my, opp_active=opp), None,
+        )
+
+        assert outcome.we_act_first is False
+        assert outcome.opp_kos_us is True
+
+    def test_same_priority_falls_back_to_speed(self):
+        my = _make_pet("我方", speed=200, hp=300, pet_id=1)
+        opp = _make_pet("敌方", speed=50, hp=10, pet_id=101)
+        engine = TacticalEngine()
+
+        our_action = {
+            "action_type": "skill",
+            "skill_id": 7020970,
+            "skill_name": "先发制人",
+            "energy_cost": 2,
+            "damage_type": 2,
+            "skill_element": 1,
+            "meta": {"damage_type": 2, "dam_para": [65], "energy_cost": [2],
+                     "type": 1, "hit_para": 10000, "skill_dam_type": 2},
+            "is_damage_skill": True,
+            "priority_layer": 1,
+        }
+        opp_act = OpponentAction(action_type="skill", skill_id=7020370, probability=1.0, priority_layer=1)
+
+        outcome = engine._resolve_skill_vs_skill(
+            our_action, opp_act, my, opp, _make_state(my_active=my, opp_active=opp), None,
+        )
+
+        assert outcome.we_act_first is True
 
     def test_switch_takes_damage(self):
         my = _make_pet("我方", speed=200, pet_id=1)

@@ -84,6 +84,7 @@ class OpponentAction:
     reason: str = ""
     threat_damage: Optional[int] = None
     can_ko: bool = False
+    priority_layer: int = 0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

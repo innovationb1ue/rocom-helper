@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from src.analysis.damage_audit import build_damage_audit
+from src.analysis.damage_audit import build_damage_audit, build_damage_mechanism_report
 from src.analysis.reflect_effects import build_reflect_candidate_effects
 from tests.conftest import SESSION11_DIR
 from tests.packet_reader import BATTLE_OPCODES
@@ -101,3 +101,13 @@ class TestSession11Replay:
         assert samples
         assert not any(s.get("server_power_applied") for s in samples)
         assert {s.get("server_power_skip_reason") for s in samples} == {"target_unmatched"}
+
+    def test_damage_mechanism_report_records_unmatched_zhui_da_runtime(self, session11_runner_result):
+        """机制审计应保留 session 11 追打未命中目标 server power 的原因。"""
+        report = build_damage_mechanism_report(session11_runner_result, session="battle_session_11")
+        samples = [s for s in report["samples"] if s.get("skill_name") == "追打"]
+
+        assert samples
+        assert not any(s.get("server_power_applied") for s in samples)
+        assert {s.get("server_power_skip_reason") for s in samples} == {"target_unmatched"}
+        assert all(s.get("matched_damage_param") is None for s in samples)

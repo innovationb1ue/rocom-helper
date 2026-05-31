@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 
-from src.analysis.damage_audit import build_damage_audit
+from src.analysis.damage_audit import build_damage_audit, build_damage_mechanism_report
 from src.analysis.reflect_effects import build_reflect_candidate_effects
 from tests.conftest import SESSION10_DIR
 from tests.packet_reader import BATTLE_OPCODES
@@ -152,3 +152,21 @@ class TestSession10Replay:
         assert {s["round_num"] for s in samples if s.get("server_power_applied")} == {6, 9, 10}
         assert [s["server_power_skip_reason"] for s in samples if not s.get("server_power_applied")] == []
         assert sum(s["pct_error"] for s in samples) / len(samples) < 0.25
+
+    def test_damage_mechanism_report_covers_key_unicorn_skills(self, session10_runner_result):
+        """机制审计应能反查追打、折射、超级糖果的服务器运行时字段。"""
+        report = build_damage_mechanism_report(session10_runner_result, session="battle_session_10")
+
+        zhui_da = [s for s in report["samples"] if s.get("skill_name") == "追打"]
+        candy = [s for s in report["samples"] if s.get("skill_name") == "超级糖果"]
+        reflect = [s for s in report["samples"] if s.get("skill_name") == "折射"]
+
+        assert zhui_da
+        assert {s["round_num"] for s in zhui_da if s.get("server_power_applied")} == {6, 9, 10}
+        assert all(s.get("matched_damage_param") is not None for s in zhui_da)
+        assert any(s.get("server_power_multiplier") for s in zhui_da)
+        assert candy
+        assert all("enhance_info" in s for s in candy)
+        assert reflect
+        assert any(s.get("enhance_info") for s in reflect)
+        assert report["recommendations"]["折射"]["status"] == "audit_only"

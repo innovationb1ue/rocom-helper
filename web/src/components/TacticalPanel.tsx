@@ -16,6 +16,8 @@ interface Props {
   recommendations: TacticalRecommendation | null;
 }
 
+const VISIBLE_ACTIONS = 5;
+
 const confidenceConfig: Record<string, { color: string; label: string }> = {
   high: { color: 'green', label: '高置信' },
   medium: { color: 'orange', label: '中置信' },
@@ -47,69 +49,126 @@ function actionName(action: ActionScore): string {
     : action.skill_name || '?';
 }
 
+function buildMetricTags(action: ActionScore, metrics: ActionScore['metrics'], unknowns: string[]): React.ReactNode[] {
+  const tags: React.ReactNode[] = [];
+
+  if (action.damage_dealt != null && action.damage_dealt > 0) {
+    tags.push(
+      <Tag key="damage-dealt" icon={<AimOutlined />} color="red" style={{ margin: 0 }}>
+        伤害 {action.damage_dealt}
+      </Tag>
+    );
+  }
+  if (action.damage_taken != null && action.damage_taken > 0) {
+    tags.push(
+      <Tag key="damage-taken" icon={<WarningOutlined />} color="orange" style={{ margin: 0 }}>
+        承受 {action.damage_taken}
+      </Tag>
+    );
+  }
+  if (metrics?.speed_order) {
+    tags.push(
+      <Tag key="speed" icon={<FieldTimeOutlined />} color="blue" style={{ margin: 0 }}>
+        {metrics.speed_order}
+      </Tag>
+    );
+  }
+  if (metrics?.energy_after != null) {
+    tags.push(
+      <Tag key="energy" icon={<ThunderboltOutlined />} color="gold" style={{ margin: 0 }}>
+        余能 {metrics.energy_after}
+      </Tag>
+    );
+  }
+  if (unknowns.length > 0) {
+    tags.push(
+      <Tooltip key="unknowns" title={unknowns.join('\n')}>
+        <Tag color="default" style={{ margin: 0 }}>
+          未知 {unknowns.length}
+        </Tag>
+      </Tooltip>
+    );
+  }
+
+  return tags;
+}
+
 const ActionRow: React.FC<{ action: ActionScore; rank: number; isTop: boolean }> = ({ action, rank, isTop }) => {
   const cat = categoryConfig[action.category || 'balanced'] || categoryConfig.balanced;
   const pct = scorePercent(action.score);
   const metrics = action.metrics || {};
   const unknowns = action.unknowns || [];
+  const name = actionName(action);
+  const summary = action.expected_gain || action.reason || '暂无收益说明';
+  const risk = action.risk || '风险较低';
+  const metricTags = buildMetricTags(action, metrics, unknowns);
+  const visibleMetricTags = metricTags.slice(0, 3);
+  const hiddenMetricCount = metricTags.length - visibleMetricTags.length;
+  const detailText = `${summary} · ${risk}`;
+  const detailsTitle = (
+    <div>
+      <div>{summary}</div>
+      <div>{risk}</div>
+    </div>
+  );
 
   return (
     <div
+      className={isTop ? 'tactical-action-row tactical-action-row-top' : 'tactical-action-row'}
       style={{
-        display: 'grid',
-        gridTemplateColumns: '28px minmax(0, 1fr) 76px',
-        gap: 8,
-        alignItems: 'center',
-        padding: '8px 10px',
-        borderRadius: 6,
         background: isTop ? '#f6ffed' : '#fff',
         border: isTop ? '1px solid #b7eb8f' : '1px solid #f0f0f0',
       }}
     >
-      <Text strong={isTop} style={{ color: isTop ? '#389e0d' : '#666' }}>{rank}</Text>
+      <Text strong={isTop} className="tactical-action-rank" style={{ color: isTop ? '#389e0d' : '#666' }}>
+        {rank}
+      </Text>
       <div style={{ minWidth: 0 }}>
-        <Space size={4} wrap>
-          <Text strong style={{ fontSize: 13 }}>{actionName(action)}</Text>
+        <div className="tactical-action-main">
+          <Tooltip title={name}>
+            <Text strong className="tactical-action-name">
+              {name}
+            </Text>
+          </Tooltip>
           <Tag color={cat.color} style={{ margin: 0, fontSize: 11 }}>{cat.label}</Tag>
           {action.can_ko && <Tag color="red" style={{ margin: 0, fontSize: 11 }}>KO</Tag>}
           {action.energy_cost > 0 && <Tag color="purple" style={{ margin: 0, fontSize: 11 }}>耗能 {action.energy_cost}</Tag>}
           {confidenceTag(action.confidence)}
-        </Space>
-        <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.45 }}>
-          <Text>{action.expected_gain || action.reason}</Text>
-          <br />
-          <Text type={action.risk?.includes('反杀') ? 'danger' : 'secondary'}>
-            {action.risk || '风险较低'}
-          </Text>
         </div>
-        <Space size={6} wrap style={{ marginTop: 4 }}>
-          {action.damage_dealt != null && action.damage_dealt > 0 && (
-            <Tag icon={<AimOutlined />} color="red" style={{ margin: 0 }}>伤害 {action.damage_dealt}</Tag>
-          )}
-          {action.damage_taken != null && action.damage_taken > 0 && (
-            <Tag icon={<WarningOutlined />} color="orange" style={{ margin: 0 }}>承受 {action.damage_taken}</Tag>
-          )}
-          {metrics.speed_order && (
-            <Tag icon={<FieldTimeOutlined />} color="blue" style={{ margin: 0 }}>{metrics.speed_order}</Tag>
-          )}
-          {metrics.energy_after != null && (
-            <Tag icon={<ThunderboltOutlined />} color="gold" style={{ margin: 0 }}>余能 {metrics.energy_after}</Tag>
-          )}
-          {unknowns.length > 0 && (
-            <Tooltip title={unknowns.join('\n')}>
-              <Tag color="default" style={{ margin: 0 }}>未知 {unknowns.length}</Tag>
-            </Tooltip>
-          )}
-        </Space>
+        <Tooltip title={detailsTitle}>
+          <div className="tactical-action-subline">
+            <Text
+              type={risk.includes('反杀') ? 'danger' : 'secondary'}
+              className="tactical-action-detail"
+            >
+              {detailText}
+            </Text>
+            <div className="tactical-action-metrics">
+              {visibleMetricTags}
+              {hiddenMetricCount > 0 && (
+                <Tooltip title={`还有 ${hiddenMetricCount} 项指标`}>
+                  <Tag color="default" style={{ margin: 0 }}>
+                    +{hiddenMetricCount}
+                  </Tag>
+                </Tooltip>
+              )}
+            </div>
+          </div>
+        </Tooltip>
       </div>
-      <Tooltip title={`行动评分 ${action.score.toFixed(3)}`}>
-        <Progress
-          percent={pct}
-          size="small"
-          strokeColor={isTop ? '#52c41a' : '#1677ff'}
-          showInfo={false}
-        />
-      </Tooltip>
+      <div className="tactical-action-score">
+        <Tooltip title={`行动评分 ${action.score.toFixed(3)}`}>
+          <Text type="secondary" style={{ fontSize: 11 }}>
+            {pct}
+          </Text>
+          <Progress
+            percent={pct}
+            size="small"
+            strokeColor={isTop ? '#52c41a' : '#1677ff'}
+            showInfo={false}
+          />
+        </Tooltip>
+      </div>
     </div>
   );
 };
@@ -142,6 +201,7 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
   const speedLine = recommendations.metrics?.speed_line as { order?: string } | undefined;
   const energyWindow = recommendations.metrics?.energy_window as { my?: number; opp?: number } | undefined;
   const petCount = recommendations.metrics?.pet_count as { my_alive?: number; opp_alive?: number; delta?: number } | undefined;
+  const visibleCount = Math.min(VISIBLE_ACTIONS, recommendations.actions.length);
 
   return (
     <Card
@@ -180,10 +240,17 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {recommendations.actions.map((action, i) => (
-          <ActionRow key={`${action.action_type}-${action.skill_id || action.switch_to_name || i}`} action={action} rank={i + 1} isTop={i === 0} />
-        ))}
+      <div className="tactical-action-header">
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          候选 {visibleCount}/{recommendations.actions.length}
+        </Text>
+      </div>
+      <div className="tactical-action-list">
+        <div className="tactical-action-list-inner">
+          {recommendations.actions.map((action, i) => (
+            <ActionRow key={`${action.action_type}-${action.skill_id || action.switch_to_name || i}`} action={action} rank={i + 1} isTop={i === 0} />
+          ))}
+        </div>
       </div>
 
       <div style={{ marginTop: 10, borderTop: '1px solid #f0f0f0', paddingTop: 8 }}>

@@ -25,9 +25,11 @@ from src.data.loader import (
     get_skill_meta,
     get_skill_name,
     get_pet_species_stats,
+    get_nature_stat_modifiers,
     get_weather_damage_mult,
 )
 from src.game.type_chart import TypeChart
+from src.game.stats import calc_pvp_template_stat
 from src.analysis.constants import SDT_TO_TYPE
 
 HookStage = Literal["pre_power", "post_base", "pre_final", "post_calc"]
@@ -298,16 +300,22 @@ class DamageCalculator:
         base_def, def_source = self._get_stat_with_source(defender, def_name)
 
         if base_atk is None:
+            base_atk = self._get_pvp_template_stat(attacker, atk_name)
+            atk_source = "pvp_template" if base_atk is not None else ""
+        if base_def is None:
+            base_def = self._get_pvp_template_stat(defender, def_name)
+            def_source = "pvp_template" if base_def is not None else ""
+        if base_atk is None:
             base_atk = self._get_wiki_stat(attacker, atk_name)
-            atk_source = "wiki"
+            atk_source = "wiki" if base_atk is not None else ""
         if base_def is None:
             base_def = self._get_wiki_stat(defender, def_name)
-            def_source = "wiki"
+            def_source = "wiki" if base_def is not None else ""
 
         if base_atk is None or base_def is None:
             return None
 
-        # 置信度分级: high(total 存在) / medium(calc+bonus) / low(wiki 估算)
+        # 置信度分级: high(total 存在) / medium(calc+bonus 或 PvP 模板) / low(wiki 估算)
         sources = {atk_source, def_source}
         if "wiki" in sources:
             confidence = "low"
@@ -315,12 +323,16 @@ class DamageCalculator:
                 warnings.append("攻击属性来自 wiki 估算")
             if def_source == "wiki":
                 warnings.append("防御属性来自 wiki 估算")
-        elif "calc_bonus" in sources:
+        elif "calc_bonus" in sources or "pvp_template" in sources:
             confidence = "medium"
             if atk_source == "calc_bonus":
                 warnings.append("攻击属性来自 calc+bonus 估算")
             if def_source == "calc_bonus":
                 warnings.append("防御属性来自 calc+bonus 估算")
+            if atk_source == "pvp_template":
+                warnings.append("攻击属性来自 PvP 通用模板估算")
+            if def_source == "pvp_template":
+                warnings.append("防御属性来自 PvP 通用模板估算")
 
         atk_mods = get_buff_stat_modifiers(attacker.get("buffs", []))
         def_mods = get_buff_stat_modifiers(defender.get("buffs", []))
@@ -776,13 +788,22 @@ class DamageCalculator:
         公式: HP = 1.7×race + 170, Other = 1.1×race + 60
         参考: references/NRC_AI/src/pokemon_db.py
         """
-        if stat_name == "HP":
-            return round(1.7 * race_value + 170)
-        return round(1.1 * race_value + 60)
+        return calc_pvp_template_stat(race_value, stat_name)
 
     @staticmethod
-    def _get_wiki_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
-        """从 pet_species 种族值估算竞技场平衡后属性值。
+    def _nature_modifiers(pet: Dict[str, Any]) -> Dict[str, float]:
+        for key in ("nature_stat_modifiers", "nature_modifiers"):
+            mods = pet.get(key)
+            if isinstance(mods, dict):
+                return {str(k).lower(): float(v) for k, v in mods.items()}
+        nature_id = pet.get("nature_id") or pet.get("nature")
+        if nature_id is not None:
+            return get_nature_stat_modifiers(nature_id)
+        return {}
+
+    @staticmethod
+    def _get_pvp_template_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
+        """从 pet_species 种族值按 PvP 通用模板估算平衡后属性值。
 
         stat_name 使用小写 key (hp/atk/spa/def/spd/spe) 以匹配 BinData。
         """
@@ -794,7 +815,13 @@ class DamageCalculator:
         key = stat_name.lower() if stat_name.isupper() else stat_name
         race = species_stats.get(key) or species_stats.get(stat_name.upper())
         if race:
-            return DamageCalculator._calc_arena_stat(int(race), stat_name)
+            nature_mod = DamageCalculator._nature_modifiers(pet).get(key, 0.0)
+            return calc_pvp_template_stat(int(race), stat_name, nature_mod)
+        return None
+
+    @staticmethod
+    def _get_wiki_stat(pet: Dict[str, Any], stat_name: str) -> Optional[int]:
+        """旧兜底接口。当前没有独立 wiki 属性源，保留为兼容入口。"""
         return None
 
     @staticmethod

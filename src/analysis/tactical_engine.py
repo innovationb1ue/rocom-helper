@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from src.analysis.damage_calc import DamageCalculator
@@ -158,8 +159,12 @@ class TacticalEngine:
             if meta is None:
                 continue
 
-            ec = meta.get("energy_cost", [0])
-            energy_cost = ec[0] if ec else 0
+            runtime = self._skill_runtime(my_active, skill_id)
+            cd_round = self._skill_cd_round(eq, runtime)
+            if cd_round > 0:
+                continue
+
+            energy_cost = self._resolve_action_energy_cost(eq, runtime, meta)
             if energy_cost > our_energy:
                 continue
 
@@ -180,6 +185,8 @@ class TacticalEngine:
                 "skill_element": element,
                 "meta": meta,
                 "is_damage_skill": damage_type in (2, 3) and (meta.get("dam_para", [0]) or [0])[0] > 0,
+                "priority_layer": self._skill_priority_layer(eq, runtime, meta),
+                "cd_round": cd_round,
             })
 
         # 换宠
@@ -219,6 +226,9 @@ class TacticalEngine:
         # 技能概率
         skill_probs = self._compute_skill_probabilities(opp_skills, opp_energy, opp_active)
         for skill_id, prob, skill_name in skill_probs:
+            meta = get_skill_meta(skill_id) or {}
+            runtime = self._skill_runtime(opp_active, skill_id)
+            skill = next((s for s in opp_skills if s.get("skill_id") == skill_id), {})
             actions.append(OpponentAction(
                 action_type="skill",
                 skill_id=skill_id,
@@ -226,6 +236,7 @@ class TacticalEngine:
                 probability=prob,
                 source=opp_source,
                 reason=self._opp_action_reason(skill_id, prob, opp_active),
+                priority_layer=self._skill_priority_layer(skill, runtime, meta),
             ))
 
         # 换宠概率
@@ -294,8 +305,12 @@ class TacticalEngine:
             if meta is None:
                 continue
 
-            ec = meta.get("energy_cost", [0])
-            energy_cost = ec[0] if ec else 0
+            runtime = self._skill_runtime(opp_active, skill_id)
+            cd_round = self._skill_cd_round(skill, runtime)
+            if cd_round > 0:
+                continue
+
+            energy_cost = self._resolve_action_energy_cost(skill, runtime, meta)
             if energy_cost > opp_energy:
                 continue
 
@@ -379,7 +394,12 @@ class TacticalEngine:
     ) -> ResolvedOutcome:
         our_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
         opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
-        we_act_first = our_speed >= opp_speed
+        our_priority = int(our_action.get("priority_layer") or 0)
+        opp_priority = int(opp_action.priority_layer or 0)
+        if our_priority != opp_priority:
+            we_act_first = our_priority > opp_priority
+        else:
+            we_act_first = our_speed >= opp_speed
 
         our_meta = our_action.get("meta")
         our_damage = self._calc_damage(my_active, opp_active, our_meta, weather)
@@ -724,13 +744,21 @@ class TacticalEngine:
     ) -> Dict[str, Any]:
         my_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
         opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
+        priority_layer = int(our_action.get("priority_layer") or 0)
+        if priority_layer > 0:
+            speed_order = f"先手技能 +{priority_layer}"
+        elif priority_layer < 0:
+            speed_order = f"后发技能 {priority_layer}"
+        else:
+            speed_order = "速度更快" if my_speed >= opp_speed else "速度较慢"
         energy_after = max(0, my_active.get("energy", 10) - our_action.get("energy_cost", 0))
         my_hp = my_active.get("current_hp", 0)
         opp_hp = opp_active.get("current_hp", 0)
         return {
-            "speed_order": "先手" if my_speed >= opp_speed else "后手",
+            "speed_order": speed_order,
             "my_speed": my_speed,
             "opp_speed": opp_speed,
+            "priority_layer": priority_layer,
             "energy_after": energy_after,
             "kill_line": max(0, opp_hp - max(0, damage_dealt)),
             "survival_line": max(0, my_hp - max(0, damage_taken)),
@@ -879,6 +907,78 @@ class TacticalEngine:
         if pred is None:
             return 0
         return pred["prediction"]["total"]
+
+    @staticmethod
+    def _skill_runtime(pet: Dict[str, Any], skill_id: Any) -> Dict[str, Any]:
+        if skill_id is None:
+            return {}
+        runtime = pet.get("skill_runtime") or {}
+        item = runtime.get(str(skill_id)) or runtime.get(skill_id) or {}
+        return item if isinstance(item, dict) else {}
+
+    @staticmethod
+    def _skill_cd_round(skill: Dict[str, Any], runtime: Dict[str, Any]) -> int:
+        for source in (runtime, skill):
+            value = source.get("cd_round")
+            if isinstance(value, list):
+                value = next((item for item in value if item is not None), None)
+            if value is not None:
+                try:
+                    return max(0, int(value))
+                except (TypeError, ValueError):
+                    return 0
+        return 0
+
+    @staticmethod
+    def _resolve_action_energy_cost(
+        skill: Dict[str, Any],
+        runtime: Dict[str, Any],
+        meta: Dict[str, Any],
+    ) -> int:
+        for source, key in (
+            (runtime, "cost_energy_result"),
+            (skill, "runtime_cost_energy"),
+            (runtime, "cost_energy"),
+            (runtime, "raw_cost_energy"),
+            (skill, "cost_energy"),
+        ):
+            value = source.get(key)
+            if value is not None:
+                return int(value)
+        costs = meta.get("energy_cost", [0]) if meta else [0]
+        return int(costs[0]) if costs else 0
+
+    @staticmethod
+    def _skill_priority_layer(
+        skill: Dict[str, Any],
+        runtime: Dict[str, Any],
+        meta: Dict[str, Any],
+    ) -> int:
+        skill_buff = runtime.get("skill_buff") if isinstance(runtime.get("skill_buff"), dict) else {}
+        runtime_priority = skill_buff.get("priority")
+        if runtime_priority not in (None, 0):
+            try:
+                return int(runtime_priority)
+            except (TypeError, ValueError):
+                pass
+
+        for value in (skill.get("skill_priority"), meta.get("skill_priority") if meta else None):
+            if value is not None:
+                try:
+                    return int(value) - 5
+                except (TypeError, ValueError):
+                    break
+
+        desc = str((meta or {}).get("desc") or skill.get("skill_desc") or skill.get("desc") or "")
+        match = re.search(r"先手\s*([+-])\s*(\d+)", desc)
+        if match:
+            layer = int(match.group(2))
+            return layer if match.group(1) == "+" else -layer
+        if "先手" in desc or "优先" in desc:
+            return 1
+        if skill.get("priority_display"):
+            return 1
+        return 0
 
     def _type_matchup_score(
         self, our_pet: Dict[str, Any], opp_pet: Dict[str, Any],

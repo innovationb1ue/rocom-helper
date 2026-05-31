@@ -4,6 +4,7 @@ from __future__ import annotations
 import pytest
 from src.game.stats import (
     calc_hp, calc_stat, get_nature_modifier, calc_all_stats,
+    calc_pvp_template_stat, calc_pvp_template_stats,
     normalize_stat, stat_total, stat_rating, STAT_NAMES, NATURE_EFFECTS,
 )
 
@@ -95,6 +96,31 @@ class TestCalcAllStats:
         neutral = calc_stat(80, 0, 0, 100, 1.0)
         boosted = calc_stat(80, 0, 0, 100, 1.1)
         assert result["ATK"] == boosted
+
+
+class TestPvpTemplateStats:
+    def test_template_stat_formula(self):
+        assert calc_pvp_template_stat(100, "HP") == 340
+        assert calc_pvp_template_stat(100, "ATK") == 170
+
+    def test_positive_nature_uses_twenty_percent(self):
+        neutral = calc_pvp_template_stat(100, "ATK")
+        boosted = calc_pvp_template_stat(100, "ATK", nature_modifier=0.1)
+        assert boosted == round(neutral * 1.2)
+
+    def test_all_template_stats(self):
+        result = calc_pvp_template_stats({
+            "hp": 100, "atk": 80, "def": 90,
+            "spa": 110, "spd": 85, "spe": 95,
+        })
+        assert result == {
+            "HP": 340,
+            "ATK": 148,
+            "DEF": 159,
+            "SPA": 181,
+            "SPD": 154,
+            "SPE": 164,
+        }
 
 
 class TestNormalizeStat:
