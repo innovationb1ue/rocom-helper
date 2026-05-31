@@ -140,6 +140,11 @@ def test_extract_data_update_pet_skill_updates():
                         _v(52, 5),
                         _v(63, 2),
                     ]),
+                    _sub(2, [
+                        _v(39, 711020000),
+                        _v(25, 6),
+                        _v(9, 3),
+                    ]),
                 ]),
             ]),
         ]
@@ -161,6 +166,9 @@ def test_extract_data_update_pet_skill_updates():
     assert update["skills"][0]["damage_type"] == 2
     assert update["skills"][0]["damage_params"][0] == {"pet_id": 401, "damage_param": 180}
     assert update["skills"][0]["restraint_types"][0] == {"pet_id": 401, "restraint_type": 1}
+    assert update["skills"][1]["skill_id"] == 7110200
+    assert update["skills"][1]["skill_name"] == "超导"
+    assert update["skills"][1]["source_index"] == 1
 
 
 def test_real_fixture_pet_skill_round_field_numbers():

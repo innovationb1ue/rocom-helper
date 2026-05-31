@@ -139,16 +139,18 @@ class TestDamageTracking:
         assert ledger["hp_result"] == 240
         assert "damage_hp_mismatch" in ledger["anomalies"]
 
-    def test_damage_ledger_falls_back_to_actual_damage(self, tracker):
+    def test_damage_without_server_hp_does_not_change_current_hp(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "damage", "actual_damage": 90, "damage": 90,
              "damage_target_side": 401},
         ]))
-        assert state["opp_active"]["current_hp"] == 260
+        assert state["opp_active"]["current_hp"] == 350
         ledger = state["field_context"]["damage_ledger"][-1]
-        assert ledger["source"] == "damage_fallback"
-        assert ledger["confidence"] == "medium"
+        assert ledger["source"] == "missing_server_hp"
+        assert ledger["confidence"] == "low"
+        assert ledger["actual_damage"] == 90
+        assert "missing_hp_after" in ledger["anomalies"]
 
     def test_damage_ledger_clamps_invalid_hp(self, tracker):
         tracker.handle_event(0x1316, _enter_event())
@@ -467,9 +469,15 @@ class TestEffectApply:
         assert buff["modifiers"] == {"spa_up": 0.1}
         assert buff["modifier_summary"] == ["魔攻 +10%"]
 
-    def test_reflect_trigger_attaches_derived_magic_modifier(self, tracker):
-        """折射触发后应把派生的光加魔攻挂到折射 buff 上。"""
+    def test_reflect_trigger_records_candidates_without_applying_magic_modifier(self, tracker):
+        """通用折射触发只记录技能池候选，不自动施加光加魔攻。"""
         tracker.handle_event(0x1316, _enter_event())
+        tracker.state["my_active"]["skills"] = [
+            {"skill_id": 7020470, "skill_name": "追打"},
+            {"skill_id": 7060130, "skill_name": "折射"},
+            {"skill_id": 7150220, "skill_name": "回旋风暴"},
+            {"skill_id": 7050180, "skill_name": "气泡"},
+        ]
         state = tracker.handle_event(0x1324, _action_resolve_event([
             {"kind": "effect_apply", "target_side": 1,
              "effect_id": 20890020, "effect_name": "折射", "effect_stage": 1},
@@ -478,6 +486,19 @@ class TestEffectApply:
         ]))
         buff = state["my_active"]["buffs"][0]
         assert buff["id"] == 20890020
+        assert "derived_buffs" not in buff
+        candidates = state["field_context"]["reflect_candidates"][0]["candidate_effects"]
+        assert [item["effect_buff_id"] for item in candidates] == [20171870, 20171900, 20172000, 20171910]
+
+    def test_confirmed_reflect_child_attaches_derived_magic_modifier(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20890020, "effect_name": "折射", "effect_stage": 1},
+            {"kind": "effect_apply", "target_side": 1,
+             "effect_id": 20171910, "effect_name": "光加魔攻", "effect_stage": 1},
+        ]))
+        buff = next(b for b in state["my_active"]["buffs"] if b["id"] == 20890020)
         assert buff["derived_buffs"][0]["id"] == 20171910
         assert buff["modifiers"] == {"spa_up": 0.4}
         assert buff["modifier_summary"] == ["魔攻 +40%"]
@@ -898,6 +919,50 @@ class TestSkillState:
             {"kind": "skill_state", "caster_pet_id": 999, "state_code": 1},
         ]))
         assert state["my_active"].get("skill_states") is None
+
+
+class TestLeaderSkillPool:
+    def test_action_ack_updates_leader_skill_pool_before_skill_cast(self, tracker):
+        enter = _enter_event()
+        enter["wrappers"][0]["skills"] = [
+            {"skill_id": 7020470, "skill_name": "追打", "equipped_slot": 1},
+            {"skill_id": 7060130, "skill_name": "折射", "equipped_slot": 2},
+            {"skill_id": 7150220, "skill_name": "回旋风暴", "equipped_slot": 3},
+            {"skill_id": 7050180, "skill_name": "气泡", "equipped_slot": 4},
+        ]
+        enter["wrappers"][0]["equipped_skills"] = list(enter["wrappers"][0]["skills"])
+        tracker.handle_event(0x1316, enter)
+
+        state = tracker.handle_event(0x130C, {
+            "state_wrappers": [
+                {
+                    "pet_id": 100,
+                    "name": "火龙",
+                    "skills": [
+                        {"skill_id": 280009, "skill_name": "夺目", "equipped_slot": 12, "source_index": 0},
+                        {"skill_id": 7000010, "skill_name": "聚能", "skill_dam_type": 21, "source_index": 1},
+                        {"skill_id": 7000030, "skill_name": "聚能", "skill_dam_type": 21, "source_index": 2},
+                        {"skill_id": 7000010, "skill_name": "聚能", "skill_dam_type": 21, "source_index": 3},
+                        {"skill_id": 7000030, "skill_name": "聚能", "skill_dam_type": 21, "source_index": 4},
+                        {"skill_id": 7020470, "skill_name": "追打", "equipped_slot": 1, "source_index": 5},
+                        {"skill_id": 7050180, "skill_name": "气泡", "equipped_slot": 4, "source_index": 6},
+                        {"skill_id": 7060130, "skill_name": "折射", "equipped_slot": 2, "source_index": 7},
+                        {"skill_id": 7150220, "skill_name": "回旋风暴", "equipped_slot": 3, "source_index": 8},
+                        {"skill_id": 7030460, "skill_name": "叶绿光束", "equipped_slot": 5, "source_index": 9},
+                        {"skill_id": 7110200, "skill_name": "超导", "equipped_slot": 6, "source_index": 10},
+                        {"skill_id": 7090240, "skill_name": "冷风", "equipped_slot": 7, "source_index": 11},
+                    ],
+                },
+            ],
+        })
+
+        pet = state["my_active"]
+        assert [s["skill_id"] for s in pet["equipped_skills"]] == [7020470, 7060130, 7150220, 7050180]
+        assert [s["skill_id"] for s in pet["leader_skill_pool"]] == [
+            7020470, 7050180, 7060130, 7150220, 7030460, 7110200, 7090240,
+        ]
+        assert [s["skill_id"] for s in pet["skills"]] == [s["skill_id"] for s in pet["leader_skill_pool"]]
+        assert pet["leader_skill_pool_source"] == "action_ack.state_wrapper.skill_round_data"
 
 
 class TestRoleSkillCast:

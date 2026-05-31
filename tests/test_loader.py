@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 import io
 import pytest
+from src.analysis.reflect_effects import build_reflect_candidate_effects
 from src.data.loader import (
     get_bundle,
     get_attr_meta,
@@ -299,6 +300,47 @@ class TestBuffStatModifiers:
             "sources": [20450050],
         }
         assert get_buff_power_modifiers([{"id": 20171870, "name": "普通加威力"}], skill_element=17) == {}
-        assert get_buff_hit_count_modifiers([{"id": 20172000, "name": "翼加连击"}], skill_element=17) == {}
         assert get_buff_power_modifiers([{"id": 20171870, "name": "普通加威力"}], skill_element=0)["flat"] == 20.0
-        assert get_buff_hit_count_modifiers([{"id": 20172000, "name": "翼加连击"}], skill_element=9)["flat"] == 1.0
+        assert get_buff_hit_count_modifiers(
+            [{"id": 20172000, "name": "翼加连击"}],
+            skill_element=17,
+            base_hit_count=1,
+        ) == {}
+        assert get_buff_hit_count_modifiers(
+            [{"id": 20172000, "name": "翼加连击"}],
+            skill_element=0,
+            base_hit_count=2,
+        )["flat"] == 1.0
+
+    def test_reflect_candidates_prefer_leader_skill_pool(self):
+        pet = {
+            "leader_skill_pool": [
+                {"skill_id": 7020470, "skill_name": "追打"},
+                {"skill_id": 7050180, "skill_name": "气泡"},
+                {"skill_id": 7060130, "skill_name": "折射"},
+                {"skill_id": 7150220, "skill_name": "回旋风暴"},
+                {"skill_id": 7030460, "skill_name": "叶绿光束"},
+                {"skill_id": 7110200, "skill_name": "超导"},
+                {"skill_id": 7090240, "skill_name": "冷风"},
+            ],
+            "skills": [
+                {"skill_id": 7020470, "skill_name": "追打"},
+                {"skill_id": 7060130, "skill_name": "折射"},
+                {"skill_id": 7150220, "skill_name": "回旋风暴"},
+                {"skill_id": 7050180, "skill_name": "气泡"},
+                {"skill_id": 200075, "skill_name": "目空"},
+                {"skill_id": 7000010, "skill_name": "聚能"},
+                {"skill_id": 7000030, "skill_name": "聚能"},
+            ],
+            "equipped_skills": [
+                {"skill_id": 7060130, "skill_name": "折射"},
+            ],
+        }
+
+        candidates = build_reflect_candidate_effects(pet)
+
+        assert {item["effect_buff_id"] for item in candidates} >= {
+            20171870, 20171900, 20171910, 20172000, 20171880, 20171960, 20171940,
+        }
+        assert 20171890 not in {item["effect_buff_id"] for item in candidates}
+        assert {item["pool_source"] for item in candidates} == {"leader_skill_pool"}

@@ -42,7 +42,12 @@ class DamageAuditSample:
     derived_buffs: List[Dict[str, Any]]
     ability_level: Optional[float]
     power_mult: Optional[float]
+    server_power_applied: bool
+    server_power_multiplier: Optional[float]
+    server_power_skip_reason: Optional[str]
     reflect_buff_applied: bool
+    reflect_candidate_effects: List[Dict[str, Any]]
+    reflect_confirmed_effects: List[Dict[str, Any]]
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -191,11 +196,66 @@ def build_damage_calibration(
     }
 
 
+def build_special_damage_rules(report: Dict[str, Any]) -> Dict[str, Any]:
+    """从协议账本生成特殊固定伤害规则草案。"""
+    grouped: Dict[str, List[Dict[str, Any]]] = {}
+    for sample in report.get("samples", []) or []:
+        skill_id = sample.get("skill_id")
+        if skill_id != 7060130:
+            continue
+        if sample.get("actual_per_hit") is None or sample.get("hit_count") is None:
+            continue
+        grouped.setdefault(str(skill_id), []).append(sample)
+
+    skills: Dict[str, Dict[str, Any]] = {}
+    for skill_id, samples in grouped.items():
+        per_hit_counts = Counter(int(s["actual_per_hit"]) for s in samples)
+        hit_count_counts = Counter(int(s["hit_count"]) for s in samples)
+        per_hit = per_hit_counts.most_common(1)[0][0]
+        hit_count = hit_count_counts.most_common(1)[0][0]
+        sessions = sorted({str(s.get("session")) for s in samples if s.get("session")})
+        observations = [
+            {
+                "session": s.get("session"),
+                "round_num": s.get("round_num"),
+                "actual_per_hit": s.get("actual_per_hit"),
+                "actual_total": s.get("actual_total"),
+                "hit_count": s.get("hit_count"),
+                "ledger_ids": s.get("ledger_ids") or [],
+                "target_side": s.get("target_side"),
+                "reflect_candidate_effects": s.get("reflect_candidate_effects") or [],
+                "reflect_confirmed_effects": s.get("reflect_confirmed_effects") or [],
+                "derived_buffs": s.get("derived_buffs") or [],
+            }
+            for s in samples
+        ]
+        skills[skill_id] = {
+            "mode": "special_fixed_light_multihit",
+            "element": 17,
+            "hit_count": hit_count,
+            "per_hit": per_hit,
+            "sample_count": len(samples),
+            "source_sessions": sessions,
+            "notes": "auto suggested from protocol damage ledger; review before committing",
+            "observations": observations,
+        }
+
+    return {
+        "version": 1,
+        "skills": dict(sorted(skills.items())),
+        "meta": {
+            "source": "scripts.audit_damage_predictions",
+            "special_skill_ids": [7060130],
+        },
+    }
+
+
 def _source_counts(samples: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
     return {
         "power_source": dict(Counter(str(s.get("power_source") or "") for s in samples)),
         "energy_cost_source": dict(Counter(str(s.get("energy_cost_source") or "") for s in samples)),
         "effectiveness_source": dict(Counter(str(s.get("effectiveness_source") or "") for s in samples)),
+        "server_power_applied": dict(Counter(str(bool(s.get("server_power_applied"))) for s in samples)),
     }
 
 
@@ -338,7 +398,12 @@ def iter_damage_audit_samples(result: ReplayResult) -> Iterable[DamageAuditSampl
                 derived_buffs=list(breakdown.get("attacker_derived_buffs") or []),
                 ability_level=breakdown.get("ability_level"),
                 power_mult=breakdown.get("power_mult"),
+                server_power_applied=bool(breakdown.get("server_power_applied")),
+                server_power_multiplier=breakdown.get("server_power_multiplier"),
+                server_power_skip_reason=breakdown.get("server_power_skip_reason"),
                 reflect_buff_applied=bool(breakdown.get("reflect_buff_applied")),
+                reflect_candidate_effects=list(breakdown.get("reflect_candidate_effects") or []),
+                reflect_confirmed_effects=list(breakdown.get("reflect_confirmed_effects") or []),
             )
 
 

@@ -11,6 +11,7 @@ from src.analysis.damage_audit import (
     build_damage_audit,
     build_damage_calibration,
     build_multi_session_damage_audit,
+    build_special_damage_rules,
     _ledger_actual_damage,
     _ledger_records_for_damage,
 )
@@ -221,6 +222,27 @@ class TestReplayRunnerDamagePrediction:
 
         assert [r["ledger_id"] for r in records] == ["a"]
         assert _ledger_actual_damage(records[0]) == 112
+
+    def test_special_damage_rule_generation_for_reflect(self):
+        report = {
+            "samples": [
+                {"session": "s1", "skill_id": 7060130, "skill_name": "折射",
+                 "round_num": 1, "actual_per_hit": 12, "actual_total": 48,
+                 "hit_count": 4, "ledger_ids": ["a"], "target_side": "敌方"},
+                {"session": "s1", "skill_id": 7060130, "skill_name": "折射",
+                 "round_num": 2, "actual_per_hit": 12, "actual_total": 48,
+                 "hit_count": 4, "ledger_ids": ["b"], "target_side": "敌方"},
+            ],
+        }
+
+        rules = build_special_damage_rules(report)
+
+        item = rules["skills"]["7060130"]
+        assert item["mode"] == "special_fixed_light_multihit"
+        assert item["element"] == 17
+        assert item["per_hit"] == 12
+        assert item["hit_count"] == 4
+        assert item["source_sessions"] == ["s1"]
 
 
 # ---------------------------------------------------------------------------

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "skills": {
+    "7020470": {
+      "enabled": true,
+      "mode": "multiplier_over_base_power",
+      "requires_matched_target": true,
+      "keep_restraint": true,
+      "max_power_ratio": 5.0,
+      "notes": "追打 server power 生产试点：把服务器目标威力按 runtime_power/base_power 转成额外倍率。"
+    }
+  },
+  "notes": "服务器同步威力试点规则。v1 只读取，不在实时战斗中自动写入。"
+}

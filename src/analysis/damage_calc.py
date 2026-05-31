@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 import re
+import copy
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
@@ -106,16 +107,33 @@ _STAT_NAME_ALIASES = {
     "SPE": ("SPE", "SPEED", "SPD_SPEED"),
 }
 _STAB_MULTIPLIER = 1.5
+_SPECIAL_FIXED_LIGHT_SKILLS = {7060130: "special_fixed_light_multihit"}
 
 
 class DamageCalculator:
-    def __init__(self, type_chart: Optional[TypeChart] = None) -> None:
+    def __init__(
+        self,
+        type_chart: Optional[TypeChart] = None,
+        *,
+        server_power_rules: Optional[Dict[str, Any]] = None,
+    ) -> None:
         self.chart = type_chart or TypeChart()
         self._hooks: Dict[HookStage, List[DamageHook]] = {
             "pre_power": [],
             "post_base": [],
             "pre_final": [],
             "post_calc": [],
+        }
+        self._server_power_rules: Dict[str, Dict[str, Any]] = {}
+        self.set_server_power_rules(server_power_rules or {})
+
+    def set_server_power_rules(self, rules: Dict[str, Any]) -> None:
+        """设置按技能启用的服务器威力规则。"""
+        raw = rules.get("skills", rules) if isinstance(rules, dict) else {}
+        self._server_power_rules = {
+            str(skill_id): dict(rule)
+            for skill_id, rule in raw.items()
+            if isinstance(rule, dict)
         }
 
     def register_hook(self, stage: HookStage, hook: DamageHook) -> None:
@@ -134,6 +152,61 @@ class DamageCalculator:
         for hook in self._hooks[stage]:
             ctx = hook(ctx)
         return ctx
+
+    def _apply_server_power_rule(
+        self,
+        server_runtime: Dict[str, Any],
+        skill_meta: Dict[str, Any],
+        base_power: int,
+    ) -> None:
+        """按技能白名单把服务器同步威力转换为额外倍率。"""
+        skill_id = skill_meta.get("id")
+        rule = self._server_power_rules.get(str(skill_id))
+        server_runtime["server_power_applied"] = False
+        if not rule:
+            server_runtime["server_power_skip_reason"] = "no_rule"
+            return
+
+        server_runtime["server_power_rule"] = {
+            k: v for k, v in rule.items()
+            if k in {"enabled", "mode", "requires_matched_target", "keep_restraint", "max_power_ratio"}
+        }
+        if not rule.get("enabled", True):
+            server_runtime["server_power_skip_reason"] = "disabled"
+            return
+        if rule.get("mode") != "multiplier_over_base_power":
+            server_runtime["server_power_skip_reason"] = "unsupported_mode"
+            return
+        if (
+            rule.get("requires_matched_target", True)
+            and server_runtime.get("has_damage_params")
+            and not server_runtime.get("matched_target_key")
+        ):
+            server_runtime["server_power_skip_reason"] = "target_unmatched"
+            return
+        if server_runtime.get("power_source") != "server_damage_params":
+            server_runtime["server_power_skip_reason"] = "no_server_damage_params"
+            return
+        runtime_power = server_runtime.get("power")
+        if base_power <= 0 or runtime_power is None:
+            server_runtime["server_power_skip_reason"] = "missing_power"
+            return
+        try:
+            multiplier = float(runtime_power) / float(base_power)
+        except (TypeError, ValueError, ZeroDivisionError):
+            server_runtime["server_power_skip_reason"] = "invalid_power"
+            return
+        if multiplier <= 0:
+            server_runtime["server_power_skip_reason"] = "invalid_ratio"
+            return
+        max_ratio = float(rule.get("max_power_ratio", 5.0) or 5.0)
+        if multiplier > max_ratio:
+            server_runtime["server_power_multiplier"] = multiplier
+            server_runtime["server_power_skip_reason"] = "ratio_exceeded"
+            return
+        server_runtime["server_power_multiplier"] = multiplier
+        server_runtime["server_power_applied"] = True
+        server_runtime["server_power_skip_reason"] = None
 
     # ------------------------------------------------------------------
     # 公开接口
@@ -158,6 +231,7 @@ class DamageCalculator:
         # 不默认替代静态技能威力进入公式。
         server_runtime["formula_power_source"] = "skill_config"
         server_runtime["power_used_in_formula"] = False
+        self._apply_server_power_rule(server_runtime, skill_meta, base_power)
         if power <= 0 or damage_type not in (2, 3):
             return None
         buff_power_modifiers = get_buff_power_modifiers(
@@ -336,6 +410,8 @@ class DamageCalculator:
         stab_mult = ctx["stab_mult"]
         weather_mult = ctx.get("weather_mult", weather_mult)
         power_mult = ctx.get("power_mult", power_mult)
+        if server_runtime.get("server_power_applied"):
+            power_mult *= float(server_runtime.get("server_power_multiplier") or 1.0)
         if server_runtime.get("effectiveness_source") != "server_restraint_types":
             display_effectiveness = calc_effectiveness
             eff_label = self.chart.get_effectiveness_label(display_effectiveness)
@@ -373,14 +449,16 @@ class DamageCalculator:
         })
         dmg = ctx["min_damage"]
 
+        hit_count = ctx.get("hit_count", 1)
         buff_hit_modifiers = get_buff_hit_count_modifiers(
             attacker.get("buffs", []),
             skill_element=skill_element,
             skill_name=skill_meta.get("name"),
+            base_hit_count=hit_count,
         )
-        hit_count = ctx.get("hit_count", 1)
         if buff_hit_modifiers.get("flat"):
             hit_count = max(1, int(hit_count + buff_hit_modifiers["flat"]))
+        special_mode = _SPECIAL_FIXED_LIGHT_SKILLS.get(skill_meta.get("id"))
         total_damage = dmg * hit_count
 
         defender_max_hp = defender.get("max_hp") or defender.get("current_hp") or 1
@@ -394,6 +472,8 @@ class DamageCalculator:
         attacker_derived_modifiers = get_buff_derived_stat_modifiers(attacker.get("buffs", []))
         defender_buff_modifiers = get_buff_stat_modifiers(defender.get("buffs", []))
         attacker_derived_buffs = self._collect_derived_buffs(attacker.get("buffs", []))
+        reflect_candidate_effects = copy.deepcopy(attacker.get("reflect_candidate_effects") or [])
+        reflect_confirmed_effects = copy.deepcopy(attacker.get("reflect_confirmed_effects") or [])
         buff_power_modifiers = get_buff_power_modifiers(
             attacker.get("buffs", []),
             skill_element=skill_element,
@@ -429,11 +509,27 @@ class DamageCalculator:
             "runtime_skill": runtime_skill or None,
             "server_runtime": server_runtime or None,
             "runtime_sources": runtime_sources,
+            "skill_element": skill_element,
+            "server_power_rule": server_runtime.get("server_power_rule"),
+            "server_power_multiplier": server_runtime.get("server_power_multiplier"),
+            "server_power_applied": bool(server_runtime.get("server_power_applied")),
+            "server_power_skip_reason": server_runtime.get("server_power_skip_reason"),
             "ability_level": round(ability_level, 3),
             "attacker_buff_modifiers": attacker_buff_modifiers,
             "attacker_derived_buff_modifiers": attacker_derived_modifiers,
             "attacker_derived_buffs": attacker_derived_buffs,
+            "reflect_candidate_effects": reflect_candidate_effects,
+            "reflect_confirmed_effects": reflect_confirmed_effects,
             "reflect_buff_applied": reflect_buff_applied,
+            "special_damage_rule": (
+                {
+                    "mode": special_mode,
+                    "element": skill_element,
+                    "source": "config_missing",
+                    "applied": False,
+                }
+                if special_mode else None
+            ),
             "buff_power_modifiers": buff_power_modifiers,
             "buff_hit_count_modifiers": buff_hit_modifiers,
             "defender_buff_modifiers": defender_buff_modifiers,
@@ -505,6 +601,8 @@ class DamageCalculator:
             "matched_target_key": server_runtime.get("matched_target_key"),
             "runtime_power": server_runtime.get("power") or runtime_skill.get("damage_param_result"),
             "power_used_in_formula": bool(server_runtime.get("power_used_in_formula")),
+            "server_power_applied": bool(server_runtime.get("server_power_applied")),
+            "server_power_skip_reason": server_runtime.get("server_power_skip_reason"),
         }
 
     def calculate_all(
@@ -623,6 +721,7 @@ class DamageCalculator:
             "power_source": power_source,
             "target_keys": target_keys,
             "matched_target_key": matched_damage_key,
+            "has_damage_params": bool(damage_by_pet),
         }
         if effectiveness is not None:
             out["effectiveness"] = effectiveness

@@ -19,6 +19,12 @@ from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_info import PetInfo
 from src.analysis.pet_identity import is_hidden_pet_id, refresh_battle_uid, same_battle_pet
+from src.analysis.reflect_effects import (
+    REFLECT_BUFF_ID,
+    REFLECT_BUFFBASE_ID,
+    build_reflect_candidate_effects,
+    reflect_effect_for_buff,
+)
 from src.analysis.state_helpers import (
     append_bounded,
     clone_state_with_effective_speed,
@@ -28,6 +34,7 @@ from src.analysis.state_helpers import (
 )
 from src.analysis.constants import (
     OPCODE_ACTION_RESOLVE,
+    OPCODE_ACTION_ACK,
     OPCODE_BATTLE_ENTER,
     OPCODE_BATTLE_FINISH,
     OPCODE_ROUND_FLOW,
@@ -36,18 +43,18 @@ from src.analysis.constants import (
     OPCODE_SKILL_SELECT,
     OPCODE_SPECIAL_REFRESH,
 )
-from src.data.loader import enrich_buff_modifiers
+from src.data.loader import enrich_buff_modifiers, get_skill_meta
 
 logger = logging.getLogger(__name__)
 
 POISON_BUFF_IDS = {20070010}
-REFLECT_BUFF_ID = 20890020
-REFLECT_BUFFBASE_ID = 2089001
-REFLECT_LIGHT_MAGIC_BUFF_ID = 20171910
 MAX_SYNC_EVENTS = 300
 MAX_PERFORM_GROUPS = 300
 MAX_DAMAGE_LEDGER = 600
 MAX_PET_HP_TRACE = 160
+MAX_REFLECT_CANDIDATES = 120
+INTERNAL_LEADER_SKILL_IDS = {280009, 7000010, 7000030}
+INTERNAL_LEADER_SKILL_DAM_TYPES = {21}
 GLOBAL_EVENT_KINDS = {
     "weather_change",
     "notify_perform",
@@ -105,6 +112,8 @@ class BattleStateTracker:
                 self._handle_round_start(detail)
             elif opcode == OPCODE_ACTION_RESOLVE:
                 self._handle_action_resolve(detail)
+            elif opcode == OPCODE_ACTION_ACK:
+                self._handle_action_ack(detail)
             elif opcode == OPCODE_BATTLE_FINISH:
                 self._handle_battle_finish(detail)
             elif opcode == OPCODE_SKILL_SELECT:
@@ -134,6 +143,7 @@ class BattleStateTracker:
         ctx.setdefault("sync_events", [])
         ctx.setdefault("item_sync_events", [])
         ctx.setdefault("damage_ledger", [])
+        ctx.setdefault("reflect_candidates", [])
         return ctx
 
     @staticmethod
@@ -269,7 +279,6 @@ class BattleStateTracker:
         damage_value = self._as_int(actual_damage)
         raw_after: Optional[int] = None
         source = source_hint or "unknown"
-        fallback_reason: Optional[str] = None
 
         if result_hp is not None:
             raw_after = result_hp
@@ -277,14 +286,8 @@ class BattleStateTracker:
         elif entry_hp_after is not None:
             raw_after = entry_hp_after
             source = "target_hp_after"
-        elif hp_before is not None and damage_value is not None:
-            raw_after = hp_before - damage_value
-            source = "damage_fallback"
-            fallback_reason = "missing_hp_result"
-        elif hp_before is not None and hp_delta is not None:
-            raw_after = hp_before + hp_delta
-            source = "hp_change_fallback"
-            fallback_reason = "missing_hp_result"
+        else:
+            source = "missing_server_hp"
 
         anomalies: List[str] = []
         if pet is None:
@@ -311,8 +314,8 @@ class BattleStateTracker:
                 anomalies.append("damage_hp_mismatch")
 
         confidence = "high"
-        if source.endswith("_fallback"):
-            confidence = "medium"
+        if source == "missing_server_hp":
+            confidence = "low"
         if anomalies:
             confidence = "low" if "target_unresolved" in anomalies or "missing_hp_after" in anomalies else "medium"
 
@@ -346,7 +349,6 @@ class BattleStateTracker:
             "max_hp": max_hp,
             "source": source,
             "confidence": confidence,
-            "fallback_reason": fallback_reason,
             "original_damage": entry.get("original_damage"),
             "damage_change": entry.get("damage_change"),
             "damage_result": entry.get("damage_result"),
@@ -471,6 +473,96 @@ class BattleStateTracker:
             if merged.get("restraint_types") is not None:
                 skill["runtime_restraint_types"] = merged["restraint_types"]
 
+    @staticmethod
+    def _skill_dam_type(skill: Dict[str, Any]) -> Optional[int]:
+        value = skill.get("skill_dam_type")
+        if value is not None:
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return None
+        meta = get_skill_meta(skill.get("skill_id"))
+        if isinstance(meta, dict) and meta.get("skill_dam_type") is not None:
+            try:
+                return int(meta["skill_dam_type"])
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    def _is_internal_leader_skill(self, skill: Dict[str, Any]) -> bool:
+        try:
+            skill_id = int(skill.get("skill_id"))
+        except (TypeError, ValueError):
+            return True
+        if skill_id in INTERNAL_LEADER_SKILL_IDS:
+            return True
+        return self._skill_dam_type(skill) in INTERNAL_LEADER_SKILL_DAM_TYPES
+
+    @staticmethod
+    def _skill_source_index(skill: Dict[str, Any], fallback: int) -> int:
+        try:
+            return int(skill.get("source_index"))
+        except (TypeError, ValueError):
+            return fallback
+
+    def _normalize_battle_skill_pool(
+        self,
+        pet: Dict[str, Any],
+        skills: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
+        if not skills:
+            return []
+        equipped_ids = {
+            skill.get("skill_id")
+            for skill in pet.get("equipped_skills", [])
+            if skill.get("skill_id") is not None
+        }
+        ordered = sorted(
+            [copy.deepcopy(skill) for skill in skills if isinstance(skill, dict) and skill.get("skill_id") is not None],
+            key=lambda item: self._skill_source_index(item, len(skills)),
+        )
+        if not ordered:
+            return []
+        start_index = 0
+        if equipped_ids:
+            for idx, skill in enumerate(ordered):
+                if skill.get("skill_id") in equipped_ids:
+                    start_index = idx
+                    break
+        normalized: List[Dict[str, Any]] = []
+        seen: set = set()
+        for skill in ordered[start_index:]:
+            skill_id = skill.get("skill_id")
+            if skill_id in seen or self._is_internal_leader_skill(skill):
+                continue
+            seen.add(skill_id)
+            item = copy.deepcopy(skill)
+            item["pool_index"] = len(normalized)
+            normalized.append(item)
+        if equipped_ids and not equipped_ids.issubset({item.get("skill_id") for item in normalized}):
+            return []
+        return normalized
+
+    def _apply_battle_skill_pool(
+        self,
+        pet: Optional[Dict[str, Any]],
+        skills: List[Dict[str, Any]],
+        *,
+        source: str,
+    ) -> None:
+        if pet is None:
+            return
+        normalized = self._normalize_battle_skill_pool(pet, skills)
+        if not normalized:
+            return
+        pet["skill_round_data"] = copy.deepcopy(skills)
+        pet["battle_skill_pool"] = copy.deepcopy(normalized)
+        pet["battle_skill_pool_source"] = source
+        pet["skills"] = copy.deepcopy(normalized)
+        if len(normalized) > len(pet.get("equipped_skills") or []):
+            pet["leader_skill_pool"] = copy.deepcopy(normalized)
+            pet["leader_skill_pool_source"] = source
+
     def _apply_pet_sync(self, sync: Dict[str, Any]) -> None:
         pet = self._pet_for_sync_id(sync.get("pet_id"))
         if pet is None:
@@ -545,12 +637,11 @@ class BattleStateTracker:
                     "name": str(sync["buff_id"]),
                     "stage": sync["buff_stack_result"],
                 }))
-            if sync["buff_id"] == REFLECT_BUFF_ID and sync["buff_stack_result"] > 0:
-                self._attach_reflect_derived_buff(
+            if sync["buff_id"] != REFLECT_BUFF_ID and sync["buff_stack_result"] > 0:
+                self._attach_reflect_confirmed_effect(
                     pet,
                     sync,
-                    source="pet_sync_reflect_buff",
-                    create_parent=True,
+                    source="pet_sync",
                 )
 
     def _apply_pet_info_sync(self, sync: Dict[str, Any]) -> None:
@@ -562,6 +653,12 @@ class BattleStateTracker:
                 pet[key] = sync[key]
         if sync.get("equipped_skills"):
             pet["runtime_equipped_skills"] = sync["equipped_skills"]
+        if sync.get("skill_round_data"):
+            self._apply_battle_skill_pool(
+                pet,
+                sync["skill_round_data"],
+                source="sync_data.pet_info.skill_round_data",
+            )
 
     def _apply_wrapper_runtime_fields(self, pet: Dict[str, Any], w: Dict[str, Any]) -> None:
         for key in (
@@ -582,21 +679,7 @@ class BattleStateTracker:
         *,
         is_mine: bool,
     ) -> Dict[str, Any]:
-        enriched = enrich_buff_modifiers(buff)
-        if enriched.get("id") != REFLECT_BUFF_ID:
-            return enriched
-        active = self.state.get("my_active" if is_mine else "opp_active")
-        if not active or active.get("side") != pet.get("side"):
-            return enriched
-        active_reflect = next(
-            (b for b in active.get("buffs", []) if b.get("id") == REFLECT_BUFF_ID and b.get("derived_buffs")),
-            None,
-        )
-        if active_reflect is None:
-            return enriched
-        enriched["derived_buffs"] = copy.deepcopy(active_reflect.get("derived_buffs", []))
-        enriched["derived_effects"] = copy.deepcopy(active_reflect.get("derived_effects", []))
-        return enrich_buff_modifiers(enriched)
+        return enrich_buff_modifiers(buff)
 
     def _apply_entry_sync_data(self, entry: Dict[str, Any]) -> None:
         sync_data = entry.get("sync_data") or {}
@@ -622,6 +705,11 @@ class BattleStateTracker:
             for skill in update.get("skills", []) or []:
                 skill.setdefault("source", "data_update.pet_skill")
                 self._update_skill_runtime(pet, skill)
+            self._apply_battle_skill_pool(
+                pet,
+                update.get("skills") or [],
+                source="data_update.pet_skill.skills",
+            )
 
     @staticmethod
     def _pick(entry: Dict[str, Any], keys: List[str]) -> Dict[str, Any]:
@@ -788,6 +876,11 @@ class BattleStateTracker:
         self.state["phase"] = "resolving"
         wrappers = detail.get("wrappers", [])
         self._update_pets_from_wrappers(wrappers)
+
+    def _handle_action_ack(self, detail: Dict[str, Any]) -> None:
+        wrappers = detail.get("state_wrappers") or detail.get("wrappers") or []
+        if wrappers:
+            self._update_pets_from_wrappers(wrappers)
 
     def _is_mine(self, side_value) -> bool:
         """True if *side_value* represents the player side."""
@@ -1219,8 +1312,7 @@ class BattleStateTracker:
                 "source_skill": (entry.get("related_skills") or [{}])[0].get("skill_name") if entry.get("related_skills") else None,
                 "turns_applied": 1,
             }))
-        if self._is_reflect_magic_child(entry):
-            self._attach_reflect_derived_buff(active, entry, source="protocol_effect_apply", create_parent=False)
+        self._attach_reflect_confirmed_effect(active, entry, source="protocol_effect_apply")
         if effect_id in POISON_BUFF_IDS:
             active["poison_stacks"] = stage if stage is not None else active.get("poison_stacks", 0) + 1
 
@@ -1261,22 +1353,17 @@ class BattleStateTracker:
 
     def _handle_buff_trigger_entry(self, entry: Dict[str, Any]) -> None:
         self._append_pet_effect_history(entry, "buff_trigger")
-        if not self._is_reflect_trigger(entry):
-            return
         side = entry.get("target_side") or entry.get("actor_side")
         active = self._get_active_for_side(side) if side is not None else None
         if active is None:
             return
-        self._attach_reflect_derived_buff(active, entry, source="reflect_buff_trigger", create_parent=True)
+        if self._is_generic_reflect_trigger(entry):
+            self._record_reflect_candidates(active, entry)
+            return
+        self._attach_reflect_confirmed_effect(active, entry, source="protocol_buff_trigger")
 
     @staticmethod
-    def _is_reflect_magic_child(entry: Dict[str, Any]) -> bool:
-        effect_name = str(entry.get("effect_name") or "")
-        effect_id = entry.get("effect_id")
-        return effect_id == REFLECT_LIGHT_MAGIC_BUFF_ID or "光加魔攻" in effect_name
-
-    @staticmethod
-    def _is_reflect_trigger(entry: Dict[str, Any]) -> bool:
+    def _is_generic_reflect_trigger(entry: Dict[str, Any]) -> bool:
         ids = {entry.get("effect_id"), entry.get("buff_id")}
         bases = set(entry.get("buffbase_ids") or [])
         if entry.get("effect_base") is not None:
@@ -1288,19 +1375,44 @@ class BattleStateTracker:
             or "折射" in effect_name
         )
 
-    def _attach_reflect_derived_buff(
+    def _record_reflect_candidates(self, active: Dict[str, Any], entry: Dict[str, Any]) -> None:
+        candidates = build_reflect_candidate_effects(active)
+        record = {
+            "round": self.state.get("round", 0),
+            "opcode": self._current_opcode,
+            "packet_index": (self._current_event_detail or {}).get("packet_index"),
+            "event_ordinal": entry.get("event_ordinal"),
+            "actor_side": entry.get("actor_side"),
+            "target_side": entry.get("target_side"),
+            "pet_id": active.get("pet_id"),
+            "pet_name": active.get("name"),
+            "candidate_effects": copy.deepcopy(candidates),
+            "source": "reflect_trigger_skill_pool",
+        }
+        record = {k: v for k, v in record.items() if v not in (None, [], {})}
+        active["reflect_candidate_effects"] = copy.deepcopy(candidates)
+        self._append_bounded(
+            self._field_context().setdefault("reflect_candidates", []),
+            record,
+            MAX_REFLECT_CANDIDATES,
+        )
+
+    def _attach_reflect_confirmed_effect(
         self,
         active: Dict[str, Any],
         entry: Dict[str, Any],
         *,
         source: str,
-        create_parent: bool,
     ) -> None:
+        effect = (
+            reflect_effect_for_buff(entry.get("effect_id"), entry.get("effect_name"))
+            or reflect_effect_for_buff(entry.get("buff_id"), entry.get("effect_name"))
+        )
+        if not effect:
+            return
         buffs = active.setdefault("buffs", [])
         reflect = next((b for b in buffs if b.get("id") == REFLECT_BUFF_ID), None)
         if reflect is None:
-            if not create_parent:
-                return
             reflect = {
                 "id": REFLECT_BUFF_ID,
                 "name": "折射",
@@ -1310,27 +1422,35 @@ class BattleStateTracker:
             buffs.append(reflect)
 
         derived = reflect.setdefault("derived_buffs", [])
-        child_id = REFLECT_LIGHT_MAGIC_BUFF_ID
+        child_id = effect["effect_buff_id"]
         if not any((item.get("id") if isinstance(item, dict) else item) == child_id for item in derived):
             derived.append({
                 "id": child_id,
-                "name": "光加魔攻",
+                "name": effect["effect_name"],
                 "source": source,
                 "parent_buff_id": REFLECT_BUFF_ID,
                 "parent_buffbase_id": REFLECT_BUFFBASE_ID,
+                "wrapper_buff_id": effect.get("wrapper_buff_id"),
+                "element_id": effect.get("element_id"),
+                "element_name": effect.get("element_name"),
+                "kind": effect.get("kind"),
                 "round": self.state.get("round"),
                 "event_ordinal": entry.get("event_ordinal"),
             })
         effects = reflect.setdefault("derived_effects", [])
-        if not any(item.get("kind") == "spa_up" and item.get("source") == source for item in effects):
+        if not any(item.get("id") == child_id and item.get("source") == source for item in effects):
             effects.append({
-                "kind": "spa_up",
-                "name": "光加魔攻",
+                "id": child_id,
+                "kind": effect.get("kind"),
+                "name": effect["effect_name"],
+                "element_id": effect.get("element_id"),
+                "element_name": effect.get("element_name"),
                 "source": source,
                 "round": self.state.get("round"),
                 "event_ordinal": entry.get("event_ordinal"),
             })
         reflect.update(enrich_buff_modifiers(reflect))
+        active["reflect_confirmed_effects"] = copy.deepcopy(reflect.get("derived_effects", []))
 
         # 变身/模型切换场景中，活跃 battler 和原宠记录会同时保留同一侧的折射 buff。
         # 将已确认的派生效果同步回同侧记录，避免预测读取阵容宠物时丢掉 modifier。
@@ -1346,6 +1466,7 @@ class BattleStateTracker:
             other["derived_buffs"] = copy.deepcopy(reflect.get("derived_buffs", []))
             other["derived_effects"] = copy.deepcopy(reflect.get("derived_effects", []))
             other.update(enrich_buff_modifiers(other))
+            pet["reflect_confirmed_effects"] = copy.deepcopy(reflect.get("derived_effects", []))
 
     def _handle_weather_change_entry(self, entry: Dict[str, Any]) -> None:
         weather_id = entry.get("weather_id")
@@ -1633,6 +1754,20 @@ class BattleStateTracker:
             side = w.get("side")
             is_mine = (side == 1 or side == "我方")
             pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
+            if side is None:
+                matched_side = None
+                matched_is_mine = False
+                for candidate_is_mine, candidates in (
+                    (True, self.state["my_pets"]),
+                    (False, self.state["opp_pets"]),
+                ):
+                    if any(self._stable_pet_matches(pet, w) for pet in candidates):
+                        matched_side = candidates
+                        matched_is_mine = candidate_is_mine
+                        break
+                if matched_side is not None:
+                    pet_list = matched_side
+                    is_mine = matched_is_mine
             pet_id = w.get("pet_id") or w.get("pet_gid")
             matched = None
             for pet in pet_list:
@@ -1689,6 +1824,12 @@ class BattleStateTracker:
                     if w_eq and not pet.get("equipped_skills"):
                         pet["skills"] = w.get("skills", [])
                         pet["equipped_skills"] = w_eq
+                    if self._current_opcode == OPCODE_ACTION_ACK and w.get("skills"):
+                        self._apply_battle_skill_pool(
+                            pet,
+                            w.get("skills") or [],
+                            source="action_ack.state_wrapper.skill_round_data",
+                        )
                     # 从 battle_stats[5] 设置基础速度（仅首次，战斗中不变）
                     if pet.get("base_speed") is None:
                         w_bs = w.get("battle_stats") or []
@@ -1707,6 +1848,12 @@ class BattleStateTracker:
                     break
             if matched is None:
                 pet_info = PetInfo.from_wrapper(w).to_dict()
+                if self._current_opcode == OPCODE_ACTION_ACK and w.get("skills"):
+                    self._apply_battle_skill_pool(
+                        pet_info,
+                        w.get("skills") or [],
+                        source="action_ack.state_wrapper.skill_round_data",
+                    )
                 refresh_battle_uid(pet_info)
                 pet_list.append(pet_info)
                 matched = pet_list[-1]

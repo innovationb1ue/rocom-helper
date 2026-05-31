@@ -142,7 +142,12 @@ SDT_TO_TYPE: Dict[int, int] = {
 def normalize_skill_id(v: Optional[int]) -> Optional[int]:
     if v is None:
         return None
-    return v // 100 if v >= 100_000 and v % 100 == 0 else v
+    if v >= 10_000_000 and v % 100 == 0:
+        candidate = v // 100
+        return candidate if get_skill_name(candidate) else candidate
+    if get_skill_name(v):
+        return v
+    return v
 
 def skill_name(skill_id: Optional[int]) -> Optional[str]:
     return get_skill_name(skill_id)
@@ -523,7 +528,7 @@ def extract_skills_from_round_data(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
     PetSkillRoundData: field 39=skill_id, field 25=pos, field 9=cost_energy。
     """
     skills, seen = [], set()
-    for entry in field_groups(msg).get(8, []):
+    for source_index, entry in enumerate(field_groups(msg).get(8, [])):
         sub = entry.get("sub")
         if sub is None:
             continue
@@ -536,7 +541,14 @@ def extract_skills_from_round_data(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
             continue
         seen.add(key)
         cost_e = pick_first(collect_varints(sub, 9))
-        item = {"skill_id": sid, "equipped_slot": pos, "pp": None, "cost_energy": cost_e}
+        item = {
+            "skill_id": sid,
+            "equipped_slot": pos,
+            "pp": None,
+            "cost_energy": cost_e,
+            "source_index": source_index,
+            "source": "battle_inside.skill_round_data",
+        }
         _attach_skill_meta(item, sid)
         skills.append(item)
     skills.sort(key=lambda it: (it["equipped_slot"] == 0, it["equipped_slot"], it["skill_id"]))

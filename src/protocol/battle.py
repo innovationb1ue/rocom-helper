@@ -601,6 +601,7 @@ def _extract_pet_skill_round_data(msg: Dict[str, Any]) -> Dict[str, Any]:
         "trans_info": _extract_trans_info(msg),
         "set_cost_info": _extract_set_cost_info(msg),
     })
+    _attach_skill_meta(item, sid)
     return item
 
 
@@ -646,6 +647,19 @@ def _extract_pet_info_sync(sync: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "equipped_slot": skill.get("equipped_slot"),
                 "cost_energy": skill.get("cost_energy"),
             }))
+        skill_round_data = []
+        for skill in (creature or {}).get("skills", []):
+            skill_round_data.append(_compact_dict({
+                "skill_id": skill.get("skill_id"),
+                "skill_name": skill.get("skill_name"),
+                "skill_element": skill.get("skill_element"),
+                "damage_type": skill.get("damage_type") or skill.get("skill_damage_type"),
+                "skill_dam_type": skill.get("skill_dam_type"),
+                "equipped_slot": skill.get("equipped_slot"),
+                "cost_energy": skill.get("cost_energy"),
+                "source_index": skill.get("source_index"),
+                "source": skill.get("source") or "sync_data.pet_info.skill_round_data",
+            }))
         item = _compact_dict({
             "pet_id": (creature or {}).get("pet_id"),
             "name": (creature or {}).get("name"),
@@ -654,6 +668,7 @@ def _extract_pet_info_sync(sync: Dict[str, Any]) -> List[Dict[str, Any]]:
             "types": (creature or {}).get("types"),
             "max_hp": (creature or {}).get("max_hp"),
             "equipped_skills": compact_skills,
+            "skill_round_data": skill_round_data,
             "data_level": _pick_sync_value(sub, 4, True),
             "full_for_data_level": bool(_pick_sync_value(sub, 5, False) or 0),
         })
@@ -722,12 +737,14 @@ def _extract_pet_skill_updates(msg: Dict[str, Any]) -> List[Dict[str, Any]]:
             "pet_id": pick_first(collect_varints(sub, 1)),
             "skills": [],
         }
-        for skill_entry in field_groups(sub).get(2, []):
+        for source_index, skill_entry in enumerate(field_groups(sub).get(2, [])):
             skill_sub = skill_entry.get("sub")
             if skill_sub is None:
                 continue
             skill = _extract_pet_skill_round_data(skill_sub)
             if skill:
+                skill.setdefault("source_index", source_index)
+                skill.setdefault("source", "data_update.pet_skill.skills")
                 update["skills"].append(skill)
         update = _compact_dict(update)
         if update:

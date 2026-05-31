@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 
+from src.analysis.damage_audit import build_damage_audit
+from src.analysis.reflect_effects import build_reflect_candidate_effects
 from tests.conftest import SESSION11_DIR
 from tests.packet_reader import BATTLE_OPCODES
 
@@ -67,3 +69,35 @@ class TestSession11Replay:
         ]
 
         assert defeated_names == ["加油蟹"]
+
+    def test_leader_skill_pool_arrives_before_reflect_selection(self, session11_runner_result):
+        """session 11 中首领化新增技能也必须在选择折射前进入有效技能池。"""
+        ack_event = next(event for event in session11_runner_result.events if event.index == 84)
+        select_reflect_event = next(event for event in session11_runner_result.events if event.index == 86)
+        pet_after_ack = _pet_by_name(ack_event.state_after, "my_pets", "白金独角兽")
+        pet_before_reflect = _pet_by_name(select_reflect_event.state_before, "my_pets", "白金独角兽")
+
+        expected = [7020470, 7050180, 7060130, 7150220, 7030240, 7110250, 7090140]
+        internal_ids = {280009, 7000010, 7000030}
+
+        assert [s["skill_id"] for s in pet_after_ack["leader_skill_pool"]] == expected
+        assert [s["skill_id"] for s in pet_before_reflect["leader_skill_pool"]] == expected
+        assert [s["skill_id"] for s in pet_after_ack["skills"]] == expected
+        assert [s["skill_id"] for s in pet_after_ack["equipped_skills"]] == [7020470, 7060130, 7150220, 7050180]
+        assert pet_after_ack["leader_skill_pool_source"] == "action_ack.state_wrapper.skill_round_data"
+        assert not internal_ids.intersection({s["skill_id"] for s in pet_after_ack["leader_skill_pool"]})
+
+        candidate_ids = {
+            item["effect_buff_id"]
+            for item in build_reflect_candidate_effects(pet_before_reflect)
+        }
+        assert {20171870, 20171900, 20171910, 20172000, 20171880, 20171960, 20171940}.issubset(candidate_ids)
+
+    def test_zhui_da_server_power_pilot_skips_without_target_match(self, session11_runner_result):
+        """session 11 的追打没有匹配目标 server power 时必须保持原公式。"""
+        report = build_damage_audit(session11_runner_result)
+        samples = [s for s in report["samples"] if s.get("skill_name") == "追打"]
+
+        assert samples
+        assert not any(s.get("server_power_applied") for s in samples)
+        assert {s.get("server_power_skip_reason") for s in samples} == {"target_unmatched"}

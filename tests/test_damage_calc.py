@@ -441,17 +441,54 @@ class TestCalculate:
 
     def test_combo_child_increases_hit_count_not_spa(self, calc):
         combo_buff = {"id": 20172000, "name": "翼加连击"}
+        skill = _make_skill(dam_type=3, power=80, element=15)
+        skill["desc"] = "造成魔伤，1连击。"
         result = calc.calculate(
             _make_attacker(types=[1], spa=180, buffs=[combo_buff]),
             _make_defender(types=[0], spd=150),
-            _make_skill(dam_type=3, power=80, element=15),
+            skill,
         )
-        assert result.hit_count == 2
-        assert result.total_damage == result.expected_damage * 2
+        assert result.hit_count == 1
         assert result.damage_breakdown["attacker_buff_modifiers"] == {}
+        assert result.damage_breakdown["buff_hit_count_modifiers"] == {}
+
+    def test_combo_child_increases_normal_multi_hit_skill(self, calc):
+        combo_buff = {"id": 20172000, "name": "翼加连击"}
+        skill = _make_skill(dam_type=3, power=75, element=2)
+        skill.update({"id": 7020470, "name": "追打", "desc": "造成魔伤，2连击。"})
+        plain = calc.calculate(
+            _make_attacker(types=[1], spa=180),
+            _make_defender(types=[0], spd=150),
+            skill,
+        )
+        buffed = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[combo_buff]),
+            _make_defender(types=[0], spd=150),
+            skill,
+        )
+        assert plain.hit_count == 2
+        assert buffed.hit_count == 3
+        assert buffed.total_damage == buffed.expected_damage * 3
+        assert buffed.damage_breakdown["attacker_buff_modifiers"] == {}
+        assert buffed.damage_breakdown["buff_hit_count_modifiers"]["flat"] == 1.0
+
+    def test_combo_child_stacks_after_runtime_hit_count_hook(self):
+        combo_buff = {"id": 20172000, "name": "翼加连击"}
+        calc = DamageCalculator(TypeChart())
+
+        def status_combo_hook(ctx):
+            return {**ctx, "hit_count": 3}
+
+        calc.register_hook("post_calc", status_combo_hook)
+        result = calc.calculate(
+            _make_attacker(types=[1], spa=180, buffs=[combo_buff]),
+            _make_defender(types=[0], spd=150),
+            _make_skill(dam_type=3, power=75, element=2),
+        )
+        assert result.hit_count == 4
         assert result.damage_breakdown["buff_hit_count_modifiers"]["flat"] == 1.0
 
-    def test_combo_child_does_not_affect_light_skill(self, calc):
+    def test_combo_child_does_not_affect_single_hit_light_skill(self, calc):
         combo_buff = {"id": 20172000, "name": "翼加连击"}
         result = calc.calculate(
             _make_attacker(types=[17], spa=180, buffs=[combo_buff]),
@@ -522,6 +559,127 @@ class TestCalculate:
         assert bd["effectiveness_source"] == "server_restraint_types"
         assert bd["runtime_sources"]["matched_target_key"] == "401"
         assert result.energy_cost == 2
+
+    def test_server_power_rule_applies_to_zhui_da(self):
+        calc = DamageCalculator(TypeChart(), server_power_rules={
+            "7020470": {
+                "enabled": True,
+                "mode": "multiplier_over_base_power",
+                "requires_matched_target": True,
+                "keep_restraint": True,
+                "max_power_ratio": 5.0,
+            }
+        })
+        attacker = _make_attacker(types=[1], spa=180)
+        attacker["skill_runtime"] = {
+            "7020470": {
+                "damage_params_by_pet": {"401": 150},
+                "restraint_types_by_pet": {"401": 1},
+            }
+        }
+        defender = _make_defender(types=[3], spd=150)
+        defender["pet_id"] = 401
+        skill = _make_skill(dam_type=3, power=75, element=2)
+        skill.update({"id": 7020470, "name": "追打"})
+
+        result = calc.calculate(attacker, defender, skill)
+        bd = result.damage_breakdown
+
+        assert result.expected_damage == 243
+        assert bd["server_power_applied"] is True
+        assert bd["server_power_multiplier"] == 2.0
+        assert bd["server_power_skip_reason"] is None
+        assert bd["server_runtime"]["calc_effectiveness"] == 1.5
+        assert bd["server_runtime"]["display_effectiveness"] == 1.5
+
+    def test_server_power_rule_does_not_apply_to_other_skills(self):
+        calc = DamageCalculator(TypeChart(), server_power_rules={
+            "7020470": {
+                "enabled": True,
+                "mode": "multiplier_over_base_power",
+                "requires_matched_target": True,
+                "max_power_ratio": 5.0,
+            }
+        })
+        attacker = _make_attacker(types=[1], spa=180)
+        attacker["skill_runtime"] = {
+            "7700001": {"damage_params_by_pet": {"401": 150}},
+        }
+        defender = _make_defender(types=[3], spd=150)
+        defender["pet_id"] = 401
+
+        result = calc.calculate(attacker, defender, _make_skill(dam_type=3, power=75, element=2))
+
+        assert result.damage_breakdown["server_power_applied"] is False
+        assert result.damage_breakdown["server_power_skip_reason"] == "no_rule"
+
+    def test_server_power_rule_requires_target_match(self):
+        calc = DamageCalculator(TypeChart(), server_power_rules={
+            "7020470": {
+                "enabled": True,
+                "mode": "multiplier_over_base_power",
+                "requires_matched_target": True,
+                "max_power_ratio": 5.0,
+            }
+        })
+        attacker = _make_attacker(types=[1], spa=180)
+        attacker["skill_runtime"] = {
+            "7020470": {"damage_params_by_pet": {"401": 150}},
+        }
+        defender = _make_defender(types=[3], spd=150)
+        defender["pet_id"] = 999
+        skill = _make_skill(dam_type=3, power=75, element=2)
+        skill.update({"id": 7020470, "name": "追打"})
+
+        result = calc.calculate(attacker, defender, skill)
+
+        assert result.damage_breakdown["server_power_applied"] is False
+        assert result.damage_breakdown["server_power_skip_reason"] == "target_unmatched"
+
+    def test_server_power_rule_rejects_extreme_ratio(self):
+        calc = DamageCalculator(TypeChart(), server_power_rules={
+            "7020470": {
+                "enabled": True,
+                "mode": "multiplier_over_base_power",
+                "requires_matched_target": True,
+                "max_power_ratio": 5.0,
+            }
+        })
+        attacker = _make_attacker(types=[1], spa=180)
+        attacker["skill_runtime"] = {
+            "7020470": {"damage_params_by_pet": {"401": 1000}},
+        }
+        defender = _make_defender(types=[3], spd=150)
+        defender["pet_id"] = 401
+        skill = _make_skill(dam_type=3, power=75, element=2)
+        skill.update({"id": 7020470, "name": "追打"})
+
+        result = calc.calculate(attacker, defender, skill)
+
+        assert result.damage_breakdown["server_power_applied"] is False
+        assert result.damage_breakdown["server_power_skip_reason"] == "ratio_exceeded"
+        assert result.damage_breakdown["server_power_multiplier"] > 5.0
+
+    def test_server_power_rule_can_be_disabled(self):
+        calc = DamageCalculator(TypeChart(), server_power_rules={
+            "7020470": {
+                "enabled": False,
+                "mode": "multiplier_over_base_power",
+            }
+        })
+        attacker = _make_attacker(types=[1], spa=180)
+        attacker["skill_runtime"] = {
+            "7020470": {"damage_params_by_pet": {"401": 150}},
+        }
+        defender = _make_defender(types=[3], spd=150)
+        defender["pet_id"] = 401
+        skill = _make_skill(dam_type=3, power=75, element=2)
+        skill.update({"id": 7020470, "name": "追打"})
+
+        result = calc.calculate(attacker, defender, skill)
+
+        assert result.damage_breakdown["server_power_applied"] is False
+        assert result.damage_breakdown["server_power_skip_reason"] == "disabled"
 
     def test_hidden_target_uses_single_server_damage_param(self, calc):
         """隐藏对手只有一个服务器目标威力时，可作为当前目标威力使用。"""
