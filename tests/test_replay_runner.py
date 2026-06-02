@@ -224,7 +224,7 @@ class TestReplayRunnerDamagePrediction:
         assert [r["ledger_id"] for r in records] == ["a"]
         assert _ledger_actual_damage(records[0]) == 112
 
-    def test_special_damage_rule_generation_for_reflect(self):
+    def test_special_damage_rule_generation_excludes_reflect(self):
         report = {
             "samples": [
                 {"session": "s1", "skill_id": 7060130, "skill_name": "折射",
@@ -238,12 +238,9 @@ class TestReplayRunnerDamagePrediction:
 
         rules = build_special_damage_rules(report)
 
-        item = rules["skills"]["7060130"]
-        assert item["mode"] == "special_fixed_light_multihit"
-        assert item["element"] == 17
-        assert item["per_hit"] == 12
-        assert item["hit_count"] == 4
-        assert item["source_sessions"] == ["s1"]
+        assert rules["skills"] == {}
+        assert rules["meta"]["excluded_skill_ids"] == [7060130]
+        assert "light special damage" in rules["meta"]["excluded_reasons"]["7060130"]
 
     def test_damage_mechanism_report_uses_state_before_runtime(self):
         state_before = {

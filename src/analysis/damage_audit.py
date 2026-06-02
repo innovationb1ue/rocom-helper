@@ -325,55 +325,21 @@ def build_damage_calibration(
 
 
 def build_special_damage_rules(report: Dict[str, Any]) -> Dict[str, Any]:
-    """从协议账本生成特殊固定伤害规则草案。"""
-    grouped: Dict[str, List[Dict[str, Any]]] = {}
-    for sample in report.get("samples", []) or []:
-        skill_id = sample.get("skill_id")
-        if skill_id != 7060130:
-            continue
-        if sample.get("actual_per_hit") is None or sample.get("hit_count") is None:
-            continue
-        grouped.setdefault(str(skill_id), []).append(sample)
+    """从协议账本生成特殊固定伤害规则草案。
 
-    skills: Dict[str, Dict[str, Any]] = {}
-    for skill_id, samples in grouped.items():
-        per_hit_counts = Counter(int(s["actual_per_hit"]) for s in samples)
-        hit_count_counts = Counter(int(s["hit_count"]) for s in samples)
-        per_hit = per_hit_counts.most_common(1)[0][0]
-        hit_count = hit_count_counts.most_common(1)[0][0]
-        sessions = sorted({str(s.get("session")) for s in samples if s.get("session")})
-        observations = [
-            {
-                "session": s.get("session"),
-                "round_num": s.get("round_num"),
-                "actual_per_hit": s.get("actual_per_hit"),
-                "actual_total": s.get("actual_total"),
-                "hit_count": s.get("hit_count"),
-                "ledger_ids": s.get("ledger_ids") or [],
-                "target_side": s.get("target_side"),
-                "reflect_candidate_effects": s.get("reflect_candidate_effects") or [],
-                "reflect_confirmed_effects": s.get("reflect_confirmed_effects") or [],
-                "derived_buffs": s.get("derived_buffs") or [],
-            }
-            for s in samples
-        ]
-        skills[skill_id] = {
-            "mode": "special_fixed_light_multihit",
-            "element": 17,
-            "hit_count": hit_count,
-            "per_hit": per_hit,
-            "sample_count": len(samples),
-            "source_sessions": sessions,
-            "notes": "auto suggested from protocol damage ledger; review before committing",
-            "observations": observations,
-        }
-
+    折射（7060130）已确认是光系魔伤，派生效果在本体伤害后结算，
+    不能从其低伤害样本反推固定伤害规则。
+    """
     return {
         "version": 1,
-        "skills": dict(sorted(skills.items())),
+        "skills": {},
         "meta": {
             "source": "scripts.audit_damage_predictions",
-            "special_skill_ids": [7060130],
+            "special_skill_ids": [],
+            "excluded_skill_ids": [7060130],
+            "excluded_reasons": {
+                "7060130": "confirmed light special damage; reflect child effects settle after base damage"
+            },
         },
     }
 
@@ -947,7 +913,10 @@ def _mechanism_recommendation(
         return {"status": "insufficient_samples", "reason": "matched direct damage samples below 3"}
     skill_ids = {sample.get("skill_id") for sample in samples if sample.get("skill_id") is not None}
     if 7060130 in skill_ids:
-        return {"status": "audit_only", "reason": "special fixed light multihit skill"}
+        return {
+            "status": "audit_only",
+            "reason": "confirmed light special damage; child effects settle after base damage",
+        }
     strategies = summary.get("strategy_compare") or {}
     production = strategies.get("production") or {}
     production_mape = production.get("mape")

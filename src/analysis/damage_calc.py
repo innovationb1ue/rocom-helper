@@ -109,7 +109,7 @@ _STAT_NAME_ALIASES = {
     "SPE": ("SPE", "SPEED", "SPD_SPEED"),
 }
 _STAB_MULTIPLIER = 1.5
-_SPECIAL_FIXED_LIGHT_SKILLS = {7060130: "special_fixed_light_multihit"}
+_SPECIAL_FIXED_LIGHT_SKILLS: Dict[int, str] = {}
 
 
 class DamageCalculator:

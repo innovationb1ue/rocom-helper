@@ -149,7 +149,7 @@ def test_non_damage_skill_returns_none(tmp_path):
     assert service.predict(_pet("我方"), _pet("敌方"), skill) is None
 
 
-def test_reflect_special_damage_without_rule_is_low_confidence(tmp_path):
+def test_reflect_is_light_special_damage_not_fixed_rule(tmp_path):
     service = DamagePredictionService(
         calibration_store=DamageCalibrationStore(tmp_path / "missing_calibration.json"),
         special_rule_store=SpecialDamageRuleStore(tmp_path / "missing_special.json"),
@@ -163,13 +163,13 @@ def test_reflect_special_damage_without_rule_is_low_confidence(tmp_path):
     pred = service.predict(_pet("白金独角兽"), _pet("敌方"), skill)
 
     assert pred is not None
-    assert pred["prediction"]["confidence"] == "low"
-    assert "special_fixed_damage" in pred["prediction"]["accuracy_flags"]
-    assert "special_damage_unmodeled" in pred["prediction"]["accuracy_flags"]
-    assert pred["result"].damage_breakdown["special_damage_rule"]["mode"] == "special_fixed_light_multihit"
+    assert pred["prediction"]["confidence"] == "medium"
+    assert "special_fixed_damage" not in pred["prediction"]["accuracy_flags"]
+    assert "special_damage_unmodeled" not in pred["prediction"]["accuracy_flags"]
+    assert pred["result"].damage_breakdown["special_damage_rule"] is None
 
 
-def test_reflect_special_damage_rule_overrides_prediction(tmp_path):
+def test_reflect_special_damage_rule_config_is_ignored_without_marker(tmp_path):
     special_path = tmp_path / "special_damage_rules.json"
     special_path.write_text(json.dumps({
         "version": 1,
@@ -197,7 +197,7 @@ def test_reflect_special_damage_rule_overrides_prediction(tmp_path):
     pred = service.predict(_pet("白金独角兽"), _pet("敌方"), skill)
 
     assert pred is not None
-    assert pred["prediction"]["per_hit"] == 12
-    assert pred["prediction"]["hit_count"] == 4
-    assert pred["prediction"]["total"] == 48
-    assert pred["result"].damage_breakdown["special_damage_rule"]["applied"] is True
+    assert pred["prediction"]["per_hit"] != 12
+    assert pred["prediction"]["hit_count"] != 4
+    assert pred["prediction"]["total"] != 48
+    assert pred["result"].damage_breakdown["special_damage_rule"] is None
