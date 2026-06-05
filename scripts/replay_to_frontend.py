@@ -6,7 +6,7 @@ Usage:
 Prerequisites:
     1. Backend running:  python -m src.main
     2. Frontend running: cd web && npm run dev
-    3. Browser open at   http://localhost:5173/battle-live
+    3. Browser open at   http://localhost:18732/battle
     4. Click "连接战斗" in the frontend first
 """
 from __future__ import annotations
@@ -22,7 +22,7 @@ if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 
 
-API_BASE = "http://localhost:8000"
+API_BASE = "http://localhost:18731"
 
 
 def main() -> None:
@@ -31,7 +31,7 @@ def main() -> None:
     parser.add_argument("--session", default="battle_session_1", help="Fixture session name")
     parser.add_argument("--round", type=int, default=None, help="Stop after this round, e.g. 7 for R7 (default: replay all)")
     parser.add_argument("--host", default="localhost", help="Backend host")
-    parser.add_argument("--port", type=int, default=8000, help="Backend port")
+    parser.add_argument("--port", type=int, default=18731, help="Backend port")
     args = parser.parse_args()
 
     url = f"http://{args.host}:{args.port}/api/battle/replay?delay_ms={args.delay}&session={args.session}"

@@ -34,12 +34,12 @@ class AppConfig:
     config_dir: Path = PROJECT_ROOT / "data" / "config"
     log_dir: Path = PROJECT_ROOT / "logs"
     api_host: str = os.getenv("RACO_API_HOST", "0.0.0.0")
-    api_port: int = _env_int("RACO_API_PORT", 8000)
-    frontend_port: int = _env_int("RACO_FRONTEND_PORT", 5173)
+    api_port: int = _env_int("RACO_API_PORT", 18731)
+    frontend_port: int = _env_int("RACO_FRONTEND_PORT", 18732)
     capture_port: int = _env_int("RACO_CAPTURE_PORT", 8195)
     cors_origins: Tuple[str, ...] = _env_csv(
         "RACO_CORS_ORIGINS",
-        ("http://localhost:5173", "http://127.0.0.1:5173"),
+        ("http://localhost:18732", "http://127.0.0.1:18732"),
     )
 
     @property

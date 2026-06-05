@@ -1,4 +1,4 @@
-const API_PORT = import.meta.env.VITE_API_PORT ?? '8000';
+const API_PORT = import.meta.env.VITE_API_PORT ?? '18731';
 
 export function apiBaseUrl(): string {
   return '/api';

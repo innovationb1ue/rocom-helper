@@ -391,7 +391,7 @@ npm install
 py -m src.main
 ```
 
-API 服务运行在 `http://localhost:8000`。
+API 服务运行在 `http://localhost:18731`。
 
 ### 3.4 启动前端
 
@@ -400,11 +400,11 @@ cd web
 npm run dev
 ```
 
-前端运行在 `http://localhost:5173`。
+前端运行在 `http://localhost:18732`。
 
 ### 3.5 开始使用
 
-1. 打开浏览器访问 `http://localhost:5173`
+1. 打开浏览器访问 `http://localhost:18732`
 2. 进入「实时战斗」页面
 3. 点击「**连接战斗**」按钮建立 WebSocket 连接
 4. 在洛克王国客户端中开始一场战斗

@@ -6,15 +6,15 @@
 
 ## 前提条件
 
-- 后端运行: `py -m src.main` (端口 8000)
-- 前端运行: `cd web && npm run dev` (端口 5173)
-- 浏览器打开 `http://localhost:5173/battle`
+- 后端运行: `py -m src.main` (端口 18731)
+- 前端运行: `cd web && npm run dev` (端口 18732)
+- 浏览器打开 `http://localhost:18732/battle`
 
 ## 回放步骤
 
 ### 1. 前端准备
 
-在浏览器中打开 `http://localhost:5173/battle`，点击 **"连接战斗"** 按钮。页面应显示绿色的 "已连接" 标签。WebSocket 连接建立后，后端的 `BattleManager` 才会推送数据。
+在浏览器中打开 `http://localhost:18732/battle`，点击 **"连接战斗"** 按钮。页面应显示绿色的 "已连接" 标签。WebSocket 连接建立后，后端的 `BattleManager` 才会推送数据。
 
 ### 2. 触发回放
 
@@ -22,16 +22,16 @@
 
 ```bash
 # 使用默认 session_1，80ms 延迟
-curl -X POST "http://localhost:8000/api/battle/replay"
+curl -X POST "http://localhost:18731/api/battle/replay"
 
 # 指定 session 和延迟
-curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=200&session=battle_session_1"
+curl -X POST "http://localhost:18731/api/battle/replay?delay_ms=200&session=battle_session_1"
 
 # 快速回放（无延迟）
-curl -X POST "http://localhost:8000/api/battle/replay?delay_ms=0"
+curl -X POST "http://localhost:18731/api/battle/replay?delay_ms=0"
 
 # 回放到指定回合停止（例如回放到 R7）
-curl -X POST "http://localhost:8000/api/battle/replay?stop_round=7"
+curl -X POST "http://localhost:18731/api/battle/replay?stop_round=7"
 ```
 
 使用 CLI 脚本:
@@ -47,7 +47,7 @@ py -m scripts.replay_to_frontend --delay 80 --round 7
 py -m scripts.replay_to_frontend --delay 80 --round 10
 
 # 指定后端地址
-py -m scripts.replay_to_frontend --delay 80 --host localhost --port 8000
+py -m scripts.replay_to_frontend --delay 80 --host localhost --port 18731
 ```
 
 参数:
@@ -204,10 +204,10 @@ packets/*.bin                  # 原始 RC01 抓包文件
 
 ```bash
 # 列出可导出的战斗报告，响应同时包含 diagnostics 诊断信息
-curl http://localhost:8000/api/battle/reports
+curl http://localhost:18731/api/battle/reports
 
 # 下载指定报告；report_id 形如 2026-05-07_21-17-31_monitor:1
-curl -o battle.raco-report "http://localhost:8000/api/battle/reports/<urlencoded_report_id>/download"
+curl -o battle.raco-report "http://localhost:18731/api/battle/reports/<urlencoded_report_id>/download"
 ```
 
 导出窗口使用战斗开始前 `10s`、战斗结束后 `5s` 的缓冲，确保 battle_enter 附近上下文不会被遗漏。包内的 `packets/*.bin` 是从 `logs/packets/<session>/` 原样写入的 RC01 文件，解压后的字节内容应与源文件一致。

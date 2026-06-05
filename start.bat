@@ -31,15 +31,15 @@ where npm >nul 2>&1 || (
     exit /b 1
 )
 
-:: Kill existing backend (uvicorn on port 8000)
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8000 " ^| findstr "LISTENING"') do (
-    echo [kill] Found backend on port 8000, PID %%p, terminating...
+:: Kill existing backend (uvicorn on port 18731)
+for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":18731 " ^| findstr "LISTENING"') do (
+    echo [kill] Found backend on port 18731, PID %%p, terminating...
     taskkill /PID %%p /F >nul 2>&1
 )
 
-:: Kill existing frontend (vite on port 5173)
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":5173 " ^| findstr "LISTENING"') do (
-    echo [kill] Found frontend on port 5173, PID %%p, terminating...
+:: Kill existing frontend (vite on port 18732)
+for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":18732 " ^| findstr "LISTENING"') do (
+    echo [kill] Found frontend on port 18732, PID %%p, terminating...
     taskkill /PID %%p /F >nul 2>&1
 )
 
@@ -58,7 +58,7 @@ start "Roco Backend" cmd /k "py -m src.main"
 start "Roco Frontend" cmd /k "cd web && npm run dev"
 
 echo.
-echo Backend:  http://localhost:8000
-echo Frontend: http://localhost:5173
+echo Backend:  http://localhost:18731
+echo Frontend: http://localhost:18732
 echo.
 echo Both servers starting in separate windows.

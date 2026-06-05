@@ -15,12 +15,12 @@ React single-page application for the Roco PvP Helper real-time battle analysis 
 
 ```bash
 npm install
-npm run dev         # Start dev server on http://localhost:5173
+npm run dev         # Start dev server on http://localhost:18732
 npm run build       # TypeScript check + production build
 npm run lint        # ESLint
 ```
 
-The frontend expects the backend running on `http://localhost:8000`.
+The frontend expects the backend running on `http://localhost:18731`.
 
 ## Pages
 
@@ -52,7 +52,7 @@ Zustand stores in `src/stores/`:
 
 ## WebSocket Protocol
 
-The `BattleLive` page connects to `ws://localhost:8000/ws/battle` and receives these message types:
+The `BattleLive` page connects to `ws://localhost:18731/ws/battle` and receives these message types:
 - `connected` - Initial connection confirmation
 - `state_update` - Full battle state snapshot
 - `battle_event` / `battle_events` - Formatted battle events for timeline

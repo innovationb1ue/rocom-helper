@@ -23,7 +23,7 @@
 
 ### 后端
 ```bash
-py -m src.main                   # 启动 FastAPI 服务 :8000（支持热重载）
+py -m src.main                   # 启动 FastAPI 服务 :18731（支持热重载）
 pytest                          # 运行所有测试
 pytest tests/test_crypto.py     # 运行单个测试文件
 pytest -k "test_name"           # 按名称模式匹配运行测试
@@ -53,7 +53,7 @@ py -m scripts.extract_battle --session <id> --extract all   # 提取所有
 
 ### 前端（在 `web/` 目录下）
 ```bash
-npm run dev                     # Vite 开发服务器 :5173
+npm run dev                     # Vite 开发服务器 :18732
 npm run build                   # TypeScript 编译 + Vite 生产构建
 npm run lint                    # ESLint 检查
 ```
@@ -83,7 +83,7 @@ cd web && npm run dev
 
 **步骤：**
 
-1. **导航到战斗页面** — 使用 `mcp__chrome-devtools__navigate_page` 打开 `http://localhost:5173/battle`
+1. **导航到战斗页面** — 使用 `mcp__chrome-devtools__navigate_page` 打开 `http://localhost:18732/battle`
 2. **建立 WebSocket 连接** — 使用 `mcp__chrome-devtools__take_snapshot` 获取页面快照，找到"连接战斗"按钮的 uid，使用 `mcp__chrome-devtools__click` 点击连接
 3. **确认连接成功** — 使用 `mcp__chrome-devtools__take_snapshot` 验证连接状态（如按钮文本变化或状态提示）
 4. **运行回放脚本** — 使用 Bash 后台运行：
@@ -230,7 +230,7 @@ web/ (React SPA)
 
 - **后端入口**：`src/main.py` 通过 `src/api.app:app` 运行 uvicorn（工厂模式 `create_app()`）
 - **路由注册**：所有路由在 `app.py` 中以 `/api` 前缀挂载（战斗 WebSocket 除外）
-- **CORS**：允许的源为 `localhost:5173` 和 `127.0.0.1:5173`（Vite 开发服务器）
+- **CORS**：允许的源为 `localhost:18732` 和 `127.0.0.1:18732`（Vite 开发服务器）
 - **状态管理**：前端使用 Zustand stores；战斗状态通过 WebSocket，宠物/阵容数据通过 REST
 - **API 客户端**：`web/src/utils/api.ts` 集中管理 Axios 调用
 - **BattleManager 单例**：`get_battle_manager()` 提供全局访问，桥接抓包器到 WebSocket 客户端和分析管线
