@@ -149,6 +149,46 @@ def test_non_damage_skill_returns_none(tmp_path):
     assert service.predict(_pet("我方"), _pet("敌方"), skill) is None
 
 
+def test_poison_capsule_reports_current_turn_poison_tick(tmp_path):
+    service = DamagePredictionService(calibration_store=DamageCalibrationStore(tmp_path / "missing.json"))
+    skill = {
+        **_skill(7120090, power=25),
+        "name": "毒囊",
+        "damage_type": 2,
+        "skill_dam_type": 12,
+        "skill_type_id": 7,
+    }
+
+    pred = service.predict(_pet("我方"), _pet("敌方"), skill)
+
+    assert pred is not None
+    direct_total = pred["prediction"]["total"]
+    assert pred["prediction"]["secondary_total"] == 9
+    assert pred["prediction"]["tactical_total"] == direct_total + 9
+    assert pred["prediction"]["predicted_hp_after_with_secondary"] == 300 - direct_total - 9
+    assert pred["prediction"]["secondary_effects"][0]["kind"] == "poison_tick"
+    assert pred["prediction"]["secondary_effects"][0]["audit_policy"] == "excluded_from_direct_damage"
+
+
+def test_poison_capsule_secondary_tick_skips_poison_type_target(tmp_path):
+    service = DamagePredictionService(calibration_store=DamageCalibrationStore(tmp_path / "missing.json"))
+    defender = {**_pet("毒系敌方"), "types": [7]}
+    skill = {
+        **_skill(7120090, power=25),
+        "name": "毒囊",
+        "damage_type": 2,
+        "skill_dam_type": 12,
+        "skill_type_id": 7,
+    }
+
+    pred = service.predict(_pet("我方"), defender, skill)
+
+    assert pred is not None
+    assert pred["prediction"]["secondary_total"] == 0
+    assert pred["prediction"]["tactical_total"] == pred["prediction"]["total"]
+    assert pred["prediction"]["secondary_effects"] == []
+
+
 def test_reflect_is_light_special_damage_not_fixed_rule(tmp_path):
     service = DamagePredictionService(
         calibration_store=DamageCalibrationStore(tmp_path / "missing_calibration.json"),

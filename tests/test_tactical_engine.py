@@ -483,6 +483,21 @@ class TestRecommendation:
         assert all(a.source for a in skill_actions)
         assert any(a.threat_damage is not None for a in skill_actions)
 
+    def test_calc_damage_uses_tactical_total_for_poison_capsule(self):
+        from src.data.loader import get_skill_meta
+
+        my = _make_pet("我方", pet_id=1, types=[7], atk=200)
+        opp = _make_pet("敌方", pet_id=101, max_hp=300, hp=300, types=[1], defense=150)
+        meta = get_skill_meta(7120090)
+
+        pred = TacticalEngine()._prediction_service.predict(my, opp, meta)
+        damage = TacticalEngine()._calc_damage(my, opp, meta, weather=None)
+
+        assert pred is not None
+        assert pred["prediction"]["secondary_total"] == 9
+        assert damage == pred["prediction"]["tactical_total"]
+        assert damage > pred["prediction"]["total"]
+
     def test_with_multiple_switch_options(self):
         my = _make_pet("我方", pet_id=1, energy=10)
         alt1 = _make_pet("替补A", pet_id=2, hp=250, max_hp=300, types=[2])
@@ -518,7 +533,7 @@ class TestRecommendation:
         }
         advice = BattleAdvisor().analyze(state)
         expected_by_skill = {
-            skill.skill_name: skill.expected_damage
+            skill.skill_name: (skill.prediction or {}).get("tactical_total") or skill.expected_damage
             for skill in advice.skill_analysis
             if skill.skill_damage_type in (2, 3) and skill.expected_damage is not None
         }

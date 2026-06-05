@@ -19,6 +19,9 @@ from src.game.type_chart import TypeChart
 _CALIBRATION_PATH = settings.config_dir / "damage_calibration.json"
 _SPECIAL_RULES_PATH = settings.config_dir / "special_damage_rules.json"
 _SERVER_POWER_RULES_PATH = settings.config_dir / "server_power_rules.json"
+_POISON_CAPSULE_SKILL_ID = 7120090
+_POISON_ELEMENT_ID = 7
+_POISON_TICK_RATIO = 0.03
 
 
 @dataclass(frozen=True)
@@ -216,6 +219,10 @@ class DamagePredictionService:
         explain = self._explain(adjusted, calibration, special_rule)
         target_hp_before = adjusted.damage_breakdown.get("defender_current_hp") or 0
         predicted_hp_after = max(0, int(target_hp_before) - adjusted.total_damage)
+        secondary_effects = self._secondary_effects(adjusted, defender)
+        secondary_total = sum(int(item.get("damage") or 0) for item in secondary_effects)
+        tactical_total = adjusted.total_damage + secondary_total
+        predicted_hp_after_with_secondary = max(0, int(target_hp_before) - tactical_total)
         runtime_sources = adjusted.damage_breakdown.get("runtime_sources") or {}
         audit_key = self._audit_key(adjusted, defender)
 
@@ -228,11 +235,15 @@ class DamagePredictionService:
                 "hit_count": adjusted.hit_count,
                 "target_hp_before": target_hp_before,
                 "predicted_hp_after": predicted_hp_after,
+                "predicted_hp_after_with_secondary": predicted_hp_after_with_secondary,
+                "secondary_total": secondary_total,
+                "tactical_total": tactical_total,
+                "secondary_effects": secondary_effects,
                 "runtime_sources": runtime_sources,
                 "confidence": confidence,
                 "accuracy_flags": flags,
             },
-            "explain": explain,
+            "explain": {**explain, "secondary_effects": secondary_effects},
             "validation_hint": validation_hint,
         }
 
@@ -350,6 +361,32 @@ class DamagePredictionService:
         }
         selected = [hints[f] for f in flags if f in hints]
         return "；".join(selected) if selected else None
+
+    @staticmethod
+    def _secondary_effects(dr: DamageResult, defender: Dict[str, Any]) -> List[Dict[str, Any]]:
+        if dr.skill_id != _POISON_CAPSULE_SKILL_ID:
+            return []
+        defender_types = set(defender.get("types") or [])
+        if _POISON_ELEMENT_ID in defender_types:
+            return []
+        max_hp = int(dr.damage_breakdown.get("defender_max_hp") or defender.get("max_hp") or 0)
+        current_hp = int(dr.damage_breakdown.get("defender_current_hp") or defender.get("current_hp") or 0)
+        if max_hp <= 0 or current_hp <= 0:
+            return []
+        hp_after_direct = max(0, current_hp - dr.total_damage)
+        if hp_after_direct <= 0:
+            return []
+        tick = max(1, int(max_hp * _POISON_TICK_RATIO))
+        tick = min(tick, hp_after_direct)
+        return [{
+            "kind": "poison_tick",
+            "name": "中毒当回合结算",
+            "damage": tick,
+            "ratio": _POISON_TICK_RATIO,
+            "timing": "after_skill_damage",
+            "audit_policy": "excluded_from_direct_damage",
+            "notes": "毒囊先造成本体伤害，再施加中毒；中毒在当前回合额外结算一次。",
+        }]
 
     @staticmethod
     def _explain(

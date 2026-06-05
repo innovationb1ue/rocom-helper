@@ -28,7 +28,15 @@ function confidenceTag(confidence: string | null | undefined) {
 }
 
 function totalDamage(s: SkillAnalysis): number {
+  return s.prediction?.tactical_total ?? s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function directDamage(s: SkillAnalysis): number {
   return s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function secondaryDamage(s: SkillAnalysis): number {
+  return s.prediction?.secondary_total ?? 0;
 }
 
 function perHitDamage(s: SkillAnalysis): number {
@@ -106,8 +114,12 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
           const attack = isAttackSkill(s);
           const hc = hitCount(s);
           const total = totalDamage(s);
+          const secondary = secondaryDamage(s);
           const conf = confidence(s);
           const pwr = powerInfo(s);
+          const damageTip = secondary > 0
+            ? `本体伤害: ${directDamage(s)}\n额外效果: +${secondary}\n预计总伤害: ${total}`
+            : undefined;
 
           return (
             <div
@@ -143,9 +155,12 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                       </Tag>
                     </Tooltip>
                   )}
-                  <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600, color: s.can_ko ? '#ff4d4f' : undefined }}>
-                    {total}
-                  </Text>
+                  <Tooltip title={damageTip}>
+                    <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600, color: s.can_ko ? '#ff4d4f' : undefined }}>
+                      {total}
+                    </Text>
+                  </Tooltip>
+                  {secondary > 0 && <Tag color="magenta" style={{ fontSize: 11, margin: 0 }}>额外 +{secondary}</Tag>}
                   {hc > 1 && <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>{perHitDamage(s)} x {hc}</Tag>}
                   {myHp > 0 && (
                     <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>

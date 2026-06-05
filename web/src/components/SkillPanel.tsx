@@ -28,7 +28,15 @@ function confidenceTag(confidence: string | null | undefined) {
 }
 
 function totalDamage(s: SkillAnalysis): number {
+  return s.prediction?.tactical_total ?? s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function directDamage(s: SkillAnalysis): number {
   return s.prediction?.total ?? s.total_max_damage ?? s.expected_damage ?? 0;
+}
+
+function secondaryDamage(s: SkillAnalysis): number {
+  return s.prediction?.secondary_total ?? 0;
 }
 
 function perHitDamage(s: SkillAnalysis): number {
@@ -127,6 +135,9 @@ function formatBreakdown(s: SkillAnalysis, oppHp: number): string {
   const hc = hitCount(s);
   if (hc > 1) lines.push(`连击: ${perHitDamage(s)} x ${hc}`);
   const total = totalDamage(s);
+  const secondary = secondaryDamage(s);
+  if (secondary > 0) lines.push(`额外效果: +${secondary}`);
+  if (secondary > 0) lines.push(`本体伤害: ${directDamage(s)}`);
   if (oppHp > 0) lines.push(`预计总伤害: ${total} (${Math.round(total / oppHp * 100)}% HP)`);
   if (s.validation_hint) lines.push(`提示: ${s.validation_hint}`);
   if (s.warnings?.length) lines.push(...s.warnings.map((w) => `警告: ${w}`));
@@ -168,6 +179,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
           const attack = isAttackSkill(s);
           const hc = hitCount(s);
           const total = totalDamage(s);
+          const secondary = secondaryDamage(s);
           const breakdownText = attack ? formatBreakdown(s, oppHp) : '';
           const conf = confidence(s);
           const pwr = powerInfo(s);
@@ -211,6 +223,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                       {total}
                     </Text>
                   </Tooltip>
+                  {secondary > 0 && <Tag color="magenta" style={{ fontSize: 11, margin: 0 }}>额外 +{secondary}</Tag>}
                   {hc > 1 && <Tag color="purple" style={{ fontSize: 11, margin: 0 }}>{perHitDamage(s)} x {hc}</Tag>}
                   {oppHp > 0 && (
                     <Text type="secondary" style={{ fontSize: 12, minWidth: 50 }}>

@@ -74,6 +74,17 @@ export interface SkillAnalysis {
   prediction?: {
     per_hit: number;
     total: number;
+    tactical_total?: number;
+    secondary_total?: number;
+    predicted_hp_after_with_secondary?: number;
+    secondary_effects?: {
+      kind?: string;
+      name?: string;
+      damage?: number;
+      ratio?: number;
+      timing?: string;
+      notes?: string;
+    }[];
     hit_count: number;
     confidence: string;
     accuracy_flags: string[];

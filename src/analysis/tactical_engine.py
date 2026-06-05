@@ -906,7 +906,8 @@ class TacticalEngine:
         pred = self._prediction_service.predict(attacker, defender, skill_meta, weather=weather)
         if pred is None:
             return 0
-        return pred["prediction"]["total"]
+        prediction = pred.get("prediction") or {}
+        return int(prediction.get("tactical_total") or prediction.get("total") or 0)
 
     @staticmethod
     def _skill_runtime(pet: Dict[str, Any], skill_id: Any) -> Dict[str, Any]:
