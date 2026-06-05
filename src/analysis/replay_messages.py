@@ -1,8 +1,9 @@
 """Shared battle replay/WebSocket message builders."""
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import List, cast
 
+from src.analysis.contracts import BattleWebSocketMessage
 from src.analysis.battle_summary import compute_battle_summary
 from src.analysis.constants import OPCODE_BATTLE_FINISH
 from src.analysis.models import ProcessResult
@@ -11,9 +12,9 @@ from src.analysis.models import ProcessResult
 def build_battle_messages(
     opcode: int,
     result: ProcessResult,
-) -> List[Dict[str, Any]]:
+) -> List[BattleWebSocketMessage]:
     """Build browser-visible messages from a processed battle event."""
-    messages: List[Dict[str, Any]] = []
+    messages: List[BattleWebSocketMessage] = []
 
     if result.formatted_events:
         if len(result.formatted_events) == 1:
@@ -49,7 +50,7 @@ def build_battle_messages(
         messages.append({"type": "hook_advice", "advice": result.hook_advice})
 
     if result.tactical:
-        messages.append({"type": "tactical_recommendations", **result.tactical})
+        messages.append(cast(BattleWebSocketMessage, {"type": "tactical_recommendations", **result.tactical}))
 
     if opcode == OPCODE_BATTLE_FINISH:
         messages.append(

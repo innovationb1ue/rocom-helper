@@ -70,6 +70,7 @@ from src.protocol.battle_schema import (
     _schema_payload,
     _schema_quality,
 )
+from src.protocol.battle_parts.lifecycle import BATTLE_RESULT_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -1712,22 +1713,6 @@ def extract_131a_round_start(record: Dict[str, Any]) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # 0x132c - Finish
 # ---------------------------------------------------------------------------
-
-BATTLE_RESULT_MAP: Dict[int, str] = {
-    0: "NULL",
-    2: "WIN",
-    4: "LOSE",
-    10: "MONSTER_RUNAWAY",
-    12: "RUNAWAY",
-    260: "RUNAWAY_ROLE_MAGIC",
-    18: "WIN_DEFEAT",
-    34: "WIN_CATCH",
-    66: "WIN_HP",
-    68: "LOSE_HP",
-    132: "MONSTER_ESCAPE",
-    516: "MONSTER_ESCAPE2",
-}
-
 
 def extract_132c_finish(record: Dict[str, Any]) -> Dict[str, Any]:
     """Extract battle-finish details from opcode 0x132C."""

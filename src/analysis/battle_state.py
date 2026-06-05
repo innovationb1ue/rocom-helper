@@ -29,9 +29,11 @@ from src.analysis.state_helpers import (
     append_bounded,
     clone_state_with_effective_speed,
     compute_effective_speed,
-    initial_battle_state,
     pick_keys,
 )
+from src.analysis.state.action_entries import ENTRY_HANDLERS
+from src.analysis.state.lifecycle import build_initial_state
+from src.analysis.state.pet_sync import bind_side_slot, side_int, side_is_player
 from src.analysis.constants import (
     OPCODE_ACTION_RESOLVE,
     OPCODE_ACTION_ACK,
@@ -78,7 +80,7 @@ def _compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
 
 class BattleStateTracker:
     def __init__(self) -> None:
-        self.state: Dict[str, Any] = initial_battle_state()
+        self.state: Dict[str, Any] = build_initial_state()
         # battle slot IDs whose ownership has been established
         self._opponent_slots: set = set()
         self._player_slots: set = set()
@@ -884,27 +886,17 @@ class BattleStateTracker:
 
     def _is_mine(self, side_value) -> bool:
         """True if *side_value* represents the player side."""
-        if side_value is None:
-            return False
-        if isinstance(side_value, str):
-            return side_value == "我方"
-        v = int(side_value)
-        pet = self._battle_side_pets.get(v)
-        if pet is not None:
-            return pet in self.state["my_pets"]
-        if v in self._opponent_slots:
-            return False
-        if v in self._player_slots:
-            return True
-        # Fallback: numeric range when slot mapping is not yet established
-        return 1 <= v <= 6
+        return side_is_player(
+            side_value,
+            battle_side_pets=self._battle_side_pets,
+            player_slots=self._player_slots,
+            opponent_slots=self._opponent_slots,
+            my_pets=self.state["my_pets"],
+        )
 
     @staticmethod
     def _side_int(side_value: Any) -> Optional[int]:
-        try:
-            return int(side_value)
-        except (TypeError, ValueError):
-            return None
+        return side_int(side_value)
 
     def _bind_battle_side(self, side_value: Any, pet: Optional[Dict[str, Any]], *, is_mine: Optional[bool] = None) -> None:
         side_num = self._side_int(side_value)
@@ -912,13 +904,14 @@ class BattleStateTracker:
             return
         if is_mine is None:
             is_mine = pet in self.state["my_pets"]
-        self._battle_side_pets[side_num] = pet
-        if is_mine:
-            self._player_slots.add(side_num)
-            self._opponent_slots.discard(side_num)
-        else:
-            self._opponent_slots.add(side_num)
-            self._player_slots.discard(side_num)
+        bind_side_slot(
+            side_num,
+            pet,
+            battle_side_pets=self._battle_side_pets,
+            player_slots=self._player_slots,
+            opponent_slots=self._opponent_slots,
+            is_mine=is_mine,
+        )
 
     def _set_active_pet(self, pet: Dict[str, Any]) -> None:
         if pet in self.state["my_pets"]:
@@ -967,36 +960,7 @@ class BattleStateTracker:
     #   effect_apply → 添加/更新 buff
     #   effect_stage → 更新 buff 阶段
 
-    _ENTRY_HANDLERS = {
-        "damage": "_handle_damage_entry",
-        "skill_cast": "_handle_skill_cast_entry",
-        "combo_skill_cast": "_handle_combo_skill_cast_entry",
-        "defeat": "_handle_defeat_entry",
-        "heal": "_handle_heal_entry",
-        "energy": "_handle_energy_entry",
-        "change_pet": "_handle_change_pet_entry",
-        "effect_apply": "_handle_effect_apply_entry",
-        "effect_stage": "_handle_effect_stage_entry",
-        "buff_trigger": "_handle_buff_trigger_entry",
-        "effect_link": "_handle_effect_link_entry",
-        "effect_trigger": "_handle_effect_trigger_entry",
-        "weather_change": "_handle_weather_change_entry",
-        "skill_state": "_handle_skill_state_entry",
-        "role_skill_cast": "_handle_role_skill_cast_entry",
-        "special_move": "_handle_special_move_entry",
-        "skill_pos_change": "_handle_skill_pos_change_entry",
-        "sp_energy_change": "_handle_sp_energy_change_entry",
-        "sp_energy_trigger": "_handle_sp_energy_trigger_entry",
-        "idle": "_handle_idle_entry",
-        "notify_perform": "_handle_notify_perform_entry",
-        "change_model": "_handle_change_model_entry",
-        "data_update": "_handle_data_update_entry",
-        "ai_action": "_handle_ai_action_entry",
-        "supply_pet": "_handle_supply_pet_entry",
-        "cmd_failed": "_handle_cmd_failed_entry",
-        "runaway": "_handle_runaway_entry",
-        "use_item": "_handle_use_item_entry",
-    }
+    _ENTRY_HANDLERS = ENTRY_HANDLERS
 
     def _handle_action_resolve(self, detail: Dict[str, Any]) -> None:
         for entry in detail.get("entries", []):

@@ -29,6 +29,7 @@ from src.analysis.hook_registry import HookContext, HookRegistry, HookTrigger
 from src.analysis.hooks import create_default_hooks
 from src.analysis.models import ProcessResult
 from src.analysis.prediction_reliability import build_prediction_reliability
+from src.analysis.state_projector import project_state_after_entries
 from src.analysis.suggestions import build_state_suggestions
 from src.analysis.tactical_engine import TacticalEngine
 
@@ -95,7 +96,6 @@ class BattleProcessor:
         if self._include_analysis and battle_is_active and opcode in self._DAMAGE_OPCODES:
             if opcode == OPCODE_ACTION_RESOLVE:
                 # 对 action_resolve 使用投影状态：buff/能量/换宠已生效但 HP 未扣减
-                from src.analysis.state_projector import project_state_after_entries
                 projected = project_state_after_entries(state_before or state, detail.get("entries", []))
                 battle_advice_dict = self._compute_damage_analysis(projected)
                 if not self._has_usable_damage_predictions(battle_advice_dict):
