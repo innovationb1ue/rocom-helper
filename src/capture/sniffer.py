@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 import logging
-import threading
-import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
@@ -15,31 +13,16 @@ except ImportError:
     HAS_SCAPY = False
 
 from src.capture.frame import Be21Packet
+from src.capture.flow_registry import FlowRegistry
+from src.capture.packet_flow import flow_key_from_packet, packet_direction, tcp_close_reason
 from src.capture.reassembly import FlowState
-from src.capture.key_capture import extract_key_from_ack, is_ack_packet
-from src.capture.crypto import decrypt_4013_body, write_key_file, printable_ascii
+from src.capture.sniffer_control_events import handle_control_frame
+from src.capture.sniffer_data_events import handle_data_frame
+from src.capture.sniffer_key_events import handle_ack_key_frame
 from src.config import settings
-from src.protocol.proto_core import parse_record, parse_tgcp_control_packet, extract_inner_message
-from src.protocol.opcodes import summarize
 
 _DEFAULT_PORT = settings.capture_port
 _DEFAULT_BPF = f"tcp port {_DEFAULT_PORT}"
-_KEY_MISSING_SUPPRESS_THRESHOLD = 3
-
-
-def _flow_key_from_packet(packet: Any, port: int) -> Optional[Tuple[str, int, str, int]]:
-    """从 TCP 包提取流标识 (client_ip, client_port, server_ip, server_port)。"""
-    if not packet.haslayer(IP) or not packet.haslayer(TCP):
-        return None
-    src_ip = packet[IP].src
-    dst_ip = packet[IP].dst
-    src_port = packet[TCP].sport
-    dst_port = packet[TCP].dport
-    if dst_port == port:
-        return (src_ip, src_port, dst_ip, dst_port)
-    elif src_port == port:
-        return (dst_ip, dst_port, src_ip, src_port)
-    return None
 
 
 class Sniffer:
@@ -66,10 +49,10 @@ class Sniffer:
         self.on_record = on_record
         self.pkt_logger = packet_logger
         self.on_event = on_event
-        self.flows: Dict[Tuple[str, int, str, int], FlowState] = {}
+        self._flow_registry = FlowRegistry(key_file=key_file, preset_key=preset_key)
+        self.flows = self._flow_registry.flows
         self._sniffer: Optional[AsyncSniffer] = None
         self._running = False
-        self._lock = threading.Lock()
         self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0, "parse_fail": 0}
 
     def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
@@ -80,24 +63,7 @@ class Sniffer:
                 logger.debug("on_event callback raised", exc_info=True)
 
     def _get_or_create_flow(self, fk: Tuple[str, int, str, int]) -> FlowState:
-        with self._lock:
-            flow = self.flows.get(fk)
-            if flow is None:
-                client_ip, client_port, server_ip, server_port = fk
-                flow_id = f"{client_ip}:{client_port}-{server_ip}:{server_port}"
-                flow = FlowState(
-                    flow_id=flow_id,
-                    client_ip=client_ip,
-                    client_port=client_port,
-                    server_ip=server_ip,
-                    server_port=server_port,
-                    key=self.preset_key,
-                )
-                self.flows[fk] = flow
-                if self.preset_key:
-                    write_key_file(self.key_file, self.preset_key, flow_id)
-                logger.info("新 TCP 流: %s", flow_id)
-            return flow
+        return self._flow_registry.get_or_create(fk)
 
     def _process_packet(self, packet: Any) -> None:
         """处理一个 Scapy 捕获的包。"""
@@ -107,27 +73,21 @@ class Sniffer:
         tcp = packet[TCP]
         payload = bytes(tcp.payload)
 
-        # 检测 FIN/RST（连接关闭）
-        flags = int(tcp.flags)
-        is_fin = bool(flags & 0x01)
-        is_rst = bool(flags & 0x04)
-
-        if is_fin or is_rst:
-            fk = _flow_key_from_packet(packet, self.port)
+        close_reason = tcp_close_reason(tcp.flags)
+        if close_reason:
+            fk = flow_key_from_packet(packet, self.port, IP, TCP)
             if fk is not None:
-                with self._lock:
-                    flow = self.flows.get(fk)
+                flow = self._flow_registry.get(fk)
                 if flow is not None:
-                    reason = "RST" if is_rst else "FIN"
-                    logger.info("TCP %s: %s", reason, flow.flow_id)
-                    self._emit("flow_closed", {"flow_id": flow.flow_id, "reason": reason})
+                    logger.info("TCP %s: %s", close_reason, flow.flow_id)
+                    self._emit("flow_closed", {"flow_id": flow.flow_id, "reason": close_reason})
             return
 
         # 只有有 payload 的包才做流重组和解析
         if not payload:
             return
 
-        fk = _flow_key_from_packet(packet, self.port)
+        fk = flow_key_from_packet(packet, self.port, IP, TCP)
         if fk is None:
             return
 
@@ -138,7 +98,7 @@ class Sniffer:
             # 第一个有 payload 的包，确认 flow 是新的
             pass
 
-        direction = "c2s" if tcp.dport == self.port else "s2c"
+        direction = packet_direction(tcp, self.port)
         seq = int(tcp.seq)
         for be21 in flow.direction_state(direction).feed(seq, payload):
             self._handle_be21(flow, be21)
@@ -147,134 +107,32 @@ class Sniffer:
         """处理一个 BE21 帧：密钥提取或解密解析。"""
         plog = self.pkt_logger
 
-        # 密钥提取
-        if is_ack_packet(be21):
-            key = extract_key_from_ack(be21)
-            if key:
-                dedupe = (be21.seq, key.hex())
-                if dedupe not in flow.seen_acks:
-                    flow.seen_acks.add(dedupe)
-                    flow.key = key
-                    flow.key_miss_count = 0
-                    flow.key_missing_suppressed = False
-                    flow.key_missing_reported = False
-                    write_key_file(self.key_file, key, flow.flow_id)
-                    logger.info("[ack_0x1002] flow=%s key=%s", flow.flow_id,
-                                printable_ascii(key) or key.hex())
-                    self._emit("key_captured", {"flow_id": flow.flow_id, "key_hex": key.hex()})
-                    if plog:
-                        plog.log_key_extracted(flow.flow_id, key)
-            if plog:
-                plog.log_be21_frame(
-                    flow.flow_id, be21.direction, be21.cmd, be21.seq,
-                    be21.header_extra, be21.body,
-                )
+        if handle_ack_key_frame(
+            flow=flow,
+            be21=be21,
+            key_file=self.key_file,
+            emit=self._emit,
+            packet_logger=plog,
+        ):
             return
 
-        # 只处理 DATA 帧
-        if be21.cmd != 0x4013:
-            pkt_dict = {
-                "cmd": be21.cmd, "direction": be21.direction,
-                "seq": be21.seq, "body_len": be21.body_len,
-                "header_extra_hex": be21.header_extra.hex(),
-                "body_hex": be21.body.hex(),
-            }
-            record = parse_tgcp_control_packet(pkt_dict)
-            if plog:
-                plog.log_be21_frame(
-                    flow.flow_id, be21.direction, be21.cmd, be21.seq,
-                    be21.header_extra, be21.body, record=record,
-                )
-            if record and self.on_record:
-                self.on_record(record)
-                self._emit("record", {"record": record})
+        if handle_control_frame(
+            flow=flow,
+            be21=be21,
+            emit=self._emit,
+            record_callback=self.on_record,
+            packet_logger=plog,
+        ):
             return
 
-        # 解密 DATA 帧
-        if flow.key is None:
-            flow.key_miss_count += 1
-            self.stats["key_miss"] += 1
-            if plog and not flow.key_missing_suppressed:
-                plog.log_key_miss(flow.flow_id, f"0x{be21.cmd:04X}", be21.seq)
-            if flow.key_miss_count >= _KEY_MISSING_SUPPRESS_THRESHOLD:
-                flow.key_missing_suppressed = True
-                if not flow.key_missing_reported:
-                    flow.key_missing_reported = True
-                    self._emit("key_missing_suppressed", {
-                        "flow_id": flow.flow_id,
-                        "cmd": be21.cmd,
-                        "seq": be21.seq,
-                        "key_miss_count": flow.key_miss_count,
-                        "reason": "已捕获到加密 DATA 帧但未捕获会话密钥，后续该连接将降级静默",
-                    })
-            return
-        try:
-            iv, plain = decrypt_4013_body(flow.key, be21.body)
-        except ValueError as exc:
-            self.stats["decrypt_fail"] += 1
-            if plog:
-                plog.log_be21_frame(
-                    flow.flow_id, be21.direction, be21.cmd, be21.seq,
-                    be21.header_extra, be21.body,
-                    error=f"解密失败: {exc}",
-                )
-            self._emit("decrypt_fail", {
-                "flow_id": flow.flow_id,
-                "cmd": be21.cmd,
-                "seq": be21.seq,
-                "reason": str(exc),
-                "key_hex": flow.key.hex() if flow.key else None,
-                "count": self.stats["decrypt_fail"],
-            })
-            return
-
-        pkt_dict = {
-            "cmd": 0x4013, "direction": be21.direction,
-            "seq": be21.seq, "body_len": be21.body_len,
-            "header_extra_hex": be21.header_extra.hex(),
-            "body_hex": be21.body.hex(),
-            "decrypted_body_hex": plain.hex(),
-        }
-        record = parse_record(pkt_dict)
-        if record is None:
-            if plog:
-                plog.log_be21_frame(
-                    flow.flow_id, be21.direction, be21.cmd, be21.seq,
-                    be21.header_extra, be21.body,
-                    decrypted_body=plain,
-                    error="parse_record 返回 None",
-                )
-            if be21.direction == "s2c":
-                # s2c parse_fail 才是真正的协议问题（可能是未知格式）
-                self.stats["parse_fail"] += 1
-                self._emit("parse_fail", {
-                    "flow_id": flow.flow_id,
-                    "seq": be21.seq,
-                    "count": self.stats["parse_fail"],
-                })
-            # c2s 非战斗包（握手/心跳等）不符合已知格式是正常的，不上报
-            return
-
-        if record.get("opcode") == 0x0414:
-            return
-
-        inner = None
-
-        kind, summary = summarize(record, inner)
-        record["_summary_kind"] = kind
-        record["_summary"] = summary
-        self.stats["decrypt_ok"] += 1
-
-        if plog:
-            plog.log_be21_frame(
-                flow.flow_id, be21.direction, be21.cmd, be21.seq,
-                be21.header_extra, be21.body,
-                decrypted_body=plain, record=record,
-            )
-
-        if self.on_record:
-            self.on_record(record)
-        self._emit("record", {"record": record})
+        handle_data_frame(
+            flow=flow,
+            be21=be21,
+            stats=self.stats,
+            emit=self._emit,
+            record_callback=self.on_record,
+            packet_logger=plog,
+        )
 
     def start(self) -> None:
         """开始抓包。"""
@@ -305,26 +163,12 @@ class Sniffer:
 
     @property
     def flow_count(self) -> int:
-        with self._lock:
-            return len(self.flows)
+        return self._flow_registry.count()
 
     def has_active_flows(self) -> bool:
         """是否有活跃的 TCP 流。"""
-        with self._lock:
-            return len(self.flows) > 0
+        return self._flow_registry.has_active()
 
     def get_status(self) -> Dict[str, Any]:
         """获取当前状态快照。"""
-        with self._lock:
-            flows_info = []
-            for _fk, flow in self.flows.items():
-                flows_info.append({
-                    "flow_id": flow.flow_id,
-                    "has_key": flow.key is not None,
-                })
-            return {
-                "running": self._running,
-                "flow_count": len(self.flows),
-                "flows": flows_info,
-                "stats": dict(self.stats),
-            }
+        return self._flow_registry.status(running=self._running, stats=self.stats)

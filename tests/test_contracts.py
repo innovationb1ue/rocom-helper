@@ -46,3 +46,41 @@ def test_build_battle_messages_keeps_browser_contract_fields():
     assert by_type["skill_analysis"]["opp_skill_source"] == "used_skills"
     assert by_type["hook_advice"]["advice"][0]["hook_id"] == "energy_monitor"
     assert by_type["tactical_recommendations"]["round_number"] == 3
+
+
+def test_build_battle_messages_batches_multiple_formatted_events():
+    result = ProcessResult(
+        state={"battle_id": 1, "round": 4, "result": None},
+        formatted_events=[
+            FormattedEvent("damage", 4, "伤害 1", {"amount": 10}, "heart", "red"),
+            FormattedEvent("heal", 4, "治疗 1", {"amount": 5}, "plus", "green"),
+        ],
+    )
+
+    messages = build_battle_messages(0x1324, result)
+    by_type = {message["type"]: message for message in messages}
+
+    assert "battle_event" not in by_type
+    assert by_type["battle_events"]["events"][0]["kind"] == "damage"
+    assert by_type["battle_events"]["events"][1]["kind"] == "heal"
+    assert by_type["state_update"]["state"]["round"] == 4
+
+
+def test_build_battle_messages_emits_finish_summary_without_changing_state_contract():
+    result = ProcessResult(
+        state={
+            "battle_id": 1,
+            "round": 5,
+            "result": "WIN",
+            "my_pets": [],
+            "opp_pets": [],
+            "events": [],
+        },
+    )
+
+    messages = build_battle_messages(0x132C, result)
+    by_type = {message["type"]: message for message in messages}
+
+    assert by_type["state_update"]["state"]["result"] == "WIN"
+    assert by_type["battle_summary"]["summary"]["result"] == "WIN"
+    assert by_type["battle_summary"]["summary"]["rounds"] == 5

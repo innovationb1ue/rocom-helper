@@ -23,6 +23,18 @@ FORBIDDEN_PACKAGE_EDGES = {
     ("game", "api"),
 }
 
+FORBIDDEN_MODULE_PREFIX_EDGES = {
+    ("src.analysis.state", "src.api"),
+    ("src.analysis.replay_messages", "src.api"),
+}
+
+FORBIDDEN_EXTERNAL_IMPORTS = {
+    "src.analysis.replay_messages": ("fastapi",),
+    "src.api.battle_sniffer_bridge": ("fastapi",),
+    "src.api.battle_ws_commands": ("fastapi",),
+    "src.api.ws_hub": ("fastapi",),
+}
+
 
 def _module_name(path: Path) -> str:
     return ".".join(path.relative_to(PROJECT_ROOT).with_suffix("").parts)
@@ -78,6 +90,37 @@ def find_forbidden_edges(graph: Dict[str, Set[str]]) -> List[Tuple[str, str]]:
             dst_pkg = _package_name(dst)
             if (src_pkg, dst_pkg) in FORBIDDEN_PACKAGE_EDGES:
                 bad.append((src, dst))
+            if any(
+                src.startswith(src_prefix) and dst.startswith(dst_prefix)
+                for src_prefix, dst_prefix in FORBIDDEN_MODULE_PREFIX_EDGES
+            ):
+                bad.append((src, dst))
+    return sorted(bad)
+
+
+def find_forbidden_external_imports() -> List[Tuple[str, str]]:
+    bad: List[Tuple[str, str]] = []
+    modules = {_module_name(path): path for path in SRC_ROOT.rglob("*.py")}
+    for module, path in modules.items():
+        forbidden = [
+            package
+            for prefix, packages in FORBIDDEN_EXTERNAL_IMPORTS.items()
+            if module == prefix or module.startswith(prefix + ".")
+            for package in packages
+        ]
+        if not forbidden:
+            continue
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            imported: str | None = None
+            if isinstance(node, ast.ImportFrom):
+                imported = node.module
+            elif isinstance(node, ast.Import):
+                for alias in node.names:
+                    imported = alias.name
+                    break
+            if imported and any(imported == pkg or imported.startswith(pkg + ".") for pkg in forbidden):
+                bad.append((module, imported))
     return sorted(bad)
 
 
@@ -128,14 +171,18 @@ def format_problems(items: Iterable[Iterable[str]]) -> str:
 def main() -> int:
     graph = scan_imports()
     forbidden = find_forbidden_edges(graph)
+    forbidden_external = find_forbidden_external_imports()
     cycles = find_cycles(graph)
     if forbidden:
         print("Forbidden package edges:")
         print(format_problems(forbidden))
+    if forbidden_external:
+        print("Forbidden external imports:")
+        print(format_problems(forbidden_external))
     if cycles:
         print("Import cycles:")
         print(format_problems(cycles))
-    if forbidden or cycles:
+    if forbidden or forbidden_external or cycles:
         return 1
     print("Architecture check passed.")
     return 0

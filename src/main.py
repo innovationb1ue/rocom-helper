@@ -12,6 +12,9 @@ def main():
         host=settings.api_host,
         port=settings.api_port,
         reload=True,
+        # 回放会在同一 WebSocket 上连续推送大量战斗消息；禁用底层
+        # keepalive ping，避免 ping 与业务消息竞争写入导致库层异常。
+        ws_ping_interval=None,
     )
 
 

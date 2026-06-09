@@ -11,25 +11,23 @@ BattleManager 负责网络层的编排：
 from __future__ import annotations
 
 import asyncio
-import json
-import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import WebSocket
 
 from src.analysis.battle_processor import BattleProcessor
-from src.analysis.battle_report import archive_latest_completed_battle
 from src.analysis.constants import (
     AUX_BATTLE_OPCODES,
     IN_BATTLE_OPCODES,
     LIFECYCLE_OPCODES,
-    OPCODE_BATTLE_FINISH,
 )
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.models import ProcessResult
 from src.analysis.replay_messages import build_battle_messages
-
-logger = logging.getLogger(__name__)
+from src.api.battle_archive import schedule_completed_battle_archive
+from src.api.battle_sniffer_bridge import BattleSnifferBridge
+from src.api.battle_ws_commands import handle_battle_ws_command
+from src.api.ws_hub import JsonWebSocketHub
 
 
 class BattleManager:
@@ -41,8 +39,12 @@ class BattleManager:
 
     def __init__(self) -> None:
         self._processor = BattleProcessor()
-        self._ws_clients: List[WebSocket] = []
-        self._bridge_registered = False
+        self._ws_hub = JsonWebSocketHub()
+        self._sniffer_bridge = BattleSnifferBridge(
+            has_clients=self._ws_hub.has_clients,
+            battle_active=self.battle_active,
+            process_event=self.process_event,
+        )
         self._process_lock = asyncio.Lock()
 
     @property
@@ -68,46 +70,19 @@ class BattleManager:
     # ------------------------------------------------------------------
 
     async def add_client(self, ws: WebSocket) -> None:
-        await ws.accept()
-        self._ws_clients.append(ws)
+        await self._ws_hub.accept(ws)
         self._ensure_bridge()
-        await ws.send_json({"type": "connected", "message": "Battle state tracker ready"})
+        await self._ws_hub.send_json(ws, {"type": "connected", "message": "Battle state tracker ready"})
 
     def remove_client(self, ws: WebSocket) -> None:
-        if ws in self._ws_clients:
-            self._ws_clients.remove(ws)
+        self._ws_hub.remove(ws)
 
     # ------------------------------------------------------------------
     # Sniffer bridge
     # ------------------------------------------------------------------
 
     def _ensure_bridge(self) -> None:
-        if self._bridge_registered:
-            return
-        self._bridge_registered = True
-        from src.api.sniffer_manager import get_sniffer_manager
-        mgr = get_sniffer_manager()
-        mgr.register_record_callback(self._on_sniffer_record)
-
-    def _on_sniffer_record(self, record: Dict[str, Any]) -> None:
-        if not self._ws_clients:
-            return
-        opcode = record.get("opcode")
-        if opcode is None:
-            return
-        if (
-            opcode not in self._LIFECYCLE_OPCODES
-            and opcode not in self._IN_BATTLE_OPCODES
-            and opcode not in self._AUX_BATTLE_OPCODES
-        ):
-            return
-        if opcode not in self._LIFECYCLE_OPCODES and not self.battle_active():
-            return
-        _summary = record.get("_summary", {})
-        detail = _summary.get("detail", _summary)
-        if not isinstance(detail, dict):
-            detail = {}
-        asyncio.create_task(self.process_event(opcode, detail))
+        self._sniffer_bridge.ensure_registered()
 
     # ------------------------------------------------------------------
     # Core processing — delegates to BattleProcessor, then pushes WebSocket
@@ -125,80 +100,23 @@ class BattleManager:
             for message in build_battle_messages(opcode, result):
                 await self._push_message(message)
 
-            if enable_archive and opcode == OPCODE_BATTLE_FINISH:
-                asyncio.create_task(self._archive_completed_battle())
+            schedule_completed_battle_archive(opcode, enable_archive=enable_archive)
 
             return result
-
-    async def _archive_completed_battle(self) -> None:
-        from src.api.sniffer_manager import get_sniffer_manager
-
-        session_dir = get_sniffer_manager().get_packet_session_dir()
-        if session_dir is None:
-            return
-        try:
-            archive_path = await asyncio.to_thread(archive_latest_completed_battle, session_dir)
-        except Exception:
-            logger.exception("自动归档战斗报告失败")
-            return
-        if archive_path is not None:
-            logger.info("战斗报告已自动归档: %s", archive_path)
 
     # ------------------------------------------------------------------
     # WebSocket push helpers
     # ------------------------------------------------------------------
 
     async def _push_message(self, message: Dict[str, Any]) -> None:
-        text = json.dumps(message, ensure_ascii=False)
-        dead: List[WebSocket] = []
-        for ws in self._ws_clients:
-            try:
-                await ws.send_text(text)
-            except Exception:
-                dead.append(ws)
-        for ws in dead:
-            self._ws_clients.remove(ws)
+        await self._ws_hub.broadcast(message)
 
     # ------------------------------------------------------------------
     # WebSocket message handler
     # ------------------------------------------------------------------
 
     async def handle_message(self, ws: WebSocket, data: Dict[str, Any]) -> None:
-        if self._processor.tracker is None:
-            await ws.send_json({"type": "error", "message": "No active tracker"})
-            return
-
-        msg_type = data.get("type")
-
-        if msg_type == "event":
-            opcode = data.get("opcode")
-            detail = data.get("detail", {})
-            if opcode is not None:
-                result = self._processor.process_event(opcode, detail)
-                await ws.send_json({"type": "state_update", "state": result.state})
-                if result.suggestions:
-                    await ws.send_json({"type": "suggestions", "suggestions": result.suggestions})
-
-        elif msg_type == "get_state":
-            state = self._processor.get_state()
-            await ws.send_json({"type": "state", "state": state})
-
-        elif msg_type == "reset":
-            self._processor.reset()
-            await ws.send_json({"type": "reset", "message": "Tracker reset"})
-
-        elif msg_type == "request_counter_pick":
-            state = self._processor.get_state()
-            opp_active = state.get("opp_active")
-            if opp_active:
-                await ws.send_json({
-                    "type": "counter_pick",
-                    "opponent": opp_active,
-                    "message": "Consider switching to counter opponent",
-                })
-
-        else:
-            await ws.send_json({"type": "error", "message": f"Unknown type: {msg_type}"})
+        await handle_battle_ws_command(ws, self._processor, data)
 
 
 # Global singleton

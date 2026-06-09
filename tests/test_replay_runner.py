@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from src.analysis.replay_models import ReplayEventSnapshot as ModelReplayEventSnapshot
+from src.analysis.replay_models import ReplayResult as ModelReplayResult
 from src.analysis.replay_runner import BattleReplayRunner, ReplayEventSnapshot, ReplayResult
 from src.analysis.damage_audit import (
     build_damage_audit,
@@ -52,6 +54,10 @@ class TestReplayRunnerBasic:
 
     def test_stopped_early_default_false(self, session1_runner_result):
         assert session1_runner_result.stopped_early is False
+
+    def test_replay_models_are_reexported_for_compatibility(self):
+        assert ReplayEventSnapshot is ModelReplayEventSnapshot
+        assert ReplayResult is ModelReplayResult
 
     def test_stop_round(self, session1_packets):
         runner = BattleReplayRunner()

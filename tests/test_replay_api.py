@@ -116,7 +116,7 @@ class TestReplayTrackerState:
 
 class TestBattleReportEndpoints:
     def test_list_reports(self, client, monkeypatch):
-        from src.api import routes_battle
+        from src.api import battle_report_endpoints
 
         summary = SimpleNamespace(
             report_id="session:1",
@@ -148,8 +148,8 @@ class TestBattleReportEndpoints:
             has_battle_enter=True,
             has_battle_finish=True,
         )
-        monkeypatch.setattr(routes_battle, "scan_report_summaries", lambda: [summary])
-        monkeypatch.setattr(routes_battle, "build_report_diagnostics", lambda reports=None: diagnostics)
+        monkeypatch.setattr(battle_report_endpoints, "scan_report_summaries", lambda: [summary])
+        monkeypatch.setattr(battle_report_endpoints, "build_report_diagnostics", lambda reports=None: diagnostics)
 
         resp = client.get("/api/battle/reports")
 
@@ -162,10 +162,10 @@ class TestBattleReportEndpoints:
         assert data["diagnostics"]["has_battle_enter"] is True
 
     def test_get_report_detail(self, client, monkeypatch):
-        from src.api import routes_battle
+        from src.api import battle_report_endpoints
 
         summary = SimpleNamespace(report_id="session:1", session_id="session", battle_index=1)
-        monkeypatch.setattr(routes_battle, "get_report_summary", lambda report_id: summary)
+        monkeypatch.setattr(battle_report_endpoints, "get_report_summary", lambda report_id: summary)
 
         resp = client.get("/api/battle/reports/session%3A1")
 
@@ -173,10 +173,10 @@ class TestBattleReportEndpoints:
         assert resp.json()["report_id"] == "session:1"
 
     def test_download_report(self, client, monkeypatch):
-        from src.api import routes_battle
+        from src.api import battle_report_endpoints
 
         monkeypatch.setattr(
-            routes_battle,
+            battle_report_endpoints,
             "get_report_package",
             lambda report_id: ("raco-report_session_battle-1.raco-report", b"zip-bytes"),
         )
@@ -189,7 +189,7 @@ class TestBattleReportEndpoints:
         assert resp.content == b"zip-bytes"
 
     def test_download_unfinished_report(self, client, monkeypatch, tmp_path: Path):
-        from src.api import routes_battle
+        from src.api import battle_report_endpoints
 
         if not FIXTURE_SESSION.exists():
             pytest.skip("battle_session_1 fixture not found")
@@ -203,7 +203,7 @@ class TestBattleReportEndpoints:
                 fpath.unlink()
 
         monkeypatch.setattr(
-            routes_battle,
+            battle_report_endpoints,
             "get_report_package",
             lambda report_id: get_report_package(report_id, packet_root),
         )
@@ -216,12 +216,12 @@ class TestBattleReportEndpoints:
         assert resp.content.startswith(b"PK")
 
     def test_invalid_report_returns_404(self, client, monkeypatch):
-        from src.api import routes_battle
+        from src.api import battle_report_endpoints
 
         def _raise(_report_id):
             raise BattleReportError("Battle not found")
 
-        monkeypatch.setattr(routes_battle, "get_report_summary", _raise)
+        monkeypatch.setattr(battle_report_endpoints, "get_report_summary", _raise)
 
         resp = client.get("/api/battle/reports/missing%3A1")
 
@@ -231,36 +231,36 @@ class TestBattleReportEndpoints:
 class TestBattleManagerArchiveToggle:
     def test_process_event_archives_by_default(self, monkeypatch):
         from src.api.battle_manager import BattleManager
+        import src.api.battle_manager as battle_manager
 
         calls = []
 
-        async def _archive():
-            calls.append("archive")
+        def _schedule(opcode, *, enable_archive):
+            calls.append((opcode, enable_archive))
 
         async def _run():
             mgr = BattleManager()
-            monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
+            monkeypatch.setattr(battle_manager, "schedule_completed_battle_archive", _schedule)
             await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"})
-            await asyncio.sleep(0)
 
         asyncio.run(_run())
 
-        assert calls == ["archive"]
+        assert calls == [(OPCODE_BATTLE_FINISH, True)]
 
     def test_process_event_can_disable_archive(self, monkeypatch):
         from src.api.battle_manager import BattleManager
+        import src.api.battle_manager as battle_manager
 
         calls = []
 
-        async def _archive():
-            calls.append("archive")
+        def _schedule(opcode, *, enable_archive):
+            calls.append((opcode, enable_archive))
 
         async def _run():
             mgr = BattleManager()
-            monkeypatch.setattr(mgr, "_archive_completed_battle", _archive)
+            monkeypatch.setattr(battle_manager, "schedule_completed_battle_archive", _schedule)
             await mgr.process_event(OPCODE_BATTLE_FINISH, {"result": "WIN"}, enable_archive=False)
-            await asyncio.sleep(0)
 
         asyncio.run(_run())
 
-        assert calls == []
+        assert calls == [(OPCODE_BATTLE_FINISH, False)]
