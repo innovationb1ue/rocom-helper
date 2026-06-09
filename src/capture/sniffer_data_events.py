@@ -9,6 +9,49 @@ from src.protocol.opcodes import summarize
 from src.protocol.proto_core import parse_record
 
 _DATA_CMD = 0x4013
+_STALE_PRESET_KEY_PARSE_FAIL_THRESHOLD = 3
+
+
+def _handle_stale_preset_key_parse_fail(
+    *,
+    flow: Any,
+    be21: Any,
+    stats: Dict[str, int],
+    emit: Callable[[str, Dict[str, Any]], None],
+) -> bool:
+    """Degrade quietly when a persisted key clearly does not fit this flow."""
+    valid_record_count = getattr(flow, "valid_record_count", 0)
+    if not isinstance(valid_record_count, int):
+        valid_record_count = 0
+    if (
+        be21.direction != "s2c"
+        or getattr(flow, "key_from_preset", False) is not True
+        or valid_record_count > 0
+        or getattr(flow, "key_missing_suppressed", False) is True
+    ):
+        return False
+
+    flow.stale_key_parse_fail_count += 1
+    if flow.stale_key_parse_fail_count < _STALE_PRESET_KEY_PARSE_FAIL_THRESHOLD:
+        return True
+
+    flow.key = None
+    flow.key_from_preset = False
+    flow.key_miss_count = flow.stale_key_parse_fail_count
+    flow.key_missing_suppressed = True
+    if flow.key_missing_reported:
+        return True
+
+    flow.key_missing_reported = True
+    stats["key_miss"] += 1
+    emit("key_missing_suppressed", {
+        "flow_id": flow.flow_id,
+        "cmd": be21.cmd,
+        "seq": be21.seq,
+        "key_miss_count": flow.key_miss_count,
+        "reason": "已保存密钥无法解析当前连接，可能已过期；后续该连接将降级静默，等待重新捕获密钥",
+    })
+    return True
 
 
 def handle_data_frame(
@@ -69,6 +112,13 @@ def handle_data_frame(
     }
     record = parse_record(pkt_dict)
     if record is None:
+        if _handle_stale_preset_key_parse_fail(
+            flow=flow,
+            be21=be21,
+            stats=stats,
+            emit=emit,
+        ):
+            return True
         if packet_logger:
             packet_logger.log_be21_frame(
                 flow.flow_id,
@@ -96,6 +146,8 @@ def handle_data_frame(
     record["_summary_kind"] = kind
     record["_summary"] = summary
     stats["decrypt_ok"] += 1
+    flow.valid_record_count += 1
+    flow.stale_key_parse_fail_count = 0
 
     if packet_logger:
         packet_logger.log_be21_frame(

@@ -4,6 +4,8 @@ import { apiBaseUrl } from '../config';
 
 const api = axios.create({ baseURL: apiBaseUrl(), timeout: 12000 });
 
+export const SNIFFER_START_TIMEOUT_MS = 30000;
+
 // 热门技能预设
 export interface PopularSkillPreset {
   name: string;

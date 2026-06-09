@@ -53,6 +53,7 @@ def test_non_ack_key_frame_is_not_consumed(tmp_path):
 def test_ack_key_frame_sets_flow_key_resets_missing_state_and_emits(tmp_path):
     events = []
     flow = _make_flow()
+    flow.key_from_preset = True
     key = b"1234567890abcdef"
     pkt_logger = MagicMock()
 
@@ -66,6 +67,7 @@ def test_ack_key_frame_sets_flow_key_resets_missing_state_and_emits(tmp_path):
 
     assert handled is True
     assert flow.key == key
+    assert flow.key_from_preset is False
     assert flow.key_miss_count == 0
     assert flow.key_missing_suppressed is False
     assert flow.key_missing_reported is False

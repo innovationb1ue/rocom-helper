@@ -37,6 +37,7 @@ class FlowRegistry:
                 server_ip=server_ip,
                 server_port=server_port,
                 key=self.preset_key,
+                key_from_preset=self.preset_key is not None,
             )
             self.flows[fk] = flow
             if self.preset_key:
@@ -48,6 +49,11 @@ class FlowRegistry:
         """获取已有 flow。"""
         with self._lock:
             return self.flows.get(fk)
+
+    def clear_preset_key(self) -> None:
+        """清除启动时加载的密钥，避免新 flow 继续套用过期 key。"""
+        with self._lock:
+            self.preset_key = None
 
     def count(self) -> int:
         """当前 flow 数量。"""

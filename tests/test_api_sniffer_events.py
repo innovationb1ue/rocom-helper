@@ -33,10 +33,13 @@ def make_handler():
 
 def test_key_missing_event_sets_state_and_pushes_event():
     handler, state = make_handler()
+    state["key_hex"] = "stale"
 
     handler.handle("key_missing_suppressed", {"flow_id": "flow-1", "key_miss_count": 3})
 
     assert state["status"] == "key_missing"
+    assert state["key_hex"] is None
+    assert state["saved_keys"] == [(None, "flow-1")]
     assert "密钥已错过" in state["message"]
     assert state["events"] == [
         {"type": "key_missing_suppressed", "flow_id": "flow-1", "key_miss_count": 3},

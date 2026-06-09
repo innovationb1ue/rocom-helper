@@ -42,6 +42,8 @@ class SnifferEventHandler:
         elif event_type == "key_captured":
             self._handle_key_captured(data)
         elif event_type == "key_missing_suppressed":
+            self._set_key_hex(None)
+            self._save_key(None, data.get("flow_id", ""))
             self._set_state("key_missing", "密钥已错过，请重启游戏或重新连接后再监听")
             self._push({"type": "key_missing_suppressed", **data})
         elif event_type in {"decrypt_fail", "parse_fail"}:

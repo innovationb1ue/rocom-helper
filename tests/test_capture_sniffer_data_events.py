@@ -105,6 +105,48 @@ def test_parse_none_reports_s2c_parse_fail(monkeypatch):
     assert emitted[0][0] == "parse_fail"
 
 
+def test_stale_preset_key_parse_fail_degrades_without_error_log(monkeypatch):
+    monkeypatch.setattr(data_events, "decrypt_4013_body", lambda _key, _body: (b"iv", b"plain"))
+    monkeypatch.setattr(data_events, "parse_record", lambda _pkt: None)
+    flow = _make_flow()
+    flow.key_from_preset = True
+    stats = _stats()
+    emitted = []
+    packet_logger = MagicMock()
+    be21 = _make_be21(direction="s2c")
+
+    for seq in range(1, 4):
+        be21.seq = seq
+        handled = handle_data_frame(
+            flow=flow,
+            be21=be21,
+            stats=stats,
+            emit=lambda event_type, data: emitted.append((event_type, data)),
+            packet_logger=packet_logger,
+        )
+        assert handled is True
+
+    assert flow.key is None
+    assert flow.key_from_preset is False
+    assert flow.key_missing_suppressed is True
+    assert flow.key_miss_count == 3
+    assert stats["parse_fail"] == 0
+    assert stats["key_miss"] == 1
+    assert emitted == [
+        (
+            "key_missing_suppressed",
+            {
+                "flow_id": flow.flow_id,
+                "cmd": 0x4013,
+                "seq": 3,
+                "key_miss_count": 3,
+                "reason": "已保存密钥无法解析当前连接，可能已过期；后续该连接将降级静默，等待重新捕获密钥",
+            },
+        ),
+    ]
+    packet_logger.log_be21_frame.assert_not_called()
+
+
 def test_inner_message_opcode_is_silently_consumed(monkeypatch):
     monkeypatch.setattr(data_events, "decrypt_4013_body", lambda _key, _body: (b"iv", b"plain"))
     monkeypatch.setattr(data_events, "parse_record", lambda _pkt: {"opcode": 0x0414})
@@ -138,9 +180,10 @@ def test_successful_record_adds_summary_logs_dispatches_and_emits(monkeypatch):
     emitted = []
     records = []
     packet_logger = MagicMock()
+    flow = _make_flow()
 
     handled = handle_data_frame(
-        flow=_make_flow(),
+        flow=flow,
         be21=_make_be21(),
         stats=stats,
         emit=lambda event_type, data: emitted.append((event_type, data)),
@@ -152,6 +195,7 @@ def test_successful_record_adds_summary_logs_dispatches_and_emits(monkeypatch):
     assert stats["decrypt_ok"] == 1
     assert record["_summary_kind"] == "battle_enter"
     assert record["_summary"] == "对战开始"
+    assert flow.valid_record_count == 1
     assert records == [record]
     assert emitted == [("record", {"record": record})]
     packet_logger.log_be21_frame.assert_called_once()

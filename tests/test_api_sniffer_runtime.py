@@ -64,12 +64,14 @@ def test_runtime_monitor_loop_carries_last_flow_count_between_ticks():
     async def _run():
         seen = []
         done = asyncio.Event()
+        hold_after_third_tick = asyncio.Event()
 
         async def monitor_tick(last_flow_count: int) -> int:
             seen.append(last_flow_count)
             next_count = last_flow_count + 2
             if len(seen) == 3:
                 done.set()
+                await hold_after_third_tick.wait()
             return next_count
 
         runtime = SnifferRuntime(

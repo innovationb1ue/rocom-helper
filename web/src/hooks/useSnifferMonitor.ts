@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from 'react';
 import { useSnifferStore } from '../stores/snifferStore';
 import type { SnifferStatus, SlimRecord } from '../stores/snifferStore';
 import { backendWsUrl } from '../config';
-import api from '../utils/api';
+import api, { SNIFFER_START_TIMEOUT_MS } from '../utils/api';
 
 export function useSnifferMonitor() {
   const wsRef = useRef<WebSocket | null>(null);
@@ -51,7 +51,7 @@ export function useSnifferMonitor() {
       // 先连接 WebSocket，确保不丢失状态变更推送
       connectWs();
 
-      const res = await api.post('/sniffer/start');
+      const res = await api.post('/sniffer/start', null, { timeout: SNIFFER_START_TIMEOUT_MS });
       console.log('[sniffer] API response:', res.data);
       updateStatus(
         res.data?.details?.status ?? 'listening',

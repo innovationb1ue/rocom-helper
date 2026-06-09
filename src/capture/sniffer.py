@@ -56,6 +56,9 @@ class Sniffer:
         self.stats: Dict[str, int] = {"decrypt_ok": 0, "decrypt_fail": 0, "key_miss": 0, "parse_fail": 0}
 
     def _emit(self, event_type: str, data: Dict[str, Any]) -> None:
+        if event_type == "key_missing_suppressed":
+            self.preset_key = None
+            self._flow_registry.clear_preset_key()
         if self.on_event:
             try:
                 self.on_event(event_type, data)

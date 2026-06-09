@@ -28,9 +28,11 @@ def handle_ack_key_frame(
         if dedupe not in flow.seen_acks:
             flow.seen_acks.add(dedupe)
             flow.key = key
+            flow.key_from_preset = False
             flow.key_miss_count = 0
             flow.key_missing_suppressed = False
             flow.key_missing_reported = False
+            flow.stale_key_parse_fail_count = 0
             write_key_file(key_file, key, flow.flow_id)
             logger.info(
                 "[ack_0x1002] flow=%s key=%s",

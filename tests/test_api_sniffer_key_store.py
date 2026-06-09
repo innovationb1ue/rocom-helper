@@ -22,10 +22,13 @@ def test_save_persistent_key_writes_bytes_and_flow_id(monkeypatch, tmp_path):
     ]
 
 
-def test_save_persistent_key_ignores_missing_key(monkeypatch, tmp_path):
+def test_save_persistent_key_clears_missing_key(monkeypatch, tmp_path):
     calls = []
     monkeypatch.setattr(crypto, "write_key_file", lambda *args: calls.append(args))
+    key_file = tmp_path / "session_key.txt"
+    key_file.write_bytes(b"stale")
 
-    save_persistent_key(tmp_path / "session_key.txt", None, "flow-1")
+    save_persistent_key(key_file, None, "flow-1")
 
     assert calls == []
+    assert not key_file.exists()
