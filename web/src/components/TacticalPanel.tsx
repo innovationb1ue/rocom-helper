@@ -95,6 +95,7 @@ function buildMetricTags(action: ActionScore, metrics: ActionScore['metrics'], u
 
 const ActionRow: React.FC<{ action: ActionScore; rank: number; isTop: boolean }> = ({ action, rank, isTop }) => {
   const cat = categoryConfig[action.category || 'balanced'] || categoryConfig.balanced;
+  const emphasized = isTop && action.confidence !== 'low';
   const pct = scorePercent(action.score);
   const metrics = action.metrics || {};
   const unknowns = action.unknowns || [];
@@ -116,11 +117,11 @@ const ActionRow: React.FC<{ action: ActionScore; rank: number; isTop: boolean }>
     <div
       className={isTop ? 'tactical-action-row tactical-action-row-top' : 'tactical-action-row'}
       style={{
-        background: isTop ? '#f6ffed' : '#fff',
-        border: isTop ? '1px solid #b7eb8f' : '1px solid #f0f0f0',
+        background: emphasized ? '#f6ffed' : '#fff',
+        border: emphasized ? '1px solid #b7eb8f' : '1px solid #f0f0f0',
       }}
     >
-      <Text strong={isTop} className="tactical-action-rank" style={{ color: isTop ? '#389e0d' : '#666' }}>
+      <Text strong={isTop} className="tactical-action-rank" style={{ color: emphasized ? '#389e0d' : '#666' }}>
         {rank}
       </Text>
       <div style={{ minWidth: 0 }}>
@@ -164,7 +165,7 @@ const ActionRow: React.FC<{ action: ActionScore; rank: number; isTop: boolean }>
           <Progress
             percent={pct}
             size="small"
-            strokeColor={isTop ? '#52c41a' : '#1677ff'}
+            strokeColor={emphasized ? '#52c41a' : '#1677ff'}
             showInfo={false}
           />
         </Tooltip>
@@ -202,6 +203,8 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
   const energyWindow = recommendations.metrics?.energy_window as { my?: number; opp?: number } | undefined;
   const petCount = recommendations.metrics?.pet_count as { my_alive?: number; opp_alive?: number; delta?: number } | undefined;
   const visibleCount = Math.min(VISIBLE_ACTIONS, recommendations.actions.length);
+  const topAction = recommendations.actions[0];
+  const primaryIsLowConfidence = topAction?.confidence === 'low';
 
   return (
     <Card
@@ -218,7 +221,7 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
     >
       {recommendations.primary_plan && (
         <Alert
-          type={recommendations.confidence === 'low' ? 'warning' : 'success'}
+          type={recommendations.confidence === 'low' || primaryIsLowConfidence ? 'warning' : 'success'}
           showIcon
           title={recommendations.primary_plan}
           style={{ marginBottom: 8 }}

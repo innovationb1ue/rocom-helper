@@ -19,7 +19,7 @@ ScoreActionFn = Callable[
         List[Dict[str, Any]],
         List[OpponentAction],
         Dict[str, Any],
-        str | None,
+        Optional[str],
     ],
     Tuple[float, str, Dict[str, Any]],
 ]

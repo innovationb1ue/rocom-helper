@@ -136,3 +136,61 @@ def test_compute_tactical_with_reliability_adds_contract_field():
     assert tactical["actions"] == [{"score": 1.0}]
     assert "reliability" in tactical
     assert tactical["reliability"]["coverage"]["opponent_skill_source"] == "used"
+
+
+def test_compute_tactical_returns_none_after_battle_finished():
+    assert processor_analysis.compute_tactical(
+        {"round": 10, "result": "WIN_HP", "opp_pets": [{"current_hp": 0}]},
+        engine=FakeEngine(FakeRecommendation([{"action": "skill"}], {"actions": [{"score": 1.0}]})),
+    ) is None
+
+
+def test_low_confidence_ko_is_downgraded_before_reaching_frontend():
+    state = {
+        "round": 2,
+        "opp_active": {"used_skills": [], "equipped_skills": []},
+    }
+    tactical = processor_analysis.compute_tactical_with_reliability(
+        state,
+        engine=FakeEngine(FakeRecommendation(
+            [{"action": "skill"}],
+            {
+                "actions": [
+                    {
+                        "action_type": "skill",
+                        "skill_id": 1,
+                        "skill_name": "水幕冲击",
+                        "score": 0.8,
+                        "can_ko": True,
+                        "category": "finisher",
+                        "confidence": "medium",
+                        "damage_dealt": 584,
+                        "expected_gain": "本回合有击杀线，成功后取得宠物数优势",
+                        "reason": "本回合有击杀线",
+                        "metrics": {"can_ko": True},
+                    },
+                ],
+                "primary_plan": "首选 水幕冲击：本回合有击杀线，成功后取得宠物数优势",
+            },
+        )),
+        battle_advice={
+            "skill_analysis": [
+                {
+                    "skill_id": 1,
+                    "skill_name": "水幕冲击",
+                    "confidence": "low",
+                    "prediction": {
+                        "confidence": "low",
+                        "accuracy_flags": ["runtime_target_unmatched", "uncalibrated_skill"],
+                    },
+                },
+            ],
+        },
+    )
+
+    action = tactical["actions"][0]
+    assert action["can_ko"] is False
+    assert action["category"] == "confirm"
+    assert action["confidence"] == "low"
+    assert "待确认候选" in action["expected_gain"]
+    assert "击杀线" not in tactical["primary_plan"]

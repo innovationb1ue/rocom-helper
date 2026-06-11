@@ -26,6 +26,10 @@ def resolve_equipped_or_pool(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def resolve_opponent_skills(opp_active: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], str]:
+    used = opp_active.get("used_skills") or []
+    if used:
+        return used, "used"
+
     equipped = (
         opp_active.get("leader_skill_pool")
         or opp_active.get("battle_skill_pool")
@@ -35,10 +39,6 @@ def resolve_opponent_skills(opp_active: Dict[str, Any]) -> Tuple[List[Dict[str, 
     )
     if equipped:
         return equipped, "protocol"
-
-    used = opp_active.get("used_skills") or []
-    if used:
-        return used, "used"
 
     pool = skills_from_pool(opp_active)
     if pool:

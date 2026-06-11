@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from src.analysis.pet_info import PetInfo
+from src.analysis.pet_info import PetInfo, canonical_pet_name
 from src.analysis.pet_identity import refresh_battle_uid
 
 def _handle_change_pet_entry(self, entry: Dict[str, Any]) -> None:
@@ -117,13 +117,21 @@ def _handle_change_pet_entry(self, entry: Dict[str, Any]) -> None:
             matched["side"] = 401 if is_opp else 1
         if matched.get("slot") is None:
             matched["slot"] = battle_pet_id
+        if new_pet_name:
+            matched["protocol_name"] = new_pet_name
         # 如果获得了真实的 conf_id，更新宠物记录（从 20000000 更新为真实值）
         if new_pet_id is not None and new_pet_id != 20000000:
             if matched.get("pet_id") == 20000000:
                 matched["pet_id"] = new_pet_id
         # 同样更新 base_conf_id
-        if new_base_conf_id is not None and matched.get("base_conf_id") is None:
+        if new_base_conf_id is not None:
             matched["base_conf_id"] = new_base_conf_id
+            matched["base_id"] = new_base_conf_id
+        matched["name"] = canonical_pet_name(
+            base_conf_id=matched.get("base_conf_id"),
+            pet_id=matched.get("pet_id"),
+            protocol_name=matched.get("protocol_name") or new_pet_name,
+        )
         refresh_battle_uid(matched, side=401 if is_opp else 1)
         self.state[active_key] = matched
         self._bind_battle_side(battle_pet_id, matched, is_mine=not is_opp)

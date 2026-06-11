@@ -32,8 +32,36 @@ def test_hit_count_modifier_requires_multi_hit_when_root_is_multi_hit_only():
 def test_source_skill_must_match_when_present():
     buff = [{"id": 20171870, "name": "普通加威力", "source_skill": "折射"}]
 
+    assert get_buff_power_modifiers(buff)["flat"] == 20.0
     assert get_buff_power_modifiers(buff, skill_name="毒囊") == {}
     assert get_buff_power_modifiers(buff, skill_name="折射")["flat"] == 20.0
+
+
+def test_source_skill_hit_modifier_requires_current_skill_name():
+    buff = [{"id": 20172000, "name": "翼加连击", "source_skill": "折射"}]
+
+    assert get_buff_hit_count_modifiers(buff, base_hit_count=2)["flat"] == 1.0
+    assert get_buff_hit_count_modifiers(buff, skill_name="追打", base_hit_count=2) == {}
+    assert get_buff_hit_count_modifiers(buff, skill_name="折射", base_hit_count=2)["flat"] == 1.0
+
+
+def test_response_chase_hit_modifier_does_not_apply_to_normal_chase():
+    buff = [{"id": 20172000, "name": "翼加连击", "source_skill": "应对！追打"}]
+
+    assert get_buff_hit_count_modifiers(buff, skill_name="追打", base_hit_count=4) == {}
+    assert get_buff_hit_count_modifiers(buff, skill_name="应对！追打", base_hit_count=4)["flat"] == 1.0
+
+
+def test_reflect_derived_hit_modifier_requires_matched_runtime_target_when_requested():
+    buff = [{"id": 20172000, "name": "翼加连击", "parent_buff_name": "折射"}]
+
+    assert get_buff_hit_count_modifiers(buff, skill_name="追打", base_hit_count=4)["flat"] == 1.0
+    assert get_buff_hit_count_modifiers(
+        buff,
+        skill_name="追打",
+        base_hit_count=4,
+        allow_reflect_derived_hit=False,
+    ) == {}
 
 
 def test_buff_modifiers_keeps_compatibility_reexports():

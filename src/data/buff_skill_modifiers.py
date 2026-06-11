@@ -26,6 +26,8 @@ _MULTI_HIT_ONLY_ROOT_IDS = {
     20172000,  # 翼加连击
 }
 
+_REFLECT_PARENT_BUFF_IDS = {20890020}
+_REFLECT_PARENT_BUFFBASE_IDS = {2089001}
 
 def _source_skill_applies(
     source_buff: Dict[str, Any],
@@ -60,14 +62,29 @@ def _hit_modifier_applies(
     *,
     skill_name: Optional[str],
     base_hit_count: Optional[int],
+    allow_reflect_derived_hit: bool,
 ) -> bool:
     if not _source_skill_applies(source_buff, skill_name=skill_name):
+        return False
+    if (
+        root_id in _MULTI_HIT_ONLY_ROOT_IDS
+        and not allow_reflect_derived_hit
+        and _is_reflect_derived_buff(source_buff)
+    ):
         return False
     if root_id in _MULTI_HIT_ONLY_ROOT_IDS and base_hit_count is not None:
         return base_hit_count > 1
     if root_id in _GENERIC_DAMAGE_MODIFIER_BUFF_IDS and not source_buff.get("source_skill"):
         return False
     return True
+
+
+def _is_reflect_derived_buff(source_buff: Dict[str, Any]) -> bool:
+    return (
+        source_buff.get("parent_buff_name") == "折射"
+        or source_buff.get("parent_buff_id") in _REFLECT_PARENT_BUFF_IDS
+        or source_buff.get("parent_buffbase_id") in _REFLECT_PARENT_BUFFBASE_IDS
+    )
 
 
 def get_buff_power_modifiers(
@@ -101,6 +118,7 @@ def get_buff_hit_count_modifiers(
     skill_element: Optional[int] = None,
     skill_name: Optional[str] = None,
     base_hit_count: Optional[int] = None,
+    allow_reflect_derived_hit: bool = True,
 ) -> Dict[str, float]:
     """解析 buff 派生的连击次数修正。当前返回 flat 加值。"""
     flat = 0.0
@@ -111,6 +129,7 @@ def get_buff_hit_count_modifiers(
             source_buff,
             skill_name=skill_name,
             base_hit_count=base_hit_count,
+            allow_reflect_derived_hit=allow_reflect_derived_hit,
         ):
             continue
         value = _HIT_FLAT_BUFF_IDS.get(buff_id)

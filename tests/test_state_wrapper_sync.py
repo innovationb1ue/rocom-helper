@@ -89,3 +89,40 @@ def test_update_pets_from_wrappers_creates_new_pet_and_applies_ack_skill_pool():
     assert pet["name"] == "新宠"
     assert [skill["skill_id"] for skill in pet["battle_skill_pool"]] == [7020370, 7110200]
     assert pet["battle_skill_pool_source"] == "action_ack.state_wrapper.skill_round_data"
+
+
+def test_multi_pet_wrapper_does_not_override_explicit_active_pointer():
+    tracker = BattleStateTracker()
+    first = {"pet_id": 200, "slot": 401, "side": 401, "name": "旧宠", "current_hp": 100, "max_hp": 100}
+    second = {"pet_id": 201, "slot": 402, "side": 402, "name": "当前宠", "current_hp": 100, "max_hp": 100}
+    tracker.state["opp_pets"] = [first, second]
+    tracker.state["opp_active"] = second
+    tracker._bind_battle_side(402, second, is_mine=False)
+
+    wrapper_sync.update_pets_from_wrappers(tracker, [
+        {"side": 401, "pet_id": 200, "slot": 401, "name": "旧宠", "hp": 80, "max_hp": 100},
+        {"side": 402, "pet_id": 201, "slot": 402, "name": "当前宠", "hp": 90, "max_hp": 100},
+    ])
+
+    assert tracker.state["opp_active"] is second
+    assert first["current_hp"] == 80
+    assert second["current_hp"] == 90
+
+
+def test_wrapper_uses_base_conf_id_for_canonical_species_name():
+    tracker = BattleStateTracker()
+
+    wrapper_sync.update_pets_from_wrappers(tracker, [{
+        "side": 401,
+        "pet_id": 410280,
+        "slot": 403,
+        "name": "翱翔于天",
+        "base_conf_id": 3287,
+        "hp": 323,
+        "max_hp": 323,
+    }])
+
+    pet = tracker.state["opp_pets"][0]
+    assert pet["name"] == "岚鸟"
+    assert pet["protocol_name"] == "翱翔于天"
+    assert pet["base_id"] == 3287

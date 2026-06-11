@@ -375,6 +375,27 @@ class TestChangePet:
         assert state["opp_active"]["name"] == "神秘宠"
         assert len(state["opp_pets"]) == 2
 
+    def test_change_pet_uses_base_conf_id_for_canonical_species_name(self, tracker):
+        """change_pet 的协议文本名不是物种名时，优先使用 base_conf_id 标准名。"""
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {
+                "kind": "change_pet",
+                "battle_pet_id": 403,
+                "target_side": 403,
+                "new_pet_id": 410280,
+                "new_pet_name": "翱翔于天",
+                "new_pet_base_conf_id": 3287,
+                "new_pet_types": [9],
+                "new_pet_current_hp": 323,
+                "new_pet_max_hp": 323,
+            },
+        ]))
+
+        assert state["opp_active"]["name"] == "岚鸟"
+        assert state["opp_active"]["protocol_name"] == "翱翔于天"
+        assert state["opp_active"]["base_id"] == 3287
+
     def test_hidden_opponent_pet_id_uses_stable_identity(self, tracker):
         tracker.handle_event(0x1316, {
             "battle_id": 1,

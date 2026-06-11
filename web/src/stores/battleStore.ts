@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { BattleState, FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice, TacticalRecommendation } from '../types/battle';
+import type { AnalysisContext, BattlePet, BattleState, FormattedBattleEvent, BattleSummary, SkillAnalysis, PetTrait, HookAdvice, TacticalRecommendation } from '../types/battle';
 
 export type { EquippedSkill, BattlePet, SkillAnalysis, FormattedBattleEvent, BattleSummary, PetTrait, HookAdvice, ActionScore, OpponentAction, TacticalRecommendation, BattleState } from '../types/battle';
 
@@ -16,6 +16,7 @@ interface BattleStore extends BattleState {
   addSuggestion: (s: { type: string; message: string }) => void;
   setConnected: (c: boolean) => void;
   reset: () => void;
+  canApplyAnalysisContext: (context?: AnalysisContext) => boolean;
   addFormattedEvent: (event: FormattedBattleEvent) => void;
   addFormattedEvents: (events: FormattedBattleEvent[]) => void;
   setBattleSummary: (summary: BattleSummary) => void;
@@ -50,15 +51,20 @@ const initialState: BattleState = {
   tacticalRecommendations: null,
 };
 
-export const useBattleStore = create<BattleStore>((set) => ({
+export const useBattleStore = create<BattleStore>((set, get) => ({
   ...initialState,
-  updateState: (partial) => set((s) => ({ ...s, ...partial })),
+  updateState: (partial) => set((s) => ({
+    ...s,
+    ...partial,
+    tacticalRecommendations: partial.result ? null : s.tacticalRecommendations,
+  })),
   addSuggestion: (s) => set((st) => {
     if (st.suggestions.some(x => x.type === s.type && x.message === s.message)) return st;
     return { suggestions: takeLast([...st.suggestions, s], MAX_SUGGESTIONS) };
   }),
   setConnected: (c) => set({ connected: c }),
   reset: () => set(initialState),
+  canApplyAnalysisContext: (context) => contextMatches(get(), context),
   addFormattedEvent: (event) =>
     set((st) => ({ formattedEvents: takeLast([...st.formattedEvents, event], MAX_FORMATTED_EVENTS) })),
   addFormattedEvents: (events) =>
@@ -76,3 +82,20 @@ export const useBattleStore = create<BattleStore>((set) => ({
   })),
   setTacticalRecommendations: (rec) => set({ tacticalRecommendations: rec }),
 }));
+
+function contextMatches(state: BattleState, context?: AnalysisContext): boolean {
+  if (!context) return true;
+  if (context.round_number != null && state.round !== context.round_number) return false;
+  if (context.my_active_uid && petIdentity(state.my_active) !== context.my_active_uid) return false;
+  if (context.opp_active_uid && petIdentity(state.opp_active) !== context.opp_active_uid) return false;
+  return true;
+}
+
+function petIdentity(pet: BattlePet | null): string {
+  if (!pet) return '';
+  if (pet.battle_uid) return `battle_uid:${pet.battle_uid}`;
+  if (pet.pet_id != null) return `pet_id:${pet.pet_id}`;
+  if (pet.base_id != null) return `base_id:${pet.base_id}`;
+  if (pet.base_conf_id != null) return `base_conf_id:${pet.base_conf_id}`;
+  return pet.name ? `name:${pet.name}` : '';
+}

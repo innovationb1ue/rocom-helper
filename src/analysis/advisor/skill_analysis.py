@@ -42,14 +42,15 @@ def build_skill_analysis(
                 sa.effectiveness = dr.effectiveness
                 sa.effectiveness_label = dr.effectiveness_label
                 sa.is_stab = dr.is_stab
+                prediction = pred["prediction"]
                 sa.can_ko = dr.can_ko
                 sa.hit_count = dr.hit_count
-                sa.confidence = dr.confidence
+                sa.confidence = prediction.get("confidence") or dr.confidence
                 sa.power_mult = dr.power_mult
                 sa.weather_mult = dr.weather_mult
                 sa.damage_breakdown = dr.damage_breakdown
                 sa.warnings = dr.warnings
-                sa.prediction = pred["prediction"]
+                sa.prediction = prediction
                 sa.explain = pred["explain"]
                 sa.validation_hint = pred["validation_hint"]
         eval_dict = eval_skill_dict(eq, meta)
@@ -124,4 +125,3 @@ def eval_skill_dict(eq: Dict[str, Any], meta: Optional[Dict[str, Any]]) -> Dict[
         "type_id": type_id,
         "effect_desc": effect_desc,
     }
-

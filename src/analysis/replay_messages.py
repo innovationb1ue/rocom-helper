@@ -15,6 +15,7 @@ def build_battle_messages(
 ) -> List[BattleWebSocketMessage]:
     """Build browser-visible messages from a processed battle event."""
     messages: List[BattleWebSocketMessage] = []
+    context = _analysis_context(result.state)
 
     if result.formatted_events:
         if len(result.formatted_events) == 1:
@@ -43,6 +44,7 @@ def build_battle_messages(
                 "opp_traits": result.battle_advice.get("opp_traits", []),
                 "opp_skill_analysis": result.battle_advice.get("opp_skill_analysis", []),
                 "opp_skill_source": result.battle_advice.get("opp_skill_source", ""),
+                **context,
             }
         )
 
@@ -50,7 +52,11 @@ def build_battle_messages(
         messages.append({"type": "hook_advice", "advice": result.hook_advice})
 
     if result.tactical:
-        messages.append(cast(BattleWebSocketMessage, {"type": "tactical_recommendations", **result.tactical}))
+        messages.append(cast(BattleWebSocketMessage, {
+            "type": "tactical_recommendations",
+            **result.tactical,
+            **context,
+        }))
 
     if opcode == OPCODE_BATTLE_FINISH:
         messages.append(
@@ -58,3 +64,21 @@ def build_battle_messages(
         )
 
     return messages
+
+
+def _analysis_context(state: dict) -> dict:
+    return {
+        "round_number": int(state.get("round") or 0),
+        "my_active_uid": _pet_identity(state.get("my_active") or {}),
+        "opp_active_uid": _pet_identity(state.get("opp_active") or {}),
+    }
+
+
+def _pet_identity(pet: dict) -> str:
+    if not pet:
+        return ""
+    for key in ("battle_uid", "pet_id", "base_id", "base_conf_id", "name"):
+        value = pet.get(key)
+        if value not in (None, ""):
+            return f"{key}:{value}"
+    return ""

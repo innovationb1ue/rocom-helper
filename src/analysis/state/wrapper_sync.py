@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from src.analysis.constants import OPCODE_ACTION_ACK
-from src.analysis.pet_info import PetInfo
+from src.analysis.pet_info import PetInfo, canonical_pet_name
 from src.analysis.pet_identity import refresh_battle_uid
 
 
@@ -25,9 +25,10 @@ def pet_matches(pet: Dict[str, Any], wrapper: Dict[str, Any]) -> bool:
 
 def update_pets_from_wrappers(tracker: Any, wrappers: List[Dict[str, Any]]) -> None:
     """Refresh roster and active-pet state from round/action wrapper payloads."""
-    active_candidates: Dict[str, Dict[str, Any]] = {}
-    active_sides: Dict[str, Any] = {}
-    active_ownership: Dict[str, bool] = {}
+    replacement_candidates: Dict[str, Dict[str, Any]] = {}
+    replacement_sides: Dict[str, Any] = {}
+    replacement_ownership: Dict[str, bool] = {}
+    side_counts = _wrapper_side_counts(wrappers)
     for wrapper in wrappers:
         side = wrapper.get("side")
         is_mine = side == 1 or side == "我方"
@@ -67,25 +68,46 @@ def update_pets_from_wrappers(tracker: Any, wrappers: List[Dict[str, Any]]) -> N
             pet_list.append(pet_info)
             matched = pet_list[-1]
 
+        if matched is not None and side is not None:
+            tracker._bind_battle_side(side, matched, is_mine=is_mine)
         active_key = "my_active" if is_mine else "opp_active"
-        if matched is not None:
-            current_candidate = active_candidates.get(active_key)
-            if current_candidate is None:
-                active_candidates[active_key] = matched
-                active_sides[active_key] = side
-                active_ownership[active_key] = is_mine
-            elif current_candidate.get("current_hp", 0) <= 0 and matched.get("current_hp", 0) > 0:
-                active_candidates[active_key] = matched
-                active_sides[active_key] = side
-                active_ownership[active_key] = is_mine
+        current_active = tracker.state.get(active_key)
+        side_count = side_counts.get("my" if is_mine else "opp", 0)
+        if matched is not None and side_count == 1:
+            tracker.state[active_key] = matched
+            tracker._bind_battle_side(side, matched, is_mine=is_mine)
+            continue
+        if (
+            matched is not None
+            and matched.get("current_hp", 0) > 0
+            and (current_active is None or current_active.get("current_hp", 0) <= 0)
+            and active_key not in replacement_candidates
+        ):
+            replacement_candidates[active_key] = matched
+            replacement_sides[active_key] = side
+            replacement_ownership[active_key] = is_mine
 
-    for active_key, pet in active_candidates.items():
+    for active_key, pet in replacement_candidates.items():
+        current_active = tracker.state.get(active_key)
+        if current_active is not None and current_active.get("current_hp", 0) > 0:
+            continue
         tracker.state[active_key] = pet
         tracker._bind_battle_side(
-            active_sides.get(active_key),
+            replacement_sides.get(active_key),
             pet,
-            is_mine=active_ownership.get(active_key),
+            is_mine=replacement_ownership.get(active_key),
         )
+
+
+def _wrapper_side_counts(wrappers: List[Dict[str, Any]]) -> Dict[str, int]:
+    counts = {"my": 0, "opp": 0}
+    for wrapper in wrappers:
+        side = wrapper.get("side")
+        if side == 1 or side == "我方":
+            counts["my"] += 1
+        elif side is not None:
+            counts["opp"] += 1
+    return counts
 
 
 def _merge_wrapper_into_pet(
@@ -111,8 +133,9 @@ def _merge_wrapper_into_pet(
                 hp_result=new_hp,
                 source_hint="round_start_wrapper",
             )
-    if wrapper.get("name") and wrapper["name"] != "?":
-        pet["name"] = wrapper["name"]
+    protocol_name = wrapper.get("pet_name") or wrapper.get("name")
+    if protocol_name and protocol_name != "?":
+        pet["protocol_name"] = protocol_name
     if wrapper.get("pet_id") and wrapper["pet_id"] != 20000000:
         pet["pet_id"] = wrapper["pet_id"]
     if wrapper.get("level") is not None:
@@ -124,6 +147,13 @@ def _merge_wrapper_into_pet(
         pet["base_id"] = wrapper["base_id"]
     if wrapper.get("base_conf_id") is not None:
         pet["base_conf_id"] = wrapper["base_conf_id"]
+        pet["base_id"] = wrapper["base_conf_id"]
+    if protocol_name and protocol_name != "?" or wrapper.get("base_conf_id") is not None or wrapper.get("pet_id") is not None:
+        pet["name"] = canonical_pet_name(
+            base_conf_id=pet.get("base_conf_id"),
+            pet_id=pet.get("pet_id"),
+            protocol_name=pet.get("protocol_name") or protocol_name,
+        )
     if wrapper.get("slot") is not None:
         pet["slot"] = wrapper["slot"]
     if wrapper.get("side") is not None:

@@ -2,6 +2,7 @@ import type {
   BattleSummary,
   FormattedBattleEvent,
   HookAdvice,
+  AnalysisContext,
   PetTrait,
   SkillAnalysis,
   TacticalRecommendation,
@@ -21,6 +22,9 @@ export type BattleMessage =
       opp_traits?: PetTrait[];
       opp_skill_analysis?: SkillAnalysis[];
       opp_skill_source?: string;
+      round_number?: number;
+      my_active_uid?: string;
+      opp_active_uid?: string;
     }
   | { type: 'hook_advice'; advice: HookAdvice[] }
   | ({ type: 'tactical_recommendations' } & TacticalRecommendation)
@@ -39,6 +43,7 @@ export interface BattleMessageHandlers {
   setOppSkillAnalysis: (skills: SkillAnalysis[], source: string) => void;
   setHookAdvice: (advice: HookAdvice[]) => void;
   setTacticalRecommendations: (rec: TacticalRecommendation | null) => void;
+  canApplyAnalysisContext: (context?: AnalysisContext) => boolean;
 }
 
 export function handleBattleMessage(msg: BattleMessage, handlers: BattleMessageHandlers) {
@@ -60,6 +65,7 @@ export function handleBattleMessage(msg: BattleMessage, handlers: BattleMessageH
       handlers.setBattleSummary(msg.summary);
       break;
     case 'skill_analysis':
+      if (!handlers.canApplyAnalysisContext(messageContext(msg))) break;
       handlers.setSkillAnalysis(msg.skills);
       if (msg.traits) handlers.setTraits(msg.traits);
       if (msg.opp_traits) handlers.setOppTraits(msg.opp_traits);
@@ -71,9 +77,18 @@ export function handleBattleMessage(msg: BattleMessage, handlers: BattleMessageH
       handlers.setHookAdvice(msg.advice);
       break;
     case 'tactical_recommendations':
+      if (!handlers.canApplyAnalysisContext(messageContext(msg))) break;
       handlers.setTacticalRecommendations(msg);
       break;
     default:
       break;
   }
+}
+
+function messageContext(msg: { round_number?: number; my_active_uid?: string; opp_active_uid?: string }): AnalysisContext {
+  return {
+    round_number: msg.round_number,
+    my_active_uid: msg.my_active_uid,
+    opp_active_uid: msg.opp_active_uid,
+  };
 }

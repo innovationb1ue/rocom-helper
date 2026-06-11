@@ -72,11 +72,20 @@ def finalize_damage_result(
     dmg = ctx["min_damage"]
 
     hit_count = ctx.get("hit_count", 1)
+    runtime_skill = data.runtime_skill or damage_runtime.get_runtime_skill(
+        data.attacker,
+        data.skill_meta.get("id"),
+    )
+    server_runtime = data.server_runtime or damage_server_runtime.resolve_server_runtime(
+        runtime_skill,
+        data.defender,
+    )
     buff_hit_modifiers = get_buff_hit_count_modifiers(
         data.attacker.get("buffs", []),
         skill_element=data.skill_element,
         skill_name=data.skill_meta.get("name"),
         base_hit_count=hit_count,
+        allow_reflect_derived_hit=server_runtime.get("server_power_skip_reason") != "target_unmatched",
     )
     if buff_hit_modifiers.get("flat"):
         hit_count = max(1, int(hit_count + buff_hit_modifiers["flat"]))
@@ -88,14 +97,6 @@ def finalize_damage_result(
     pct = total_damage / defender_max_hp
     can_ko = total_damage >= defender_cur_hp
 
-    runtime_skill = data.runtime_skill or damage_runtime.get_runtime_skill(
-        data.attacker,
-        data.skill_meta.get("id"),
-    )
-    server_runtime = data.server_runtime or damage_server_runtime.resolve_server_runtime(
-        runtime_skill,
-        data.defender,
-    )
     energy_cost, energy_cost_source = damage_runtime.resolve_energy_cost(runtime_skill, data.skill_meta)
     warnings = list(data.warnings)
     if energy_cost > 0:

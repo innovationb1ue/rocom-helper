@@ -1,16 +1,18 @@
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback, useEffect, useState } from 'react';
 import { useBattleStore } from '../stores/battleStore';
 import { backendWsUrl } from '../config';
 import { handleBattleMessage, type BattleMessage } from '../utils/battleMessages';
 
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations } = useBattleStore();
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'connected' | 'disconnected'>('idle');
+  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext } = useBattleStore();
 
   const sendIfOpen = useCallback((payload: unknown) => {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       setConnected(false);
+      setConnectionStatus('disconnected');
       return false;
     }
     ws.send(JSON.stringify(payload));
@@ -18,12 +20,23 @@ export function useBattle() {
   }, [setConnected]);
 
   const connect = useCallback(() => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.CONNECTING) return;
+    setConnectionStatus('connecting');
     const ws = new WebSocket(backendWsUrl('/ws/battle'));
     wsRef.current = ws;
 
-    ws.onopen = () => setConnected(true);
-    ws.onclose = () => setConnected(false);
-    ws.onerror = () => setConnected(false);
+    ws.onopen = () => {
+      setConnected(true);
+      setConnectionStatus('connected');
+    };
+    ws.onclose = () => {
+      setConnected(false);
+      setConnectionStatus('disconnected');
+    };
+    ws.onerror = () => {
+      setConnected(false);
+      setConnectionStatus('disconnected');
+    };
 
     ws.onmessage = (ev) => {
       try {
@@ -40,12 +53,13 @@ export function useBattle() {
           setOppSkillAnalysis,
           setHookAdvice,
           setTacticalRecommendations,
+          canApplyAnalysisContext,
         });
       } catch (err) {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations]);
+  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     sendIfOpen({ type: 'event', opcode, detail });
@@ -54,6 +68,7 @@ export function useBattle() {
   const resetBattle = useCallback(() => {
     sendIfOpen({ type: 'reset' });
     reset();
+    setConnectionStatus(wsRef.current?.readyState === WebSocket.OPEN ? 'connected' : 'idle');
   }, [reset, sendIfOpen]);
 
   const getState = useCallback(() => {
@@ -64,5 +79,5 @@ export function useBattle() {
     return () => { wsRef.current?.close(); };
   }, []);
 
-  return { connect, sendEvent, resetBattle, getState };
+  return { connect, sendEvent, resetBattle, getState, connectionStatus };
 }

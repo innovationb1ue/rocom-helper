@@ -197,11 +197,19 @@ export interface TacticalRecommendation {
   opp_predicted: OpponentAction[];
   round_number: number;
   confidence: string;
+  my_active_uid?: string;
+  opp_active_uid?: string;
   primary_plan?: string;
   warnings?: string[];
   metrics?: Record<string, unknown>;
   reliability?: PredictionReliability;
   opponent_profile?: Record<string, unknown>;
+}
+
+export interface AnalysisContext {
+  round_number?: number;
+  my_active_uid?: string;
+  opp_active_uid?: string;
 }
 
 export interface BattleState {
