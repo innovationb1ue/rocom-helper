@@ -1045,6 +1045,64 @@ class TestSpEnergyChange:
         assert log[0]["sp_element"]["stack"] == 2
 
 
+class TestRoleResourceSync:
+    def test_role_resource_sync_is_projected_without_terminal_pending(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {
+                "kind": "data_update",
+                "sync_data": {
+                    "role_sync": [
+                        {
+                            "role_uin": 90001,
+                            "role_energy_change": -1,
+                            "role_energy_result": 2,
+                            "remain_use_cnt": 3,
+                        }
+                    ]
+                },
+            },
+        ]))
+
+        assert state["phase"] == "selecting"
+        assert state["terminal_pending"] is False
+        assert state["role_resources"]["90001"]["role_energy_result"] == 2
+        assert state["role_resource_events"][-1]["source"] == "role_sync"
+        assert state["role_resource_events"][-1]["role_energy_change"] == -1
+
+    def test_final_battle_resource_zero_is_projected_without_terminal_pending(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {
+                "kind": "data_update",
+                "sync_data": {
+                    "comm_sync": [
+                        {
+                            "sp_energy_type": 1,
+                            "final_battle_energy_change": -1,
+                            "final_battle_energy_result": 0,
+                        }
+                    ]
+                },
+            },
+        ]))
+
+        assert state["phase"] == "selecting"
+        assert state["terminal_pending"] is False
+        assert state.get("terminal_pending_reason") in (None, "")
+        assert state["battle_resource"]["final_battle_energy_result"] == 0
+        assert state["role_resource_events"][-1]["source"] == "comm_sync"
+
+    def test_defeat_count_does_not_enter_settling_without_resource_zero(self, tracker):
+        tracker.handle_event(0x1316, _enter_event())
+        state = tracker.handle_event(0x1324, _action_resolve_event([
+            {"kind": "defeat", "target_pet_id": 200, "target_side": 401},
+        ]))
+
+        assert state["phase"] == "selecting"
+        assert state["terminal_pending"] is False
+
+
 class TestSpEnergyTrigger:
     def test_sp_trigger_stored(self, tracker):
         tracker.handle_event(0x1316, _enter_event())

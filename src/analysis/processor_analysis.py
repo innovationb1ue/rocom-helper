@@ -99,6 +99,7 @@ def compute_tactical_with_reliability(
         tactical=tactical,
     )
     apply_prediction_guardrails(tactical, battle_advice)
+    sync_tactical_confidence(tactical)
     return tactical
 
 
@@ -153,6 +154,17 @@ def apply_prediction_guardrails(
             reverse=True,
         )
         tactical["primary_plan"] = _primary_plan(tactical["actions"])
+        sync_tactical_confidence(tactical)
+
+
+def sync_tactical_confidence(tactical: Dict[str, Any]) -> None:
+    """Keep user-visible tactical confidence tied to the current top action."""
+    actions = tactical.get("actions") or []
+    if not actions:
+        tactical["confidence"] = tactical.get("confidence") or tactical.get("model_confidence") or "medium"
+        return
+    tactical.setdefault("model_confidence", tactical.get("confidence") or "medium")
+    tactical["confidence"] = actions[0].get("confidence") or tactical.get("model_confidence") or "medium"
 
 
 def _prediction_quality_by_skill(
@@ -189,4 +201,6 @@ def _primary_plan(actions: list[Dict[str, Any]]) -> str:
     name = f"换上 {top.get('switch_to_name')}" if top.get("action_type") == "switch" else (
         top.get("skill_name") or top.get("reason") or "行动"
     )
+    if top.get("confidence") == "low":
+        return f"待确认候选 {name}：{top.get('expected_gain') or top.get('reason') or ''}"
     return f"首选 {name}：{top.get('expected_gain') or top.get('reason') or ''}"

@@ -52,6 +52,41 @@ class TestSession12Replay:
         assert len(state["my_pets"]) == 6
         assert len(state["opp_pets"]) == 5
 
+    def test_five_observed_opponent_defeats_are_allowed_until_finish(self, session12_runner_result):
+        state = session12_runner_result.final_state
+        defeated = [pet for pet in state["opp_pets"] if pet.get("current_hp") == 0]
+
+        assert len(defeated) == 5
+        assert state["phase"] == "finished"
+        assert state["result"] == "WIN_HP"
+        assert state.get("terminal_pending") is False
+
+    def test_observed_defeats_do_not_trigger_settling_without_resource_zero(self, session12_packets):
+        result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+            session12_packets,
+            stop_round=9,
+        )
+        state = result.final_state
+        defeated = [pet for pet in state["opp_pets"] if pet.get("current_hp") == 0]
+
+        assert len(defeated) >= 3
+        assert state["result"] is None
+        assert state["phase"] != "settling"
+        assert state.get("terminal_pending") is False
+        assert result.stopped_early is True
+
+    def test_stop_round_10_processes_finish_packet_in_same_round(self, session12_packets):
+        result = BattleReplayRunner(include_analysis=False, include_hooks=False).run(
+            session12_packets,
+            stop_round=10,
+        )
+        state = result.final_state
+
+        assert result.stopped_early is False
+        assert state["round"] == 10
+        assert state["phase"] == "finished"
+        assert state["result"] == "WIN_HP"
+
     def test_change_pet_uses_base_conf_canonical_name(self, session12_packets):
         result = BattleReplayRunner().run(session12_packets, stop_round=4)
         opp_active = result.final_state["opp_active"]
@@ -68,7 +103,9 @@ class TestSession12Replay:
         used_names = [skill.get("skill_name") for skill in opp_active.get("used_skills", [])]
 
         assert opp_active["name"] == "岚鸟"
-        assert used_names == ["顺风", "震击", "闪击"]
+        assert used_names == ["顺风", "震击", "闪击", "聚能"]
+        assert "助燃" not in used_names
+        assert "晒太阳" not in used_names
 
     def test_round2_low_confidence_ko_is_flagged(self, session12_packets):
         result = BattleReplayRunner().run(session12_packets, stop_round=2)
@@ -85,7 +122,7 @@ class TestSession12Replay:
 
         assert pred["hit_count"] == 1
         assert pred["expected_damage"] == 63
-        assert pred["damage_breakdown"]["reflect_buff_applied"] is False
+        assert pred["damage_breakdown"]["buff_hit_count_modifiers"] == {}
 
     def test_round8_zhui_da_target_unmatched_stays_low_confidence(self, session12_packets):
         result = BattleReplayRunner().run(session12_packets, stop_round=8)

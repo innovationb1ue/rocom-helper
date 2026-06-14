@@ -220,6 +220,24 @@ class TestComboModifyHook:
         assert result["hit_count"] == 5  # 2 base + 3 combo, no multiplier
         assert result["min_damage"] == 50
 
+    def test_reflect_ignores_combo_bonus_and_combo_buffs(self):
+        attacker = _make_attacker(
+            combo_bonus=3,
+            buffs=[{"id": 20450020}],
+        )
+        ctx = {
+            "min_damage": 50,
+            "max_damage": 60,
+            "hit_count": 2,
+            "attacker": attacker,
+            "defender": _make_defender(),
+            "skill_meta": {"id": 7060130, "name": "折射", "skill_dam_type": 0},
+        }
+
+        result = combo_modify_hook(ctx)
+
+        assert result["hit_count"] == 2
+
     def test_non_innate_buff_ignored(self):
         """Buffs that are not innate skills should be ignored."""
         attacker = _make_attacker(

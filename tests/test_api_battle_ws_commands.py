@@ -65,11 +65,40 @@ def test_ws_command_get_state_reset_and_counter_pick():
         await handle_battle_ws_command(ws, processor, {"type": "request_counter_pick"})  # type: ignore[arg-type]
         await handle_battle_ws_command(ws, processor, {"type": "reset"})  # type: ignore[arg-type]
 
-        assert ws.jsons[0] == {"type": "state", "state": processor.state}
+        assert ws.jsons[0] == {"type": "state_update", "state": processor.state}
         assert ws.jsons[1]["type"] == "counter_pick"
         assert ws.jsons[1]["opponent"] == {"pet_name": "火神"}
         assert ws.jsons[2] == {"type": "reset", "message": "Tracker reset"}
         assert processor.reset_called is True
+
+    asyncio.run(_run())
+
+
+def test_ws_command_get_state_can_include_ordered_stream_context():
+    async def _run():
+        ws = FakeWebSocket()
+        processor = FakeProcessor()
+        seq = 7
+
+        def next_seq():
+            nonlocal seq
+            seq += 1
+            return seq
+
+        await handle_battle_ws_command(
+            ws,
+            processor,  # type: ignore[arg-type]
+            {"type": "get_state"},
+            stream_id="stream-a",
+            next_seq=next_seq,
+        )
+
+        assert ws.jsons[0] == {
+            "type": "state_update",
+            "state": processor.state,
+            "stream_id": "stream-a",
+            "seq": 8,
+        }
 
     asyncio.run(_run())
 

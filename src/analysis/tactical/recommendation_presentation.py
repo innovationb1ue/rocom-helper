@@ -11,6 +11,8 @@ def primary_plan(actions: List[ActionScore]) -> str:
         return ""
     top = actions[0]
     name = f"换上 {top.switch_to_name}" if top.action_type == "switch" else (top.skill_name or top.reason)
+    if top.confidence == "low":
+        return f"待确认候选 {name}：{top.expected_gain or top.reason}"
     return f"首选 {name}：{top.expected_gain or top.reason}"
 
 

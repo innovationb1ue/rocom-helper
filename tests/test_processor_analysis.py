@@ -193,4 +193,6 @@ def test_low_confidence_ko_is_downgraded_before_reaching_frontend():
     assert action["category"] == "confirm"
     assert action["confidence"] == "low"
     assert "待确认候选" in action["expected_gain"]
+    assert tactical["confidence"] == "low"
+    assert tactical["model_confidence"] == "medium"
     assert "击杀线" not in tactical["primary_plan"]

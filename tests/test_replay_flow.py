@@ -6,6 +6,7 @@ from src.analysis.models import ProcessResult
 from src.analysis.replay_flow import (
     filter_process_result,
     make_event_snapshot,
+    should_stop_before_event,
     should_stop_replay,
     update_round_snapshot,
 )
@@ -94,11 +95,33 @@ def test_update_round_snapshot_aggregates_event_outputs_and_analysis():
     assert snapshot.opp_traits == [{"name": "对手特性"}]
     assert snapshot.opp_skill_analysis == [{"skill_name": "对手技能"}]
     assert snapshot.opp_skill_source == "used"
+    assert snapshot.suggestions == [{"type": "info", "message": "提示"}]
     assert snapshot.tactical_recommendations == {"actions": [{"score": 1}]}
+
+    update_round_snapshot(
+        round_map,
+        round_num=3,
+        state_before=event.state_before,
+        state_after={"round": 3, "phase": "resolving"},
+        event=event,
+        battle_advice=None,
+        formatted_events=[],
+        suggestions=[],
+        messages=[],
+        tactical=None,
+    )
+
+    assert snapshot.suggestions == []
 
 
 def test_should_stop_replay_only_stops_on_round_boundary_events():
-    assert should_stop_replay(5, 5, 0x1324) is True
+    assert should_stop_replay(5, 5, 0x1324) is False
     assert should_stop_replay(5, 6, 0x131A) is True
     assert should_stop_replay(5, 5, 0x130C) is False
     assert should_stop_replay(None, 5, 0x1324) is False
+
+
+def test_should_stop_before_event_stops_only_before_next_round_start():
+    assert should_stop_before_event(5, {"round": 5}, 0x131A, {"round": 6}) is True
+    assert should_stop_before_event(5, {"round": 5}, 0x131A, {"round": 5}) is False
+    assert should_stop_before_event(5, {"round": 5}, 0x132C, {}) is False

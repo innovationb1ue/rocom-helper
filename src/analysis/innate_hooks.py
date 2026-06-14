@@ -30,9 +30,13 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
     attacker = ctx.get("attacker", {})
     defender = ctx.get("defender", {})
-    combo_bonus = attacker.get("combo_bonus", 0)
 
     base_hits = ctx.get("hit_count", 1)
+    if _skill_ignores_combo_modifiers(ctx.get("skill_meta", {})):
+        ctx["hit_count"] = base_hits
+        return ctx
+
+    combo_bonus = attacker.get("combo_bonus", 0)
 
     additive_bonus = 0
     multiplier = 1
@@ -77,6 +81,11 @@ def combo_modify_hook(ctx: Dict[str, Any]) -> Dict[str, Any]:
         ctx["hit_count"] = total_hits
 
     return ctx
+
+
+def _skill_ignores_combo_modifiers(skill_meta: Dict[str, Any]) -> bool:
+    """部分技能可多段出伤，但不受连击数类效果修改。"""
+    return skill_meta.get("id") == 7060130 or skill_meta.get("name") == "折射"
 
 
 # ---------------------------------------------------------------------------

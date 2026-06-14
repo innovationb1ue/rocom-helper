@@ -197,7 +197,6 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
     return null;
   }
 
-  const conf = confidenceConfig[recommendations.confidence] || confidenceConfig.medium;
   const reliability = recommendations.reliability;
   const speedLine = recommendations.metrics?.speed_line as { order?: string } | undefined;
   const energyWindow = recommendations.metrics?.energy_window as { my?: number; opp?: number } | undefined;
@@ -205,6 +204,10 @@ const TacticalPanel: React.FC<Props> = ({ recommendations }) => {
   const visibleCount = Math.min(VISIBLE_ACTIONS, recommendations.actions.length);
   const topAction = recommendations.actions[0];
   const primaryIsLowConfidence = topAction?.confidence === 'low';
+  const displayConfidence = primaryIsLowConfidence
+    ? 'low'
+    : (topAction?.confidence || recommendations.confidence);
+  const conf = confidenceConfig[displayConfidence] || confidenceConfig.medium;
 
   return (
     <Card

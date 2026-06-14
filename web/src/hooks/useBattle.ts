@@ -6,7 +6,7 @@ import { handleBattleMessage, type BattleMessage } from '../utils/battleMessages
 export function useBattle() {
   const wsRef = useRef<WebSocket | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'connected' | 'disconnected'>('idle');
-  const { updateState, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext } = useBattleStore();
+  const { updateState, beginBattleStream, applyBattleFrame, completeBattleStream, addSuggestion, setConnected, reset, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext } = useBattleStore();
 
   const sendIfOpen = useCallback((payload: unknown) => {
     const ws = wsRef.current;
@@ -42,6 +42,9 @@ export function useBattle() {
       try {
         handleBattleMessage(JSON.parse(ev.data) as BattleMessage, {
           updateState,
+          beginBattleStream,
+          applyBattleFrame,
+          completeBattleStream,
           addSuggestion,
           clearExpiredAdvice,
           addFormattedEvent,
@@ -59,7 +62,7 @@ export function useBattle() {
         console.error("[useBattle] WebSocket message error:", err);
       }
     };
-  }, [updateState, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext]);
+  }, [updateState, beginBattleStream, applyBattleFrame, completeBattleStream, addSuggestion, setConnected, addFormattedEvent, addFormattedEvents, setBattleSummary, setSkillAnalysis, setTraits, setOppTraits, setHookAdvice, setOppSkillAnalysis, clearExpiredAdvice, setTacticalRecommendations, canApplyAnalysisContext]);
 
   const sendEvent = useCallback((opcode: number, detail: Record<string, unknown>) => {
     sendIfOpen({ type: 'event', opcode, detail });

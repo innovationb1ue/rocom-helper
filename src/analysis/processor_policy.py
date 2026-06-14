@@ -11,7 +11,12 @@ def should_snapshot_state_before(*, include_analysis: bool, opcode: int) -> bool
 
 
 def battle_is_active(state: Dict[str, Any]) -> bool:
-    return state.get("battle_id") is not None and state.get("result") is None
+    return (
+        state.get("battle_id") is not None
+        and state.get("result") is None
+        and state.get("phase") != "settling"
+        and not state.get("terminal_pending")
+    )
 
 
 def should_compute_damage_analysis(

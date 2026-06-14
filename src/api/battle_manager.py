@@ -11,6 +11,7 @@ BattleManager 负责网络层的编排：
 from __future__ import annotations
 
 import asyncio
+import uuid
 from typing import Any, Dict, Optional
 
 from fastapi import WebSocket
@@ -23,7 +24,7 @@ from src.analysis.constants import (
 )
 from src.analysis.battle_state import BattleStateTracker
 from src.analysis.models import ProcessResult
-from src.analysis.replay_messages import build_battle_messages
+from src.analysis.replay_messages import build_battle_frame
 from src.api.battle_archive import schedule_completed_battle_archive
 from src.api.battle_sniffer_bridge import BattleSnifferBridge
 from src.api.battle_ws_commands import handle_battle_ws_command
@@ -46,6 +47,9 @@ class BattleManager:
             process_event=self.process_event,
         )
         self._process_lock = asyncio.Lock()
+        self._stream_id = self._new_stream_id()
+        self._seq = 0
+        self._event_index = 0
 
     @property
     def tracker(self) -> Optional[BattleStateTracker]:
@@ -57,6 +61,7 @@ class BattleManager:
 
     def reset_tracker(self) -> BattleStateTracker:
         self._processor.reset()
+        self._reset_stream()
         return self._processor.tracker
 
     def get_state(self) -> Dict[str, Any]:
@@ -97,12 +102,50 @@ class BattleManager:
     ) -> ProcessResult:
         async with self._process_lock:
             result = self._processor.process_event(opcode, detail)
-            for message in build_battle_messages(opcode, result):
-                await self._push_message(message)
+            frame = build_battle_frame(
+                opcode,
+                result,
+                stream_id=self._stream_id,
+                seq=self._next_seq(),
+                event_index=self._next_event_index(),
+            )
+            await self._push_message(frame)
 
             schedule_completed_battle_archive(opcode, enable_archive=enable_archive)
 
             return result
+
+    async def begin_replay_stream(self) -> BattleStateTracker:
+        """Reset state and notify clients that an ordered replay stream starts."""
+        tracker = self.reset_tracker()
+        await self._push_message({
+            "type": "replay_begin",
+            "stream_id": self._stream_id,
+            "seq": self._seq,
+        })
+        return tracker
+
+    async def complete_replay_stream(
+        self,
+        *,
+        final_state: Dict[str, Any],
+        processed: int,
+        total_formatted_events: int,
+        stopped_early: bool,
+        suggestions: list[Dict[str, str]] | None = None,
+    ) -> None:
+        await self._push_message({
+            "type": "replay_complete",
+            "stream_id": self._stream_id,
+            "seq": self._next_seq(),
+            "state": final_state,
+            "result": final_state.get("result"),
+            "rounds": final_state.get("round"),
+            "processed": processed,
+            "total_formatted_events": total_formatted_events,
+            "stopped_early": stopped_early,
+            "suggestions": suggestions or [],
+        })
 
     # ------------------------------------------------------------------
     # WebSocket push helpers
@@ -111,12 +154,35 @@ class BattleManager:
     async def _push_message(self, message: Dict[str, Any]) -> None:
         await self._ws_hub.broadcast(message)
 
+    @staticmethod
+    def _new_stream_id() -> str:
+        return uuid.uuid4().hex
+
+    def _reset_stream(self) -> None:
+        self._stream_id = self._new_stream_id()
+        self._seq = 0
+        self._event_index = 0
+
+    def _next_seq(self) -> int:
+        self._seq += 1
+        return self._seq
+
+    def _next_event_index(self) -> int:
+        self._event_index += 1
+        return self._event_index
+
     # ------------------------------------------------------------------
     # WebSocket message handler
     # ------------------------------------------------------------------
 
     async def handle_message(self, ws: WebSocket, data: Dict[str, Any]) -> None:
-        await handle_battle_ws_command(ws, self._processor, data)
+        await handle_battle_ws_command(
+            ws,
+            self._processor,
+            data,
+            stream_id=self._stream_id,
+            next_seq=self._next_seq,
+        )
 
 
 # Global singleton

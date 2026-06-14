@@ -138,6 +138,7 @@ def apply_entry_sync_data(tracker: Any, entry: Dict[str, Any]) -> None:
         return
     tracker._record_sync_event(entry)
     tracker._record_item_sync_events(entry)
+    _apply_role_resource_sync(tracker, entry)
     for sync in sync_data.get("pet_sync", []):
         tracker._apply_pet_sync(sync)
     for sync in sync_data.get("skill_sync", []):
@@ -149,6 +150,68 @@ def apply_entry_sync_data(tracker: Any, entry: Dict[str, Any]) -> None:
     for sync in sync_data.get("pet_info", []):
         tracker._apply_pet_info_sync(sync)
     # role_sync/comm_sync/task_infos are retained in compact history only.
+
+
+def _apply_role_resource_sync(tracker: Any, entry: Dict[str, Any]) -> None:
+    """Project explicit role/battle resource syncs into state.
+
+    These fields are protocol resources, not pet defeat counters.  They are
+    projected for display/diagnostics only; battle_finish remains the only
+    source that can finalize the battle.
+    """
+    sync_data = entry.get("sync_data") or {}
+    resource_events = tracker.state.setdefault("role_resource_events", [])
+    role_resources = tracker.state.setdefault("role_resources", {})
+    battle_resource = tracker.state.setdefault("battle_resource", {})
+    common = {
+        "round": tracker.state.get("round", 0),
+        "packet_index": (tracker._current_event_detail or {}).get("packet_index"),
+        "group_id": entry.get("group_id"),
+        "event_ordinal": entry.get("event_ordinal"),
+    }
+
+    for sync in sync_data.get("role_sync", []) or []:
+        if not any(key in sync for key in ("role_energy_change", "role_energy_result", "remain_use_cnt", "allow_use_cnt")):
+            continue
+        role_key = str(sync.get("role_uin") if sync.get("role_uin") is not None else "unknown")
+        current = role_resources.setdefault(role_key, {})
+        if sync.get("role_uin") is not None:
+            current["role_uin"] = sync["role_uin"]
+        for key in ("role_energy_result", "remain_use_cnt", "allow_use_cnt", "allow_use_cnt_inbattle"):
+            if sync.get(key) is not None:
+                current[key] = sync[key]
+        event = {
+            **common,
+            "source": "role_sync",
+            "role_key": role_key,
+            "role_uin": sync.get("role_uin"),
+            "role_energy_change": sync.get("role_energy_change"),
+            "role_energy_result": sync.get("role_energy_result"),
+            "remain_use_cnt": sync.get("remain_use_cnt"),
+            "allow_use_cnt": sync.get("allow_use_cnt"),
+            "allow_use_cnt_inbattle": sync.get("allow_use_cnt_inbattle"),
+        }
+        resource_events.append({k: v for k, v in event.items() if v is not None})
+
+    for sync in sync_data.get("comm_sync", []) or []:
+        if not any(key in sync for key in ("sp_energy_result", "final_battle_energy_result")):
+            continue
+        for key in ("sp_energy_type", "sp_energy_result", "final_battle_energy_result"):
+            if sync.get(key) is not None:
+                battle_resource[key] = sync[key]
+        event = {
+            **common,
+            "source": "comm_sync",
+            "sp_energy_type": sync.get("sp_energy_type"),
+            "sp_energy_change": sync.get("sp_energy_change"),
+            "sp_energy_result": sync.get("sp_energy_result"),
+            "final_battle_energy_change": sync.get("final_battle_energy_change"),
+            "final_battle_energy_result": sync.get("final_battle_energy_result"),
+        }
+        resource_events.append({k: v for k, v in event.items() if v is not None})
+
+    if len(resource_events) > 200:
+        del resource_events[:len(resource_events) - 200]
 
 
 def apply_pet_skill_updates(tracker: Any, entry: Dict[str, Any]) -> None:

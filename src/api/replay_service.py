@@ -9,7 +9,7 @@ import asyncio
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from src.analysis.constants import OPCODE_ROUND_START
+from src.analysis.replay_flow import should_stop_before_event
 from src.api.battle_manager import BattleManager
 
 
@@ -28,12 +28,13 @@ async def replay_fixture_to_manager(
     if not packets:
         return {"status": "error", "message": "No battle packets found"}
 
-    manager.reset_tracker()
+    await manager.begin_replay_stream()
 
     processed = 0
     total_formatted = 0
     stopped_early = False
     final_state: Dict[str, Any] = manager.get_state()
+    final_suggestions = []
 
     for item in packets:
         record = item["record"]
@@ -48,20 +49,26 @@ async def replay_fixture_to_manager(
         if not isinstance(detail, dict):
             detail = {}
 
-        if stop_round is not None and opcode == OPCODE_ROUND_START:
-            current_round = manager.get_state().get("round", 0)
-            incoming_round = detail.get("round", current_round + 1)
-            if incoming_round > stop_round:
-                stopped_early = True
-                break
+        if should_stop_before_event(stop_round, manager.get_state(), opcode, detail):
+            stopped_early = True
+            break
 
         result = await manager.process_event(opcode, detail, enable_archive=False)
         final_state = result.state
+        final_suggestions = result.suggestions
         processed += 1
         total_formatted += len(result.formatted_events)
 
         if delay_ms > 0:
             await asyncio.sleep(delay_ms / 1000.0)
+
+    await manager.complete_replay_stream(
+        final_state=final_state,
+        processed=processed,
+        total_formatted_events=total_formatted,
+        stopped_early=stopped_early,
+        suggestions=final_suggestions,
+    )
 
     return {
         "status": "ok",

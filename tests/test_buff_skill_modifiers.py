@@ -42,7 +42,13 @@ def test_source_skill_hit_modifier_requires_current_skill_name():
 
     assert get_buff_hit_count_modifiers(buff, base_hit_count=2)["flat"] == 1.0
     assert get_buff_hit_count_modifiers(buff, skill_name="追打", base_hit_count=2) == {}
-    assert get_buff_hit_count_modifiers(buff, skill_name="折射", base_hit_count=2)["flat"] == 1.0
+    assert get_buff_hit_count_modifiers(buff, skill_name="折射", base_hit_count=2) == {}
+
+
+def test_reflect_ignores_hit_count_modifiers_even_when_multi_hit():
+    buff = [{"id": 20172000, "name": "翼加连击"}]
+
+    assert get_buff_hit_count_modifiers(buff, skill_name="折射", base_hit_count=4) == {}
 
 
 def test_response_chase_hit_modifier_does_not_apply_to_normal_chase():

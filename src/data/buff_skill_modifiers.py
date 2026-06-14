@@ -64,6 +64,8 @@ def _hit_modifier_applies(
     base_hit_count: Optional[int],
     allow_reflect_derived_hit: bool,
 ) -> bool:
+    if _skill_ignores_hit_count_modifiers(skill_name):
+        return False
     if not _source_skill_applies(source_buff, skill_name=skill_name):
         return False
     if (
@@ -77,6 +79,10 @@ def _hit_modifier_applies(
     if root_id in _GENERIC_DAMAGE_MODIFIER_BUFF_IDS and not source_buff.get("source_skill"):
         return False
     return True
+
+
+def _skill_ignores_hit_count_modifiers(skill_name: Optional[str]) -> bool:
+    return skill_name == "折射"
 
 
 def _is_reflect_derived_buff(source_buff: Dict[str, Any]) -> bool:

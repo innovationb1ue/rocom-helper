@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from src.analysis.event_formatter import FormattedEvent
 from src.analysis.models import ProcessResult
-from src.analysis.replay_messages import build_battle_messages
+from src.analysis.replay_messages import build_battle_frame, build_battle_messages
 
 
 def test_build_battle_messages_keeps_browser_contract_fields():
@@ -33,6 +33,7 @@ def test_build_battle_messages_keeps_browser_contract_fields():
             "opp_predicted": [],
             "round_number": 3,
             "confidence": "medium",
+            "model_confidence": "high",
         },
     )
 
@@ -46,6 +47,7 @@ def test_build_battle_messages_keeps_browser_contract_fields():
     assert by_type["skill_analysis"]["opp_skill_source"] == "used_skills"
     assert by_type["hook_advice"]["advice"][0]["hook_id"] == "energy_monitor"
     assert by_type["tactical_recommendations"]["round_number"] == 3
+    assert by_type["tactical_recommendations"]["model_confidence"] == "high"
 
 
 def test_build_battle_messages_batches_multiple_formatted_events():
@@ -84,3 +86,49 @@ def test_build_battle_messages_emits_finish_summary_without_changing_state_contr
     assert by_type["state_update"]["state"]["result"] == "WIN"
     assert by_type["battle_summary"]["summary"]["result"] == "WIN"
     assert by_type["battle_summary"]["summary"]["rounds"] == 5
+
+
+def test_build_battle_frame_keeps_outputs_in_one_ordered_payload():
+    result = ProcessResult(
+        state={
+            "battle_id": 1,
+            "round": 6,
+            "result": None,
+            "my_active": {"battle_uid": "my-1"},
+            "opp_active": {"battle_uid": "opp-1"},
+        },
+        formatted_events=[
+            FormattedEvent("damage", 6, "造成伤害", {"amount": 40}, "heart", "red"),
+        ],
+        battle_advice={
+            "skill_analysis": [{"skill_id": 1, "skill_name": "测试"}],
+            "opp_skill_analysis": [{"skill_id": 2, "skill_name": "对手"}],
+            "opp_skill_source": "used_skills",
+        },
+        hook_advice=[{"hook_id": "energy_monitor"}],
+        suggestions=[{"type": "info", "message": "建议"}],
+        tactical={
+            "actions": [],
+            "opp_predicted": [],
+            "round_number": 6,
+            "confidence": "medium",
+            "model_confidence": "high",
+        },
+    )
+
+    frame = build_battle_frame(0x1324, result, stream_id="stream-a", seq=3, event_index=2)
+
+    assert frame["type"] == "battle_frame"
+    assert frame["stream_id"] == "stream-a"
+    assert frame["seq"] == 3
+    assert frame["event_index"] == 2
+    assert frame["round"] == 6
+    assert frame["state"]["round"] == 6
+    assert frame["events"][0]["kind"] == "damage"
+    assert frame["skills"][0]["skill_id"] == 1
+    assert frame["opp_skill_source"] == "used_skills"
+    assert frame["hook_advice"][0]["hook_id"] == "energy_monitor"
+    assert frame["tactical_recommendations"]["round_number"] == 6
+    assert frame["tactical_recommendations"]["model_confidence"] == "high"
+    assert frame["my_active_uid"] == "battle_uid:my-1"
+    assert frame["opp_active_uid"] == "battle_uid:opp-1"

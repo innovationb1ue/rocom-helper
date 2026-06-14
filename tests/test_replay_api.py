@@ -229,6 +229,70 @@ class TestBattleReportEndpoints:
 
 
 class TestBattleManagerArchiveToggle:
+    def test_process_event_broadcasts_ordered_battle_frame(self, monkeypatch):
+        from src.api.battle_manager import BattleManager
+        import src.api.battle_manager as battle_manager
+
+        messages = []
+
+        async def _push(message):
+            messages.append(message)
+
+        async def _run():
+            mgr = BattleManager()
+            monkeypatch.setattr(mgr, "_push_message", _push)
+            monkeypatch.setattr(
+                battle_manager,
+                "schedule_completed_battle_archive",
+                lambda _opcode, *, enable_archive: None,
+            )
+            await mgr.process_event(0x1316, {"battle_id": 1, "round": 0, "wrappers": []})
+            await mgr.process_event(0x131A, {"round": 1, "wrappers": []})
+
+        asyncio.run(_run())
+
+        assert [m["type"] for m in messages] == ["battle_frame", "battle_frame"]
+        assert messages[0]["stream_id"] == messages[1]["stream_id"]
+        assert messages[0]["seq"] == 1
+        assert messages[1]["seq"] == 2
+        assert messages[0]["event_index"] == 1
+        assert messages[1]["event_index"] == 2
+        assert messages[1]["state"]["round"] == 1
+
+    def test_complete_replay_stream_carries_latest_suggestions(self, monkeypatch):
+        from src.api.battle_manager import BattleManager
+
+        messages = []
+
+        async def _push(message):
+            messages.append(message)
+
+        async def _run():
+            mgr = BattleManager()
+            monkeypatch.setattr(mgr, "_push_message", _push)
+            await mgr.complete_replay_stream(
+                final_state={"round": 8, "result": None},
+                processed=12,
+                total_formatted_events=34,
+                stopped_early=True,
+                suggestions=[],
+            )
+
+        asyncio.run(_run())
+
+        assert messages == [{
+            "type": "replay_complete",
+            "stream_id": messages[0]["stream_id"],
+            "seq": 1,
+            "state": {"round": 8, "result": None},
+            "result": None,
+            "rounds": 8,
+            "processed": 12,
+            "total_formatted_events": 34,
+            "stopped_early": True,
+            "suggestions": [],
+        }]
+
     def test_process_event_archives_by_default(self, monkeypatch):
         from src.api.battle_manager import BattleManager
         import src.api.battle_manager as battle_manager

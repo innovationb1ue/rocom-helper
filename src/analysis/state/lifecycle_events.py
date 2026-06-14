@@ -24,6 +24,10 @@ def handle_battle_enter(tracker: Any, detail: Dict[str, Any]) -> None:
     tracker.state["result"] = None
     tracker.state["events"] = []
     tracker.state["phase"] = "selecting"
+    tracker.state["terminal_pending"] = False
+    tracker.state["role_resources"] = {}
+    tracker.state["battle_resource"] = {}
+    tracker.state["role_resource_events"] = []
 
     weather_id = detail.get("weather_id")
     weather = {
@@ -98,6 +102,7 @@ def handle_action_ack(tracker: Any, detail: Dict[str, Any]) -> None:
 def handle_battle_finish(tracker: Any, detail: Dict[str, Any]) -> None:
     tracker.state["result"] = detail.get("result_name", "UNKNOWN")
     tracker.state["phase"] = "finished"
+    tracker.state["terminal_pending"] = False
     for finish_pet in detail.get("finish_pet_infos", []):
         pet_id = finish_pet.get("pet_gid")
         remain = finish_pet.get("remain_hp", 0)

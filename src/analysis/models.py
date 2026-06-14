@@ -135,6 +135,7 @@ class TacticalRecommendation:
     opp_predicted: List[OpponentAction] = field(default_factory=list)
     round_number: int = 0
     confidence: str = "medium"
+    model_confidence: str = "medium"
     primary_plan: str = ""
     warnings: List[str] = field(default_factory=list)
     metrics: Dict[str, Any] = field(default_factory=dict)
@@ -147,6 +148,7 @@ class TacticalRecommendation:
             "opp_predicted": [o.to_dict() for o in self.opp_predicted],
             "round_number": self.round_number,
             "confidence": self.confidence,
+            "model_confidence": self.model_confidence,
             "primary_plan": self.primary_plan,
             "warnings": self.warnings,
             "metrics": self.metrics,

@@ -40,6 +40,7 @@ def test_build_recommendation_assembles_contract_fields():
 
     assert rec.round_number == 7
     assert rec.confidence == "medium"
+    assert rec.model_confidence == "medium"
     assert rec.primary_plan.startswith("首选 终结技")
     assert rec.metrics == {"type_matchup": 1.0}
     assert rec.opponent_profile["skill_source"] == "used"
@@ -64,3 +65,23 @@ def test_recommendations_builder_facade_stays_compatible():
 
     assert rec.round_number == 7
     assert rec.confidence == "medium"
+
+
+def test_build_recommendation_uses_top_action_confidence_for_user_visible_confidence():
+    scored, opp_predicted, my_active, opp_active = _inputs()
+    scored[0].confidence = "low"
+
+    rec = recommendation_builder.build_recommendation(
+        scored=scored,
+        opp_predicted=opp_predicted,
+        state={"round": 7},
+        my_active=my_active,
+        opp_active=opp_active,
+        my_pets=[my_active],
+        opp_pets=[opp_active],
+        opp_skill_source="used",
+        battle_metrics=lambda *_args: {"type_matchup": 1.0},
+    )
+
+    assert rec.model_confidence == "medium"
+    assert rec.confidence == "low"

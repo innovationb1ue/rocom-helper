@@ -24,6 +24,7 @@ from src.analysis.replay_flow import (
     extract_replay_detail,
     filter_process_result,
     make_event_snapshot,
+    should_stop_before_event,
     should_stop_replay,
     update_round_snapshot,
 )
@@ -71,6 +72,10 @@ class BattleReplayRunner:
 
             kind, detail = extract_replay_detail(record, opcode)
             state_before = copy.deepcopy(processor.get_state())
+            if should_stop_before_event(stop_round, state_before, opcode, detail):
+                stopped_early = True
+                break
+
             result = processor.process_event(opcode, detail)
             state_after = result.state
 

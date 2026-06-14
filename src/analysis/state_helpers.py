@@ -36,6 +36,10 @@ def initial_battle_state() -> Dict[str, Any]:
         "opp_active": None,
         "events": [],
         "result": None,
+        "terminal_pending": False,
+        "role_resources": {},
+        "battle_resource": {},
+        "role_resource_events": [],
     }
 
 

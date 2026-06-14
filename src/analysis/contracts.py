@@ -66,6 +66,8 @@ class ConnectedMessage(TypedDict):
 class StateUpdateMessage(TypedDict):
     type: Literal["state_update"]
     state: BattleStateContract
+    stream_id: NotRequired[str]
+    seq: NotRequired[int]
 
 
 class BattleEventMessage(TypedDict):
@@ -111,6 +113,7 @@ class TacticalRecommendationsMessage(TypedDict):
     opp_predicted: List[Dict[str, Any]]
     round_number: int
     confidence: str
+    model_confidence: NotRequired[str]
     my_active_uid: NotRequired[str]
     opp_active_uid: NotRequired[str]
     primary_plan: NotRequired[str]

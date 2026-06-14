@@ -4,7 +4,7 @@ from __future__ import annotations
 import copy
 from typing import Any, Dict, List, Optional, Tuple
 
-from src.analysis.constants import OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START
+from src.analysis.constants import OPCODE_ROUND_START
 from src.analysis.models import ProcessResult
 from src.analysis.replay_messages import build_battle_messages
 from src.analysis.replay_models import ReplayEventSnapshot, RoundSnapshot
@@ -119,7 +119,7 @@ def update_round_snapshot(
     round_snapshot.events.append(event)
     round_snapshot.state_at_end = state_after
     round_snapshot.formatted_events.extend(formatted_events)
-    round_snapshot.suggestions.extend(suggestions)
+    round_snapshot.suggestions = list(suggestions)
     round_snapshot.messages.extend(messages)
     if battle_advice:
         round_snapshot.battle_advice = battle_advice
@@ -135,10 +135,33 @@ def update_round_snapshot(
     return round_snapshot
 
 
+def should_stop_before_event(
+    stop_round: Optional[int],
+    current_state: Dict[str, Any],
+    opcode: int,
+    detail: Dict[str, Any],
+) -> bool:
+    """Return whether replay should stop before processing this event.
+
+    `--round N` means replay all events that belong to round N and stop only
+    before the first event of round N+1.  Finish packets are never inferred
+    from defeat/resource counts and must be allowed through when they arrive.
+    """
+    if stop_round is None or opcode != OPCODE_ROUND_START:
+        return False
+    current_round = int(current_state.get("round") or 0)
+    incoming_round = detail.get("round", current_round + 1)
+    try:
+        incoming_round = int(incoming_round)
+    except (TypeError, ValueError):
+        incoming_round = current_round + 1
+    return incoming_round > stop_round
+
+
 def should_stop_replay(stop_round: Optional[int], current_round: int, opcode: int) -> bool:
-    """Return whether replay should stop after this event."""
+    """Compatibility helper for old callers; prefer should_stop_before_event."""
     return (
         stop_round is not None
-        and current_round >= stop_round
-        and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START)
+        and opcode == OPCODE_ROUND_START
+        and current_round > stop_round
     )

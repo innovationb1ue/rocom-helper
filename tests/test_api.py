@@ -49,8 +49,9 @@ class TestWebSocket:
             ws.send_json({"type": "get_state"})
             for _ in range(5):
                 msg = ws.receive_json()
-                if msg["type"] == "state":
+                if msg["type"] == "state_update":
                     break
+            assert msg["type"] == "state_update"
 
             ws.send_json({"type": "reset"})
             reset_resp = ws.receive_json()
