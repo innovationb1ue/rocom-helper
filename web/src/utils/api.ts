@@ -78,6 +78,20 @@ export type SnifferTestResult = {
   } | null;
 }
 
+export interface SnifferStatusDetails {
+  status: string;
+  message: string;
+  flow_count: number;
+  key_hex: string | null;
+  sniffer_running?: boolean;
+  key_miss?: number;
+  decrypt_fail?: number;
+  parse_fail?: number;
+}
+
+export const fetchSnifferStatus = () =>
+  api.get<{ status: string; details: SnifferStatusDetails }>('/sniffer/status').then(r => r.data);
+
 export const testSniffer = (refreshKey = false) =>
   api.post<SnifferTestResult>('/sniffer/test', null, { params: refreshKey ? { refresh_key: true } : {} })
     .then(r => r.data);
