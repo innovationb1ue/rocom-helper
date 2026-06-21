@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from src.analysis.formatting.core import FormattedEvent, is_mine, side_label
+from src.analysis.formatting.core import FormattedEvent, resolve_pet_display_name, side_label
 
 
 def format_skill_cast(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
@@ -39,8 +39,11 @@ def format_skill_cast(entry: Dict[str, Any], _state: Dict[str, Any]) -> Formatte
     )
 
 
-def format_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEvent:
-    target = side_label(entry.get("damage_target_side") or entry.get("target_side"))
+def format_damage(entry: Dict[str, Any], state: Dict[str, Any]) -> FormattedEvent:
+    target_side = entry.get("damage_target_side") or entry.get("target_side")
+    target_side_label = side_label(target_side)
+    target_name = resolve_pet_display_name(target_side, state, pet_id=entry.get("target_pet_id"))
+    target = _side_with_pet_name(target_side_label, target_name)
     dmg = entry.get("damage", 0)
     hp = entry.get("hp_after")
     if hp is None:
@@ -54,7 +57,8 @@ def format_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEve
         round=0,
         summary=summary,
         detail={
-            "target_side": target,
+            "target_side": target_side_label,
+            "target_name": target_name,
             "damage": dmg,
             "hp_after": hp,
             "hp_before": entry.get("hp_before"),
@@ -72,21 +76,29 @@ def format_damage(entry: Dict[str, Any], _state: Dict[str, Any]) -> FormattedEve
 def format_defeat(entry: Dict[str, Any], state: Dict[str, Any]) -> FormattedEvent:
     winner = side_label(entry.get("actor_side"))
     defeated_side = entry.get("target_side")
-    defeated = side_label(defeated_side)
-
-    if defeated_side is not None:
-        pet_list = state.get("my_pets", []) if is_mine(defeated_side) else state.get("opp_pets", [])
-        slot = int(defeated_side)
-        for pet in pet_list:
-            if pet.get("slot") == slot:
-                defeated = pet.get("name", defeated)
-                break
+    defeated_side_label = side_label(defeated_side)
+    defeated = resolve_pet_display_name(
+        defeated_side,
+        state,
+        pet_id=entry.get("target_pet_id"),
+    )
 
     return FormattedEvent(
         kind="defeat",
         round=0,
         summary=f"{winner} 击败了 {defeated}!",
-        detail={"winner_side": winner, "defeated_side": defeated},
+        detail={
+            "winner_side": winner,
+            "defeated_side": defeated_side_label,
+            "defeated_name": defeated,
+            "target_pet_id": entry.get("target_pet_id"),
+        },
         icon="skull",
         color="red",
     )
+
+
+def _side_with_pet_name(side: str, pet_name: str) -> str:
+    if pet_name == side or pet_name in {"?", ""}:
+        return side
+    return f"{side}({pet_name})"

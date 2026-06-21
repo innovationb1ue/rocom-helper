@@ -10,6 +10,11 @@ _IMMUTABLE_TYPES = (str, int, float, bool, type(None))
 def build_state_snapshot(state: Dict[str, Any]) -> Dict[str, Any]:
     """Deep-copy state and attach derived fields exposed to API/replay callers."""
     snapshot = clone_state_mapping(state)
+    for key in ("my_pets", "opp_pets"):
+        snapshot[key] = [
+            pet for pet in snapshot.get(key, [])
+            if not pet.get("supply_placeholder")
+        ]
     for pet in snapshot.get("my_pets", []) + snapshot.get("opp_pets", []):
         pet["effective_speed"] = compute_effective_speed(pet)
     for key in ("my_active", "opp_active"):

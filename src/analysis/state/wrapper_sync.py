@@ -33,6 +33,8 @@ def update_pets_from_wrappers(tracker: Any, wrappers: List[Dict[str, Any]]) -> N
         side = wrapper.get("side")
         is_mine = side == 1 or side == "我方"
         pet_list = tracker.state["my_pets"] if is_mine else tracker.state["opp_pets"]
+        active_key = "my_active" if is_mine else "opp_active"
+        current_active = tracker.state.get(active_key)
         if side is None:
             matched_side = None
             matched_is_mine = False
@@ -56,6 +58,12 @@ def update_pets_from_wrappers(tracker: Any, wrappers: List[Dict[str, Any]]) -> N
             _merge_wrapper_into_pet(tracker, pet, wrapper, is_mine=is_mine, side=side)
             break
 
+        hydrated_placeholder = False
+        if matched is None and _can_hydrate_supply_placeholder(current_active, pet_list):
+            matched = current_active
+            hydrated_placeholder = True
+            _merge_wrapper_into_pet(tracker, matched, wrapper, is_mine=is_mine, side=side)
+
         if matched is None:
             pet_info = PetInfo.from_wrapper(wrapper).to_dict()
             if tracker._current_opcode == OPCODE_ACTION_ACK and wrapper.get("skills"):
@@ -67,11 +75,14 @@ def update_pets_from_wrappers(tracker: Any, wrappers: List[Dict[str, Any]]) -> N
             refresh_battle_uid(pet_info)
             pet_list.append(pet_info)
             matched = pet_list[-1]
+        elif hydrated_placeholder:
+            matched.pop("supply_placeholder", None)
+            pending_side = matched.pop("pending_supply_side", None)
+            if pending_side is not None:
+                tracker._bind_battle_side(pending_side, matched, is_mine=is_mine)
 
         if matched is not None and side is not None:
             tracker._bind_battle_side(side, matched, is_mine=is_mine)
-        active_key = "my_active" if is_mine else "opp_active"
-        current_active = tracker.state.get(active_key)
         side_count = side_counts.get("my" if is_mine else "opp", 0)
         if matched is not None and side_count == 1:
             tracker.state[active_key] = matched
@@ -110,6 +121,17 @@ def _wrapper_side_counts(wrappers: List[Dict[str, Any]]) -> Dict[str, int]:
     return counts
 
 
+def _can_hydrate_supply_placeholder(
+    current_active: Dict[str, Any] | None,
+    pet_list: List[Dict[str, Any]],
+) -> bool:
+    return (
+        current_active is not None
+        and current_active.get("supply_placeholder") is True
+        and current_active in pet_list
+    )
+
+
 def _merge_wrapper_into_pet(
     tracker: Any,
     pet: Dict[str, Any],
@@ -123,7 +145,11 @@ def _merge_wrapper_into_pet(
         pet["max_hp"] = wrapper["max_hp"]
     if "hp" in wrapper:
         new_hp = wrapper["hp"]
-        if new_hp is not None and (is_mine or new_hp <= pet.get("current_hp", float("inf"))):
+        if new_hp is not None and (
+            is_mine
+            or pet.get("supply_placeholder") is True
+            or new_hp <= pet.get("current_hp", float("inf"))
+        ):
             tracker._apply_hp_update(
                 pet,
                 event_kind="round_start",

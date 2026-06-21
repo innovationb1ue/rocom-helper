@@ -4,6 +4,8 @@ from __future__ import annotations
 import copy
 from typing import Any, Dict
 
+from src.analysis.pet_identity import refresh_battle_uid
+
 
 def _round(self) -> int:
     return self.state["round"]
@@ -193,6 +195,61 @@ def _handle_supply_pet_entry(self, entry: Dict[str, Any]) -> None:
         "supply_pets": entry.get("supply_pets", []),
         "round": self.state["round"],
     })
+    for supplied in entry.get("supply_pets", []) or []:
+        side_value = supplied.get("pet_id")
+        side_num = self._side_int(side_value)
+        if side_num is None:
+            continue
+        is_mine = self._is_mine(side_num)
+        pet_list = self.state["my_pets"] if is_mine else self.state["opp_pets"]
+        mapped = self._battle_side_pets.get(side_num)
+        matched = mapped if mapped is not None and (
+            mapped.get("current_hp", 0) > 0
+            or (mapped.get("pet_id") is None and mapped.get("slot") == side_num)
+        ) else None
+        if matched is None:
+            for pet in pet_list:
+                if pet.get("slot") == side_num and (
+                    pet.get("current_hp", 0) > 0
+                    or pet.get("pet_id") is None
+                ):
+                    matched = pet
+                    break
+        if matched is None and is_mine and 1 <= side_num <= len(pet_list):
+            matched = pet_list[side_num - 1]
+        if matched is None:
+            matched = {
+                "pet_id": None,
+                "name": "我方" if is_mine else "敌方",
+                "types": [],
+                "current_hp": 0,
+                "max_hp": 0,
+                "hp_pct": 0.0,
+                "energy": 10,
+                "buffs": [],
+                "initial_buff_ids": [],
+                "innate_skill_id": None,
+                "level": None,
+                "slot": side_num,
+                "side": 1 if is_mine else 401,
+                "stats": [],
+                "skills": [],
+                "equipped_skills": [],
+                "base_id": None,
+                "base_conf_id": None,
+                "base_skill_pool": None,
+                "combo_bonus": 0,
+                "poison_stacks": 0,
+                "used_skills": [],
+                "base_speed": None,
+                "protocol_name": None,
+                "supply_placeholder": True,
+                "pending_supply_side": side_num,
+            }
+            refresh_battle_uid(matched, side=1 if is_mine else 401)
+            pet_list.append(matched)
+        self.state["my_active" if is_mine else "opp_active"] = matched
+        self._bind_battle_side(side_num, matched, is_mine=is_mine)
 
 def _handle_cmd_failed_entry(self, entry: Dict[str, Any]) -> None:
     self.state.setdefault("cmd_failed_events", []).append({

@@ -1,7 +1,13 @@
 """事件格式化共享工具测试。"""
 from __future__ import annotations
 
-from src.analysis.formatting.core import FormattedEvent, is_mine, resolve_pet_name, side_label
+from src.analysis.formatting.core import (
+    FormattedEvent,
+    is_mine,
+    resolve_pet_display_name,
+    resolve_pet_name,
+    side_label,
+)
 
 
 def test_formatted_event_to_dict_keeps_browser_fields():
@@ -43,3 +49,13 @@ def test_resolve_pet_name_matches_slot_or_pet_id():
     assert resolve_pet_name(1, True, state) == "火龙"
     assert resolve_pet_name(200, False, state) == "水龟"
     assert resolve_pet_name(999, True, state) == "999"
+
+
+def test_resolve_pet_display_name_prefers_pet_id_over_generic_side():
+    state = {
+        "my_pets": [{"slot": 1, "pet_id": 100, "name": "火龙"}],
+        "opp_pets": [{"slot": 168, "pet_id": 3118005, "name": "熔岩布丁"}],
+    }
+
+    assert resolve_pet_display_name(403, state, pet_id=3118005) == "熔岩布丁"
+    assert resolve_pet_display_name(403, state) == "敌方"

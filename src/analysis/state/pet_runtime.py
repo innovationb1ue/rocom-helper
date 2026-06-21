@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 import copy
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
+from src.analysis.pet_info import canonical_pet_name
+from src.analysis.pet_identity import refresh_battle_uid
 from src.analysis.reflect_effects import REFLECT_BUFF_ID
-from src.data.loader import enrich_buff_modifiers
+from src.analysis.state import side_resolver
+from src.data.loader import enrich_buff_modifiers, get_pet_skill_meta
 
 
 WRAPPER_RUNTIME_KEYS = (
@@ -103,10 +106,29 @@ def apply_pet_sync(tracker: Any, sync: Dict[str, Any]) -> None:
 def apply_pet_info_sync(tracker: Any, sync: Dict[str, Any]) -> None:
     pet = tracker._pet_for_sync_id(sync.get("pet_id"))
     if pet is None:
+        pet = _find_or_create_pet_from_info_sync(tracker, sync)
+    if pet is None:
         return
     for key in ("name", "level", "base_conf_id", "types", "max_hp"):
         if sync.get(key) is not None:
             pet[key] = sync[key]
+    if sync.get("pet_id") is not None:
+        pet["pet_id"] = sync["pet_id"]
+    if sync.get("base_conf_id") is not None:
+        pet["base_id"] = sync["base_conf_id"]
+    protocol_name = sync.get("name")
+    if protocol_name:
+        pet["protocol_name"] = protocol_name
+    if protocol_name or sync.get("base_conf_id") is not None or sync.get("pet_id") is not None:
+        pet["name"] = canonical_pet_name(
+            base_conf_id=pet.get("base_conf_id"),
+            pet_id=pet.get("pet_id"),
+            protocol_name=pet.get("protocol_name") or protocol_name,
+        )
+    if pet.get("max_hp", 0) > 0:
+        if pet.get("current_hp", 0) <= 0 and not pet.get("hp_trace"):
+            pet["current_hp"] = pet["max_hp"]
+        pet["hp_pct"] = pet["current_hp"] / pet["max_hp"]
     if sync.get("equipped_skills"):
         pet["runtime_equipped_skills"] = sync["equipped_skills"]
     if sync.get("skill_round_data"):
@@ -115,6 +137,21 @@ def apply_pet_info_sync(tracker: Any, sync: Dict[str, Any]) -> None:
             sync["skill_round_data"],
             source="sync_data.pet_info.skill_round_data",
         )
+    if pet.get("base_skill_pool") is None and pet.get("base_id") is not None:
+        skill_pool = get_pet_skill_meta(pet["base_id"])
+        if isinstance(skill_pool, dict):
+            pet["base_skill_pool"] = skill_pool.get("level_skills") or []
+    side_value = sync.get("source_side")
+    if side_value is not None and side_resolver.is_battle_side_value(tracker, side_value):
+        side_num = tracker._side_int(side_value)
+        is_mine = tracker._is_mine(side_value)
+        if pet.get("side") is None:
+            pet["side"] = 1 if is_mine else 401
+        if pet.get("slot") is None and side_num is not None:
+            pet["slot"] = side_num
+        refresh_battle_uid(pet, side=1 if is_mine else 401)
+        tracker._bind_battle_side(side_value, pet, is_mine=is_mine)
+        tracker._set_active_pet(pet)
 
 
 def apply_wrapper_runtime_fields(pet: Dict[str, Any], wrapper: Dict[str, Any]) -> None:
@@ -147,7 +184,10 @@ def apply_entry_sync_data(tracker: Any, entry: Dict[str, Any]) -> None:
     for sync in sync_data.get("skill_change_sync", []):
         sync.setdefault("source", "skill_change_sync")
         tracker._update_skill_runtime(tracker._pet_for_sync_id(sync.get("pet_id")), sync)
+    pet_info_side = _pet_info_source_side(tracker, entry)
     for sync in sync_data.get("pet_info", []):
+        if pet_info_side is not None:
+            sync.setdefault("source_side", pet_info_side)
         tracker._apply_pet_info_sync(sync)
     # role_sync/comm_sync/task_infos are retained in compact history only.
 
@@ -212,6 +252,85 @@ def _apply_role_resource_sync(tracker: Any, entry: Dict[str, Any]) -> None:
 
     if len(resource_events) > 200:
         del resource_events[:len(resource_events) - 200]
+
+
+def _pet_info_source_side(tracker: Any, entry: Dict[str, Any]) -> Optional[Any]:
+    for key in ("target_side", "actor_side", "damage_target_side"):
+        value = entry.get(key)
+        if side_resolver.is_battle_side_value(tracker, value):
+            return value
+    return None
+
+
+def _find_or_create_pet_from_info_sync(tracker: Any, sync: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    side_value = sync.get("source_side")
+    is_mine = tracker._is_mine(side_value) if side_value is not None else False
+    pet_list = tracker.state["my_pets"] if is_mine else tracker.state["opp_pets"]
+    pet_id = sync.get("pet_id")
+    base_conf_id = sync.get("base_conf_id")
+    for pet in pet_list:
+        if pet_id is not None and pet.get("pet_id") == pet_id:
+            return pet
+        if base_conf_id is not None and pet.get("base_conf_id") == base_conf_id:
+            return pet
+    side_num = tracker._side_int(side_value)
+    if side_num is not None:
+        for pet in pet_list:
+            if pet.get("slot") == side_num:
+                return pet
+    if side_value is None or not side_resolver.is_battle_side_value(tracker, side_value):
+        return None
+    pet = _new_pet_from_info_sync(tracker, sync, side_value=side_value, is_mine=is_mine)
+    pet_list.append(pet)
+    return pet
+
+
+def _new_pet_from_info_sync(
+    tracker: Any,
+    sync: Dict[str, Any],
+    *,
+    side_value: Any,
+    is_mine: bool,
+) -> Dict[str, Any]:
+    side_num = tracker._side_int(side_value)
+    max_hp = sync.get("max_hp") or 0
+    base_conf_id = sync.get("base_conf_id")
+    pet = {
+        "pet_id": sync.get("pet_id"),
+        "name": canonical_pet_name(
+            base_conf_id=base_conf_id,
+            pet_id=sync.get("pet_id"),
+            protocol_name=sync.get("name"),
+        ),
+        "types": sync.get("types") or [],
+        "current_hp": max_hp,
+        "max_hp": max_hp,
+        "hp_pct": 1.0 if max_hp else 0.0,
+        "energy": 10,
+        "buffs": [],
+        "initial_buff_ids": [],
+        "innate_skill_id": None,
+        "level": sync.get("level"),
+        "slot": side_num,
+        "side": 1 if is_mine else 401,
+        "stats": [{"name": "HP", "total": max_hp}] if max_hp else [],
+        "skills": [],
+        "equipped_skills": [],
+        "base_id": base_conf_id,
+        "base_conf_id": base_conf_id,
+        "base_skill_pool": None,
+        "combo_bonus": 0,
+        "poison_stacks": 0,
+        "used_skills": [],
+        "base_speed": None,
+        "protocol_name": sync.get("name"),
+    }
+    if pet["base_id"] is not None:
+        skill_pool = get_pet_skill_meta(pet["base_id"])
+        if isinstance(skill_pool, dict):
+            pet["base_skill_pool"] = skill_pool.get("level_skills") or []
+    refresh_battle_uid(pet, side=1 if is_mine else 401)
+    return pet
 
 
 def apply_pet_skill_updates(tracker: Any, entry: Dict[str, Any]) -> None:

@@ -7,11 +7,27 @@ from src.analysis.pet_identity import is_hidden_pet_id, same_battle_pet
 from src.analysis.state.pet_sync import bind_side_slot, side_int, side_is_player
 
 
+def is_battle_side_value(tracker: Any, side_value: Any) -> bool:
+    """Return True for protocol battle-side ids, not arbitrary real pet ids."""
+    side_num = tracker._side_int(side_value)
+    if side_num is None:
+        return False
+    if side_num in tracker._battle_side_pets or side_num in tracker._player_slots or side_num in tracker._opponent_slots:
+        return True
+    if 1 <= side_num <= 6 or 401 <= side_num <= 499:
+        return True
+    for pet in tracker.state["my_pets"] + tracker.state["opp_pets"]:
+        if pet.get("slot") == side_num:
+            return True
+    return False
+
+
 def pet_for_sync_id(tracker: Any, pet_id: Any) -> Optional[Dict[str, Any]]:
     if pet_id is None:
         return None
     side_num = tracker._side_int(pet_id)
-    if side_num is not None and side_num in tracker._battle_side_pets:
+    side_like = is_battle_side_value(tracker, pet_id)
+    if side_like and side_num is not None and side_num in tracker._battle_side_pets:
         pet = tracker._battle_side_pets[side_num]
         active_key = "my_active" if tracker._is_mine(side_num) else "opp_active"
         active = tracker.state.get(active_key)
@@ -26,8 +42,8 @@ def pet_for_sync_id(tracker: Any, pet_id: Any) -> Optional[Dict[str, Any]]:
     for pet in tracker.state["my_pets"] + tracker.state["opp_pets"]:
         if pet.get("pet_id") == pet_id or pet.get("slot") == pet_id:
             return pet
-    if side_num is not None:
-        return tracker._resolve_pet_for_side(side_num, bind_fallback=False)
+    if side_like and side_num is not None:
+        return tracker._resolve_pet_for_side(side_num, bind_fallback=True)
     return None
 
 
@@ -128,6 +144,8 @@ def resolve_pet_for_side(
             if candidate.get("slot") == side_num:
                 tracker._bind_battle_side(side_num, candidate)
                 return candidate
+        if not is_battle_side_value(tracker, side_value):
+            return None
 
     active_key = "my_active" if tracker._is_mine(side_value) else "opp_active"
     active = tracker.state[active_key]

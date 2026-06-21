@@ -22,6 +22,12 @@ def _damage(*, hp_after: int, ledger_id: int) -> FormattedEvent:
     )
 
 
+def _named_damage(*, hp_after: int, ledger_id: int) -> FormattedEvent:
+    event = _damage(hp_after=hp_after, ledger_id=ledger_id)
+    event.detail["target_name"] = "熔岩布丁"
+    return event
+
+
 def test_merge_damage_events_merges_consecutive_identical_hits():
     merged = merge_damage_events([_damage(hp_after=90, ledger_id=1), _damage(hp_after=80, ledger_id=2)])
 
@@ -30,6 +36,15 @@ def test_merge_damage_events_merges_consecutive_identical_hits():
     assert merged[0].detail["hp_after"] == 80
     assert merged[0].detail["ledger_ids"] == [1, 2]
     assert "10x2" in merged[0].summary
+
+
+def test_merge_damage_events_keeps_side_and_pet_name_in_summary():
+    merged = merge_damage_events([
+        _named_damage(hp_after=90, ledger_id=1),
+        _named_damage(hp_after=80, ledger_id=2),
+    ])
+
+    assert merged[0].summary == "敌方(熔岩布丁) 受到 10x2 伤害 (HP→80) [连击]"
 
 
 def test_merge_damage_events_keeps_non_matching_events_separate():

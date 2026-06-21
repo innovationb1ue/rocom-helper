@@ -1,7 +1,7 @@
 """战术行动 cockpit metrics 构造。"""
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 TypeMatchupFn = Callable[[Dict[str, Any], Dict[str, Any]], float]
 
@@ -56,7 +56,7 @@ def battle_metrics(
         "speed_line": {
             "my": my_speed,
             "opp": opp_speed,
-            "order": "我方先手" if my_speed >= opp_speed else "对手先手",
+            "order": battle_speed_order(my_speed, opp_speed),
         },
         "energy_window": {
             "my": my_active.get("energy", 0),
@@ -71,13 +71,21 @@ def battle_metrics(
     }
 
 
-def active_speed(pet: Dict[str, Any]) -> int:
-    return pet.get("effective_speed") or pet.get("base_speed", 0)
+def active_speed(pet: Dict[str, Any]) -> Optional[int]:
+    return pet.get("effective_speed") or pet.get("base_speed")
 
 
-def speed_order(my_speed: int, opp_speed: int, priority_layer: int) -> str:
+def speed_order(my_speed: Optional[int], opp_speed: Optional[int], priority_layer: int) -> str:
     if priority_layer > 0:
         return f"先手技能 +{priority_layer}"
     if priority_layer < 0:
         return f"后发技能 {priority_layer}"
+    if my_speed is None or opp_speed is None:
+        return "速度未知"
     return "速度更快" if my_speed >= opp_speed else "速度较慢"
+
+
+def battle_speed_order(my_speed: Optional[int], opp_speed: Optional[int]) -> str:
+    if my_speed is None or opp_speed is None:
+        return "速度未知"
+    return "我方先手" if my_speed >= opp_speed else "对手先手"

@@ -22,9 +22,13 @@ def score_non_damage_skill(
     tags = classify_skill_effect(meta)
 
     hp_pct = my_active.get("hp_pct", 1.0)
-    our_speed = my_active.get("effective_speed") or my_active.get("base_speed", 0)
-    opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed", 0)
-    we_outspeed = our_speed >= opp_speed
+    our_speed = my_active.get("effective_speed") or my_active.get("base_speed")
+    opp_speed = opp_active.get("effective_speed") or opp_active.get("base_speed")
+    we_outspeed = (
+        our_speed is not None
+        and opp_speed is not None
+        and our_speed >= opp_speed
+    )
 
     if "stat_up" in tags:
         if "spd_up" in tags or "speed" in tags:

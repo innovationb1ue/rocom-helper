@@ -39,7 +39,7 @@ def merge_damage_events(events: List[FormattedEvent]) -> List[FormattedEvent]:
             last = events[j - 1]
             hp = last.detail.get("hp_after")
             damage = event.detail.get("damage", 0)
-            target = event.detail.get("target_side", "")
+            target = _target_display(event.detail)
             skill = event.detail.get("skill_name")
             ledger_ids = [
                 item.detail.get("ledger_id")
@@ -65,3 +65,11 @@ def merge_damage_events(events: List[FormattedEvent]) -> List[FormattedEvent]:
             result.append(event)
         i = j
     return result
+
+
+def _target_display(detail: dict) -> str:
+    target_side = detail.get("target_side", "")
+    target_name = detail.get("target_name")
+    if target_name and target_name != target_side:
+        return f"{target_side}({target_name})"
+    return target_side

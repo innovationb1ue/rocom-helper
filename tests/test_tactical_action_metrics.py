@@ -73,3 +73,4 @@ def test_speed_order_prefers_priority_before_speed():
     assert action_metrics.speed_order(200, 100, -1) == "后发技能 -1"
     assert action_metrics.speed_order(200, 100, 0) == "速度更快"
     assert action_metrics.speed_order(100, 200, 0) == "速度较慢"
+    assert action_metrics.speed_order(100, None, 0) == "速度未知"

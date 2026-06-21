@@ -38,8 +38,13 @@ def test_combat_entry_formatters_keep_legacy_summaries():
     defeat = format_defeat({"actor_side": 1, "target_side": 401}, _state())
 
     assert skill.summary == "我方 使用 毒囊 (消耗2能量, 剩余8)"
+    assert damage.summary == "敌方(水龟) 受到 32 伤害 (HP→366) [毒囊]"
     assert damage.detail["hp_after"] == 366
+    assert damage.detail["target_side"] == "敌方"
+    assert damage.detail["target_name"] == "水龟"
     assert "水龟" in defeat.summary
+    assert defeat.detail["defeated_side"] == "敌方"
+    assert defeat.detail["defeated_name"] == "水龟"
 
 
 def test_effect_entry_formatters_enrich_modifiers_and_bases():

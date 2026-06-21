@@ -89,3 +89,25 @@ def test_score_non_damage_skill_applies_energy_floor():
 
     assert score == 0.05
     assert detail["metrics"]["energy_after"] == 0
+
+
+def test_score_non_damage_skill_tolerates_unknown_opponent_speed():
+    action = {
+        "action_type": "skill",
+        "skill_name": "强化",
+        "energy_cost": 1,
+        "meta": {"desc": "提升自身能力"},
+    }
+    opp = _pet("敌方")
+    opp["base_speed"] = None
+    opp["effective_speed"] = None
+
+    score, _reason, detail = non_damage_scoring.score_non_damage_skill(
+        action,
+        _pet("我方"),
+        opp,
+        assess_confidence=_confidence,
+    )
+
+    assert score >= 0.05
+    assert detail["metrics"]["energy_after"] == 9
