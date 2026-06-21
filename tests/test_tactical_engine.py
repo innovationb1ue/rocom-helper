@@ -485,18 +485,21 @@ class TestRecommendation:
 
     def test_calc_damage_uses_tactical_total_for_poison_capsule(self):
         from src.data.loader import get_skill_meta
+        from src.analysis.tactical.damage import TacticalDamageToolkit
 
         my = _make_pet("我方", pet_id=1, types=[7], atk=200)
         opp = _make_pet("敌方", pet_id=101, max_hp=300, hp=300, types=[1], defense=150)
         meta = get_skill_meta(7120090)
 
-        pred = TacticalEngine()._prediction_service.predict(my, opp, meta)
-        damage = TacticalEngine()._calc_damage(my, opp, meta, weather=None)
+        toolkit = TacticalDamageToolkit()
+        pred = toolkit.prediction_service.predict(my, opp, meta)
+        damage = toolkit.calc_damage(my, opp, meta, weather=None)
 
         assert pred is not None
         assert pred["prediction"]["secondary_total"] == 9
         assert damage == pred["prediction"]["tactical_total"]
         assert damage > pred["prediction"]["total"]
+        assert TacticalEngine()._calc_damage(my, opp, meta, weather=None) == damage
 
     def test_with_multiple_switch_options(self):
         my = _make_pet("我方", pet_id=1, energy=10)

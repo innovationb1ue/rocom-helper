@@ -16,13 +16,10 @@
 """
 from __future__ import annotations
 
-import logging
 from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
-
-logger = logging.getLogger(__name__)
 
 
 class HookTrigger(Enum):
@@ -106,48 +103,30 @@ class HookRegistry:
         self._hooks[hook.hook_id] = hook
 
     def dispatch(self, trigger: HookTrigger, ctx: HookContext) -> List[HookAdvice]:
-        results: List[HookAdvice] = []
-        for hook in self._hooks.values():
-            if trigger not in hook.triggers:
-                continue
-            try:
-                advice = hook.process(ctx)
-                if advice is not None:
-                    results.append(advice)
-            except Exception:
-                logger.exception("Hook %s failed on %s", hook.hook_id, trigger.value)
-        return results
+        from src.analysis.hook_dispatch import dispatch_hooks
+
+        return dispatch_hooks(list(self._hooks.values()), trigger, ctx)
 
     def notify_battle_enter(self, ctx: HookContext) -> None:
-        for hook in self._hooks.values():
-            try:
-                hook.on_battle_enter(ctx)
-            except Exception:
-                logger.exception("Hook %s on_battle_enter failed", hook.hook_id)
+        from src.analysis.hook_dispatch import notify_hooks_enter
+
+        notify_hooks_enter(list(self._hooks.values()), ctx)
 
     def notify_battle_finish(self, ctx: HookContext) -> None:
-        for hook in self._hooks.values():
-            try:
-                hook.on_battle_finish(ctx)
-            except Exception:
-                logger.exception("Hook %s on_battle_finish failed", hook.hook_id)
+        from src.analysis.hook_dispatch import notify_hooks_finish
+
+        notify_hooks_finish(list(self._hooks.values()), ctx)
 
     def collect_signals(self, ctx: HookContext) -> List[HookSignal]:
         """收集所有钩子发出的信号。"""
-        signals: List[HookSignal] = []
-        for hook in self._hooks.values():
-            try:
-                signals.extend(hook.emit_signals(ctx))
-            except Exception:
-                logger.exception("Hook %s emit_signals failed", hook.hook_id)
-        return signals
+        from src.analysis.hook_dispatch import collect_hook_signals
+
+        return collect_hook_signals(list(self._hooks.values()), ctx)
 
     def reset(self) -> None:
-        for hook in self._hooks.values():
-            try:
-                hook.reset()
-            except Exception:
-                logger.exception("Hook %s reset failed", hook.hook_id)
+        from src.analysis.hook_dispatch import reset_hooks
+
+        reset_hooks(list(self._hooks.values()))
 
     @property
     def hook_ids(self) -> List[str]:

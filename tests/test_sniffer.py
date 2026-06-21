@@ -170,3 +170,14 @@ class TestSnifferMissingKeySuppression:
         assert flow.key_missing_suppressed is False
         assert flow.key_missing_reported is False
         assert any(e[0] == "key_captured" for e in events)
+
+    def test_key_missing_suppression_clears_preset_key_for_future_flows(self):
+        sniffer, _events = self._make_sniffer()
+        stale_key = b"1234567890abcdef"
+        sniffer.preset_key = stale_key
+        sniffer._flow_registry.preset_key = stale_key
+
+        sniffer._emit("key_missing_suppressed", {"flow_id": "flow-1"})
+
+        assert sniffer.preset_key is None
+        assert sniffer._flow_registry.preset_key is None

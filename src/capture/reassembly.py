@@ -176,9 +176,12 @@ class FlowState:
     s2c: DirectionState = field(default_factory=lambda: DirectionState("s2c"))
     seen_acks: _BoundedAckSet = field(default_factory=_BoundedAckSet)
     key: Optional[bytes] = None
+    key_from_preset: bool = False
     key_miss_count: int = 0
     key_missing_suppressed: bool = False
     key_missing_reported: bool = False
+    stale_key_parse_fail_count: int = 0
+    valid_record_count: int = 0
 
     def direction_state(self, direction: str) -> DirectionState:
         return self.c2s if direction == "c2s" else self.s2c

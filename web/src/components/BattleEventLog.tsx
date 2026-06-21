@@ -45,26 +45,26 @@ interface Props {
   maxDisplay?: number;
 }
 
-const BattleEventLog: React.FC<Props> = ({ events = [], maxDisplay = 80 }) => {
+const BattleEventLog: React.FC<Props> = ({ events = [], maxDisplay = 50 }) => {
   const [filter, setFilter] = useState<string | undefined>(undefined);
   const [showCount, setShowCount] = useState(maxDisplay);
 
-  const filtered = useMemo(() => {
-    let result = events;
-    if (filter) {
-      result = events.filter((e) => e.kind === filter);
-    }
-    return result.slice(-showCount).reverse();
-  }, [events, filter, showCount]);
+  const filteredAll = useMemo(() => {
+    if (!filter) return events;
+    return events.filter((e) => e.kind === filter);
+  }, [events, filter]);
+
+  const visibleEvents = useMemo(() => {
+    return filteredAll.slice(-showCount).reverse();
+  }, [filteredAll, showCount]);
 
   const allKinds = useMemo(() => {
     const kinds = new Set(events.map((e) => e.kind));
     return Array.from(kinds).sort();
   }, [events]);
 
-  const hasMore = filter
-    ? events.filter((e) => e.kind === filter).length > showCount
-    : events.length > showCount;
+  const totalCount = filteredAll.length;
+  const hasMore = totalCount > showCount;
 
   return (
     <div>
@@ -81,11 +81,11 @@ const BattleEventLog: React.FC<Props> = ({ events = [], maxDisplay = 80 }) => {
           }))}
         />
         <span style={{ color: '#999', fontSize: 12 }}>
-          共 {filter ? events.filter((e) => e.kind === filter).length : events.length} 条
+          共 {totalCount} 条
         </span>
       </div>
       <Timeline
-        items={filtered.map((ev) => ({
+        items={visibleEvents.map((ev) => ({
           color: KIND_COLORS[ev.kind] || ev.color || 'blue',
           content: (
             <div style={{ fontSize: 13 }}>

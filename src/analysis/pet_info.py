@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from src.analysis.pet_identity import battle_uid
-from src.data.loader import enrich_buff_modifiers, get_pet_meta, get_pet_skill_meta
+from src.data.loader import enrich_buff_modifiers, get_pet_meta, get_pet_name, get_pet_skill_meta
 
 
 class PetInfo:
@@ -19,7 +19,7 @@ class PetInfo:
         "energy", "buffs", "initial_buff_ids", "innate_skill_id",
         "level", "slot", "side", "stats", "skills", "equipped_skills",
         "base_id", "base_conf_id", "base_skill_pool", "combo_bonus", "poison_stacks",
-        "used_skills", "base_speed", "battle_uid",
+        "used_skills", "base_speed", "battle_uid", "protocol_name",
     )
 
     def __init__(self) -> None:
@@ -47,6 +47,7 @@ class PetInfo:
         self.used_skills: List[Dict[str, Any]] = []
         self.base_speed: Optional[int] = None
         self.battle_uid: Optional[str] = None
+        self.protocol_name: Optional[str] = None
 
     def recalc_hp_pct(self) -> None:
         if self.max_hp > 0:
@@ -80,6 +81,7 @@ class PetInfo:
             "used_skills": self.used_skills,
             "base_speed": self.base_speed,
             "battle_uid": self.battle_uid,
+            "protocol_name": self.protocol_name,
         }
 
     @classmethod
@@ -89,7 +91,15 @@ class PetInfo:
         equipped = w.get("equipped_skills") or []
         initial_buffs = w.get("initial_buffs", [])
         pet.pet_id = w.get("pet_id") or w.get("pet_gid")
-        pet.name = w.get("pet_name") or w.get("name", "?")
+        protocol_name = w.get("pet_name") or w.get("name")
+        pet.protocol_name = protocol_name
+        pet.base_id = w.get("base_id")
+        pet.base_conf_id = w.get("base_conf_id")
+        pet.name = canonical_pet_name(
+            base_conf_id=pet.base_conf_id,
+            pet_id=pet.pet_id,
+            protocol_name=protocol_name,
+        )
         pet.types = w.get("types", [])
         pet.current_hp = w.get("hp") if w.get("hp") is not None else w.get("current_hp", 0)
         pet.max_hp = w.get("max_hp", 0)
@@ -113,8 +123,8 @@ class PetInfo:
                 ]
         pet.skills = w.get("skills", [])
         pet.equipped_skills = equipped
-        pet.base_id = w.get("base_id")
-        pet.base_conf_id = w.get("base_conf_id")
+        if pet.base_conf_id is not None:
+            pet.base_id = pet.base_conf_id
         pet.base_skill_pool = w.get("base_skill_pool")
         # 从 battle_stats[5] 提取基础速度（含性格/个体/努力值，战斗中不变）
         battle_stats = w.get("battle_stats") or []
@@ -134,7 +144,15 @@ class PetInfo:
         """从 change_pet action entry 构造宠物信息（换宠时不在阵容中的新宠物）。"""
         pet = cls()
         pet.pet_id = entry.get("new_pet_id")
-        pet.name = entry.get("new_pet_name", "?")
+        pet.protocol_name = entry.get("new_pet_name")
+        if entry.get("new_pet_base_conf_id") is not None:
+            pet.base_conf_id = entry["new_pet_base_conf_id"]
+            pet.base_id = pet.base_conf_id
+        pet.name = canonical_pet_name(
+            base_conf_id=pet.base_conf_id,
+            pet_id=pet.pet_id,
+            protocol_name=pet.protocol_name,
+        )
         pet.types = entry.get("new_pet_types", [])
         pet.side = 401 if is_opp else 1
         pet.slot = battle_pet_id
@@ -151,11 +169,12 @@ class PetInfo:
             pet.base_speed = battle_stats[5]
         if entry.get("new_pet_passive_skill_id") is not None:
             pet.innate_skill_id = entry["new_pet_passive_skill_id"]
-        # 从协议数据提取 base_conf_id（PetData field 15，进化阶段 petbase ID）
-        if entry.get("new_pet_base_conf_id") is not None:
-            pet.base_conf_id = entry["new_pet_base_conf_id"]
-        # 查找 base_id（通过 conf_id → pet_meta → base_id）
-        if pet.pet_id is not None and pet.pet_id != 20000000:
+        # PvP 中 new_pet_id 可能指向怪物/形态条目；base_conf_id 才是稳定物种配置。
+        if pet.base_id is not None:
+            skill_pool = get_pet_skill_meta(pet.base_id)
+            if isinstance(skill_pool, dict):
+                pet.base_skill_pool = skill_pool.get("level_skills") or []
+        elif pet.pet_id is not None and pet.pet_id != 20000000:
             pet_meta_data = get_pet_meta(pet.pet_id)
             if isinstance(pet_meta_data, dict) and pet_meta_data.get("base_id") is not None:
                 pet.base_id = pet_meta_data["base_id"]
@@ -165,3 +184,25 @@ class PetInfo:
         pet.battle_uid = battle_uid(pet.to_dict())
         pet.recalc_hp_pct()
         return pet
+
+
+def canonical_pet_name(
+    *,
+    base_conf_id: Any = None,
+    pet_id: Any = None,
+    protocol_name: Optional[str] = None,
+) -> str:
+    """Return the stable species name for battle display and identity."""
+    try:
+        name = get_pet_name(int(base_conf_id)) if base_conf_id is not None else None
+    except (TypeError, ValueError):
+        name = None
+    if name:
+        return name
+    if protocol_name:
+        return protocol_name
+    try:
+        name = get_pet_name(int(pet_id)) if pet_id is not None else None
+    except (TypeError, ValueError):
+        name = None
+    return name or "?"

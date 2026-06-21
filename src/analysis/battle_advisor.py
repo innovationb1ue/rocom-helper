@@ -15,16 +15,13 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from src.analysis.constants import SDT_TO_TYPE
+from src.analysis.advisor.skill_analysis import build_skill_analysis, eval_skill_dict, skill_from_equipped
+from src.analysis.advisor.suggestions import build_advisor_suggestions
+from src.analysis.advisor.traits import extract_traits
 from src.analysis.damage_prediction import DamagePredictionService
 from src.analysis.models import BattleAdvice, SkillAnalysis
-from src.analysis.pet_identity import same_battle_pet
 from src.analysis.skill_resolver import resolve_equipped_or_pool, resolve_opponent_skills, skills_from_pool
-from src.analysis.suggestions import build_state_suggestions
-from src.data.loader import get_skill_meta, get_skill_name
 from src.game.type_chart import TypeChart
-from src.game.skill_eval import score_skill
-from src.analysis.counter import CounterPicker
 
 
 class BattleAdvisor:
@@ -77,111 +74,24 @@ class BattleAdvisor:
         equipped: List[Dict[str, Any]],
         weather: Optional[Dict[str, Any]] = None,
     ) -> List[SkillAnalysis]:
-        results: List[SkillAnalysis] = []
-        for eq in equipped:
-            skill_id = eq.get("skill_id")
-            if skill_id is None:
-                continue
-            meta = get_skill_meta(skill_id)
-            sa = self._skill_from_equipped(eq, meta)
-            damage_type = sa.skill_damage_type
-            if meta and damage_type in (2, 3):
-                pred = self._prediction_service.predict(attacker, defender, meta, weather=weather)
-                if pred is not None:
-                    dr = pred["result"]
-                    sa.power = dr.power
-                    sa.effective_power = dr.effective_power
-                    sa.expected_damage = dr.expected_damage
-                    sa.min_damage = dr.min_damage
-                    sa.max_damage = dr.max_damage
-                    sa.total_min_damage = dr.total_min_damage
-                    sa.total_max_damage = dr.total_max_damage
-                    sa.effectiveness = dr.effectiveness
-                    sa.effectiveness_label = dr.effectiveness_label
-                    sa.is_stab = dr.is_stab
-                    sa.can_ko = dr.can_ko
-                    sa.hit_count = dr.hit_count
-                    sa.confidence = dr.confidence
-                    sa.power_mult = dr.power_mult
-                    sa.weather_mult = dr.weather_mult
-                    sa.damage_breakdown = dr.damage_breakdown
-                    sa.warnings = dr.warnings
-                    sa.prediction = pred["prediction"]
-                    sa.explain = pred["explain"]
-                    sa.validation_hint = pred["validation_hint"]
-            # 技能综合质量评分
-            eval_dict = self._eval_skill_dict(eq, meta)
-            sa._quality_score = round(score_skill(eval_dict, self.chart), 1)
-            results.append(sa)
-        results.sort(key=lambda s: s.equipped_slot)
-        return results
+        return build_skill_analysis(
+            prediction_service=self._prediction_service,
+            chart=self.chart,
+            attacker=attacker,
+            defender=defender,
+            equipped=equipped,
+            weather=weather,
+        )
 
     @staticmethod
     def _skill_from_equipped(
         eq: Dict[str, Any], meta: Optional[Dict[str, Any]],
     ) -> SkillAnalysis:
-        skill_id = eq.get("skill_id", 0)
-        slot = eq.get("equipped_slot", 0)
-        name = eq.get("skill_name") or get_skill_name(skill_id) or "?"
-        element = eq.get("skill_element") or 0
-        damage_type = eq.get("skill_damage_type") or (meta.get("damage_type", 0) if meta else 0)
-        energy_cost = eq.get("runtime_cost_energy")
-        if energy_cost is None:
-            energy_cost = eq.get("cost_energy")
-        if energy_cost is None and meta:
-            ec = meta.get("energy_cost", [0])
-            energy_cost = ec[0] if ec else 0
-        if energy_cost is None:
-            energy_cost = 0
-        desc = eq.get("skill_desc")
-        if desc is None and meta:
-            desc = meta.get("desc")
-        if element == 0 and meta:
-            dt = meta.get("skill_dam_type")
-            if dt is not None:
-                element = SDT_TO_TYPE.get(dt, 0)
-        return SkillAnalysis(
-            skill_id=skill_id,
-            skill_name=name,
-            equipped_slot=slot,
-            skill_element=element,
-            skill_damage_type=damage_type,
-            energy_cost=energy_cost,
-            skill_desc=desc,
-        )
+        return skill_from_equipped(eq, meta)
 
     @staticmethod
     def _eval_skill_dict(eq: Dict[str, Any], meta: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-        """构造适合 skill_eval.score_skill 的技能字典。"""
-        power = 0
-        energy_cost = eq.get("cost_energy") or 0
-        accuracy = 100
-        pp = 20
-        type_id = eq.get("skill_element") or 0
-        effect_desc = eq.get("skill_desc")
-
-        if meta:
-            dam_para = meta.get("dam_para", [])
-            power = dam_para[0] if dam_para else 0
-            ec = meta.get("energy_cost", [0])
-            energy_cost = energy_cost or (ec[0] if ec else 0)
-            hit_para = meta.get("hit_para")
-            if hit_para is not None:
-                accuracy = hit_para / 100
-            pp = meta.get("max_pp", 20)
-            effect_desc = effect_desc or meta.get("desc")
-            dt = meta.get("skill_dam_type")
-            if dt is not None:
-                type_id = SDT_TO_TYPE.get(dt, type_id)
-
-        return {
-            "power": power,
-            "energy_cost": energy_cost,
-            "accuracy": accuracy,
-            "pp": pp,
-            "type_id": type_id,
-            "effect_desc": effect_desc,
-        }
+        return eval_skill_dict(eq, meta)
 
     def _build_suggestions(
         self,
@@ -190,64 +100,13 @@ class BattleAdvisor:
         skill_analysis: List[SkillAnalysis],
         my_pets: Optional[List[Dict[str, Any]]] = None,
     ) -> List[Dict[str, str]]:
-        suggestions: List[Dict[str, str]] = []
-        attack_skills = [s for s in skill_analysis if s.expected_damage is not None]
-        if not attack_skills:
-            return suggestions
-
-        best = max(attack_skills, key=lambda s: s.total_max_damage or 0)
-        if best.can_ko:
-            suggestions.append({
-                "type": "ko_skill",
-                "message": f"{best.skill_name} 可以击杀 {opp_active.get('name', '对方精灵')}！",
-            })
-        elif best.effectiveness is not None and best.effectiveness >= 2.0:
-            suggestions.append({
-                "type": "super_effective",
-                "message": f"{best.skill_name} 效果拔群，预计造成 {best.expected_damage} 伤害",
-            })
-        elif best.effectiveness is not None and 0 < best.effectiveness < 1.0:
-            suggestions.append({
-                "type": "resisted",
-                "message": "所有攻击技能均被抵抗，考虑换宠",
-            })
-            # team-level 反制建议
-            if my_pets:
-                living = [
-                    p for p in my_pets
-                    if p.get("current_hp", 1) > 0 and not same_battle_pet(p, my_active)
-                ]
-                if living:
-                    picker = CounterPicker(self.chart)
-                    norm_opp = {"types": opp_active.get("types", [])}
-                    norm_living = [
-                        {
-                            "types": p.get("types", []),
-                            "pet_id": p.get("pet_id"),
-                            "name": p.get("name"),
-                            "slot": p.get("slot"),
-                            "side": p.get("side"),
-                            "base_conf_id": p.get("base_conf_id"),
-                            "battle_uid": p.get("battle_uid"),
-                        }
-                        for p in living
-                    ]
-                    counters = picker.find_counters([norm_opp], norm_living, top_n=1)
-                    if counters:
-                        name = counters[0].get("name", "未知")
-                        suggestions.append({
-                            "type": "counter_switch",
-                            "message": f"当前对位被全面克制，建议换上 {name} 进行反制",
-                        })
-
-        low_energy = [s for s in attack_skills if "能量不足" in "".join(s.warnings)]
-        if len(low_energy) == len(attack_skills) and attack_skills:
-            suggestions.append({
-                "type": "no_energy",
-                "message": "能量不足以使用任何攻击技能",
-            })
-
-        return suggestions
+        return build_advisor_suggestions(
+            chart=self.chart,
+            my_active=my_active,
+            opp_active=opp_active,
+            skill_analysis=skill_analysis,
+            my_pets=my_pets,
+        )
 
     @staticmethod
     def _skills_from_pool(pet: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -259,34 +118,4 @@ class BattleAdvisor:
 
     @staticmethod
     def _extract_traits(pet: Dict[str, Any]) -> List[Dict[str, str]]:
-        from src.data.loader import get_innate_skill, get_pet_innate_trait
-        traits: List[Dict[str, str]] = []
-        seen_names: set = set()
-
-        def _add(name: str, description: str) -> None:
-            if name and name not in seen_names:
-                seen_names.add(name)
-                traits.append({"name": name, "description": description})
-
-        # Source 1: pet_species.pet_feature → skill_map.name (authoritative trait mapping)
-        wiki_trait = get_pet_innate_trait(pet.get("name", ""))
-        if wiki_trait:
-            _add(wiki_trait["name"], wiki_trait.get("description", ""))
-
-        # Source 2: innate_skill_id from protocol (cur_passive_skill)
-        innate_id = pet.get("innate_skill_id")
-        if innate_id:
-            innate = get_innate_skill(innate_id)
-            if innate is not None:
-                _add(innate.get("name", "?"), innate.get("description", ""))
-
-        # Source 3: buff list — only known innate skills from innate_skills.json
-        for buff in pet.get("buffs", []):
-            buff_id = buff.get("id")
-            if buff_id is None:
-                continue
-            innate = get_innate_skill(buff_id)
-            if innate is not None:
-                _add(innate.get("name", "?"), innate.get("description", ""))
-
-        return traits
+        return extract_traits(pet)

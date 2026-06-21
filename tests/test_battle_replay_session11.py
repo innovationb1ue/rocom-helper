@@ -93,21 +93,29 @@ class TestSession11Replay:
         }
         assert {20171870, 20171900, 20171910, 20172000, 20171880, 20171960, 20171940}.issubset(candidate_ids)
 
-    def test_zhui_da_server_power_pilot_skips_without_target_match(self, session11_runner_result):
-        """session 11 的追打没有匹配目标 server power 时必须保持原公式。"""
+    def test_zhui_da_server_power_pilot_matches_only_after_target_hydrates(self, session11_runner_result):
+        """session 11 的追打只在补宠目标水合后应用 server power。"""
         report = build_damage_audit(session11_runner_result)
         samples = [s for s in report["samples"] if s.get("skill_name") == "追打"]
 
         assert samples
-        assert not any(s.get("server_power_applied") for s in samples)
-        assert {s.get("server_power_skip_reason") for s in samples} == {"target_unmatched"}
+        assert {s["round_num"] for s in samples if s.get("server_power_applied")} == {9}
+        assert {
+            s.get("server_power_skip_reason")
+            for s in samples
+            if not s.get("server_power_applied")
+        } == {"target_unmatched"}
 
-    def test_damage_mechanism_report_records_unmatched_zhui_da_runtime(self, session11_runner_result):
-        """机制审计应保留 session 11 追打未命中目标 server power 的原因。"""
+    def test_damage_mechanism_report_records_zhui_da_target_hydration(self, session11_runner_result):
+        """机制审计应区分补宠前未匹配和补宠水合后的 server power。"""
         report = build_damage_mechanism_report(session11_runner_result, session="battle_session_11")
         samples = [s for s in report["samples"] if s.get("skill_name") == "追打"]
 
         assert samples
-        assert not any(s.get("server_power_applied") for s in samples)
-        assert {s.get("server_power_skip_reason") for s in samples} == {"target_unmatched"}
-        assert all(s.get("matched_damage_param") is None for s in samples)
+        assert {s["round_num"] for s in samples if s.get("server_power_applied")} == {9}
+        assert {
+            s.get("server_power_skip_reason")
+            for s in samples
+            if not s.get("server_power_applied")
+        } == {"target_unmatched"}
+        assert any(s.get("matched_damage_param") is not None for s in samples)

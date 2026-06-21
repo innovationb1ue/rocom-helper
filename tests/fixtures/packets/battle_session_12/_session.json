@@ -1,0 +1,14 @@
+{
+  "session_start": "2026-06-11T23:22:36.625864",
+  "session_id": "battle_session_12",
+  "source_session": "2026-06-10_22-09-19_monitor",
+  "source_path": "logs\\packets\\2026-06-10_22-09-19_monitor",
+  "battle_index": 1,
+  "enter_file": "s2c_0x4013_0627_221033.921.bin",
+  "finish_file": "s2c_0x4013_1623_221322.122.bin",
+  "enter_ts": "22:10:33.921",
+  "finish_ts": "22:13:22.122",
+  "pad_before": 5.0,
+  "pad_after": 2.0,
+  "file_count": 700
+}

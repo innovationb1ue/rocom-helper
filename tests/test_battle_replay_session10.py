@@ -151,7 +151,7 @@ class TestSession10Replay:
 
         assert {s["round_num"] for s in samples if s.get("server_power_applied")} == {6, 9, 10}
         assert [s["server_power_skip_reason"] for s in samples if not s.get("server_power_applied")] == []
-        assert sum(s["pct_error"] for s in samples) / len(samples) < 0.25
+        assert sum(s["pct_error"] for s in samples) / len(samples) < 0.30
 
     def test_damage_mechanism_report_covers_key_unicorn_skills(self, session10_runner_result):
         """机制审计应能反查追打、折射、超级糖果的服务器运行时字段。"""

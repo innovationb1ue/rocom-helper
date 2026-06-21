@@ -10,7 +10,13 @@ def build_state_suggestions(state: Dict[str, Any]) -> List[Dict[str, str]]:
     my_active = state.get("my_active")
     opp_active = state.get("opp_active")
 
+    if state.get("result") is not None or state.get("phase") in {"finished", "settling"}:
+        return suggestions
+    if state.get("terminal_pending"):
+        return suggestions
     if my_active is None or opp_active is None:
+        return suggestions
+    if my_active.get("current_hp", 1) <= 0 or opp_active.get("current_hp", 1) <= 0:
         return suggestions
 
     if my_active.get("hp_pct", 1.0) < 0.25:

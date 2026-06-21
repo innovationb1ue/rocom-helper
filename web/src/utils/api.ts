@@ -4,6 +4,8 @@ import { apiBaseUrl } from '../config';
 
 const api = axios.create({ baseURL: apiBaseUrl(), timeout: 12000 });
 
+export const SNIFFER_START_TIMEOUT_MS = 30000;
+
 // 热门技能预设
 export interface PopularSkillPreset {
   name: string;
@@ -75,6 +77,20 @@ export type SnifferTestResult = {
     capture_duration_ms: number;
   } | null;
 }
+
+export interface SnifferStatusDetails {
+  status: string;
+  message: string;
+  flow_count: number;
+  key_hex: string | null;
+  sniffer_running?: boolean;
+  key_miss?: number;
+  decrypt_fail?: number;
+  parse_fail?: number;
+}
+
+export const fetchSnifferStatus = () =>
+  api.get<{ status: string; details: SnifferStatusDetails }>('/sniffer/status').then(r => r.data);
 
 export const testSniffer = (refreshKey = false) =>
   api.post<SnifferTestResult>('/sniffer/test', null, { params: refreshKey ? { refresh_key: true } : {} })

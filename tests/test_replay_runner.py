@@ -6,6 +6,8 @@ from pathlib import Path
 
 import pytest
 
+from src.analysis.replay_models import ReplayEventSnapshot as ModelReplayEventSnapshot
+from src.analysis.replay_models import ReplayResult as ModelReplayResult
 from src.analysis.replay_runner import BattleReplayRunner, ReplayEventSnapshot, ReplayResult
 from src.analysis.damage_audit import (
     build_damage_audit,
@@ -52,6 +54,10 @@ class TestReplayRunnerBasic:
 
     def test_stopped_early_default_false(self, session1_runner_result):
         assert session1_runner_result.stopped_early is False
+
+    def test_replay_models_are_reexported_for_compatibility(self):
+        assert ReplayEventSnapshot is ModelReplayEventSnapshot
+        assert ReplayResult is ModelReplayResult
 
     def test_stop_round(self, session1_packets):
         runner = BattleReplayRunner()
@@ -658,10 +664,11 @@ class TestReplayRunnerSuggestions:
                 assert "type" in sug
                 assert "message" in sug
 
-    def test_round_suggestions_aggregated(self, session1_runner_result):
-        total_per_round = sum(len(rs.suggestions) for rs in session1_runner_result.rounds)
-        total_per_event = sum(len(ev.suggestions) for ev in session1_runner_result.events)
-        assert total_per_round == total_per_event
+    def test_round_suggestions_reflect_latest_round_snapshot(self, session1_runner_result):
+        for rs in session1_runner_result.rounds:
+            if not rs.events:
+                continue
+            assert rs.suggestions == rs.events[-1].suggestions
 
     def test_suggestions_json_serializable(self, session1_runner_result):
         for ev in session1_runner_result.events:

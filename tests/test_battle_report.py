@@ -259,8 +259,10 @@ def test_analyze_report_unpacks_verifies_and_writes_outputs(report_package, tmp_
     assert result.summary["final_round"] == 17
     assert result.summary["result"] == "WIN_HP"
     assert "洛克王国 PvP 对战回放报告" in result.text_report_path.read_text(encoding="utf-8")
+    assert result.analysis_json_path.stat().st_size < 50 * 1024 * 1024
     analysis = json.loads(result.analysis_json_path.read_text(encoding="utf-8"))
     assert analysis["battle_summary"]["result"] == "WIN_HP"
+    assert "messages" not in analysis
 
 
 def test_archive_latest_completed_battle(packet_root: Path, tmp_path: Path):

@@ -19,7 +19,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 if sys.stdout.encoding != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8")
 
-from scripts.generate_battle_report import generate_report_from_result, replay_result_to_dict
+from scripts.generate_battle_report import generate_report_from_result
 from scripts.unpack_battle_report import ReportUnpackError, unpack_report
 from src.analysis.replay_runner import BattleReplayRunner
 from tests.packet_reader import load_battle_packets
@@ -66,7 +66,7 @@ def analyze_report(
         raise ReportUnpackError(f"No replayable battle packets found in: {packet_dir}")
 
     result = BattleReplayRunner().run(packets)
-    analysis = replay_result_to_dict(result)
+    analysis = replay_result_to_report_dict(result)
 
     text_report_path = output_dir / "battle_report.txt"
     analysis_json_path = output_dir / "analysis.json"
@@ -91,6 +91,44 @@ def analyze_report(
         analysis_json_path=analysis_json_path,
         summary=summary,
     )
+
+
+def replay_result_to_report_dict(result: Any) -> Dict[str, Any]:
+    """Serialize replay output for received-report analysis without WebSocket payload bloat."""
+    return {
+        "total_packets": result.total_packets,
+        "stopped_early": result.stopped_early,
+        "rounds": [
+            {
+                "round_num": rs.round_num,
+                "formatted_events": rs.formatted_events,
+                "suggestions": rs.suggestions,
+                "damage_predictions": rs.damage_predictions,
+                "battle_advice": rs.battle_advice,
+                "traits": rs.traits,
+                "opp_traits": rs.opp_traits,
+                "opp_skill_analysis": rs.opp_skill_analysis,
+                "opp_skill_source": rs.opp_skill_source,
+                "tactical_recommendations": rs.tactical_recommendations,
+            }
+            for rs in result.rounds
+        ],
+        "events": [
+            {
+                "index": ev.index,
+                "opcode": ev.opcode,
+                "kind": ev.kind,
+                "round_num": ev.round_num,
+                "formatted_events": ev.formatted_events,
+                "hook_advice": ev.hook_advice,
+                "suggestions": ev.suggestions,
+                "tactical": ev.tactical,
+            }
+            for ev in result.events
+        ],
+        "final_state": result.final_state,
+        "battle_summary": result.battle_summary,
+    }
 
 
 def main() -> None:

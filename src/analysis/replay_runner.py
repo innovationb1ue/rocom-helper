@@ -15,66 +15,22 @@ from __future__ import annotations
 
 import copy
 import logging
-from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from src.analysis.battle_processor import BattleProcessor
 from src.analysis.battle_summary import compute_battle_summary
-from src.analysis.models import ProcessResult
-from src.analysis.constants import OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START
-from src.analysis.replay_messages import build_battle_messages
-from src.protocol.opcodes import summarize
-from src.protocol.proto_core import extract_inner_message
+from src.analysis.replay_flow import (
+    build_replay_messages,
+    extract_replay_detail,
+    filter_process_result,
+    make_event_snapshot,
+    should_stop_before_event,
+    should_stop_replay,
+    update_round_snapshot,
+)
+from src.analysis.replay_models import ReplayEventSnapshot, ReplayResult, RoundSnapshot
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Data structures
-# ---------------------------------------------------------------------------
-@dataclass
-class ReplayEventSnapshot:
-    index: int
-    opcode: int
-    kind: str
-    round_num: int
-    state_before: Dict[str, Any]
-    state_after: Dict[str, Any]
-    formatted_events: List[Dict[str, Any]] = field(default_factory=list)
-    battle_advice: Optional[Dict[str, Any]] = None
-    hook_advice: List[Dict[str, Any]] = field(default_factory=list)
-    suggestions: List[Dict[str, str]] = field(default_factory=list)
-    tactical: Optional[Dict[str, Any]] = None
-    messages: List[Dict[str, Any]] = field(default_factory=list)
-
-
-@dataclass
-class RoundSnapshot:
-    round_num: int
-    events: List[ReplayEventSnapshot] = field(default_factory=list)
-    state_at_start: Dict[str, Any] = field(default_factory=dict)
-    state_at_end: Dict[str, Any] = field(default_factory=dict)
-    battle_advice: Optional[Dict[str, Any]] = None
-    damage_predictions: List[Dict[str, Any]] = field(default_factory=list)
-    formatted_events: List[Dict[str, Any]] = field(default_factory=list)
-    suggestions: List[Dict[str, str]] = field(default_factory=list)
-    traits: List[Dict[str, Any]] = field(default_factory=list)
-    opp_traits: List[Dict[str, Any]] = field(default_factory=list)
-    opp_skill_analysis: List[Dict[str, Any]] = field(default_factory=list)
-    opp_skill_source: str = ""
-    tactical_recommendations: Optional[Dict[str, Any]] = None
-    messages: List[Dict[str, Any]] = field(default_factory=list)
-
-
-@dataclass
-class ReplayResult:
-    total_packets: int
-    events: List[ReplayEventSnapshot] = field(default_factory=list)
-    rounds: List[RoundSnapshot] = field(default_factory=list)
-    final_state: Dict[str, Any] = field(default_factory=dict)
-    battle_summary: Dict[str, Any] = field(default_factory=dict)
-    stopped_early: bool = False
-    messages: List[Dict[str, Any]] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -114,50 +70,32 @@ class BattleReplayRunner:
             record = item["record"]
             opcode = item["opcode"]
 
-            inner = None
-            if opcode == 0x0414:
-                inner = extract_inner_message(record.get("root", {}))
-
-            kind, summary = summarize(record, inner)
-            detail = summary.get("detail", summary)
-            if detail is None:
-                detail = {}
-
+            kind, detail = extract_replay_detail(record, opcode)
             state_before = copy.deepcopy(processor.get_state())
+            if should_stop_before_event(stop_round, state_before, opcode, detail):
+                stopped_early = True
+                break
+
             result = processor.process_event(opcode, detail)
             state_after = result.state
 
             current_round = state_after.get("round", current_round)
-
-            # Formatting
-            formatted_dicts: List[Dict[str, Any]] = []
-            if self._include_formatting:
-                formatted_dicts = [copy.deepcopy(e.to_dict()) for e in result.formatted_events]
-
-            # Analysis (already computed by processor, just include/exclude)
-            battle_advice_dict: Optional[Dict[str, Any]] = None
-            if self._include_analysis:
-                battle_advice_dict = copy.deepcopy(result.battle_advice)
-
-            # Hooks (already computed by processor, just include/exclude)
-            hook_advice_dicts: List[Dict[str, Any]] = []
-            if self._include_hooks:
-                hook_advice_dicts = copy.deepcopy(result.hook_advice)
-
-            # Suggestions
-            suggestions = copy.deepcopy(result.suggestions)
-            filtered_result = ProcessResult(
-                state=state_after,
-                formatted_events=result.formatted_events if self._include_formatting else [],
-                battle_advice=battle_advice_dict,
-                hook_advice=hook_advice_dicts,
-                suggestions=suggestions,
-                tactical=copy.deepcopy(result.tactical) if self._include_analysis else None,
+            (
+                filtered_result,
+                formatted_dicts,
+                battle_advice_dict,
+                hook_advice_dicts,
+                suggestions,
+            ) = filter_process_result(
+                result,
+                include_analysis=self._include_analysis,
+                include_hooks=self._include_hooks,
+                include_formatting=self._include_formatting,
             )
-            messages = build_battle_messages(opcode, filtered_result)
+            messages = build_replay_messages(opcode, filtered_result)
             message_sequence.extend(messages)
 
-            snap = ReplayEventSnapshot(
+            snap = make_event_snapshot(
                 index=idx,
                 opcode=opcode,
                 kind=kind,
@@ -173,32 +111,20 @@ class BattleReplayRunner:
             )
             event_snapshots.append(snap)
 
-            # Round aggregation
-            if current_round not in round_map:
-                round_map[current_round] = RoundSnapshot(
-                    round_num=current_round,
-                    state_at_start=state_before,
-                )
-            rs = round_map[current_round]
-            rs.events.append(snap)
-            rs.state_at_end = state_after
-            rs.formatted_events.extend(formatted_dicts)
-            rs.suggestions.extend(suggestions)
-            rs.messages.extend(messages)
-            if battle_advice_dict:
-                rs.battle_advice = battle_advice_dict
-                rs.damage_predictions = battle_advice_dict.get("skill_analysis", [])
-                rs.traits = battle_advice_dict.get("traits", [])
-                rs.opp_traits = battle_advice_dict.get("opp_traits", [])
-                opp_skill_analysis = battle_advice_dict.get("opp_skill_analysis", [])
-                if opp_skill_analysis:
-                    rs.opp_skill_analysis = opp_skill_analysis
-                    rs.opp_skill_source = battle_advice_dict.get("opp_skill_source", "")
-            if filtered_result.tactical:
-                rs.tactical_recommendations = filtered_result.tactical
+            update_round_snapshot(
+                round_map,
+                round_num=current_round,
+                state_before=state_before,
+                state_after=state_after,
+                event=snap,
+                battle_advice=battle_advice_dict,
+                formatted_events=formatted_dicts,
+                suggestions=suggestions,
+                messages=messages,
+                tactical=filtered_result.tactical,
+            )
 
-            # Stop early check
-            if stop_round is not None and current_round >= stop_round and opcode in (OPCODE_ACTION_RESOLVE, OPCODE_ROUND_START):
+            if should_stop_replay(stop_round, current_round, opcode):
                 stopped_early = True
                 break
 

@@ -51,6 +51,19 @@ function confidence(s: SkillAnalysis): string | null | undefined {
   return s.prediction?.confidence ?? s.confidence;
 }
 
+const SEVERE_ACCURACY_FLAGS = new Set([
+  'runtime_target_unmatched',
+  'uncalibrated_skill',
+  'runtime_effect_unmodeled',
+]);
+
+function hasReliableKo(s: SkillAnalysis): boolean {
+  if (!s.can_ko) return false;
+  if (confidence(s) === 'low') return false;
+  const flags = s.prediction?.accuracy_flags ?? [];
+  return !flags.some((flag) => SEVERE_ACCURACY_FLAGS.has(flag));
+}
+
 function numberValue(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
@@ -183,6 +196,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
           const breakdownText = attack ? formatBreakdown(s, oppHp) : '';
           const conf = confidence(s);
           const pwr = powerInfo(s);
+          const reliableKo = hasReliableKo(s);
 
           return (
             <div
@@ -194,8 +208,8 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                 gap: 8,
                 padding: '4px 8px',
                 borderRadius: 6,
-                background: s.can_ko ? '#f6ffed' : 'transparent',
-                border: s.can_ko ? '1px solid #b7eb8f' : '1px solid transparent',
+                background: reliableKo ? '#f6ffed' : 'transparent',
+                border: reliableKo ? '1px solid #b7eb8f' : '1px solid transparent',
               }}
             >
               <Tag style={{ margin: 0, minWidth: 48, textAlign: 'center', background: typeColor, color: textColorFor(typeColor), border: 'none', fontWeight: 600, fontSize: 11 }}>
@@ -219,7 +233,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                     </Tooltip>
                   )}
                   <Tooltip title={breakdownText || undefined}>
-                    <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600 }}>
+                    <Text style={{ fontSize: 14, fontWeight: reliableKo ? 700 : 600 }}>
                       {total}
                     </Text>
                   </Tooltip>
@@ -236,7 +250,7 @@ export default function SkillPanel({ skills, oppActive, traits }: SkillPanelProp
                     </Tag>
                   )}
                   {s.is_stab && <Tag color="blue" style={{ fontSize: 11, margin: 0 }}>STAB</Tag>}
-                  {s.can_ko && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>KO!</Tag>}
+                  {reliableKo && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>KO!</Tag>}
                   <Tooltip title={s.validation_hint || s.warnings?.join('\n') || undefined}>
                     {confidenceTag(conf)}
                   </Tooltip>

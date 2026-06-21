@@ -1,11 +1,10 @@
 """BattleStateTracker 的纯辅助函数。
 
-这些函数不持有 tracker 实例状态，集中管理初始状态结构、速度计算和
-小型字典操作，避免状态机主类同时承担结构声明和工具函数职责。
+这些函数不持有 tracker 实例状态，集中管理初始状态结构和小型字典操作，
+避免状态机主类同时承担结构声明和工具函数职责。
 """
 from __future__ import annotations
 
-import copy
 from typing import Any, Dict, List, Optional
 
 
@@ -37,36 +36,23 @@ def initial_battle_state() -> Dict[str, Any]:
         "opp_active": None,
         "events": [],
         "result": None,
+        "terminal_pending": False,
+        "role_resources": {},
+        "battle_resource": {},
+        "role_resource_events": [],
     }
 
 
 def clone_state_with_effective_speed(state: Dict[str, Any]) -> Dict[str, Any]:
-    """深拷贝状态并为所有精灵补充 effective_speed。"""
-    snapshot = copy.deepcopy(state)
-    for pet in snapshot.get("my_pets", []) + snapshot.get("opp_pets", []):
-        pet["effective_speed"] = compute_effective_speed(pet)
-    for key in ("my_active", "opp_active"):
-        active = snapshot.get(key)
-        if active:
-            active["effective_speed"] = compute_effective_speed(active)
-    return snapshot
+    """兼容旧导入名；状态快照投影实现位于 state.snapshot。"""
+    from src.analysis.state.snapshot import build_state_snapshot
+    return build_state_snapshot(state)
 
 
 def compute_effective_speed(pet: Dict[str, Any]) -> Optional[int]:
-    """计算实际速度 = (基础速度 + 固定修正) * (1 + 百分比修正 + 属性等级修正)。"""
-    base = pet.get("base_speed")
-    if base is None:
-        return None
-    from src.data.loader import get_buff_stat_modifiers, get_speed_buff_modifiers
-    speed_mods = get_speed_buff_modifiers(pet.get("buffs", []))
-    stat_mods = get_buff_stat_modifiers(pet.get("buffs", []))
-    pct = (
-        speed_mods.get("pct_total", 0.0)
-        + stat_mods.get("spd_up", 0.0)
-        - stat_mods.get("spd_down", 0.0)
-    )
-    effective = (base + speed_mods.get("flat_total", 0)) * (1.0 + pct)
-    return max(1, int(round(effective)))
+    """兼容旧导入名；速度快照派生实现位于 state.snapshot。"""
+    from src.analysis.state.snapshot import compute_effective_speed as _compute_effective_speed
+    return _compute_effective_speed(pet)
 
 
 def append_bounded(items: List[Dict[str, Any]], item: Dict[str, Any], limit: int) -> None:

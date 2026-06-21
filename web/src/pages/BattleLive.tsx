@@ -28,21 +28,22 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; text:
 };
 
 const BattleLive: React.FC = () => {
-  const { connect: connectBattle, resetBattle, getState } = useBattle();
+  const { connect: connectBattle, resetBattle, getState, connectionStatus } = useBattle();
   const {
     my_pets, opp_pets, my_active, opp_active,
-    round, result, suggestions, connected,
+    round, result, suggestions,
     formattedEvents, battleSummary, skillAnalysis, traits, oppTraits,
     hookAdvice, oppSkillAnalysis, oppSkillSource,
     tacticalRecommendations,
   } = useBattleStore();
-  const [wsStarted, setWsStarted] = useState(false);
   const [starting, setStarting] = useState(false);
 
   const { startMonitoring, stopMonitoring } = useSnifferMonitor();
   const sniffer = useSnifferStore();
 
-  const startWs = () => { connectBattle(); setWsStarted(true); };
+  const startWs = () => {
+    connectBattle();
+  };
 
   const handleStart = async () => {
     setStarting(true);
@@ -118,13 +119,17 @@ const BattleLive: React.FC = () => {
 
       {/* 战斗 WebSocket 控制 */}
       <Space style={{ marginBottom: 12 }} wrap>
-        {!wsStarted ? (
-          <Button type="primary" onClick={startWs}>
-            连接战斗
+        {connectionStatus !== 'connected' ? (
+          <Button
+            type="primary"
+            onClick={startWs}
+            loading={connectionStatus === 'connecting'}
+          >
+            {connectionStatus === 'disconnected' ? '重新连接战斗' : '连接战斗'}
           </Button>
         ) : (
           <>
-            <Tag color={connected ? 'green' : 'red'}>{connected ? '已连接' : '未连接'}</Tag>
+            <Tag color="green">已连接</Tag>
             <Button onClick={resetBattle}>重置</Button>
             <Button onClick={getState}>获取状态</Button>
           </>

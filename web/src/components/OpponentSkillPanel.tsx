@@ -51,6 +51,19 @@ function confidence(s: SkillAnalysis): string | null | undefined {
   return s.prediction?.confidence ?? s.confidence;
 }
 
+const SEVERE_ACCURACY_FLAGS = new Set([
+  'runtime_target_unmatched',
+  'uncalibrated_skill',
+  'runtime_effect_unmodeled',
+]);
+
+function hasReliableKo(s: SkillAnalysis): boolean {
+  if (!s.can_ko) return false;
+  if (confidence(s) === 'low') return false;
+  const flags = s.prediction?.accuracy_flags ?? [];
+  return !flags.some((flag) => SEVERE_ACCURACY_FLAGS.has(flag));
+}
+
 function numberValue(value: unknown): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
@@ -96,7 +109,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
     <Card
       title={
         <span>
-          对手技能 vs {myName}
+          对手技能: {oppName || '对手'} → {myName}
           {sourceLabel && <Tag color={sourceColor} style={{ marginLeft: 8, fontSize: 11 }}>{sourceLabel}</Tag>}
         </span>
       }
@@ -106,7 +119,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <Text type="secondary" style={{ fontSize: 12 }}>
-          {oppName || '对手'} 可能使用的技能及对我方的伤害预测
+          当前对手可能使用的技能及对我方的伤害预测
         </Text>
         {skills.map((s) => {
           const typeColor = TYPE_COLORS[s.skill_element] || '#999';
@@ -120,6 +133,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
           const damageTip = secondary > 0
             ? `本体伤害: ${directDamage(s)}\n额外效果: +${secondary}\n预计总伤害: ${total}`
             : undefined;
+          const reliableKo = hasReliableKo(s);
 
           return (
             <div
@@ -131,8 +145,8 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                 gap: 8,
                 padding: '4px 8px',
                 borderRadius: 6,
-                background: s.can_ko ? '#fff2f0' : 'transparent',
-                border: s.can_ko ? '1px solid #ffccc7' : '1px solid transparent',
+                background: reliableKo ? '#fff2f0' : 'transparent',
+                border: reliableKo ? '1px solid #ffccc7' : '1px solid transparent',
               }}
             >
               <Tag style={{ margin: 0, minWidth: 48, textAlign: 'center', background: typeColor, color: textColorFor(typeColor), border: 'none', fontWeight: 600, fontSize: 11 }}>
@@ -156,7 +170,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                     </Tooltip>
                   )}
                   <Tooltip title={damageTip}>
-                    <Text style={{ fontSize: 14, fontWeight: s.can_ko ? 700 : 600, color: s.can_ko ? '#ff4d4f' : undefined }}>
+                    <Text style={{ fontSize: 14, fontWeight: reliableKo ? 700 : 600, color: reliableKo ? '#ff4d4f' : undefined }}>
                       {total}
                     </Text>
                   </Tooltip>
@@ -173,7 +187,7 @@ export default function OpponentSkillPanel({ skills, source, myActive, oppName }
                     </Tag>
                   )}
                   {s.is_stab && <Tag color="blue" style={{ fontSize: 11, margin: 0 }}>STAB</Tag>}
-                  {s.can_ko && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>危险!</Tag>}
+                  {reliableKo && <Tag color="red" style={{ fontSize: 11, margin: 0 }}>危险!</Tag>}
                   <Tooltip title={s.validation_hint || s.warnings?.join('\n') || undefined}>
                     {confidenceTag(conf)}
                   </Tooltip>

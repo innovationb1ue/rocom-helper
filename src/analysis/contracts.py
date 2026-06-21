@@ -5,7 +5,9 @@
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, NotRequired, TypedDict, Union
+from typing import Any, Dict, List, Literal, Union
+
+from typing_extensions import NotRequired, TypedDict
 
 
 class BattleBuffContract(TypedDict, total=False):
@@ -64,6 +66,8 @@ class ConnectedMessage(TypedDict):
 class StateUpdateMessage(TypedDict):
     type: Literal["state_update"]
     state: BattleStateContract
+    stream_id: NotRequired[str]
+    seq: NotRequired[int]
 
 
 class BattleEventMessage(TypedDict):
@@ -93,6 +97,9 @@ class SkillAnalysisMessage(TypedDict):
     opp_traits: List[Dict[str, Any]]
     opp_skill_analysis: List[Dict[str, Any]]
     opp_skill_source: str
+    round_number: NotRequired[int]
+    my_active_uid: NotRequired[str]
+    opp_active_uid: NotRequired[str]
 
 
 class HookAdviceMessage(TypedDict):
@@ -106,6 +113,9 @@ class TacticalRecommendationsMessage(TypedDict):
     opp_predicted: List[Dict[str, Any]]
     round_number: int
     confidence: str
+    model_confidence: NotRequired[str]
+    my_active_uid: NotRequired[str]
+    opp_active_uid: NotRequired[str]
     primary_plan: NotRequired[str]
     warnings: NotRequired[List[str]]
     metrics: NotRequired[Dict[str, Any]]

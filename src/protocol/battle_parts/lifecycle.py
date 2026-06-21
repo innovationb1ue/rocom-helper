@@ -1,19 +1,24 @@
-"""Lifecycle constants and helpers for battle protocol extraction."""
+"""Lifecycle opcode extraction compatibility facade."""
 from __future__ import annotations
 
-from typing import Dict
+from src.protocol.battle_parts.lifecycle_core import (
+    BATTLE_RESULT_MAP,
+    extract_1316_enter,
+    extract_131a_round_start,
+    extract_132c_finish,
+)
+from src.protocol.battle_parts.lifecycle_flow import (
+    extract_1312_round_flow,
+    extract_1313_round_confirm,
+    extract_1314_round_confirm_rsp,
+)
 
-BATTLE_RESULT_MAP: Dict[int, str] = {
-    0: "NULL",
-    2: "WIN",
-    4: "LOSE",
-    10: "MONSTER_RUNAWAY",
-    12: "RUNAWAY",
-    260: "RUNAWAY_ROLE_MAGIC",
-    18: "WIN_DEFEAT",
-    34: "WIN_CATCH",
-    66: "WIN_HP",
-    68: "LOSE_HP",
-    132: "MONSTER_ESCAPE",
-    516: "MONSTER_ESCAPE2",
-}
+__all__ = [
+    "BATTLE_RESULT_MAP",
+    "extract_1312_round_flow",
+    "extract_1313_round_confirm",
+    "extract_1314_round_confirm_rsp",
+    "extract_1316_enter",
+    "extract_131a_round_start",
+    "extract_132c_finish",
+]

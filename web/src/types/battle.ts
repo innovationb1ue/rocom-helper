@@ -197,6 +197,9 @@ export interface TacticalRecommendation {
   opp_predicted: OpponentAction[];
   round_number: number;
   confidence: string;
+  model_confidence?: string;
+  my_active_uid?: string;
+  opp_active_uid?: string;
   primary_plan?: string;
   warnings?: string[];
   metrics?: Record<string, unknown>;
@@ -204,14 +207,28 @@ export interface TacticalRecommendation {
   opponent_profile?: Record<string, unknown>;
 }
 
+export interface AnalysisContext {
+  round_number?: number;
+  my_active_uid?: string;
+  opp_active_uid?: string;
+}
+
 export interface BattleState {
   battle_id: number | null;
+  battle_mode?: number | null;
   round: number;
+  max_round?: number;
+  phase?: string;
   my_pets: BattlePet[];
   opp_pets: BattlePet[];
   my_active: BattlePet | null;
   opp_active: BattlePet | null;
   result: string | null;
+  terminal_pending?: boolean;
+  terminal_pending_reason?: string;
+  role_resources?: Record<string, Record<string, unknown>>;
+  battle_resource?: Record<string, unknown>;
+  role_resource_events?: Record<string, unknown>[];
   events: unknown[];
   suggestions: { type: string; message: string }[];
   connected: boolean;
